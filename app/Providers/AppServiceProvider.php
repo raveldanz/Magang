@@ -3,7 +3,10 @@
 namespace App\Providers;
 
 use App\Enums\AccountStatus;
+use App\Enums\ApplicationStatus;
 use App\Enums\FeedbackStatus;
+use App\Models\Application;
+use App\Models\Certificate;
 use App\Models\SystemFeedback;
 use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -71,8 +74,8 @@ class AppServiceProvider extends ServiceProvider
 
             $unreadCount = 0;
             if ($user->isSupervisor()) {
-                $waitingApps = \App\Models\Application::where('status', \App\Enums\ApplicationStatus::WAITING_APPROVAL->value)->count();
-                $waitingCerts = \App\Models\Certificate::where('approval_status', 'waiting_approval')->count();
+                $waitingApps = Application::where('status', ApplicationStatus::WAITING_APPROVAL->value)->count();
+                $waitingCerts = Certificate::where('approval_status', 'waiting_approval')->count();
                 $unreadCount = $waitingApps + $waitingCerts;
             }
 

@@ -38,6 +38,25 @@ class SystemFeedback extends Model
         'responded_at' => 'datetime',
     ];
 
+    /**
+     * Nama peran pengirim yang dibaca manusia (kolom sender_role menyimpan kode peran mentah).
+     * Sama dengan User::roleLabel() tanpa perlu memuat relasi pengguna.
+     */
+    public function senderRoleLabel(): string
+    {
+        return match ((string) $this->sender_role) {
+            'super_admin' => 'Super Admin',
+            'admin' => 'Admin Dinas',
+            'supervisor' => 'Supervisor',
+            'mentor', 'pembimbing' => 'Mentor Lapangan',
+            'dosen', 'academic_advisor', 'lecturer' => 'Pembimbing',
+            'universitas', 'university' => 'Admin Kampus/Sekolah',
+            'mahasiswa', 'student' => 'Peserta Magang',
+            '' => '-',
+            default => ucwords(str_replace('_', ' ', (string) $this->sender_role)),
+        };
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

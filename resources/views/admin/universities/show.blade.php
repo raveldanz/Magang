@@ -10,10 +10,10 @@
                 </a>
                 <div>
                     <h2 class="cc-title font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                        <span>Pusat Kendali Perguruan Tinggi<span class="cc-hide-m">: {{ $university->name }}</span></span>
+                        <span>Pusat Kendali Kampus/Sekolah<span class="cc-hide-m">: {{ $university->name }}</span></span>
                     </h2>
                     <p class="hidden sm:block text-xs sm:text-sm text-gray-500 mt-0.5">
-                        Manajemen terpadu Dosen Pembimbing, Mahasiswa, Akun Admin Portal, dan Kebijakan Penilaian
+                        Manajemen terpadu Pembimbing, Peserta Magang, Akun Admin Portal, dan Kebijakan Penilaian
                     </p>
                 </div>
             </div>
@@ -35,7 +35,7 @@
     </x-slot>
 
     <div class="cc-wrap py-8" x-data="{ 
-        activeTab: '{{ request('tab', $activeTab ?? 'dosen') }}',
+        activeTab: @js(request('tab', $activeTab ?? 'dosen')),
         showAddDosenModal: false,
         showAssignAdvisorModal: false,
         selectedApplicationId: null,
@@ -72,11 +72,11 @@
                     <!-- Sisi Kiri: Logo Resmi, Nama & Informasi Kontak -->
                     <div class="cc-hero-main flex items-start gap-4 sm:gap-6 flex-1 min-w-0">
                         <div class="cc-logo border border-slate-200 rounded-xl p-2 bg-white shadow-2xs flex items-center justify-center shrink-0 overflow-hidden"
-                             style="width: 88px; height: 88px; min-width: 88px; min-height: 88px; max-width: 88px; max-height: 88px;">
+                             style="height: 88px; min-width: 88px; max-width: 180px;">
                             @if($univLogoUrl)
-                                <img src="{{ $univLogoUrl }}" alt="Logo {{ $university->name }}" class="w-16 h-16 object-contain shrink-0" style="width: 64px; height: 64px; max-width: 64px; max-height: 64px; object-fit: contain;">
+                                <img src="{{ $univLogoUrl }}" alt="Logo {{ $university->name }}" class="w-16 h-16 object-contain shrink-0" style="height: 64px; width: auto; max-width: 160px; object-fit: contain;">
                             @else
-                                <img src="{{ asset('images/default-university.svg') }}" alt="Default Logo {{ $university->name }}" class="w-16 h-16 object-contain shrink-0" style="width: 64px; height: 64px; max-width: 64px; max-height: 64px; object-fit: contain;">
+                                <img src="{{ asset('images/default-university.svg') }}" alt="Default Logo {{ $university->name }}" class="w-16 h-16 object-contain shrink-0" style="height: 64px; width: auto; max-width: 160px; object-fit: contain;">
                             @endif
                         </div>
 
@@ -129,12 +129,12 @@
                                         @if($university->evaluation_scheme === 'mentor_only')
                                             100% Mentor Dinas
                                         @else
-                                            Mentor {{ $university->weight_mentor ?? 40 }}% · Dosen {{ $university->weight_lecturer ?? 60 }}%
+                                            Mentor {{ $university->weight_mentor ?? 40 }}% · Pembimbing {{ $university->weight_lecturer ?? 60 }}%
                                         @endif
                                     </dd>
                                 </div>
                                 <div class="min-w-0">
-                                    <dt class="text-xs font-semibold uppercase tracking-wider text-slate-400">Penugasan Dosen</dt>
+                                    <dt class="text-xs font-semibold uppercase tracking-wider text-slate-400">Penugasan Pembimbing</dt>
                                     <dd class="mt-1 text-sm font-semibold text-slate-800">
                                         {{ $university->require_dpl ? 'Wajib ditetapkan' : 'Opsional' }}
                                     </dd>
@@ -161,7 +161,7 @@
                                 {{ $university->pic_name ?? 'Belum Ditentukan' }}
                             </div>
                             <div class="text-slate-600 text-xs">
-                                {{ $university->pic_position ?? 'Pimpinan / Penanggung Jawab MBKM' }}
+                                {{ $university->pic_position ?? 'Pimpinan / Penanggung Jawab Magang' }}
                             </div>
                             @if($university->pic_nip)
                                 <div class="text-slate-600 text-xs font-mono">
@@ -187,7 +187,7 @@
                                             @click="$dispatch('open-confirm-modal', {
                                                 form: $el.form,
                                                 title: 'Buat Akun Admin Kampus',
-                                                message: 'Sistem akan membuat akun login portal untuk perwakilan kampus agar dapat mengelola dosen pembimbing secara mandiri.',
+                                                message: 'Sistem akan membuat akun login portal untuk perwakilan kampus agar dapat mengelola pembimbing secara mandiri.',
                                                 label: 'Perguruan tinggi:',
                                                 name: @js($university->name),
                                                 desc: 'Password awal: password',
@@ -208,14 +208,14 @@
             <!-- Ringkasan Metrik Kampus (satu panel, garis pemisah tipis) -->
             <div class="cc-metrics grid grid-cols-2 lg:grid-cols-5 gap-px bg-slate-200/70 rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs">
                 <div class="bg-white p-4 sm:p-5">
-                    <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Mahasiswa</div>
+                    <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Peserta Magang</div>
                     <div class="mt-1.5 flex items-baseline gap-1.5">
                         <span class="text-2xl font-bold text-slate-900">{{ $stats['total_students'] }}</span>
                         <span class="text-sm text-slate-500">orang</span>
                     </div>
                 </div>
                 <div class="bg-white p-4 sm:p-5">
-                    <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Dosen Pembimbing</div>
+                    <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Pembimbing</div>
                     <div class="mt-1.5 flex items-baseline gap-1.5">
                         <span class="text-2xl font-bold text-slate-900">{{ $stats['total_dosens'] }}</span>
                         <span class="text-sm text-slate-500">terdaftar</span>
@@ -253,7 +253,7 @@
                             :class="activeTab === 'dosen' ? 'cc-active border-blue-600 text-blue-600 font-black' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold'"
                             class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                        <span>Dosen Pembimbing</span>
+                        <span>Pembimbing</span>
                     </button>
 
                     <!-- Tab 2: Mahasiswa Terdaftar & Status Magang -->
@@ -262,7 +262,7 @@
                             :class="activeTab === 'mahasiswa' ? 'cc-active border-blue-600 text-blue-600 font-black' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold'"
                             class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        <span>Mahasiswa Kampus</span>
+                        <span>Peserta Magang Kampus</span>
                     </button>
 
                     <!-- Tab 3: Akun Admin Portal Kampus -->

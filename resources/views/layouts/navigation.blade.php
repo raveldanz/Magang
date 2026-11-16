@@ -113,7 +113,7 @@
                         </a>
                         <a href="{{ route('admin.universities.index') }}" 
                            class="transition py-1 {{ request()->routeIs('admin.universities.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Universitas
+                            Kampus & Sekolah
                         </a>
 
                         <a href="{{ route('public.projects.index') }}" 
@@ -258,7 +258,7 @@
                         </a>
                         <a href="{{ route('lecturer.monitoring.index') }}" 
                            class="transition py-1 {{ request()->routeIs('lecturer.monitoring.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Mahasiswa Bimbingan
+                            Peserta Bimbingan
                         </a>
                         <a href="{{ route('lecturer.logbooks.index') }}" 
                            class="transition py-1 {{ request()->routeIs('lecturer.logbooks.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
@@ -266,19 +266,19 @@
                         </a>
 
                     @elseif ($isMentor)
-                        <a href="{{ route('mentor.dashboard') }}" 
-                           class="transition py-1 {{ request()->routeIs('mentor.dashboard') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Portal Mentor
+                        <a href="{{ route('mentor.dashboard') }}"
+                           class="transition py-1 text-base {{ request()->routeIs('mentor.dashboard', 'mentor.students.*', 'mentor.evaluations.*') ? 'text-blue-700 font-bold border-b-2 border-blue-600' : 'text-slate-700 hover:text-blue-700' }}">
+                            Beranda &amp; Tugas
                         </a>
-                        <a href="{{ route('mentor.logbooks.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('mentor.logbooks.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Review Logbook
+                        <a href="{{ route('mentor.logbooks.index') }}"
+                           class="transition py-1 text-base {{ request()->routeIs('mentor.logbooks.*') ? 'text-blue-700 font-bold border-b-2 border-blue-600' : 'text-slate-700 hover:text-blue-700' }}">
+                            Periksa Logbook
                         </a>
 
                     @elseif ($isUniversitas)
                         <a href="{{ route('university.dashboard') }}" 
                            class="transition py-1 {{ request()->routeIs('university.dashboard') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Portal Universitas
+                            Portal Kampus/Sekolah
                         </a>
                         <a href="{{ route('university.lecturers.index') }}" 
                            class="transition py-1 {{ request()->routeIs('university.lecturers.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
@@ -297,8 +297,8 @@
             <div class="hidden md:flex items-center gap-3">
 
                 @php
-                    $navHasUnreadDot = Auth::user() ? (\App\Services\NotificationService::hasUnreadDot(Auth::user()) || ((int) ($unreadCount ?? 0) > 0)) : false;
                     $navAllNotifs = Auth::user() ? \App\Services\NotificationService::getNotificationsForUser(Auth::user()) : [];
+                    $navHasUnreadDot = Auth::user() ? (\App\Services\NotificationService::hasUnreadDot(Auth::user(), $navAllNotifs) || ((int) ($unreadCount ?? 0) > 0)) : false;
                     // Pesan chat belum dibaca didahulukan agar tidak tenggelam di bawah pemberitahuan otomatis lain
                     $navIsUnreadChat = fn ($n) => ($n['category'] ?? '') === 'chat' && empty($n['is_read']);
                     $navQuickNotifs = array_slice(array_merge(
@@ -357,7 +357,8 @@
                         <div class="space-y-1.5 max-h-72 overflow-y-auto">
                             @forelse($navQuickNotifs as $qn)
                                 <a href="{{ $qn['action_url'] ?? route('notifications.index') }}" class="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-slate-50 transition block">
-                                    <span class="text-xl shrink-0 mt-0.5">{{ $qn['icon'] ?? '' }}</span>
+                                    {{-- Ikon garis, bukan emoji tersimpan ($qn['icon']): tampilan peran senior tanpa emoji --}}
+                                    <svg class="w-5 h-5 shrink-0 mt-0.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0"/></svg>
                                     <div class="space-y-0.5 overflow-hidden">
                                         <div class="text-xs font-bold text-slate-800 truncate">{{ $qn['title'] }}</div>
                                         <div class="text-[11px] text-slate-500 line-clamp-1">{{ $qn['message'] }}</div>
@@ -393,8 +394,8 @@
                             class="flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-slate-200 hover:border-slate-300 bg-white transition cursor-pointer shadow-2xs">
                         <span class="text-xs font-semibold text-slate-700 max-w-[140px] truncate">{{ Auth::user()->name ?? 'Pengguna' }}</span>
                         @if($navAvatarLogo)
-                            <div class="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
-                                <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-0.5" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
+                            <div class="rounded-lg bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs" style="height: 28px; min-width: 28px; max-width: 52px; padding: 2px;">
+                                <img src="{{ $navAvatarLogo }}" alt="Logo" class="object-contain" style="height: 100%; width: auto; max-width: 100%;" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
                             </div>
                         @else
                             <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
@@ -419,8 +420,8 @@
                         <div class="px-3 py-2.5 bg-slate-50 rounded-2xl mb-2 flex items-center justify-between" style="background-color: #f8fafc !important;">
                             <div class="flex items-center gap-2.5 overflow-hidden">
                                 @if($navAvatarLogo)
-                                    <div class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
-                                        <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-1" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
+                                    <div class="rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs" style="height: 36px; min-width: 36px; max-width: 64px; padding: 4px;">
+                                        <img src="{{ $navAvatarLogo }}" alt="Logo" class="object-contain" style="height: 100%; width: auto; max-width: 100%;" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
                                     </div>
                                 @else
                                     <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
@@ -515,24 +516,24 @@
                                 Portal Pembimbing
                             </a>
                             <a href="{{ route('lecturer.monitoring.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Mahasiswa Bimbingan
+                                Peserta Bimbingan
                             </a>
                             <a href="{{ route('profile.edit') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Pengaturan Akun
                             </a>
                         @elseif ($isMentor)
-                            <a href="{{ route('mentor.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Portal Mentor
+                            <a href="{{ route('mentor.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                Beranda &amp; Tugas
                             </a>
-                            <a href="{{ route('mentor.logbooks.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Review Logbook
+                            <a href="{{ route('mentor.logbooks.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                Periksa Logbook
                             </a>
                             <a href="{{ route('profile.edit') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Pengaturan Akun
                             </a>
                         @elseif ($isUniversitas)
                             <a href="{{ route('university.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Portal Universitas
+                                Portal Kampus/Sekolah
                             </a>
                             <a href="{{ route('university.lecturers.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Pembimbing
@@ -658,8 +659,8 @@
             <div class="p-3 rounded-2xl border border-slate-100 flex items-center justify-between bg-slate-50">
                 <div class="flex items-center gap-2.5">
                     @if($navAvatarLogo)
-                        <div class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
-                            <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-1" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
+                        <div class="rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs" style="height: 36px; min-width: 36px; max-width: 64px; padding: 4px;">
+                            <img src="{{ $navAvatarLogo }}" alt="Logo" class="object-contain" style="height: 100%; width: auto; max-width: 100%;" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
                         </div>
                     @else
                         <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
@@ -695,7 +696,7 @@
                         <span>Instansi Dinas</span>
                     </a>
                     <a href="{{ route('admin.universities.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('admin.universities.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <span>Perguruan Tinggi</span>
+                        <span>Kampus & Sekolah</span>
                     </a>
                     <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('admin.users.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         <span>Semua Pengguna</span>
@@ -788,7 +789,7 @@
                     </a>
                     <a href="{{ route('lecturer.monitoring.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('lecturer.monitoring.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         
-                        <span>Mahasiswa Bimbingan</span>
+                        <span>Peserta Bimbingan</span>
                     </a>
                     <a href="{{ route('lecturer.logbooks.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('lecturer.logbooks.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         
@@ -799,13 +800,11 @@
                     </a>
 
                 @elseif ($isMentor)
-                    <a href="{{ route('mentor.dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('mentor.dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        
-                        <span>Portal Mentor</span>
+                    <a href="{{ route('mentor.dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-base font-semibold transition min-h-[48px] {{ request()->routeIs('mentor.dashboard', 'mentor.students.*', 'mentor.evaluations.*') ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-800 hover:bg-slate-50' }}">
+                        <span>Beranda &amp; Tugas</span>
                     </a>
-                    <a href="{{ route('mentor.logbooks.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('mentor.logbooks.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        
-                        <span>Review Logbook</span>
+                    <a href="{{ route('mentor.logbooks.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-base font-semibold transition min-h-[48px] {{ request()->routeIs('mentor.logbooks.*') ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-800 hover:bg-slate-50' }}">
+                        <span>Periksa Logbook</span>
                     </a>
                     <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition {{ request()->routeIs('profile.edit') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         <span>Pengaturan Akun</span>
@@ -814,7 +813,7 @@
                 @elseif ($isUniversitas)
                     <a href="{{ route('university.dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('university.dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         
-                        <span>Portal Universitas</span>
+                        <span>Portal Kampus/Sekolah</span>
                     </a>
                     <a href="{{ route('university.lecturers.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('university.lecturers.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         

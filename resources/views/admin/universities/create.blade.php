@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
             <a href="{{ route('admin.universities.index') }}" class="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 transition flex items-center justify-center shadow-xs" title="Kembali">
@@ -8,16 +8,100 @@
             </a>
             <div>
                 <h2 class="font-black text-xl text-gray-900 tracking-tight">
-                    Tambah Universitas / Perguruan Tinggi Mitra
+                    Tambah Kampus / Sekolah Mitra
                 </h2>
-                <p class="text-xs text-gray-500">Daftarkan perguruan tinggi mitra baru untuk program magang MBKM</p>
+                <p class="text-xs text-gray-500">Daftarkan kampus atau sekolah mitra baru untuk program magang</p>
             </div>
         </div>
     </x-slot>
 
     <div class="py-8">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-xs p-6 sm:p-8">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-xs p-6 sm:p-8"
+                 x-data="{
+                     searchQuery: '',
+                     searchResults: [],
+                     loading: false,
+                     selectedMaster: null,
+                     name: @js(old('name', '')),
+                     code: @js(old('code', '')),
+                     address: @js(old('address', '')),
+
+                     async searchMaster() {
+                         const q = this.searchQuery.trim();
+                         if (q.length < 2) {
+                             this.searchResults = [];
+                             return;
+                         }
+                         this.loading = true;
+                         try {
+                             const res = await fetch(`{{ route('universities.master-search') }}?q=${encodeURIComponent(q)}&limit=8`);
+                             const json = await res.json();
+                             this.searchResults = json.data || [];
+                         } catch (e) {
+                             console.error('Master search error:', e);
+                             this.searchResults = [];
+                         } finally {
+                             this.loading = false;
+                         }
+                     },
+
+                     pickCampus(item) {
+                         this.selectedMaster = item;
+                         this.name = item.name;
+                         this.code = item.acronym || item.code || '';
+                         if (item.city || item.province) {
+                             this.address = `${item.city || ''}, ${item.province || ''}`.replace(/^, /, '').trim();
+                         }
+                         this.searchResults = [];
+                         this.searchQuery = '';
+                     }
+                 }">
+
+                <!-- Kotak Pencarian Master Perguruan Tinggi Nasional -->
+                <div class="mb-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50/90 to-indigo-50/80 border border-blue-200/80 shadow-2xs space-y-2.5">
+                    <div class="flex items-center gap-2 text-blue-900 font-bold text-xs uppercase tracking-wider">
+                        <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        <span>Pencarian Cepat Master Kampus & Sekolah (PDDikti / Kemendikdasmen)</span>
+                    </div>
+                    <p class="text-xs text-slate-600">
+                        Cari nama kampus atau singkatan resmi (misal: "Brawijaya", "UNAIR", "Telkom") untuk mengisi formulir secara otomatis tanpa perlu mengetik manual.
+                    </p>
+                    <div class="relative">
+                        <input type="text"
+                               x-model="searchQuery"
+                               @input.debounce.300ms="searchMaster()"
+                               placeholder="Ketik nama kampus atau singkatan di sini..."
+                               class="w-full text-xs sm:text-sm border-blue-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-white shadow-2xs placeholder-slate-400">
+                        <div x-show="loading" class="absolute right-3 top-2.5 text-xs text-blue-600 font-medium">
+                            Mencari...
+                        </div>
+
+                        <!-- Dropdown Hasil Master -->
+                        <div x-show="searchResults.length > 0"
+                             @click.away="searchResults = []"
+                             class="absolute z-20 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto divide-y divide-slate-100">
+                            <template x-for="item in searchResults" :key="item.name">
+                                <button type="button"
+                                        @click="pickCampus(item)"
+                                        class="w-full text-left px-4 py-2.5 hover:bg-blue-50 transition flex items-center justify-between gap-3 text-xs cursor-pointer">
+                                    <div class="min-w-0">
+                                        <div class="font-bold text-slate-800" x-text="item.name"></div>
+                                        <div class="text-[11px] text-slate-500" x-text="`${item.city || '-'} • ${item.province || '-'}`"></div>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-black bg-blue-100 text-blue-800 shrink-0 uppercase" x-text="item.acronym || item.code"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
+                    <template x-if="selectedMaster">
+                        <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-center justify-between">
+                            <span class="font-medium">Data terisi otomatis dari: <strong x-text="selectedMaster.name"></strong></span>
+                            <button type="button" @click="selectedMaster = null" class="text-emerald-700 hover:text-emerald-900 font-bold text-[11px]">Batal</button>
+                        </div>
+                    </template>
+                </div>
 
                 <form method="POST" action="{{ route('admin.universities.store') }}" enctype="multipart/form-data" class="space-y-6">
                     @csrf
@@ -25,16 +109,16 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="sm:col-span-2">
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                                Nama Resmi Perguruan Tinggi <span class="text-rose-500">*</span>
+                                Nama Resmi Kampus/Sekolah <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" name="name" value="{{ old('name') }}" required placeholder="Contoh: Universitas Airlangga" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="name" x-model="name" required placeholder="Contoh: Universitas Airlangga" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Kode / Singkatan <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" name="code" value="{{ old('code') }}" required placeholder="UNAIR" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono uppercase">
+                            <input type="text" name="code" x-model="code" required placeholder="UNAIR" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono uppercase">
                         </div>
                     </div>
 
@@ -58,7 +142,7 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Alamat Kampus Utama
                         </label>
-                        <textarea name="address" rows="2" placeholder="Jl. Airlangga No. 4-6, Surabaya..." class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">{{ old('address') }}</textarea>
+                        <textarea name="address" x-model="address" rows="2" placeholder="Jl. Airlangga No. 4-6, Surabaya..." class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"></textarea>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -87,7 +171,7 @@
                     <!-- Upload Logo Resmi Kampus (Mobile Friendly Card) -->
                     <div class="pt-4 border-t border-gray-100">
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                            Logo Resmi Perguruan Tinggi (Opsional)
+                            Logo Resmi Kampus/Sekolah (Opsional)
                         </label>
                         <div class="flex flex-col sm:flex-row sm:items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
                             <div class="flex items-center gap-3 shrink-0">
@@ -100,7 +184,7 @@
                                 </div>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <input type="file" id="univLogoInput" name="logo" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml" 
+                                <input type="file" data-max-kb="2048" id="univLogoInput" name="logo" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
                                        onchange="handleLogoPreview(this, 'univLogoPreview', '{{ asset('images/default-university.svg') }}')"
                                        class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer shadow-2xs">
                                 <p class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Format didukung: PNG, JPG, WEBP, SVG. Jika dikosongkan, sistem menyediakan logo default.</p>
@@ -113,7 +197,7 @@
                             Batal
                         </a>
                         <button type="submit" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer text-center justify-center flex items-center">
-                            Daftarkan Universitas
+                            Daftarkan Institusi
                         </button>
                     </div>
                 </form>
@@ -130,7 +214,7 @@
 
             if (input.files && input.files[0]) {
                 const file = input.files[0];
-                
+
                 // Validasi tipe file
                 if (!file.type.startsWith('image/')) {
                     notify('Berkas harus berupa gambar (PNG, JPG, WEBP, atau SVG).');

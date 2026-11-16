@@ -29,4 +29,5 @@ Route::middleware(['auth', 'role:universitas'])->group(function () {
     Route::match(['put', 'patch'], '/university/lecturers/{id}', [UniversityLecturerController::class, 'update'])->name('university.lecturers.update');
     Route::delete('/university/lecturers/{id}', [UniversityLecturerController::class, 'destroy'])->name('university.lecturers.destroy');
     Route::post('/university/lecturers/{id}/reset-password', [UniversityLecturerController::class, 'resetPassword'])->name('university.lecturers.reset_password');
+    Route::post('/university/lecturers/{id}/approve', [UniversityLecturerController::class, 'approve'])->name('university.lecturers.approve');
 });

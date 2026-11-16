@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h2 class="font-bold text-2xl text-gray-900 leading-tight">
                     {{ __('Daftar Pengajuan Magang') }}
@@ -10,6 +10,19 @@
                         Bidang: {{ auth()->user()->unit->name ?? 'Bidang Kerja' }}
                     </p>
                 @endif
+            </div>
+            <div class="flex items-center gap-2">
+                <form action="{{ route('admin.applications.sync_status') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit"
+                            title="Periksa dan sinkronkan status magang yang tanggal mulainya telah tiba ke ACTIVE"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:border-slate-400 active:scale-95 shadow-2xs transition">
+                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        <span>Sinkronkan Status</span>
+                    </button>
+                </form>
             </div>
         </div>
     </x-slot>
@@ -24,7 +37,7 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
                         </div>
                         <div>
-                            <span class="font-medium text-indigo-700">Filter Aktif Perguruan Tinggi:</span>
+                            <span class="font-medium text-indigo-700">Filter Aktif Kampus/Sekolah:</span>
                             <h4 class="font-black text-sm text-indigo-950">{{ $selectedUniversity->name }} {{ $selectedUniversity->code ? "({$selectedUniversity->code})" : '' }}</h4>
                         </div>
                     </div>
@@ -53,7 +66,7 @@
                                 </svg>
                             </div>
                             <input type="text" name="search" value="{{ request('search') }}" 
-                                placeholder="Cari nama mahasiswa, NIM, atau universitas..." 
+                                placeholder="Cari nama peserta magang, NIM/NIS, atau kampus/sekolah..." 
                                 class="w-full text-xs sm:text-sm bg-white border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs font-medium placeholder:text-gray-400 h-10"
                                 style="padding-left: 2.75rem !important; padding-right: 1rem !important;" />
                         </div>
@@ -81,7 +94,7 @@
                         @if(isset($universities))
                             <div>
                                 <select name="university_id" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-2xs bg-white font-medium">
-                                    <option value="">-- Semua Kampus --</option>
+                                    <option value="">-- Semua Kampus/Sekolah --</option>
                                     @foreach ($universities as $unv)
                                         <option value="{{ $unv->id }}" {{ request('university_id') == $unv->id ? 'selected' : '' }}>
                                             {{ $unv->name }} ({{ $unv->code }})
@@ -100,7 +113,7 @@
                                 </div>
                             @else
                                 <select name="unit_id" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-2xs bg-white font-medium">
-                                    <option value="">-- Semua Unit/Divisi --</option>
+                                    <option value="">-- Semua Unit Bidang --</option>
                                     @if (isset($groupedUnits) && $groupedUnits !== null)
                                         @foreach ($groupedUnits as $agencyName => $agencyUnits)
                                             @if(count($groupedUnits) > 1)
@@ -471,7 +484,9 @@
                                     $groupMemberCount = $groupMembers->count();
                                     $groupStatuses = $groupMembers->map(fn($a) => $a->statusValue())->unique();
                                     $isUniformGroupStatus = $groupStatuses->count() === 1;
-                                    $groupPendingOrWaiting = in_array($app->group->status, ['pending', 'waiting_approval']) || in_array($rawStatus, ['pending', 'waiting_approval']);
+                                    $pendingMembersCount = $groupMembers->filter(fn($a) => in_array($a->statusValue(), ['pending', 'waiting_approval'], true))->count();
+                                    $rejectedMembersCount = $groupMembers->filter(fn($a) => $a->statusValue() === 'rejected')->count();
+                                    $groupPendingOrWaiting = in_array($app->group->status, ['pending', 'waiting_approval']) || $pendingMembersCount > 0;
                                 @endphp
                                 <tbody class="text-sm divide-y divide-slate-100 border-b border-slate-200/80" 
                                        x-data="{ expanded: false }">
@@ -513,8 +528,8 @@
 
                                                     <!-- Baris 2: Ketua: [Nama Ketua] • [Nama Universitas] -->
                                                     <div class="text-[11px] text-slate-500 mt-0.5 leading-tight truncate font-normal" 
-                                                         title="Ketua: {{ $app->group->leader?->name ?? $app->user?->name ?? 'Mahasiswa' }} • {{ $app->user?->studentProfile?->universitas ?? '-' }}">
-                                                        <span class="text-slate-600">Ketua: <span class="font-medium text-slate-700">{{ $app->group->leader?->name ?? $app->user?->name ?? 'Mahasiswa' }}</span></span>
+                                                         title="Ketua: {{ $app->group->leader?->name ?? $app->user?->name ?? 'Peserta Magang' }} • {{ $app->user?->studentProfile?->universitas ?? '-' }}">
+                                                        <span class="text-slate-600">Ketua: <span class="font-medium text-slate-700">{{ $app->group->leader?->name ?? $app->user?->name ?? 'Peserta Magang' }}</span></span>
                                                         <span class="text-slate-300 mx-1">•</span>
                                                         <span class="text-slate-500">{{ $app->user?->studentProfile?->universitas ?? '-' }}</span>
                                                     </div>
@@ -559,6 +574,20 @@
                                             @endphp
                                             <x-status-badge :status="$app->group->status ?? $app->status"
                                                 :tooltip="$groupTooltip" />
+                                            @if(!$isUniformGroupStatus)
+                                                <div class="mt-1 flex flex-col items-center gap-0.5">
+                                                    @if($pendingMembersCount > 0)
+                                                        <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                                            {{ $pendingMembersCount }} Menunggu Keputusan
+                                                        </span>
+                                                    @endif
+                                                    @if($rejectedMembersCount > 0)
+                                                        <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                                            {{ $rejectedMembersCount }} Perlu Perbaikan
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            @endif
                                         </td>
                                         <td class="py-3.5 px-6 text-center whitespace-nowrap align-middle">
                                             <div class="flex items-center justify-center">
@@ -581,12 +610,12 @@
                                                     <div class="flex items-center gap-2">
                                                         <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 shrink-0"></span>
                                                         <h5 class="font-extrabold text-xs text-slate-800 uppercase tracking-wider">
-                                                            Daftar Mahasiswa Anggota: {{ $app->group->name }}
+                                                            Daftar Peserta Magang Anggota: {{ $app->group->name }}
                                                         </h5>
-                                                        <span class="text-xs text-slate-400 font-medium">Total {{ $groupMemberCount }} Mahasiswa</span>
+                                                        <span class="text-xs text-slate-400 font-medium">Total {{ $groupMemberCount }} Peserta Magang</span>
                                                     </div>
                                                     <div class="text-[11px] text-slate-500">
-                                                        Buka Detail untuk melihat berkas dan mengelola keputusan per mahasiswa
+                                                        Buka Detail untuk melihat berkas dan mengelola keputusan per peserta magang
                                                     </div>
                                                 </div>
 
@@ -595,9 +624,9 @@
                                                         <thead>
                                                             <tr class="text-[10px] uppercase font-bold text-slate-400 border-b border-slate-100 bg-slate-50/60">
                                                                 <th class="py-2 px-3">Peran</th>
-                                                                <th class="py-2 px-3">Nama Mahasiswa &amp; NIM</th>
+                                                                <th class="py-2 px-3">Nama Peserta Magang &amp; NIM/NIS</th>
                                                                 <th class="py-2 px-3">Jurusan &amp; Kampus</th>
-                                                                <th class="py-2 px-3 text-center">Status Mahasiswa</th>
+                                                                <th class="py-2 px-3 text-center">Status Peserta Magang</th>
                                                                 <th class="py-2 px-3 text-center">Aksi</th>
                                                             </tr>
                                                         </thead>
@@ -617,10 +646,10 @@
                                                                     </td>
                                                                     <td class="py-2.5 px-3">
                                                                         <div class="font-bold text-slate-900 text-xs">
-                                                                            {{ $memberApp->user?->name ?? 'Mahasiswa' }}
+                                                                            {{ $memberApp->user?->name ?? 'Peserta Magang' }}
                                                                         </div>
                                                                         <div class="text-[11px] text-slate-400 font-mono">
-                                                                            NIM: {{ $memberApp->user?->studentProfile?->nim ?? '-' }}
+                                                                            NIM/NIS: {{ $memberApp->user?->studentProfile?->nim ?? '-' }}
                                                                         </div>
                                                                     </td>
                                                                     <td class="py-2.5 px-3">
@@ -665,8 +694,8 @@
                                                     {{ strtoupper(substr($app->user?->name ?? 'M', 0, 1)) }}
                                                 </div>
                                                 <div class="min-w-0 max-w-[240px] sm:max-w-[280px]">
-                                                    <a href="{{ route('admin.applications.show', $app->id) }}" class="font-bold text-slate-900 text-xs sm:text-sm hover:text-blue-600 transition leading-tight truncate block" title="{{ $app->user?->name ?? 'Mahasiswa' }}">
-                                                        {{ $app->user?->name ?? 'Mahasiswa' }}
+                                                    <a href="{{ route('admin.applications.show', $app->id) }}" class="font-bold text-slate-900 text-xs sm:text-sm hover:text-blue-600 transition leading-tight truncate block" title="{{ $app->user?->name ?? 'Peserta Magang' }}">
+                                                        {{ $app->user?->name ?? 'Peserta Magang' }}
                                                     </a>
                                                     <div class="text-[11px] text-slate-500 mt-0.5 leading-tight truncate" title="{{ $app->user?->studentProfile?->universitas ?? '-' }}{{ $app->user?->studentProfile?->jurusan ? ' • ' . $app->user?->studentProfile?->jurusan : '' }}">
                                                         <span class="font-medium text-slate-700">{{ $app->user?->studentProfile?->universitas ?? '-' }}</span>
@@ -762,33 +791,31 @@
                                 $isUniformGroupStatus = $groupStatuses->count() === 1;
                                 $groupPendingOrWaiting = in_array($app->group->status, ['pending', 'waiting_approval']) || in_array($rawStatus, ['pending', 'waiting_approval']);
                             @endphp
-                            <div class="p-4 bg-white rounded-2xl border border-indigo-200/90 shadow-2xs space-y-3 relative" 
+                            <div class="p-4 bg-white rounded-2xl border border-indigo-200/90 shadow-2xs space-y-2.5 relative" 
                                  x-data="{ expanded: false }">
-                                @if($groupPendingOrWaiting)
-                                    <div class="absolute top-4 right-4 z-10">
-                                        <input type="checkbox" name="application_ids[]" value="{{ $app->id }}" x-model="selected" class="bulk-cb w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
-                                    </div>
-                                @endif
-                                <div class="flex items-start justify-between gap-2">
-                                    <div class="min-w-0 pr-2">
-                                        <div class="flex items-center gap-1.5 mb-1">
-                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-black bg-indigo-100 text-indigo-800 border border-indigo-200 uppercase">
-                                                Jalur Kelompok
-                                            </span>
-                                            <span class="font-mono text-[10px] font-bold text-slate-500">#{{ $app->group->code }}</span>
-                                        </div>
-                                        <h4 class="font-bold text-sm text-slate-900 leading-snug truncate">{{ $app->group->name }}</h4>
-                                        <p class="text-xs text-slate-600 mt-0.5 font-normal">Ketua: {{ $app->group->leader?->name ?? $app->user?->name ?? 'Mahasiswa' }}</p>
-                                        <p class="text-xs text-slate-500 mt-0.5">{{ $app->user?->studentProfile?->universitas ?? '-' }}</p>
-                                    </div>
-                                    <div class="text-right shrink-0 {{ $groupPendingOrWaiting ? 'pr-8' : '' }}">
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
                                         <x-status-badge :status="$app->group->status ?? $app->status" />
                                         @if(! $isUniformGroupStatus)
-                                            <div class="mt-1 text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 inline-block">
+                                            <span class="text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 inline-block">
                                                 Status Beragam
-                                            </div>
+                                            </span>
                                         @endif
                                     </div>
+                                    @if($groupPendingOrWaiting)
+                                        <input type="checkbox" name="application_ids[]" value="{{ $app->id }}" x-model="selected" class="bulk-cb w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0">
+                                    @endif
+                                </div>
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black bg-indigo-100 text-indigo-800 border border-indigo-200 uppercase whitespace-nowrap">
+                                        Jalur Kelompok
+                                    </span>
+                                    <span class="font-mono text-[10px] font-bold text-slate-500 whitespace-nowrap">#{{ $app->group->code }}</span>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm text-slate-900 leading-snug">{{ $app->group->name }}</h4>
+                                    <p class="text-xs text-slate-600 mt-0.5 font-normal">Ketua: {{ $app->group->leader?->name ?? $app->user?->name ?? 'Peserta Magang' }}</p>
+                                    <p class="text-xs text-slate-500 mt-0.5">{{ $app->user?->studentProfile?->universitas ?? '-' }}</p>
                                 </div>
 
                                 <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1.5">
@@ -801,7 +828,7 @@
                                     </div>
                                     <div class="flex items-center justify-between text-slate-600">
                                         <span class="text-slate-400">Diajukan:</span>
-                                        <span class="font-mono text-slate-500">{{ $app->group->created_at ? $app->group->created_at->format('d M Y, H:i') : $app->created_at->format('d M Y, H:i') }}</span>
+                                        <span class="font-mono text-slate-500">{{ $app->group->created_at ? $app->group->created_at->translatedFormat('d M Y, H:i') : $app->created_at->translatedFormat('d M Y, H:i') }}</span>
                                     </div>
                                 </div>
 
@@ -825,9 +852,9 @@
                                                         <span class="px-1.5 py-0.5 rounded text-[9px] font-black {{ $memberApp->role_in_group === 'leader' ? 'bg-purple-100 text-purple-800 border border-purple-200' : 'bg-slate-200 text-slate-700' }}">
                                                             {{ $memberApp->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }}
                                                         </span>
-                                                        <span class="font-bold text-xs text-slate-900">{{ $memberApp->user?->name ?? 'Mahasiswa' }}</span>
+                                                        <span class="font-bold text-xs text-slate-900">{{ $memberApp->user?->name ?? 'Peserta Magang' }}</span>
                                                     </div>
-                                                    <p class="text-[11px] text-slate-500 mt-0.5">NIM: {{ $memberApp->user?->studentProfile?->nim ?? '-' }} · {{ $memberApp->user?->studentProfile?->jurusan ?? '-' }}</p>
+                                                    <p class="text-[11px] text-slate-500 mt-0.5">NIM/NIS: {{ $memberApp->user?->studentProfile?->nim ?? '-' }} · {{ $memberApp->user?->studentProfile?->jurusan ?? '-' }}</p>
                                                 </div>
                                                 <x-status-badge :status="$memberApp->status" />
                                             </div>
@@ -850,23 +877,21 @@
                             </div>
                         @else
                             <!-- Jalur Individu Mobile -->
-                            <div class="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs space-y-3 relative">
-                                @if(in_array($rawStatus, ['pending', 'waiting_approval']))
-                                    <div class="absolute top-4 right-4 z-10">
-                                        <input type="checkbox" name="application_ids[]" value="{{ $app->id }}" x-model="selected" class="bulk-cb w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
-                                    </div>
-                                @endif
-                                <div class="flex items-start justify-between gap-2">
-                                    <div class="min-w-0 pr-2">
-                                        <h4 class="font-bold text-sm text-slate-900 leading-snug truncate">{{ $app->user?->name ?? 'Mahasiswa' }}</h4>
-                                        <p class="text-xs text-slate-500 mt-0.5">{{ $app->user?->studentProfile?->universitas ?? '-' }} <span class="text-slate-400">· {{ $app->user?->studentProfile?->jurusan ?? '-' }}</span></p>
-                                    </div>
-                                    <div class="text-right shrink-0 {{ in_array($rawStatus, ['pending', 'waiting_approval']) ? 'pr-8' : '' }}">
+                            <div class="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs space-y-2.5 relative">
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2 flex-wrap">
                                         <x-status-badge :status="$app->status" />
                                         @if($app->isPastEndDate())
-                                            <div class="mt-1 text-[10px] font-bold text-rose-700">Lewat {{ $app->daysPastEndDate() }} hari</div>
+                                            <span class="text-[10px] font-bold text-rose-700">Lewat {{ $app->daysPastEndDate() }} hari</span>
                                         @endif
                                     </div>
+                                    @if(in_array($rawStatus, ['pending', 'waiting_approval']))
+                                        <input type="checkbox" name="application_ids[]" value="{{ $app->id }}" x-model="selected" class="bulk-cb w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0">
+                                    @endif
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm text-slate-900 leading-snug">{{ $app->user?->name ?? 'Peserta Magang' }}</h4>
+                                    <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">{{ $app->user?->studentProfile?->universitas ?? '-' }} <span class="text-slate-400">· {{ $app->user?->studentProfile?->jurusan ?? '-' }}</span></p>
                                 </div>
 
                                 @if($isActive && $isReadyToComplete)
@@ -895,7 +920,7 @@
                                     </div>
                                     <div class="flex items-center justify-between text-slate-600">
                                         <span class="text-slate-400">Diajukan:</span>
-                                        <span class="font-mono text-slate-500">{{ $app->created_at->format('d M Y, H:i') }}</span>
+                                        <span class="font-mono text-slate-500">{{ $app->created_at->translatedFormat('d M Y, H:i') }}</span>
                                     </div>
                                 </div>
 

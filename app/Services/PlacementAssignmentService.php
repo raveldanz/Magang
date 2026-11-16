@@ -40,7 +40,7 @@ class PlacementAssignmentService
 
         if (! $mentorId && ! $advisorId) {
             throw ValidationException::withMessages([
-                'assignment' => 'Pilih minimal satu pembimbing (Mentor Dinas atau DPL) yang akan ditetapkan.',
+                'assignment' => 'Pilih minimal satu pembimbing (Mentor Dinas atau Pembimbing) yang akan ditetapkan.',
             ]);
         }
 
@@ -98,7 +98,7 @@ class PlacementAssignmentService
 
         if (! $mentor || ($agencyId !== null && (int) $mentor->agency_profile_id !== (int) $agencyId)) {
             throw ValidationException::withMessages([
-                'mentor_id' => 'Mentor yang dipilih harus akun mentor resmi dari instansi penempatan mahasiswa.',
+                'mentor_id' => 'Mentor yang dipilih harus akun mentor resmi dari instansi penempatan peserta magang.',
             ]);
         }
 
@@ -118,7 +118,13 @@ class PlacementAssignmentService
 
         if (! $advisor || ($studentUnivId && (int) $advisor->university_id !== (int) $studentUnivId)) {
             throw ValidationException::withMessages([
-                'academic_advisor_id' => 'Dosen Pembimbing yang dipilih harus berasal dari perguruan tinggi mahasiswa.',
+                'academic_advisor_id' => 'Pembimbing yang dipilih harus berasal dari kampus/sekolah peserta magang.',
+            ]);
+        }
+
+        if ($advisor->isPendingApproval()) {
+            throw ValidationException::withMessages([
+                'academic_advisor_id' => "Akun pembimbing {$advisor->name} masih menunggu persetujuan, jadi belum bisa ditugaskan.",
             ]);
         }
 

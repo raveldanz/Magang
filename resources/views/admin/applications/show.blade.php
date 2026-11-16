@@ -78,8 +78,22 @@
                                 <h3 class="text-base sm:text-lg font-black text-slate-900 mt-0.5">{{ $application->group->name }}</h3>
                             </div>
                         </div>
+                        @php
+                            $groupPendingOrWaitingCount = $application->group->applications->filter(fn ($m) => in_array($m->statusValue(), ['pending', 'waiting_approval'], true))->count();
+                            $groupRejectedCount = $application->group->applications->filter(fn ($m) => $m->statusValue() === 'rejected')->count();
+                        @endphp
                         <div class="flex items-center gap-2 flex-wrap">
-                            @if(in_array($application->group->status, ['pending', 'waiting_approval']) || in_array($application->statusValue(), ['pending', 'waiting_approval']))
+                            @if($groupPendingOrWaitingCount > 0)
+                                <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 border border-amber-200 text-[11px] font-bold">
+                                    {{ $groupPendingOrWaitingCount }} Anggota Menunggu Keputusan
+                                </span>
+                            @endif
+                            @if($groupRejectedCount > 0)
+                                <span class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-800 border border-rose-200 text-[11px] font-bold">
+                                    {{ $groupRejectedCount }} Anggota Perlu Perbaikan Berkas
+                                </span>
+                            @endif
+                            @if(in_array($application->group->status, ['pending', 'waiting_approval']) || $groupPendingOrWaitingCount > 0)
                                 <button type="button" 
                                         @click="showGroupModal = true"
                                         class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-xs hover:shadow transition active:scale-95 cursor-pointer">
@@ -161,7 +175,7 @@
                                         <option value="">-- Tetapkan Nanti atau Tetap Saat Ini --</option>
                                         @if(isset($pembimbings))
                                             @foreach($pembimbings as $pmb)
-                                                <option value="{{ $pmb->id }}">{{ $pmb->name }} - {{ $pmb->unit->name ?? 'Bidang Kerja' }}</option>
+                                                <option value="{{ $pmb->id }}">{{ $pmb->name }} ({{ $pmb->email }}) - {{ $pmb->unit->name ?? 'Bidang Kerja' }}</option>
                                             @endforeach
                                         @endif
                                     </select>
@@ -191,7 +205,7 @@
                     <!-- Daftar Anggota Tim -->
                     <div class="space-y-2">
                         <div class="flex items-center justify-between text-xs text-slate-700 font-bold">
-                            <span>Anggota Tim Terdaftar ({{ $application->group->applications->count() }} Mahasiswa):</span>
+                            <span>Anggota Tim Terdaftar ({{ $application->group->applications->count() }} Peserta Magang):</span>
                             @if($application->group->proposal_letter_path)
                                 <div class="flex items-center gap-2">
                                     <a href="{{ route('documents.group.proposal', $application->group->id) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-2xs transition active:scale-95 shrink-0 cursor-pointer">
@@ -211,14 +225,14 @@
                                    class="p-3 rounded-xl border transition flex items-center justify-between {{ $grpMember->id === $application->id ? 'bg-indigo-100/80 border-indigo-300 font-bold text-indigo-950 ring-2 ring-indigo-400/30' : 'bg-white border-slate-200 hover:border-indigo-300 text-slate-800' }}">
                                     <div class="min-w-0 pr-2">
                                         <div class="text-xs truncate font-bold text-slate-900">{{ $grpMember->user?->name }}</div>
-                                        <div class="text-[11px] text-slate-500 font-mono">NIM: {{ $grpMember->user?->studentProfile?->nim ?? '-' }}</div>
+                                        <div class="text-[11px] text-slate-500 font-mono">NIM/NIS: {{ $grpMember->user?->studentProfile?->nim ?? '-' }}</div>
                                     </div>
                                     <div class="text-right shrink-0">
                                         <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase {{ $grpMember->role_in_group === 'leader' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600' }}">
                                             {{ $grpMember->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }}
                                         </span>
                                         <div class="mt-0.5">
-                                            <span class="text-[10px] font-bold {{ $grpMember->statusValue() === 'accepted' ? 'text-emerald-700' : ($grpMember->statusValue() === 'rejected' ? 'text-rose-700' : 'text-slate-500') }}">
+                                            <span class="text-[10px] font-bold {{ $grpMember->statusValue() === 'active' ? 'text-blue-600' : ($grpMember->statusValue() === 'accepted' ? 'text-emerald-600' : ($grpMember->statusValue() === 'rejected' ? 'text-rose-600' : ($grpMember->statusValue() === 'completed' ? 'text-indigo-600' : 'text-amber-600'))) }}">
                                                 {{ ucfirst($grpMember->statusValue()) }}
                                             </span>
                                         </div>
@@ -240,29 +254,29 @@
                     </div>
                     <div>
                         <h3 class="text-base font-bold text-slate-900">Informasi Pemohon Magang</h3>
-                        <p class="text-xs text-slate-500">Data identitas mahasiswa, kampus asal, dan posisi unit magang yang diajukan</p>
+                        <p class="text-xs text-slate-500">Data identitas peserta magang, kampus asal, dan posisi unit magang yang diajukan</p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 text-xs">
                     <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 space-y-1">
-                        <span class="text-slate-400 font-semibold uppercase text-[10px] tracking-wider block">Mahasiswa</span>
+                        <span class="text-slate-600 font-semibold uppercase text-xs tracking-wider block">Peserta Magang</span>
                         <div class="font-bold text-slate-900 text-sm">{{ $application->user->name }}</div>
-                        <div class="text-slate-500 font-mono">NIM: {{ $application->user->studentProfile->nim ?? '-' }}</div>
-                        <div class="text-slate-500">Telp: {{ $application->user->studentProfile->phone ?? '-' }}</div>
+                        <div class="text-slate-600 font-mono">NIM/NIS: {{ $application->user->studentProfile->nim ?? '-' }}</div>
+                        <div class="text-slate-600">Telp: {{ $application->user->studentProfile->phone ?? '-' }}</div>
                     </div>
 
                     <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 space-y-1">
-                        <span class="text-slate-400 font-semibold uppercase text-[10px] tracking-wider block">Asal Perguruan Tinggi</span>
+                        <span class="text-slate-600 font-semibold uppercase text-xs tracking-wider block">Asal Kampus/Sekolah</span>
                         <div class="font-bold text-slate-900 text-sm">{{ $application->user->studentProfile->universitas ?? $application->user->university ?? '-' }}</div>
-                        <div class="text-slate-500">{{ $application->user->studentProfile->faculty ?? $application->user->studentProfile->fakultas ?? '-' }}</div>
-                        <div class="text-slate-500 font-medium text-blue-700">{{ $application->user->studentProfile->major ?? $application->user->studentProfile->jurusan ?? '-' }}</div>
+                        <div class="text-slate-600">{{ $application->user->studentProfile->faculty ?? $application->user->studentProfile->fakultas ?? '-' }}</div>
+                        <div class="font-medium text-blue-700">{{ $application->user->studentProfile->major ?? $application->user->studentProfile->jurusan ?? '-' }}</div>
                     </div>
 
                     <div class="p-3.5 rounded-xl bg-blue-50/50 border border-blue-100 space-y-1 md:col-span-2 lg:col-span-1">
-                        <span class="text-blue-600 font-semibold uppercase text-[10px] tracking-wider block">Tujuan Magang</span>
+                        <span class="text-blue-700 font-semibold uppercase text-xs tracking-wider block">Tujuan Magang</span>
                         <div class="font-bold text-slate-900 text-sm">{{ $application->unit->name ?? '-' }}</div>
-                        <div class="text-slate-500 mt-1 font-mono text-[11px]">
+                        <div class="text-slate-600 mt-1 font-mono text-xs">
                             {{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d M Y') }} &mdash; {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d M Y') }}
                         </div>
                     </div>
@@ -279,7 +293,7 @@
                     </div>
                     <div>
                         <h3 class="text-base font-bold text-slate-900">Dokumen Persyaratan</h3>
-                        <p class="text-xs text-slate-500">Berkas administrasi yang diunggah mahasiswa untuk diverifikasi</p>
+                        <p class="text-xs text-slate-600">Berkas administrasi yang diunggah peserta magang untuk diverifikasi</p>
                     </div>
                 </div>
 
@@ -287,22 +301,22 @@
                     @forelse ($application->documents as $doc)
                         <div class="flex items-center justify-between p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 hover:border-blue-200 transition">
                             <div class="flex items-center gap-3 min-w-0 mr-3">
-                                <div class="w-9 h-9 rounded-lg bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center shrink-0 font-bold text-[10px]">
+                                <div class="w-9 h-9 rounded-lg bg-rose-50 border border-rose-100 text-rose-700 flex items-center justify-center shrink-0 font-bold text-xs">
                                     PDF
                                 </div>
                                 <div class="min-w-0">
                                     <div class="font-bold text-xs text-slate-800 truncate">{{ $doc->document_type }}</div>
-                                    <div class="text-[11px] text-slate-400 mt-0.5">Format dokumen terverifikasi</div>
+                                    <div class="text-xs text-slate-600 mt-0.5">Format dokumen terverifikasi</div>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
                                 <a href="{{ route('documents.application', $doc->id) }}" target="_blank"
-                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-2xs transition active:scale-95 cursor-pointer">
+                                   class="inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-2xs transition active:scale-95 cursor-pointer">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                     <span>Lihat PDF</span>
                                 </a>
                                 <a href="{{ route('documents.application.download', $doc->id) }}"
-                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold shadow-2xs transition active:scale-95 cursor-pointer"
+                                   class="inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold shadow-2xs transition active:scale-95 cursor-pointer"
                                    title="Unduh berkas">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     <span>Unduh</span>
@@ -326,7 +340,7 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                             </div>
                             <div>
-                                <h3 class="text-base font-bold text-slate-900">Laporan Akhir Mahasiswa</h3>
+                                <h3 class="text-base font-bold text-slate-900">Laporan Akhir Peserta Magang</h3>
                                 <p class="text-xs text-slate-500">Naskah laporan akhir sebagai syarat kelulusan magang</p>
                             </div>
                         </div>
@@ -351,7 +365,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-indigo-100 pb-3">
                         <div>
                             <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 block">Evaluasi & Transkrip Kelulusan Magang</span>
-                            <h3 class="text-base font-black text-gray-900 mt-0.5">Rekapitulasi Penilaian Akhir Mahasiswa</h3>
+                            <h3 class="text-base font-black text-gray-900 mt-0.5">Rekapitulasi Penilaian Akhir Peserta Magang</h3>
                         </div>
                         <a href="{{ route('admin.certificates.show', $application->placement->id) }}" target="_blank"
                             class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-xs">
@@ -388,9 +402,9 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                     </div>
                     <div>
-                        <h4 class="text-sm font-bold text-rose-900">Mahasiswa Belum Mengisi Logbook Aktivitas</h4>
+                        <h4 class="text-sm font-bold text-rose-900">Peserta Magang Belum Mengisi Logbook Aktivitas</h4>
                         <p class="text-xs text-rose-800/90 mt-1 leading-relaxed">
-                            Mahasiswa belum pernah mengisi catatan logbook kegiatan harian selama magang. Sesuai kebijakan program, <strong>mahasiswa yang tidak mengisi logbook tidak dapat dinyatakan lulus magang (COMPLETED)</strong>.
+                            Peserta Magang belum pernah mengisi catatan logbook kegiatan harian selama magang. Sesuai kebijakan program, <strong>peserta magang yang tidak mengisi logbook tidak dapat dinyatakan lulus magang (COMPLETED)</strong>.
                         </p>
                     </div>
                 </div>
@@ -402,7 +416,7 @@
                     <div>
                         <h4 class="text-sm font-bold text-amber-900">Menunggu Input Nilai Evaluasi Magang</h4>
                         <p class="text-xs text-amber-800/90 mt-1 leading-relaxed">
-                            Naskah laporan akhir mahasiswa telah <strong>disetujui</strong>, namun penilaian magang dari <strong>Pembimbing Lapangan / Dosen Pembimbing</strong> belum diisi secara lengkap. Tombol status keputusan <strong>{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</strong> di bawah akan otomatis aktif setelah seluruh komponen penilaian diisi.
+                            Naskah laporan akhir peserta magang telah <strong>disetujui</strong>, namun penilaian magang dari <strong>Pembimbing Lapangan / Pembimbing</strong> belum diisi secara lengkap. Tombol status keputusan <strong>{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</strong> di bawah akan otomatis aktif setelah seluruh komponen penilaian diisi.
                         </p>
                     </div>
                 </div>
@@ -415,9 +429,15 @@
             @endphp
             <div class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-xs"
                  x-data="{ 
-                     status: '{{ old('status', $currentStatusVal) }}' 
+                     status: @js(old('status', $currentStatusVal)),
+                     syncGroup: {{ old('sync_group', in_array($currentStatusVal, ['rejected', 'resigned'], true) ? '0' : '1') == '1' ? 'true' : 'false' }}
                  }"
                  x-init="$watch('status', val => {
+                     if (val === 'rejected' || val === 'resigned') {
+                         syncGroup = false;
+                     } else {
+                         syncGroup = true;
+                     }
                      const sel = document.getElementById('status-select');
                      if (sel) {
                          sel.value = val;
@@ -434,7 +454,7 @@
                         </div>
                         <div>
                             <h3 class="text-base font-bold text-slate-900">Aksi Verifikasi & Seleksi</h3>
-                            <p class="text-xs text-slate-500">Tentukan status seleksi berkas mahasiswa dan plotting mentor lapangan</p>
+                            <p class="text-xs text-slate-500">Tentukan status seleksi berkas peserta magang dan plotting mentor lapangan</p>
                         </div>
                     </div>
 
@@ -486,16 +506,23 @@
                     @endif
 
                     @if($application->group_id && $application->group)
-                        <div class="mb-5 p-4 rounded-2xl bg-indigo-50/80 border border-indigo-200 flex items-start gap-3 shadow-2xs">
-                            <input type="checkbox" id="sync_group" name="sync_group" value="1" checked
-                                   class="w-4 h-4 mt-0.5 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
-                            <div class="flex-1">
-                                <label for="sync_group" class="text-xs font-bold text-indigo-950 cursor-pointer select-none">
-                                    Terapkan keputusan ini ke seluruh anggota kelompok ({{ $application->group->name }})
-                                </label>
-                                <p class="text-[11px] text-indigo-700 mt-0.5 leading-relaxed">
-                                    Centang opsi ini agar keputusan status, surat balasan, tanggal pelaksanaan, dan penugasan mentor diterapkan ke {{ $application->group->applications->count() }} anggota tim sekaligus. <strong>Hilangkan centang</strong> jika ingin memproses mahasiswa ini secara mandiri (khusus individu).
-                                </p>
+                        <div class="mb-5 p-4 rounded-2xl border shadow-2xs transition-colors"
+                             :class="status === 'rejected' ? (syncGroup ? 'bg-rose-50/90 border-rose-300' : 'bg-amber-50/80 border-amber-200') : 'bg-indigo-50/80 border-indigo-200'">
+                            <div class="flex items-start gap-3">
+                                <input type="hidden" name="sync_group" value="0">
+                                <input type="checkbox" id="sync_group" name="sync_group" value="1" x-model="syncGroup"
+                                       class="w-4 h-4 mt-0.5 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                                <div class="flex-1 space-y-1">
+                                    <label for="sync_group" class="text-xs font-bold text-slate-900 cursor-pointer select-none block">
+                                        Terapkan keputusan ini ke seluruh anggota kelompok
+                                    </label>
+                                    <p class="text-[11px] text-slate-600" x-show="status !== 'rejected'">
+                                        Centang untuk memproses seluruh anggota kelompok secara bersamaan.
+                                    </p>
+                                    <p class="text-[11px]" x-show="status === 'rejected'" :class="syncGroup ? 'text-rose-800 font-semibold' : 'text-amber-900'"
+                                       x-text="syncGroup ? 'Perhatian: Seluruh anggota dalam kelompok ini akan ditolak.' : 'Hanya berkas peserta magang ini yang ditolak; anggota tim lain tetap berjalan.'">
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     @endif
@@ -739,7 +766,7 @@
                                 </div>
                                 <div>
                                     <h4 class="font-bold text-emerald-950 text-xs sm:text-sm">Data Penempatan, Surat &amp; Penugasan Pembimbing</h4>
-                                    <p class="text-[11px] text-emerald-700 mt-0.5">Penugasan Pembimbing (Susulan / Ganti), penetapan mentor dinas, dosen pembimbing, dan surat balasan resmi.</p>
+                                    <p class="text-[11px] text-emerald-700 mt-0.5">Penugasan Pembimbing (Susulan / Ganti), penetapan mentor dinas, pembimbing, dan surat balasan resmi.</p>
                                 </div>
                             </div>
                         </div>
@@ -757,8 +784,8 @@
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     </div>
                                     <div class="min-w-0">
-                                        <div class="text-xs font-bold text-emerald-950 truncate">Surat Pengantar Kampus: {{ $suratPengantar->document_type }}</div>
-                                        <div class="text-[11px] text-slate-500">Tinjau permohonan resmi dari perguruan tinggi sebelum menetapkan balasan</div>
+                                        <div class="text-xs font-bold text-emerald-950 truncate">Surat Pengantar Kampus/Sekolah: {{ $suratPengantar->document_type }}</div>
+                                        <div class="text-[11px] text-slate-500">Tinjau permohonan resmi dari kampus/sekolah sebelum menetapkan balasan</div>
                                     </div>
                                 </div>
                                 <a href="{{ route('documents.application', $suratPengantar->id) }}" target="_blank"
@@ -784,11 +811,19 @@
                                 }
                             }
 
-                            $mentorItems = $filteredPembimbings->map(function ($m) {
+                            // Beberapa mentor bisa bernama sama persis; email ditempelkan agar pilihan tetap bisa dibedakan
+                            // baik di daftar maupun setelah dipilih.
+                            $duplicateMentorNames = $pembimbings->groupBy(fn ($m) => mb_strtolower(trim((string) $m->name)))
+                                ->filter(fn ($group) => $group->count() > 1)->keys()->all();
+                            $mentorLabel = fn ($m) => in_array(mb_strtolower(trim((string) $m->name)), $duplicateMentorNames, true)
+                                ? $m->name.' ('.$m->email.')'
+                                : $m->name;
+
+                            $mentorItems = $filteredPembimbings->map(function ($m) use ($mentorLabel) {
                                 $unitName = $m->unit?->name;
                                 return [
                                     'id' => $m->id,
-                                    'name' => $m->name,
+                                    'name' => $mentorLabel($m),
                                     'acronym' => 'Mentor',
                                     'meta' => ($unitName ? $unitName . ' • ' : '') . $m->email . ($m->phone ? ' • ' . $m->phone : ''),
                                 ];
@@ -799,7 +834,7 @@
                                 return [
                                     'id' => $d->id,
                                     'name' => $d->name,
-                                    'acronym' => 'Dosen',
+                                    'acronym' => 'Pembimbing',
                                     'meta' => $d->email . ($univName ? ' • ' . $univName : ''),
                                 ];
                             })->values()->all();
@@ -828,7 +863,7 @@
                                     @endunless
                                 </div>
                                 <div class="p-3.5 rounded-xl border bg-white/95 {{ $currAdvisor ? 'border-emerald-200 shadow-2xs' : 'border-amber-200 bg-amber-50/40' }}">
-                                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Dosen Pembimbing Kampus Saat Ini</div>
+                                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Pembimbing Kampus/Sekolah Saat Ini</div>
                                     <div class="font-bold text-slate-900 text-xs mt-1 flex items-center justify-between">
                                         <span>{{ $currAdvisor?->name ?? 'Belum Ditugaskan' }}</span>
                                         @if($currAdvisor)
@@ -838,7 +873,7 @@
                                         @endif
                                     </div>
                                     @unless ($currAdvisor)
-                                        <div class="text-[11px] text-amber-700 mt-1">Menunggu penetapan penugasan dosen dari perguruan tinggi.</div>
+                                        <div class="text-[11px] text-amber-700 mt-1">Menunggu penetapan penugasan pembimbing dari perguruan tinggi.</div>
                                     @endunless
                                 </div>
                             </div>
@@ -862,10 +897,10 @@
                                 name="academic_advisor_id"
                                 :items="$dosenItems"
                                 :selected="$selectedDosenId"
-                                label="Plotting Dosen Pembimbing Kampus"
-                                placeholder="-- Cari atau Pilih Dosen Pembimbing (Ketik nama / email / kampus) --"
+                                label="Plotting Pembimbing Kampus/Sekolah"
+                                placeholder="-- Cari atau Pilih Pembimbing (Ketik nama / email / kampus) --"
                             />
-                            <p class="text-[11px] text-slate-500 mt-1 font-medium">Dosen Pembimbing resmi dari perguruan tinggi mahasiswa yang bersangkutan.</p>
+                            <p class="text-[11px] text-slate-500 mt-1 font-medium">Pembimbing resmi dari kampus/sekolah peserta magang yang bersangkutan.</p>
                         </div>
 
                         <!-- Grid Nomor Surat & Tanggal Surat -->
@@ -911,7 +946,7 @@
                         </label>
                         <textarea name="rejection_note" rows="3" 
                             :required="status === 'rejected'"
-                            placeholder="Tuliskan alasan pengajuan ditolak secara jelas (minimal 5 karakter) agar dapat dipahami oleh pihak mahasiswa..."
+                            placeholder="Tuliskan alasan pengajuan ditolak secara jelas (minimal 5 karakter) agar dapat dipahami oleh pihak peserta magang..."
                             class="w-full text-xs border-rose-200 rounded-xl focus:ring-rose-500 focus:border-rose-500 bg-white">{{ old('rejection_note', $application->rejection_note) }}</textarea>
                         @error('rejection_note')
                             <p class="text-xs text-rose-600 font-semibold mt-1">{{ $message }}</p>

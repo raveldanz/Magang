@@ -3,6 +3,7 @@
 namespace App\Enums;
 
 use App\Enums\Concerns\DisplaysStatusCode;
+use App\Models\User;
 
 enum ApplicationStatus: string
 {
@@ -32,6 +33,29 @@ enum ApplicationStatus: string
             self::DRAFT => 'Draf Kelompok (Belum Dikirim)',
             self::PENDING => 'Menunggu Verifikasi Berkas',
             self::WAITING_APPROVAL => 'Setujui, Serahkan ke Atasan',
+            self::ACCEPTED => 'Diterima, Belum Mulai Magang',
+            self::ACTIVE => 'Aktif Magang',
+            self::COMPLETED => 'Selesai Magang',
+            self::REJECTED => 'Pengajuan Ditolak',
+            self::RESIGNED => 'Mengundurkan Diri',
+        };
+    }
+
+    /**
+     * Label status UI Bahasa Indonesia terstandar khusus peran mentor & supervisor.
+     * Menjaga satu istilah seragam di seluruh layar tanpa mengubah kode sistem berbahasa Inggris.
+     */
+    public function localizedLabel(?string $role = null): string
+    {
+        $effectiveRole = $role ?? auth()->user()?->role;
+        if (! User::isLocalizedStatusUiRole($effectiveRole)) {
+            return $this->label();
+        }
+
+        return match ($this) {
+            self::DRAFT => 'Draf Pengajuan',
+            self::PENDING => 'Menunggu Verifikasi Berkas',
+            self::WAITING_APPROVAL => 'Menunggu ACC',
             self::ACCEPTED => 'Diterima, Belum Mulai Magang',
             self::ACTIVE => 'Aktif Magang',
             self::COMPLETED => 'Selesai Magang',

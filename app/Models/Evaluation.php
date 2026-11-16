@@ -25,6 +25,7 @@ class Evaluation extends Model
 
     /**
      * Mengambil daftar komponen penilaian Mentor Lapangan Dinas (dinamis atau fallback ke 3 kriteria standar).
+     *
      * @return array<int, array{name: string, score: float|int|null}>
      */
     public function getMentorComponents(): array
@@ -47,15 +48,15 @@ class Evaluation extends Model
 
         return [
             [
-                'name' => $univ ? $univ->getDinasComponent(1) : \App\Models\University::DEFAULT_DINAS_COMPONENTS[1],
+                'name' => $univ ? $univ->getDinasComponent(1) : University::DEFAULT_DINAS_COMPONENTS[1],
                 'score' => $this->nilai_disiplin !== null ? (float) $this->nilai_disiplin : null,
             ],
             [
-                'name' => $univ ? $univ->getDinasComponent(2) : \App\Models\University::DEFAULT_DINAS_COMPONENTS[2],
+                'name' => $univ ? $univ->getDinasComponent(2) : University::DEFAULT_DINAS_COMPONENTS[2],
                 'score' => $this->nilai_kinerja !== null ? (float) $this->nilai_kinerja : null,
             ],
             [
-                'name' => $univ ? $univ->getDinasComponent(3) : \App\Models\University::DEFAULT_DINAS_COMPONENTS[3],
+                'name' => $univ ? $univ->getDinasComponent(3) : University::DEFAULT_DINAS_COMPONENTS[3],
                 'score' => $this->nilai_laporan !== null ? (float) $this->nilai_laporan : null,
             ],
         ];
@@ -63,6 +64,7 @@ class Evaluation extends Model
 
     /**
      * Mengambil daftar komponen penilaian Dosen Pembimbing Lapangan (dinamis atau fallback ke 3 kriteria standar).
+     *
      * @return array<int, array{name: string, score: float|int|null}>
      */
     public function getLecturerComponents(): array
@@ -80,15 +82,15 @@ class Evaluation extends Model
 
         return [
             [
-                'name' => $univ ? $univ->getDplComponent(1) : \App\Models\University::DEFAULT_DPL_COMPONENTS[1],
+                'name' => $univ ? $univ->getDplComponent(1) : University::DEFAULT_DPL_COMPONENTS[1],
                 'score' => $this->dosenAspectScore('score_mastery'),
             ],
             [
-                'name' => $univ ? $univ->getDplComponent(2) : \App\Models\University::DEFAULT_DPL_COMPONENTS[2],
+                'name' => $univ ? $univ->getDplComponent(2) : University::DEFAULT_DPL_COMPONENTS[2],
                 'score' => $this->dosenAspectScore('score_report'),
             ],
             [
-                'name' => $univ ? $univ->getDplComponent(3) : \App\Models\University::DEFAULT_DPL_COMPONENTS[3],
+                'name' => $univ ? $univ->getDplComponent(3) : University::DEFAULT_DPL_COMPONENTS[3],
                 'score' => $this->dosenAspectScore('score_attitude'),
             ],
         ];

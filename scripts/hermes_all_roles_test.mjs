@@ -100,6 +100,9 @@ class HermesSession {
         }
 
         const target = res.headers.get('location') || '/dashboard';
+        if (target.endsWith('/login')) {
+            throw new Error(`[${this.roleName}] Login ditolak untuk ${email} (redirect kembali ke /login)`);
+        }
         return await this.getWithRedirects(target);
     }
 }
@@ -203,11 +206,11 @@ async function runFullHermesTest() {
     }
 
     // -------------------------------------------------------------------------
-    // 2. ROLE 2: ADMIN DINAS / OPD (KOMINFO)
+    // 2. ROLE 2: ADMIN DINAS / OPD (DISPUSIP)
     // -------------------------------------------------------------------------
     const adminDinas = new HermesSession('AdminDinas');
     try {
-        const dash = await adminDinas.login('admin.kominfo@surabaya.go.id', 'password');
+        const dash = await adminDinas.login('admin.dispusip@surabaya.go.id', 'password');
         record('AdminDinas', 'Login & Dashboard Dinas Scoped', dash.status === 200 ? 'PASS' : 'FAIL', dash.url);
 
         const dinasEndpoints = [
@@ -312,7 +315,7 @@ async function runFullHermesTest() {
     // -------------------------------------------------------------------------
     const mentor = new HermesSession('Mentor');
     try {
-        const dash = await mentor.login('mentor.kominfo@surabaya.go.id', 'password');
+        const dash = await mentor.login('mentor.dispusip@surabaya.go.id', 'password');
         record('Mentor', 'Login & Dashboard Pembimbing Dinas', dash.status === 200 ? 'PASS' : 'FAIL', dash.url);
 
         const mMatch = dash.html.match(/\/mentor\/students\/(\d+)/);

@@ -61,21 +61,21 @@
                 <h3 class="font-bold text-base text-slate-900 pb-3 border-b border-slate-100">Data Magang</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div>
-                        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Mahasiswa</span>
+                        <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Peserta Magang</span>
                         <span class="font-bold text-slate-900 block mt-0.5">{{ $student->name ?? '-' }}</span>
-                        <span class="text-xs text-slate-500">NIM: {{ $profile->nim ?? '-' }} &bull; {{ $profile->universitas ?? '-' }}</span>
+                        <span class="text-xs text-slate-600">NIM/NIS: {{ $profile->nim ?? '-' }} &bull; {{ $profile->universitas ?? '-' }}</span>
                     </div>
                     <div>
-                        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Instansi & Unit Kerja</span>
+                        <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Instansi & Unit Kerja</span>
                         <span class="font-medium text-slate-800 block mt-0.5">{{ $agency->agency_name ?? '-' }}</span>
-                        <span class="text-xs text-slate-500">{{ $unit->name ?? '-' }}</span>
+                        <span class="text-xs text-slate-600">{{ $unit->name ?? '-' }}</span>
                     </div>
                     <div>
-                        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Mentor Lapangan</span>
+                        <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Mentor Lapangan</span>
                         <span class="font-medium text-slate-800 block mt-0.5">{{ $mentor->name ?? 'Belum Ditugaskan' }}</span>
                     </div>
                     <div>
-                        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Dosen Pembimbing</span>
+                        <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Pembimbing</span>
                         <span class="font-medium text-slate-800 block mt-0.5">{{ $dosen->name ?? 'Belum Ditugaskan' }}</span>
                     </div>
                 </div>
@@ -90,15 +90,34 @@
 
                 <p class="text-sm text-slate-800 leading-relaxed whitespace-pre-line">{{ trim($logbook->activity) }}</p>
 
-                <div class="pt-1">
-                    <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block mb-2">Bukti Kegiatan</span>
+                <div class="pt-1" x-data="{ lightboxOpen: false }" @keydown.escape.window="lightboxOpen = false">
+                    <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block mb-2">Bukti Kegiatan</span>
                     @if ($logbook->attachment)
                         @if ($attIsImage)
-                            <a href="{{ $logbook->attachment_url }}" target="_blank" title="Klik untuk memperbesar" class="inline-block">
+                            <button type="button" @click="lightboxOpen = true" title="Klik untuk memperbesar"
+                                    class="inline-block text-left rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-zoom-in">
                                 <img src="{{ $logbook->attachment_url }}" alt="Bukti kegiatan {{ $dateLabel }}" loading="lazy"
                                      class="rounded-lg border border-slate-200 object-cover" style="max-width: 100%; width: 360px; max-height: 260px;">
-                            </a>
-                            <span class="block text-xs text-slate-400 mt-1">Klik foto untuk memperbesar</span>
+                            </button>
+                            <span class="block text-xs text-slate-600 mt-1.5">Klik foto untuk memperbesar di halaman ini</span>
+
+                            <div x-show="lightboxOpen" style="display: none;"
+                                 class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 p-4"
+                                 @click.self="lightboxOpen = false">
+                                <div class="relative bg-white rounded-2xl max-w-4xl w-full p-4 sm:p-5 shadow-2xl space-y-3">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <p class="text-sm font-bold text-slate-900">Bukti Kegiatan ({{ $dateLabel }})</p>
+                                        <button type="button" @click="lightboxOpen = false"
+                                                class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-bold rounded-xl transition cursor-pointer">
+                                            Tutup Foto
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center justify-center bg-slate-50 rounded-xl border border-slate-200 p-2 max-h-[75vh] overflow-auto">
+                                        <img src="{{ $logbook->attachment_url }}" alt="Bukti kegiatan {{ $dateLabel }}"
+                                             class="max-w-full max-h-[70vh] object-contain rounded-lg">
+                                    </div>
+                                </div>
+                            </div>
                         @else
                             <a href="{{ $logbook->attachment_url }}" target="_blank"
                                class="inline-flex items-center px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-bold rounded-xl border border-slate-300 transition">
@@ -106,7 +125,7 @@
                             </a>
                         @endif
                     @else
-                        <p class="text-sm text-slate-400">Mahasiswa tidak melampirkan bukti untuk kegiatan ini.</p>
+                        <p class="text-sm text-slate-400">Peserta Magang tidak melampirkan bukti untuk kegiatan ini.</p>
                     @endif
                 </div>
             </div>
@@ -126,11 +145,11 @@
                     </div>
                     <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
                         <div class="flex items-center justify-between gap-2">
-                            <span class="text-sm font-bold text-slate-800">Dosen Pembimbing</span>
+                            <span class="text-sm font-bold text-slate-800">Pembimbing</span>
                             <x-status-badge type="review" :status="$logbook->lecturer_status ?? 'pending'" />
                         </div>
                         <p class="text-sm {{ $logbook->lecturer_feedback ? 'text-slate-700' : 'text-slate-400' }}">
-                            {{ $logbook->lecturer_feedback ?: 'Belum ada catatan dari dosen.' }}
+                            {{ $logbook->lecturer_feedback ?: 'Belum ada catatan dari pembimbing.' }}
                         </p>
                     </div>
                 </div>
@@ -142,7 +161,7 @@
                 if ($isMentor) {
                     $reviewForm = ['route' => route('mentor.logbooks.updateStatus', $logbook->id), 'feedback' => $logbook->feedback, 'title' => 'Verifikasi Mentor Lapangan'];
                 } elseif ($isLecturer) {
-                    $reviewForm = ['route' => route('lecturer.logbooks.updateStatus', $logbook->id), 'feedback' => $logbook->lecturer_feedback, 'title' => 'Verifikasi Dosen Pembimbing'];
+                    $reviewForm = ['route' => route('lecturer.logbooks.updateStatus', $logbook->id), 'feedback' => $logbook->lecturer_feedback, 'title' => 'Verifikasi Pembimbing'];
                 } elseif ($isAdminFallback) {
                     $reviewForm = ['route' => route('admin.logbooks.review', $logbook->id), 'feedback' => $logbook->feedback, 'title' => Auth::user()->isBidangAdmin() ? 'Validasi Sementara oleh Admin Bidang' : 'Validasi Sementara oleh Admin Dinas'];
                 }
@@ -153,7 +172,7 @@
                     <div class="pb-3 border-b border-slate-100">
                         <h3 class="font-bold text-base text-slate-900">{{ $reviewForm['title'] }}</h3>
                         @if ($isAdminFallback)
-                            <p class="text-sm text-slate-500 mt-1">Mahasiswa ini belum memiliki Mentor Dinas. Anda dapat memvalidasi logbook sementara sampai mentor ditugaskan. Riwayat validasi tetap tersimpan.</p>
+                            <p class="text-sm text-slate-500 mt-1">Peserta Magang ini belum memiliki Mentor Dinas. Anda dapat memvalidasi logbook sementara sampai mentor ditugaskan. Riwayat validasi tetap tersimpan.</p>
                         @elseif ($isUnitHeadFallback)
                             <p class="text-sm text-slate-500 mt-1">Anda memvalidasi sebagai Kepala Unit (sementara, karena mentor belum ditunjuk).</p>
                         @endif
@@ -164,26 +183,66 @@
                         @method('PUT')
 
                         <div>
-                            <label for="feedback" class="block text-sm font-bold text-slate-700 mb-1.5">Catatan untuk mahasiswa</label>
+                            <label for="feedback" class="block text-base font-bold text-slate-900 mb-1.5">
+                                Catatan untuk peserta magang <span class="font-normal text-slate-600">(wajib bila meminta revisi)</span>
+                            </label>
+                            {{-- Selalu mulai kosong: catatan lama sudah tampil di atas dan tidak boleh ikut terkirim tanpa sengaja --}}
                             <textarea id="feedback" name="feedback" rows="3" maxlength="1000"
-                                      class="w-full text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500"
-                                      placeholder="Tuliskan catatan, arahan, atau alasan revisi...">{{ old('feedback', $reviewForm['feedback']) }}</textarea>
+                                      class="w-full text-base border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500"
+                                      placeholder="Tuliskan catatan, arahan, atau alasan revisi...">{{ old('feedback', '') }}</textarea>
+                            @error('feedback')
+                                <p class="mt-1 text-base font-semibold text-rose-700" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
-                            <button type="submit" name="status" value="rejected"
-                                    class="inline-flex items-center justify-center px-4 py-2.5 bg-white hover:bg-rose-50 text-rose-700 text-sm font-bold rounded-xl border border-rose-300 transition cursor-pointer">
+                            <button type="button" name="status" value="rejected"
+                                    @click="
+                                        const fbField = $el.closest('form').querySelector('#feedback');
+                                        const fb = (fbField?.value || '').trim();
+                                        if (fb === '') {
+                                            fbField?.focus();
+                                            $dispatch('toast', { type: 'error', message: 'Tulis dulu catatan perbaikan agar peserta magang tahu apa yang harus diperbaiki.' });
+                                            return;
+                                        }
+                                        $dispatch('open-confirm-modal', {
+                                            form: $el.closest('form'),
+                                            submitter: $el,
+                                            title: 'Konfirmasi Permintaan Revisi Logbook',
+                                            message: 'Logbook akan dikembalikan kepada peserta magang untuk diperbaiki sesuai catatan Anda.',
+                                            label: 'Status Tujuan',
+                                            name: @js(\App\Enums\ReviewStatus::REJECTED->localizedLabel(auth()->user()?->role)),
+                                            desc: fb !== '' ? 'Catatan: ' + fb : 'Belum ada catatan tertulis.',
+                                            confirmText: 'Ya, Minta Revisi',
+                                            tone: 'rose'
+                                        });
+                                    "
+                                    class="inline-flex items-center justify-center min-h-[44px] px-4 py-2.5 bg-white hover:bg-rose-50 text-rose-700 text-sm font-bold rounded-xl border border-rose-300 transition cursor-pointer">
                                 Minta Revisi
                             </button>
                             <div class="flex flex-wrap items-center gap-3">
                                 @if ($isAdminFallback && $placement?->application_id)
                                     <a href="{{ route('admin.applications.show', $placement->application_id) }}#penugasan-pembimbing"
-                                       class="inline-flex items-center px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-sm font-bold rounded-xl border border-slate-300 transition">
+                                       class="inline-flex items-center justify-center min-h-[44px] px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-sm font-bold rounded-xl border border-slate-300 transition">
                                         Tugaskan Mentor
                                     </a>
                                 @endif
-                                <button type="submit" name="status" value="approved"
-                                        class="inline-flex items-center justify-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition cursor-pointer">
+                                <button type="button" name="status" value="approved"
+                                        @click="
+                                            const fb = ($el.closest('form').querySelector('#feedback')?.value || '').trim();
+                                            $dispatch('open-confirm-modal', {
+                                                form: $el.closest('form'),
+                                                submitter: $el,
+                                                title: 'Konfirmasi Persetujuan Logbook',
+                                                message: 'Apakah Anda yakin ingin menyetujui catatan logbook peserta magang ini?',
+                                                label: 'Status Tujuan',
+                                                name: @js(\App\Enums\ReviewStatus::APPROVED->localizedLabel(auth()->user()?->role)),
+                                                desc: fb !== '' ? 'Catatan: ' + fb : '',
+                                                confirmText: 'Ya, Setujui Logbook',
+                                                tone: 'blue'
+                                            });
+                                        "
+                                        class="inline-flex items-center justify-center min-h-[44px] px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition cursor-pointer">
                                     Setujui
                                 </button>
                             </div>

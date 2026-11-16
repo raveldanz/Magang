@@ -34,7 +34,7 @@
 
                     @if($lecturerFeedback)
                         <div class="rounded-2xl bg-white p-4 border border-rose-100 shadow-2xs space-y-1">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-rose-700 block">Masukan Dosen Pembimbing Lapangan:</span>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-rose-700 block">Masukan Pembimbing:</span>
                             <p class="text-xs sm:text-sm text-slate-700 leading-relaxed italic whitespace-pre-line">"{{ $lecturerFeedback }}"</p>
                         </div>
                     @endif
@@ -63,7 +63,7 @@
                     </p>
                 </div>
 
-                <form action="{{ route('student.logbook.update', $logbook->id) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
+                <form action="{{ route('student.logbook.update', $logbook->id) }}" data-autosave="logbook-{{ $logbook->id }}-{{ auth()->id() }}" method="POST" enctype="multipart/form-data" class="space-y-5">
                     @csrf
                     @method('PUT')
 
@@ -72,7 +72,7 @@
                         <label for="date" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                             Tanggal Kegiatan <span class="text-rose-500">*</span>
                         </label>
-                        <input type="date" id="date" name="date" value="{{ old('date', $logbook->date) }}" 
+                        <input type="date" id="date" name="date" value="{{ old('date', $logbook->date) }}" max="{{ date('Y-m-d') }}" 
                                class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs" required>
                         <x-input-error :messages="$errors->get('date')" class="mt-1" />
                     </div>
@@ -111,7 +111,7 @@
                         </label>
 
                         <div class="flex items-center gap-2 w-full">
-                            <input type="file" 
+                            <input type="file" data-max-kb="2048" 
                                    id="attachment" 
                                    name="attachment" 
                                    accept=".pdf,.jpg,.jpeg,.png" 
@@ -119,7 +119,7 @@
                                    @change="if($event.target.files.length) { 
                                        const file = $event.target.files[0];
                                        if(file.size > 2 * 1024 * 1024) {
-                                           alert('Ukuran berkas lampiran maksimal 2MB.');
+                                           window.notify('Ukuran berkas lampiran melebihi batas maksimal (Maksimal 2 MB). Silakan pilih berkas yang lebih kecil.');
                                            $event.target.value = '';
                                            selectedName = '';
                                            previewUrl = null;
@@ -133,7 +133,7 @@
                             <button type="button" 
                                     @click="document.getElementById('attachment').click()"
                                     class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
-                                Choose File
+                                Pilih Berkas
                             </button>
 
                             <!-- Tempat Nama File: File Baru atau File yang Sudah Ada (Dapat Diklik Langsung untuk View) -->
@@ -159,7 +159,7 @@
                                     </template>
                                 @else
                                     <template x-if="!selectedName">
-                                        <span class="text-slate-400">No file chosen</span>
+                                        <span class="text-slate-400">Belum ada berkas dipilih</span>
                                     </template>
                                 @endif
                             </div>

@@ -8,9 +8,9 @@ const ROLE_GROUPS = [
     ['super_admin', 'Super Admin / Helpdesk'],
     ['agency', 'Admin Dinas'],
     ['mentor', 'Mentor Lapangan'],
-    ['lecturer', 'Dosen Pembimbing (DPL)'],
-    ['campus', 'Admin Kampus'],
-    ['student', 'Mahasiswa'],
+    ['lecturer', 'Pembimbing'],
+    ['campus', 'Admin Kampus/Sekolah'],
+    ['student', 'Peserta Magang'],
     ['other', 'Lainnya'],
 ];
 

@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Lecturer;
 use App\Http\Controllers\Controller;
 use App\Models\Logbook;
 use App\Models\Placement;
+use App\Services\LogbookReviewDecision;
 use App\Services\LogbookWeeklyBundler;
 use App\Services\StudentNotifier;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class LogbookController extends Controller
 {
@@ -55,13 +58,14 @@ class LogbookController extends Controller
         }
 
         if ($request->filled('search')) {
-            $search = strtolower(trim($request->search));
-            $filteredQuery->where(function ($q) use ($search) {
-                $q->where('activity', 'like', "%{$search}%")
-                    ->orWhereHas('placement.application.user', function ($uq) use ($search) {
-                        $uq->where('name', 'like', "%{$search}%")
-                            ->orWhereHas('studentProfile', function ($sq) use ($search) {
-                                $sq->where('nim', 'like', "%{$search}%");
+            $search = trim($request->search);
+            $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+            $filteredQuery->where(function ($q) use ($search, $like) {
+                $q->where('activity', $like, "%{$search}%")
+                    ->orWhereHas('placement.application.user', function ($uq) use ($search, $like) {
+                        $uq->where('name', $like, "%{$search}%")
+                            ->orWhereHas('studentProfile', function ($sq) use ($search, $like) {
+                                $sq->where('nim', $like, "%{$search}%");
                             });
                     });
             });
@@ -128,7 +132,7 @@ class LogbookController extends Controller
         }
 
         if (! $isAssignedAdvisor && ! $isSameUniv) {
-            abort(403, 'Anda tidak memiliki hak akses untuk memonitor logbook mahasiswa ini.');
+            abort(403, 'Anda tidak memiliki hak akses untuk memonitor logbook peserta magang ini.');
         }
 
         return view('admin.logbooks.show', compact('logbook'));
@@ -143,26 +147,19 @@ class LogbookController extends Controller
 
         $request->validate([
             'status' => 'required|in:approved,rejected,pending',
-            'feedback' => 'nullable|string',
+            'feedback' => 'nullable|required_if:status,rejected|string|max:1500',
         ]);
 
         $logbook = Logbook::with('placement.application.user')->findOrFail($id);
         $placement = $logbook->placement;
         $student = $placement?->application?->user;
 
-        // Otorisasi
-        $isAssignedAdvisor = ($placement && ($placement->academic_advisor_id === $user->id || $placement->mentor_id === $user->id));
-        $isSameUniv = ($user->university_id !== null && $student?->university_id === $user->university_id);
+        // Otorisasi: memverifikasi logbook adalah tugas DPL yang ditetapkan pada penempatan,
+        // sama seperti bulkApprove dan penilaian. Dosen lain di kampus yang sama hanya boleh melihat.
+        $isAssignedAdvisor = ($placement && ((int) $placement->academic_advisor_id === (int) $user->id || (int) $placement->mentor_id === (int) $user->id));
 
-        if (! $isSameUniv && $user->university && $student) {
-            $isSameUniv = (
-                $student->university === $user->university ||
-                optional($student->studentProfile)->universitas === $user->university
-            );
-        }
-
-        if (! $isAssignedAdvisor && ! $isSameUniv) {
-            abort(403, 'Anda tidak memiliki hak akses untuk memverifikasi logbook mahasiswa ini.');
+        if (! $isAssignedAdvisor) {
+            abort(403, 'Anda tidak memiliki hak akses untuk memverifikasi logbook peserta magang ini.');
         }
 
         $logbook->update([
@@ -177,7 +174,7 @@ class LogbookController extends Controller
 
         $statusText = $request->status === 'approved' ? 'disetujui (ACC)' : ($request->status === 'rejected' ? 'ditolak / diminta revisi' : 'diperbarui');
 
-        return redirect()->back()->with('success', "Logbook berhasil {$statusText} dan catatan feedback Dosen telah tersimpan!");
+        return redirect()->back()->with('success', "Logbook berhasil {$statusText} dan catatan feedback Pembimbing telah tersimpan!");
     }
 
     /**
@@ -199,8 +196,14 @@ class LogbookController extends Controller
         $request->validate([
             'logbook_ids' => 'required|array|min:1',
             'logbook_ids.*' => 'integer|exists:logbooks,id',
-            'action' => 'required|in:approved,rejected',
-            'bulk_feedback' => 'nullable|string|max:1000',
+            // per_day: hari yang dicentang "Perlu Diperbaiki" (revise_ids) dikembalikan, sisanya disetujui.
+            'action' => 'required|in:approved,rejected,per_day',
+            'revise_ids' => 'nullable|array',
+            'revise_ids.*' => ['integer', Rule::in(array_map('intval', (array) $request->input('logbook_ids', [])))],
+            'bulk_feedback' => 'nullable|required_if:action,rejected|required_with:revise_ids|string|max:1000',
+        ], [
+            'bulk_feedback.required_if' => 'Catatan wajib diisi saat menolak atau meminta revisi, agar peserta magang tahu apa yang perlu diperbaiki.',
+            'bulk_feedback.required_with' => 'Catatan wajib diisi saat menolak atau meminta revisi, agar peserta magang tahu apa yang perlu diperbaiki.',
         ]);
 
         // Ambil ID placement yang dibimbing langsung oleh Dosen ini
@@ -208,34 +211,40 @@ class LogbookController extends Controller
             ->pluck('id')
             ->toArray();
 
-        $updates = [
-            'lecturer_status' => $action,
-            'lecturer_verified_at' => Carbon::now(),
-        ];
-        // Catatan hanya ditimpa bila DPL menulis catatan baru; setujui banyak sekaligus
-        // tanpa catatan tidak menghapus catatan lama per logbook.
-        if (filled($feedback)) {
-            $updates['lecturer_feedback'] = $feedback;
-        }
+        $logbooks = Logbook::whereIn('id', $request->logbook_ids)
+            ->whereIn('placement_id', $supervisedPlacementIds)
+            ->get();
 
-        $targetQuery = Logbook::whereIn('id', $request->logbook_ids)
-            ->whereIn('placement_id', $supervisedPlacementIds);
+        $reviseIds = collect($request->input('revise_ids', []))->map(fn ($id) => (int) $id)->all();
+        $decisions = LogbookReviewDecision::resolve($logbooks, $action, $reviseIds);
+        $note = filled($feedback) ? (string) $feedback : null;
+        $noteTargetsRejected = in_array('rejected', $decisions, true);
 
-        // Hitung per penempatan sebelum update, untuk satu notifikasi per mahasiswa saat minta revisi.
-        $perPlacement = $action === 'rejected'
-            ? (clone $targetQuery)->selectRaw('placement_id, count(*) as total')->groupBy('placement_id')->pluck('total', 'placement_id')
-            : collect();
+        // Catatan lama dipertahankan bila tidak ada catatan baru, kecuali catatan revisi yang
+        // sudah ditangani mahasiswa (lihat LogbookReviewDecision::feedbackFor).
+        DB::transaction(function () use ($logbooks, $decisions, $note, $noteTargetsRejected) {
+            foreach ($logbooks as $logbook) {
+                $newStatus = $decisions[$logbook->id];
+                $logbook->update([
+                    'lecturer_status' => $newStatus,
+                    'lecturer_verified_at' => Carbon::now(),
+                    'lecturer_feedback' => LogbookReviewDecision::feedbackFor($logbook->lecturer_status, $logbook->lecturer_feedback, $newStatus, $note, $noteTargetsRejected),
+                ]);
+            }
+        });
 
-        $count = $targetQuery->update($updates);
-
-        if ($perPlacement->isNotEmpty()) {
+        // Satu notifikasi per mahasiswa saat ada hari yang dikembalikan.
+        $rejected = $logbooks->filter(fn ($logbook) => $decisions[$logbook->id] === 'rejected');
+        if ($rejected->isNotEmpty()) {
+            $perPlacement = $rejected->countBy('placement_id');
             Placement::with('application.user')->whereIn('id', $perPlacement->keys())->get()
-                ->each(fn ($pl) => StudentNotifier::logbookRevision($pl->application?->user, 'lecturer', (int) $perPlacement[$pl->id], $feedback));
+                ->each(fn ($pl) => StudentNotifier::logbookRevision($pl->application?->user, 'lecturer', (int) $perPlacement[$pl->id], $note));
         }
 
-        $statusMsg = $action === 'approved' ? 'disetujui (ACC)' : 'diminta revisi';
-
-        return redirect()->back()->with('success', "Sebanyak {$count} logbook mahasiswa bimbingan berhasil {$statusMsg} sekaligus!");
+        return redirect()->back()->with('success', LogbookReviewDecision::summaryMessage(
+            $logbooks->count() - $rejected->count(),
+            $rejected->count()
+        ));
     }
 
     /**
@@ -253,7 +262,7 @@ class LogbookController extends Controller
         $isSuperAdmin = $user->isSuperAdmin();
 
         if (! $isAssignedAdvisor && ! $isSuperAdmin) {
-            abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing Lapangan yang ditugaskan untuk mahasiswa ini.');
+            abort(403, 'Akses Ditolak: Anda bukan Pembimbing yang ditugaskan untuk peserta magang ini.');
         }
 
         $now = Carbon::now();
@@ -302,7 +311,7 @@ class LogbookController extends Controller
         ]);
 
         if ($count > 0) {
-            return redirect()->back()->with('success', "Sebanyak {$count} logbook mahasiswa yang telah disetujui mentor berhasil di-ACC sekaligus!");
+            return redirect()->back()->with('success', "Sebanyak {$count} logbook peserta magang yang telah disetujui mentor berhasil di-ACC sekaligus!");
         }
 
         return redirect()->back()->with('info', 'Tidak ada logbook menunggu yang telah di-ACC oleh mentor.');

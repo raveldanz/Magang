@@ -128,7 +128,7 @@
                             <span class="text-slate-500 text-xs mt-0.5 block">{{ $application?->unit?->name ?? '-' }}</span>
                         </div>
                         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                            <span class="text-slate-400 uppercase font-semibold text-[10px] block mb-1">Universitas / Kampus</span>
+                            <span class="text-slate-400 uppercase font-semibold text-[10px] block mb-1">Kampus / Sekolah</span>
                             <span class="font-bold text-slate-800 text-sm block">{{ Auth::user()?->studentProfile?->universitas ?? Auth::user()?->university ?? '-' }}</span>
                             <span class="text-slate-500 text-xs mt-0.5 block">{{ Auth::user()?->studentProfile?->jurusan ?? '-' }}</span>
                         </div>
@@ -194,8 +194,8 @@
                                 <span class="w-5 h-5 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold">2</span>
                                 <span>Evaluasi 2 Pihak</span>
                             </div>
-                            <p class="text-[11px] text-slate-600 leading-relaxed">
-                                Naskah dan karya yang diunggah akan dinilai langsung oleh <strong>Mentor Dinas</strong> dan <strong>Dosen Pembimbing (DPL)</strong> sebagai penentu nilai akhir.
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Naskah dan karya yang diunggah akan dinilai langsung oleh <strong>Mentor Dinas</strong> dan <strong>Pembimbing</strong> sebagai penentu nilai akhir.
                             </p>
                         </div>
 
@@ -376,7 +376,7 @@
                             Naskah Laporan Akhir
                         </h3>
                         <p class="text-xs text-slate-500 mt-0.5">
-                            Pengunggahan berkas naskah laporan ilmiah Praktik Kerja Lapangan / Magang MBKM
+                            Pengunggahan berkas naskah laporan ilmiah Praktik Kerja Lapangan / Magang
                         </p>
                     </div>
                 </div>
@@ -406,7 +406,7 @@
                         <!-- Detail & Unduh File -->
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 bg-slate-50 rounded-xl sm:rounded-2xl border border-slate-100">
                             <div class="text-xs text-slate-600">
-                                Terakhir diunggah: <strong>{{ $finalReport->updated_at ? $finalReport->updated_at->format('d F Y, H:i') : '-' }}</strong>
+                                Terakhir diunggah: <strong>{{ $finalReport->updated_at ? $finalReport->updated_at->translatedFormat('d F Y, H:i') : '-' }}</strong>
                             </div>
                             <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -438,14 +438,14 @@
                             </h3>
                         </div>
 
-                        <form action="{{ route('student.final_report.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4 sm:space-y-5">
+                        <form action="{{ route('student.final_report.store') }}" data-autosave="laporan-akhir-{{ auth()->id() }}" method="POST" enctype="multipart/form-data" class="space-y-4 sm:space-y-5">
                             @csrf
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                                     Judul Naskah Laporan Akhir Magang
                                 </label>
-                                <input type="text" name="title" value="{{ old('title', $finalReport->title ?? 'Laporan Akhir Praktik Kerja Lapangan (PKL) / Magang MBKM') }}" placeholder="Contoh: Rancang Bangun Sistem Monitoring Layanan Publik..." class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                                <input type="text" name="title" value="{{ old('title', $finalReport->title ?? 'Laporan Akhir Praktik Kerja Lapangan (PKL) / Magang') }}" placeholder="Contoh: Rancang Bangun Sistem Monitoring Layanan Publik..." class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                             </div>
 
                             <div>
@@ -482,12 +482,12 @@
                                         <span class="px-2 py-0.5 rounded-md bg-slate-200 text-slate-700 text-[10px] font-bold uppercase tracking-wider shrink-0">Format Baku</span>
                                     </div>
                                     <p class="text-slate-600 leading-relaxed text-[11px] sm:text-xs">
-                                        Agar memudahkan Dosen Pembimbing dan Mentor Dinas dalam memeriksa berkas Anda, pastikan nama file telah berformat standar:
+                                        Agar memudahkan Pembimbing dan Mentor Dinas dalam memeriksa berkas Anda, pastikan nama file telah berformat standar:
                                     </p>
                                     <div class="p-2 sm:p-2.5 bg-white border border-slate-200 rounded-xl space-y-1">
                                         <div class="flex items-center gap-1.5 font-mono text-[11px] sm:text-xs font-bold text-blue-700">
                                             <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                            <span class="truncate">Format: Laporan_Akhir_[NIM]_[Nama].[ext]</span>
+                                            <span class="truncate">Format: Laporan_Akhir_[NIM/NIS]_[Nama].[ext]</span>
                                         </div>
                                         <div class="text-[10px] sm:text-[11px] text-slate-500 break-all leading-normal">
                                             Contoh: <strong class="text-slate-800 font-mono">Laporan_Akhir_{{ preg_replace('/[^A-Za-z0-9]/', '', Auth::user()->studentProfile->nim ?? '22051204001') }}_{{ \Illuminate\Support\Str::slug(Auth::user()->name, '_') }}.pdf</strong>
@@ -518,7 +518,7 @@
                                      ondragleave="handleDragLeave(event)" 
                                      ondrop="handleFileDrop(event)"
                                      class="relative border-2 border-dashed border-slate-300 hover:border-blue-600 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 bg-slate-50/50 hover:bg-blue-50/40 transition cursor-pointer text-center group space-y-2 sm:space-y-3">
-                                    <input type="file" name="file_laporan" id="file_laporan" accept=".pdf,application/pdf" 
+                                    <input type="file" data-max-kb="{{ \App\Support\UploadRules::MAX_FINAL_REPORT_KB }}" name="file_laporan" id="file_laporan" accept=".pdf,application/pdf" 
                                            {{ $finalReport && $finalReport->file_path ? '' : 'required' }}
                                            onchange="handleFinalReportPreview(this)"
                                            class="hidden">
@@ -579,7 +579,7 @@
                             </div>
                             <h3 class="font-black text-base sm:text-xl text-emerald-950">Laporan Akhir Anda Telah Disetujui Secara Resmi (ACC)</h3>
                             <p class="text-xs sm:text-sm text-emerald-800 max-w-xl mx-auto leading-relaxed">
-                                Selamat! Naskah laporan ilmiah dan luaran magang Anda telah diverifikasi dan disetujui oleh Dosen Pembimbing Lapangan dan Mentor Instansi Pemerintah Kota Surabaya.
+                                Selamat! Naskah laporan ilmiah dan luaran magang Anda telah diverifikasi dan disetujui oleh Pembimbing dan Mentor Instansi Pemerintah Kota Surabaya.
                             </p>
                         </div>
 
@@ -600,7 +600,7 @@
                             <div class="space-y-4 pt-1">
                                 <div class="flex items-center justify-between border-b border-gray-100 pb-3 gap-2">
                                     <div>
-                                        <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-indigo-600 block">Hasil Evaluasi Magang MBKM</span>
+                                        <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-indigo-600 block">Hasil Evaluasi Magang</span>
                                         <h4 class="font-black text-sm sm:text-base text-gray-900">Rekapitulasi Nilai Kelulusan & Prestasi</h4>
                                     </div>
                                     <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold text-[11px] sm:text-xs rounded-full border border-emerald-200 shrink-0">
@@ -640,7 +640,7 @@
                                             <p class="text-slate-700"><strong class="text-slate-900">Ulasan Pembimbing Lapangan:</strong> <span class="italic text-slate-600">"{{ $evaluation->catatan }}"</span></p>
                                         @endif
                                         @if($evaluation->feedback_dosen)
-                                            <p class="text-slate-700"><strong class="text-slate-900">Ulasan Dosen Pembimbing:</strong> <span class="italic text-slate-600">"{{ $evaluation->feedback_dosen }}"</span></p>
+                                            <p class="text-slate-700"><strong class="text-slate-900">Ulasan Pembimbing:</strong> <span class="italic text-slate-600">"{{ $evaluation->feedback_dosen }}"</span></p>
                                         @endif
                                     </div>
                                 @endif
@@ -751,14 +751,14 @@
                                     <div class="flex items-center gap-1.5 font-bold">
                                         @if($hasDosenScore || $isMentorOnly)
                                             <span class="text-emerald-600 font-bold">✓</span>
-                                            <span>3. Dosen Pembimbing</span>
+                                            <span>3. Pembimbing</span>
                                         @else
                                             <span class="text-amber-500 font-bold">⏳</span>
-                                            <span>3. Dosen Pembimbing</span>
+                                            <span>3. Pembimbing</span>
                                         @endif
                                     </div>
                                     <p class="text-[11px] {{ ($hasDosenScore || $isMentorOnly) ? 'text-emerald-700' : 'text-slate-500' }}">
-                                        {{ $isMentorOnly ? 'Skema Kampus 100% Dinas' : ($hasDosenScore ? 'Selesai Menilai' : 'Menunggu Nilai Dosen Pembimbing') }}
+                                        {{ $isMentorOnly ? 'Skema Kampus 100% Dinas' : ($hasDosenScore ? 'Selesai Menilai' : 'Menunggu Nilai Pembimbing') }}
                                     </p>
                                 </div>
 
@@ -788,7 +788,6 @@
     </div>
 
     @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
     <script>
         let currentObjectUrl = null;
 
@@ -881,12 +880,12 @@
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 if (!['image/jpeg', 'image/png', 'image/jpg', 'image/webp'].includes(file.type)) {
-                    alert('Format foto harus berupa JPG, PNG, atau WebP.');
+                    window.notify('Format foto harus berupa JPG, PNG, atau WebP.');
                     input.value = '';
                     return;
                 }
                 if (file.size > 3 * 1024 * 1024) {
-                    alert('Ukuran foto maksimal 3 MB.');
+                    window.notify('Ukuran foto maksimal 3 MB.');
                     input.value = '';
                     return;
                 }

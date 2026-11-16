@@ -18,8 +18,17 @@ class UniversityHubService
     /**
      * @return array{0: Collection, 1: Collection, 2: array, 3: bool}
      */
-    public function build(University $university, ?string $statusFilter = '', ?string $search = null): array
+    public function build(University $university, ?string $statusFilter = '', ?string $search = null, ?User $scopeTo = null): array
     {
+        // Admin Dinas hanya melihat mahasiswa yang mengajukan ke instansinya; Admin Bidang hanya bidangnya.
+        // $scopeTo null berarti tanpa batas (Super Admin).
+        $withinScope = function ($unitQuery) use ($scopeTo) {
+            $unitQuery->where('agency_profile_id', $scopeTo->agency_profile_id);
+            if ($scopeTo->unit_id) {
+                $unitQuery->whereKey($scopeTo->unit_id);
+            }
+        };
+
         // 1. Query Seluruh Dosen Pembimbing Kampus Ini
         $dosens = User::whereIn('role', ['dosen', 'academic_advisor'])
             ->where(function ($q) use ($university) {
@@ -72,10 +81,14 @@ class UniversityHubService
                             ->orWhereRaw('LOWER(universitas) = ?', [mb_strtolower($university->name)]);
                     });
             })
+            ->when($scopeTo, fn ($q) => $q->whereHas('applications.unit', $withinScope))
             ->with([
                 'studentProfile',
-                'applications' => function ($q) {
+                'applications' => function ($q) use ($scopeTo, $withinScope) {
                     $q->latest();
+                    if ($scopeTo) {
+                        $q->whereHas('unit', $withinScope);
+                    }
                 },
                 'applications.group',
                 'applications.unit.agencyProfile',

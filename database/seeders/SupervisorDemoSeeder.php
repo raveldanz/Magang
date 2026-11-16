@@ -69,11 +69,24 @@ class SupervisorDemoSeeder extends Seeder
             ['description' => 'Preservasi, digitalisasi arsip bersejarah, restorasi naskah kuno, dan penyelamatan memori kolektif daerah.', 'quota' => 10]
         );
 
-        // 3. Akun Supervisor Utama (Untuk Login Pengujian)
+        // 3. Akun Supervisor Utama & Kepegawaian (Untuk Login Pengujian)
         $supervisorDispusip = User::updateOrCreate(
             ['email' => 'supervisor@dispusip.surabaya.go.id'],
             [
                 'name' => 'Bambang Supriyadi, S.Sos., M.AP',
+                'password' => $defaultPassword,
+                'role' => 'supervisor',
+                'agency_profile_id' => $dispusip->id,
+                'unit_id' => $unitSekretariat->id,
+                'status' => 'active',
+                'email_verified_at' => now(),
+            ]
+        );
+
+        $supervisorKepegawaian = User::updateOrCreate(
+            ['email' => 'kepegawaian@dispusip.surabaya.go.id'],
+            [
+                'name' => 'Tim Kerja dan Kepegawaian',
                 'password' => $defaultPassword,
                 'role' => 'supervisor',
                 'agency_profile_id' => $dispusip->id,
@@ -202,7 +215,7 @@ class SupervisorDemoSeeder extends Seeder
             ['file_path' => $samplePdf]
         );
         ApplicationDocument::updateOrCreate(
-            ['application_id' => $appAnisa->id, 'document_type' => 'Proposal Magang Mahasiswa'],
+            ['application_id' => $appAnisa->id, 'document_type' => 'Proposal Magang Peserta'],
             ['file_path' => $samplePdf]
         );
         ApplicationDocument::updateOrCreate(
@@ -237,7 +250,7 @@ class SupervisorDemoSeeder extends Seeder
             ['file_path' => $samplePdf]
         );
         ApplicationDocument::updateOrCreate(
-            ['application_id' => $appBagas->id, 'document_type' => 'Proposal Magang Mahasiswa'],
+            ['application_id' => $appBagas->id, 'document_type' => 'Proposal Magang Peserta'],
             ['file_path' => $samplePdf]
         );
 
@@ -720,7 +733,7 @@ class SupervisorDemoSeeder extends Seeder
                 'approval_status' => 'revision',
                 'approved_by' => null,
                 'approved_at' => null,
-                'notes' => 'Catatan Atasan: Mohon diverifikasi kembali skor kehadiran pada lembar presensi sebelum pengesahan sertifikat.',
+                'notes' => 'Catatan Atasan: Mohon diverifikasi kembali skor kedisiplinan dengan catatan logbook harian sebelum pengesahan sertifikat.',
             ]
         );
     }

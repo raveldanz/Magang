@@ -335,7 +335,7 @@
                         <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
                             <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Pembimbing Magang</span>
                             <span class="font-bold text-slate-800 text-sm block">Mentor: {{ $placement?->mentor?->name ?? $placement?->pembimbing?->name ?? 'Belum Ditugaskan' }}</span>
-                            <span class="text-slate-500 text-[11px] block mt-0.5">Dosen: {{ $placement?->academicAdvisor?->name ?? '-' }}</span>
+                            <span class="text-slate-500 text-[11px] block mt-0.5">Pembimbing: {{ $placement?->academicAdvisor?->name ?? '-' }}</span>
                         </div>
                     </div>
 
@@ -356,7 +356,7 @@
                                     <div class="flex items-start justify-between gap-2">
                                         <div>
                                             <div class="font-bold text-slate-900 text-xs sm:text-sm">{{ $mStudent?->name ?? '-' }}</div>
-                                            <div class="text-[11px] font-mono text-slate-500">NIM: {{ $mProfile?->nim ?? '-' }}</div>
+                                            <div class="text-[11px] font-mono text-slate-500">NIM/NIS: {{ $mProfile?->nim ?? '-' }}</div>
                                         </div>
                                         @if($mem->is_leader)
                                             <span class="px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded shadow-2xs shrink-0">Ketua Tim</span>
@@ -381,9 +381,9 @@
                 <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                         <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                            <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Mahasiswa Pengembang</span>
+                            <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Peserta Magang Pengembang</span>
                             <span class="font-bold text-slate-900 text-sm block">{{ $student->name ?? '-' }}</span>
-                            <span class="text-slate-500 text-[11px] font-mono block mt-0.5">NIM: {{ $student->studentProfile?->nim ?? '-' }}</span>
+                            <span class="text-slate-500 text-[11px] font-mono block mt-0.5">NIM/NIS: {{ $student->studentProfile?->nim ?? '-' }}</span>
                             @if($project->members->first())
                                 <span class="inline-block mt-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
                                     Peran: {{ $project->members->first()->role_in_project ?: 'Pengembang Utama' }}
@@ -392,7 +392,7 @@
                         </div>
 
                         <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                            <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Asal Perguruan Tinggi</span>
+                            <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Asal Kampus/Sekolah</span>
                             <span class="font-bold text-slate-800 text-sm block">{{ $student->studentProfile?->universitas ?? $student->university ?? '-' }}</span>
                             <span class="text-slate-500 text-[11px] block mt-0.5">{{ $student->studentProfile?->jurusan ?? '-' }}</span>
                         </div>
@@ -406,7 +406,7 @@
                         <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
                             <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Mentor Lapangan (Dinas)</span>
                             <span class="font-bold text-slate-800 text-sm block">{{ $placement?->mentor?->name ?? $placement?->pembimbing?->name ?? 'Belum Ditugaskan' }}</span>
-                            <span class="text-slate-500 text-[11px] block mt-0.5">Dosen: {{ $placement?->academicAdvisor?->name ?? '-' }}</span>
+                            <span class="text-slate-500 text-[11px] block mt-0.5">Pembimbing: {{ $placement?->academicAdvisor?->name ?? '-' }}</span>
                         </div>
                     </div>
                 </div>
@@ -420,7 +420,7 @@
                             Galeri Tangkapan Layar & Dokumentasi Visual Proyek
                         </h3>
                         <p class="text-xs text-slate-500 mt-0.5">
-                            Koleksi antarmuka aplikasi, alur kerja sistem, dan hasil visual yang dirancang mahasiswa
+                            Koleksi antarmuka aplikasi, alur kerja sistem, dan hasil visual yang dirancang peserta magang
                         </p>
                     </div>
                     <div class="flex items-center gap-2">
@@ -468,9 +468,9 @@
                                 <div class="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-thin">
                                     @foreach($allScreenshots as $idx => $item)
                                         <button type="button" 
-                                                @click="activePhoto = '{{ $item['url'] }}'; activeTitle = '{{ $item['title'] }}'"
+                                                @click="activePhoto = @js((string) $item['url']); activeTitle = @js((string) $item['title'])"
                                                 class="relative shrink-0 w-28 sm:w-36 aspect-video rounded-xl overflow-hidden border-2 transition cursor-pointer"
-                                                :class="activePhoto === '{{ $item['url'] }}' ? 'border-blue-600 ring-2 ring-blue-500/30' : 'border-slate-200 opacity-70 hover:opacity-100 hover:border-slate-400'">
+                                                :class="activePhoto === @js((string) $item['url']) ? 'border-blue-600 ring-2 ring-blue-500/30' : 'border-slate-200 opacity-70 hover:opacity-100 hover:border-slate-400'">
                                             <img src="{{ $item['url'] }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover">
                                             <span class="absolute bottom-0 inset-x-0 bg-slate-900/80 text-[10px] text-white text-center py-0.5 truncate px-1 font-medium">
                                                 {{ $item['title'] }}
@@ -495,7 +495,7 @@
                         Deskripsi & Latar Belakang Inovasi
                     </h3>
                     <p class="text-xs text-slate-500 mt-0.5">
-                        Tujuan pembuatan, ruang lingkup teknologi, dan kontribusi mahasiswa selama masa penempatan
+                        Tujuan pembuatan, ruang lingkup teknologi, dan kontribusi peserta magang selama masa penempatan
                     </p>
                 </div>
                 <div class="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line space-y-2">
@@ -561,7 +561,7 @@
                         $repoTitle = $isGithub ? 'Repositori GitHub / Git' : ($isDrive ? 'Folder Google Drive' : ($isBehance ? 'Portofolio Desain' : 'Repositori / Berkas Awan'));
                         $repoButton = $isGithub ? 'Buka Repositori GitHub' : ($isDrive ? 'Buka Google Drive Proyek' : ($isBehance ? 'Buka Portofolio Desain' : 'Buka Tautan Sumber'));
                         $repoDesc = $project->repository_url 
-                            ? ($isGithub ? 'Inspeksi arsitektur kode sumber, commit, dan implementasi teknis.' : ($isDrive ? 'Akses folder Google Drive naskah, berkas master, atau materi proyek.' : 'Akses tautan materi daring karya inovasi mahasiswa.'))
+                            ? ($isGithub ? 'Inspeksi arsitektur kode sumber, commit, dan implementasi teknis.' : ($isDrive ? 'Akses folder Google Drive naskah, berkas master, atau materi proyek.' : 'Akses tautan materi daring karya inovasi peserta magang.'))
                             : 'Tautan repositori atau berkas daring belum dilampirkan.';
                     @endphp
                     <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs hover:shadow-md transition flex flex-col justify-between space-y-4">
@@ -738,7 +738,7 @@
                             Dokumen Pendukung & Berkas Lampiran Proyek
                         </h3>
                         <p class="text-xs text-slate-500 mt-0.5">
-                            Buku panduan (*manual book*), laporan teknis, atau proposal luaran magang mahasiswa
+                            Buku panduan (*manual book*), laporan teknis, atau proposal luaran magang peserta
                         </p>
                     </div>
                     @if(!empty($documents))
@@ -882,7 +882,7 @@
                             <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800" x-text="commentsCount"></span>
                         </h3>
                         <p class="text-xs text-slate-500 mt-0.5">
-                            Sampaikan apresiasi, pertanyaan, atau masukan membangun untuk penyempurnaan karya mahasiswa ini.
+                            Sampaikan apresiasi, pertanyaan, atau masukan membangun untuk penyempurnaan karya peserta magang ini.
                         </p>
                     </div>
                 </div>

@@ -51,6 +51,83 @@ class InternshipProject extends Model
     }
 
     /**
+     * Moderator proyek: Super Admin, atau Admin Dinas/Supervisor dari dinas tempat proyek
+     * itu dibuat. Staf dinas lain tidak boleh melihat proyek privat atau memoderasinya.
+     */
+    public function isModeratableBy(?User $user): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
+        if (! in_array($user->role, ['admin', 'supervisor'], true)) {
+            return false;
+        }
+
+        // Supervisor tanpa dinas adalah supervisor tingkat kota (pengesah lintas dinas)
+        if ($user->agency_profile_id === null) {
+            return $user->role === 'supervisor';
+        }
+
+        $this->loadMissing('placement.application.unit');
+        $agencyId = $this->placement?->application?->unit?->agency_profile_id;
+
+        return $agencyId !== null && (int) $agencyId === (int) $user->agency_profile_id;
+    }
+
+    /**
+     * Batasi query ke proyek yang boleh dilihat: semua proyek publik, ditambah proyek privat
+     * milik dinas moderator (Super Admin melihat semuanya).
+     */
+    public function scopeVisibleTo($query, ?User $user)
+    {
+        if ($user?->isSuperAdmin() || ($user?->role === 'supervisor' && $user->agency_profile_id === null)) {
+            return $query;
+        }
+
+        $agencyId = ($user && in_array($user->role, ['admin', 'supervisor'], true)) ? $user->agency_profile_id : null;
+
+        return $query->where(function ($q) use ($agencyId) {
+            $q->where('is_public', true);
+
+            if ($agencyId !== null) {
+                $q->orWhereHas('placement.application.unit', fn ($u) => $u->where('agency_profile_id', $agencyId));
+            }
+        });
+    }
+
+    /**
+     * Pengguna yang boleh membuka proyek (dipakai juga untuk menerima suka/komentar)
+     */
+    public function isViewableBy(?User $user): bool
+    {
+        if ($this->is_public || $this->isModeratableBy($user)) {
+            return true;
+        }
+
+        if (! $user) {
+            return false;
+        }
+
+        $this->loadMissing(['placement.application', 'members.placement.application']);
+        $placement = $this->placement;
+
+        if ($placement && in_array((int) $user->id, [
+            (int) $placement->application?->user_id,
+            (int) $placement->mentor_id,
+            (int) $placement->academic_advisor_id,
+        ], true)) {
+            return true;
+        }
+
+        return $this->members->contains(fn ($m) => (int) $m->placement?->application?->user_id === (int) $user->id);
+    }
+
+    /**
      * Cek apakah proyek sudah disukai oleh pengguna login atau pengunjung tamu
      */
     public function isLikedBy(?User $user, ?string $guestId = null): bool
@@ -93,6 +170,7 @@ class InternshipProject extends Model
 
         return array_values(array_filter(array_map(function ($item) {
             $path = is_array($item) ? ($item['path'] ?? null) : $item;
+
             return $this->normalizeMediaUrl($path);
         }, $this->screenshots)));
     }
@@ -108,6 +186,7 @@ class InternshipProject extends Model
 
         return array_values(array_filter(array_map(function ($item) {
             $path = is_array($item) ? ($item['path'] ?? null) : $item;
+
             return $this->normalizeMediaUrl($path);
         }, $this->community_photos)));
     }
@@ -125,7 +204,7 @@ class InternshipProject extends Model
 
         // Pola YouTube (youtu.be/ID atau youtube.com/watch?v=ID atau youtube.com/embed/ID)
         if (preg_match('/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/', $url, $matches)) {
-            return 'https://www.youtube.com/embed/' . $matches[1];
+            return 'https://www.youtube.com/embed/'.$matches[1];
         }
 
         return null;
@@ -164,7 +243,7 @@ class InternshipProject extends Model
             return asset($path);
         }
 
-        return asset('storage/' . $path);
+        return asset('storage/'.$path);
     }
 
     public const CATEGORIES = [
@@ -237,48 +316,48 @@ class InternshipProject extends Model
      */
     public const CATEGORY_KEYWORDS = [
         'teknologi' => [
-            'it', 'web', 'website', 'aplikasi', 'software', 'coding', 'koding', 'pemrograman', 'program', 'programmer', 
-            'developer', 'ui', 'ux', 'ui/ux', 'mobile', 'frontend', 'backend', 'fullstack', 'database', 'basis data', 
-            'android', 'ios', 'flutter', 'laravel', 'react', 'vue', 'digital', 'sistem digital', 'sistem informasi', 
-            'komputer', 'jaringan', 'iot', 'ai', 'kecerdasan buatan', 'machine learning', 'api', 'server', 'cloud', 
-            'otomasi digital', 'bot', 'chatbot', 'dashboard', 'portal web', 'e-library', 'perpustakaan digital', 
-            'arsip digital', 'katalog online', 'opac'
+            'it', 'web', 'website', 'aplikasi', 'software', 'coding', 'koding', 'pemrograman', 'program', 'programmer',
+            'developer', 'ui', 'ux', 'ui/ux', 'mobile', 'frontend', 'backend', 'fullstack', 'database', 'basis data',
+            'android', 'ios', 'flutter', 'laravel', 'react', 'vue', 'digital', 'sistem digital', 'sistem informasi',
+            'komputer', 'jaringan', 'iot', 'ai', 'kecerdasan buatan', 'machine learning', 'api', 'server', 'cloud',
+            'otomasi digital', 'bot', 'chatbot', 'dashboard', 'portal web', 'e-library', 'perpustakaan digital',
+            'arsip digital', 'katalog online', 'opac',
         ],
         'buku' => [
-            'buku', 'karya literasi', 'literasi', 'buku bacaan', 'novel', 'cerita', 'cerpen', 'cerita anak', 'cerita pendek', 
-            'cerita rakyat', 'antologi', 'kamus', 'modul', 'modul ajar', 'ensiklopedia', 'bacaan', 'karya tulis', 
-            'karya ilmiah', 'puisi', 'pantun', 'komik', 'penulisan naskah', 'naskah buku', 'penulisan buku', 'resensi', 
-            'jurnal', 'artikel', 'buletin', 'majalah', 'sinopsis', 'esai', 'storytelling', 'dongeng', 'mendongeng', 
-            'pojok baca', 'minat baca', 'klub buku', 'literasi inklusif', 'braille', 'buku saku', 'panduan membaca'
+            'buku', 'karya literasi', 'literasi', 'buku bacaan', 'novel', 'cerita', 'cerpen', 'cerita anak', 'cerita pendek',
+            'cerita rakyat', 'antologi', 'kamus', 'modul', 'modul ajar', 'ensiklopedia', 'bacaan', 'karya tulis',
+            'karya ilmiah', 'puisi', 'pantun', 'komik', 'penulisan naskah', 'naskah buku', 'penulisan buku', 'resensi',
+            'jurnal', 'artikel', 'buletin', 'majalah', 'sinopsis', 'esai', 'storytelling', 'dongeng', 'mendongeng',
+            'pojok baca', 'minat baca', 'klub buku', 'literasi inklusif', 'braille', 'buku saku', 'panduan membaca',
         ],
         'media' => [
-            'media kreatif', 'videografi', 'videografer', 'video', 'edit video', 'editing video', 'video editor', 
-            'sinematografi', 'film', 'film pendek', 'dokumenter', 'animasi', 'motion graphic', 'fotografi', 'fotografer', 
-            'foto', 'photoshoot', 'pemotretan', 'podcast', 'audio', 'audiobook', 'rekaman suara', 'voice over', 
-            'narasi suara', 'multimedia', 'desain grafis', 'grafis', 'desain', 'desainer', 'karya seni', 'seni rupa', 
-            'seni visual', 'seni lukis', 'lukisan', 'melukis', 'sketsa', 'kaligrafi', 'lettering', 'tipografi', 
-            'mural', 'ilustrasi', 'ilustrator', 'poster', 'infografis', 'flyer', 'brosur', 'leaflet', 'pamflet', 
-            'banner', 'spanduk', 'baliho', 'dekorasi visual', 'penata display', 'display pameran', 'maket', 
-            'interior ruang', 'tata ruang', 'wayfinding', 'signage', 'penunjuk arah', 'branding', 'logo', 
-            'feed instagram', 'konten kreatif', 'media sosial', 'youtube', 'reels', 'tiktok', 'katalog visual'
+            'media kreatif', 'videografi', 'videografer', 'video', 'edit video', 'editing video', 'video editor',
+            'sinematografi', 'film', 'film pendek', 'dokumenter', 'animasi', 'motion graphic', 'fotografi', 'fotografer',
+            'foto', 'photoshoot', 'pemotretan', 'podcast', 'audio', 'audiobook', 'rekaman suara', 'voice over',
+            'narasi suara', 'multimedia', 'desain grafis', 'grafis', 'desain', 'desainer', 'karya seni', 'seni rupa',
+            'seni visual', 'seni lukis', 'lukisan', 'melukis', 'sketsa', 'kaligrafi', 'lettering', 'tipografi',
+            'mural', 'ilustrasi', 'ilustrator', 'poster', 'infografis', 'flyer', 'brosur', 'leaflet', 'pamflet',
+            'banner', 'spanduk', 'baliho', 'dekorasi visual', 'penata display', 'display pameran', 'maket',
+            'interior ruang', 'tata ruang', 'wayfinding', 'signage', 'penunjuk arah', 'branding', 'logo',
+            'feed instagram', 'konten kreatif', 'media sosial', 'youtube', 'reels', 'tiktok', 'katalog visual',
         ],
         'preservasi' => [
-            'preservasi', 'preservasi kearsipan', 'konservasi', 'konservasi arsip', 'arsip sejarah', 'sejarah', 
-            'sejarah lokal', 'sejarah surabaya', 'naskah kuno', 'manuskrip', 'naskah bersejarah', 'dokumen sejarah', 
-            'presentasi sejarah', 'kajian sejarah', 'telaah sejarah', 'cagar budaya', 'restorasi', 'restorasi naskah', 
-            'fumigasi', 'laminasi', 'enkapsulasi', 'alih media arsip', 'scanning arsip', 'digitalisasi arsip', 
-            'arsip kuno', 'arsip statis', 'arsip vital', 'khazanah arsip', 'perawatan arsip', 'perawatan fisik', 
-            'penjilidan arsip', 'penyelamatan arsip', 'inventarisasi arsip', 'kurasi arsip', 'pameran arsip', 
-            'diorama sejarah', 'arsiparis'
+            'preservasi', 'preservasi kearsipan', 'konservasi', 'konservasi arsip', 'arsip sejarah', 'sejarah',
+            'sejarah lokal', 'sejarah surabaya', 'naskah kuno', 'manuskrip', 'naskah bersejarah', 'dokumen sejarah',
+            'presentasi sejarah', 'kajian sejarah', 'telaah sejarah', 'cagar budaya', 'restorasi', 'restorasi naskah',
+            'fumigasi', 'laminasi', 'enkapsulasi', 'alih media arsip', 'scanning arsip', 'digitalisasi arsip',
+            'arsip kuno', 'arsip statis', 'arsip vital', 'khazanah arsip', 'perawatan arsip', 'perawatan fisik',
+            'penjilidan arsip', 'penyelamatan arsip', 'inventarisasi arsip', 'kurasi arsip', 'pameran arsip',
+            'diorama sejarah', 'arsiparis',
         ],
         'tata_kelola' => [
-            'tata kelola', 'tata kelola layanan', 'sop', 'standar operasional', 'standar operasional prosedur', 
-            'standar pelayanan', 'maklumat pelayanan', 'pedoman kerja', 'pedoman tata kelola', 'alur layanan', 
-            'alur kerja', 'kebijakan', 'regulasi', 'aturan', 'prosedur kerja', 'analisis jabatan', 'survei kepuasan', 
-            'ikm', 'indeks kepuasan masyarakat', 'kuesioner', 'evaluasi layanan', 'penilaian kinerja', 
-            'jadwal retensi arsip', 'jra', 'penyusutan arsip', 'pemusnahan arsip', 'tata naskah dinas', 
-            'penataan berkas', 'klasifikasi arsip', 'pengelolaan arsip inaktif', 'arsip dinamis', 
-            'administrasi perkantoran', 'manajemen kantor', 'reformasi birokrasi', 'pelayanan publik', 'inovasi layanan'
+            'tata kelola', 'tata kelola layanan', 'sop', 'standar operasional', 'standar operasional prosedur',
+            'standar pelayanan', 'maklumat pelayanan', 'pedoman kerja', 'pedoman tata kelola', 'alur layanan',
+            'alur kerja', 'kebijakan', 'regulasi', 'aturan', 'prosedur kerja', 'analisis jabatan', 'survei kepuasan',
+            'ikm', 'indeks kepuasan masyarakat', 'kuesioner', 'evaluasi layanan', 'penilaian kinerja',
+            'jadwal retensi arsip', 'jra', 'penyusutan arsip', 'pemusnahan arsip', 'tata naskah dinas',
+            'penataan berkas', 'klasifikasi arsip', 'pengelolaan arsip inaktif', 'arsip dinamis',
+            'administrasi perkantoran', 'manajemen kantor', 'reformasi birokrasi', 'pelayanan publik', 'inovasi layanan',
         ],
     ];
 
@@ -298,10 +377,12 @@ class InternshipProject extends Model
             $scores[$catKey] = 0;
             foreach ($keywords as $kw) {
                 $kw = strtolower(trim($kw));
-                if (empty($kw)) continue;
+                if (empty($kw)) {
+                    continue;
+                }
 
                 if (mb_strlen($kw) < 4) {
-                    if (preg_match('/(^|[^a-z0-9])' . preg_quote($kw, '/') . '([^a-z0-9]|$)/i', $text)) {
+                    if (preg_match('/(^|[^a-z0-9])'.preg_quote($kw, '/').'([^a-z0-9]|$)/i', $text)) {
                         $scores[$catKey] += mb_strlen($kw) * 3;
                     }
                 } else {
@@ -332,24 +413,28 @@ class InternshipProject extends Model
     public function getCategoryBadgeClassAttribute(): string
     {
         $key = strtolower(trim((string) $this->category));
+
         return self::CATEGORIES[$key]['badge'] ?? 'bg-emerald-100 text-emerald-800 border-emerald-300';
     }
 
     public function getCategoryBgColorAttribute(): string
     {
         $key = strtolower(trim((string) $this->category));
+
         return self::CATEGORIES[$key]['bg'] ?? '#d1fae5';
     }
 
     public function getCategoryTextColorAttribute(): string
     {
         $key = strtolower(trim((string) $this->category));
+
         return self::CATEGORIES[$key]['text'] ?? '#065f46';
     }
 
     public function getCategoryBorderColorAttribute(): string
     {
         $key = strtolower(trim((string) $this->category));
+
         return self::CATEGORIES[$key]['border'] ?? '#6ee7b7';
     }
 }

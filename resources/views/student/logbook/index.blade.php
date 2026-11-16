@@ -127,7 +127,7 @@
                             <span class="text-slate-500 text-xs mt-0.5 block">{{ $application->unit->name ?? '-' }}</span>
                         </div>
                         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                            <span class="text-slate-400 uppercase font-semibold text-[10px] block mb-1">Universitas / Kampus</span>
+                            <span class="text-slate-400 uppercase font-semibold text-[10px] block mb-1">Kampus / Sekolah</span>
                             <span class="font-bold text-slate-800 text-sm block">{{ Auth::user()->studentProfile->universitas ?? Auth::user()->university ?? '-' }}</span>
                             <span class="text-slate-500 text-xs mt-0.5 block">{{ Auth::user()->studentProfile->jurusan ?? '-' }}</span>
                         </div>
@@ -185,7 +185,7 @@
                                 </p>
                                 @if ($requiresDpl && (!$placement || empty($placement->academic_advisor_id)))
                                     <p class="text-xs text-amber-700 mt-1 leading-relaxed">
-                                        Dosen Pembimbing belum ditugaskan. Hal ini <strong>tidak menghambat</strong> pengisian logbook — validasi dosen akan menyusul setelah dosen pembimbing ditetapkan kampus.
+                                        Pembimbing belum ditugaskan. Hal ini <strong>tidak menghambat</strong> pengisian logbook — validasi pembimbing akan menyusul setelah pembimbing ditetapkan kampus.
                                     </p>
                                 @endif
                             </div>
@@ -193,7 +193,7 @@
                         
                         @if ($requiresDpl && (!$placement || empty($placement->academic_advisor_id)))
                             <a href="{{ route('dashboard') }}#change-advisor-box" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0 flex items-center gap-2 cursor-pointer">
-                                <span>Pilih Dosen di Dashboard </span>
+                                <span>Pilih Pembimbing di Dashboard </span>
                             </a>
                         @endif
                     </div>
@@ -264,8 +264,8 @@
                             <p>&bull; Mentor Dinas belum ditunjuk: logbook Anda divalidasi sementara oleh <strong>Admin Dinas</strong> instansi penempatan.</p>
                         @endunless
                         @if ($requiresDpl && !$placement->hasAcademicAdvisor())
-                            <p>&bull; Dosen Pembimbing belum ditugaskan kampus: validasi dosen akan dilakukan setelah dosen pembimbing ditetapkan.
-                                <a href="{{ route('dashboard') }}#change-advisor-box" class="underline font-semibold">Pilih Dosen di Dashboard</a> bila sudah mengetahui dosen Anda.</p>
+                            <p>&bull; Pembimbing belum ditugaskan kampus: validasi pembimbing akan dilakukan setelah pembimbing ditetapkan.
+                                <a href="{{ route('dashboard') }}#change-advisor-box" class="underline font-semibold">Pilih Pembimbing di Dashboard</a> bila sudah mengetahui pembimbing Anda.</p>
                         @endif
                     </div>
                 @endif
@@ -292,12 +292,12 @@
                             <p class="font-bold text-sm text-white">{{ $placement?->mentor?->name ?? $placement?->pembimbing?->name ?? 'Belum Ditugaskan (divalidasi Admin Dinas)' }}</p>
                         </div>
                         <div class="p-3 bg-white/10 rounded-xl">
-                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Dosen Pembimbing</p>
+                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Pembimbing</p>
                             <p class="font-bold text-sm text-white">{{ $placement?->academicAdvisor?->name ?? 'Belum Ditugaskan' }}</p>
                         </div>
                         <div class="p-3 bg-white/10 rounded-xl">
                             <p class="text-blue-200 uppercase tracking-wider mb-0.5">Periode Magang</p>
-                            <p class="font-bold text-sm text-white">{{ \Carbon\Carbon::parse($application->start_date)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($application->end_date)->format('d M Y') }}</p>
+                            <p class="font-bold text-sm text-white">{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d M Y') }}</p>
                         </div>
                     </div>
                 </div>
@@ -332,7 +332,7 @@
                             <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">
                                 Daftar Logbook Harian
                             </h3>
-                            <p class="text-xs text-gray-400 mt-0.5">Catatan aktivitas dan verifikasi dua arah (Mentor Dinas & Dosen Kampus)</p>
+                            <p class="text-xs text-gray-400 mt-0.5">Catatan aktivitas dan verifikasi dua arah (Mentor Dinas & Pembimbing Kampus/Sekolah)</p>
                         </div>
 
                         {{-- Tombol Tambah Logbook (Hanya Tampil Jika Status ACTIVE) --}}
@@ -377,7 +377,7 @@
                                     <th class="p-4">Kegiatan</th>
                                     <th class="p-4">Lampiran</th>
                                     <th class="p-4 text-center">Status Mentor Dinas</th>
-                                    <th class="p-4 text-center">Status Dosen Kampus</th>
+                                    <th class="p-4 text-center">Status Pembimbing</th>
                                     <th class="p-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -386,20 +386,20 @@
                                     <tr class="hover:bg-gray-50/50 transition">
                                         <td class="p-4 text-gray-500">{{ $index + 1 }}</td>
                                         <td class="p-4 font-semibold text-gray-700 whitespace-nowrap">
-                                            {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}
+                                            {{ \Carbon\Carbon::parse($log->date)->translatedFormat('d M Y') }}
                                         </td>
                                         <td class="p-4 text-gray-700 max-w-xs">
                                             <p class="font-medium text-slate-800">{{ Str::limit($log->activity, 120) }}</p>
-                                            @if(!empty($log->mentor_note))
+                                            @if(!empty($log->feedback))
                                                 <div class="mt-2 p-2 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-start gap-1">
                                                     <span class="font-bold shrink-0">Catatan Mentor:</span>
-                                                    <span>{{ $log->mentor_note }}</span>
+                                                    <span>{{ $log->feedback }}</span>
                                                 </div>
                                             @endif
-                                            @if(!empty($log->lecturer_note))
+                                            @if($requiresDpl && !empty($log->lecturer_feedback))
                                                 <div class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800 flex items-start gap-1">
-                                                    <span class="font-bold shrink-0">Catatan Dosen:</span>
-                                                    <span>{{ $log->lecturer_note }}</span>
+                                                    <span class="font-bold shrink-0">Catatan Pembimbing:</span>
+                                                    <span>{{ $log->lecturer_feedback }}</span>
                                                 </div>
                                             @endif
                                         </td>
@@ -413,7 +413,7 @@
                                                    @click.prevent="$dispatch('open-lightbox', { 
                                                        url: '{{ $log->attachment_url }}', 
                                                        isImage: {{ $isImg ? 'true' : 'false' }}, 
-                                                       title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}' 
+                                                       title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->translatedFormat('d M Y') }}' 
                                                    })"
                                                    target="_blank" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold inline-flex items-center gap-1 transition cursor-pointer">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
@@ -448,7 +448,7 @@
                                                                 @click="$dispatch('open-delete-modal', {
                                                                     action: '{{ route('student.logbook.destroy', $log->id) }}',
                                                                     title: 'Hapus Catatan Logbook',
-                                                                    name: @js('Logbook ' . \Carbon\Carbon::parse($log->date)->format('d M Y')),
+                                                                    name: @js('Logbook ' . \Carbon\Carbon::parse($log->date)->translatedFormat('d M Y')),
                                                                     desc: @js(\Illuminate\Support\Str::limit(strip_tags($log->activity ?? ''), 90))
                                                                 })"
                                                                 class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white shadow-sm cursor-pointer active:scale-95" title="Hapus Logbook">
@@ -486,7 +486,7 @@
                                             {{ $index + 1 }}
                                         </span>
                                         <span class="font-bold text-xs text-slate-800">
-                                            {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}
+                                            {{ \Carbon\Carbon::parse($log->date)->translatedFormat('d M Y') }}
                                         </span>
                                     </div>
                                     @if ($log->attachment)
@@ -498,7 +498,7 @@
                                            @click.prevent="$dispatch('open-lightbox', { 
                                                url: '{{ $log->attachment_url }}', 
                                                isImage: {{ $isImg ? 'true' : 'false' }}, 
-                                               title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}' 
+                                               title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->translatedFormat('d M Y') }}' 
                                            })"
                                            target="_blank" class="px-2.5 py-1 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-lg border border-blue-100 flex items-center gap-1 cursor-pointer">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
@@ -510,6 +510,18 @@
                                 <p class="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
                                     {{ $log->activity }}
                                 </p>
+                                @if(!empty($log->feedback))
+                                    <div class="p-2 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-start gap-1">
+                                        <span class="font-bold shrink-0">Catatan Mentor:</span>
+                                        <span>{{ $log->feedback }}</span>
+                                    </div>
+                                @endif
+                                @if($requiresDpl && !empty($log->lecturer_feedback))
+                                    <div class="p-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800 flex items-start gap-1">
+                                        <span class="font-bold shrink-0">Catatan Pembimbing:</span>
+                                        <span>{{ $log->lecturer_feedback }}</span>
+                                    </div>
+                                @endif
 
                                 <div class="grid grid-cols-2 gap-2 text-[11px]">
                                     <div class="p-2 rounded-xl bg-slate-50 border border-slate-100">
@@ -517,7 +529,7 @@
                                         <x-status-badge type="review" :status="$log->status" class="mt-1" />
                                     </div>
                                     <div class="p-2 rounded-xl bg-slate-50 border border-slate-100">
-                                        <span class="text-slate-400 block text-[10px] font-semibold uppercase">Dosen Pembimbing:</span>
+                                        <span class="text-slate-400 block text-[10px] font-semibold uppercase">Pembimbing:</span>
                                         @if (!$requiresDpl)
                                             <span class="font-bold text-slate-500 mt-0.5 inline-block">Dilewati</span>
                                         @else
@@ -538,7 +550,7 @@
                                                     @click="$dispatch('open-delete-modal', {
                                                         action: '{{ route('student.logbook.destroy', $log->id) }}',
                                                         title: 'Hapus Catatan Logbook',
-                                                        name: @js('Logbook ' . \Carbon\Carbon::parse($log->date)->format('d M Y')),
+                                                        name: @js('Logbook ' . \Carbon\Carbon::parse($log->date)->translatedFormat('d M Y')),
                                                         desc: @js(\Illuminate\Support\Str::limit(strip_tags($log->activity ?? ''), 90))
                                                     })"
                                                     class="px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition cursor-pointer">

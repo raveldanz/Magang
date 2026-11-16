@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Student;
 use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
+use App\Models\AuditLog;
 use App\Models\Logbook;
 use App\Models\Placement;
 use App\Services\PrivateDocumentStorage;
 use App\Services\UniversityResolver;
 use App\Support\UploadRules;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class LogbookController extends Controller
@@ -153,16 +155,28 @@ class LogbookController extends Controller
         }
 
         $request->validate([
-            'date' => 'required|date',
+            'date' => $this->logbookDateRules($application),
             'activity' => 'required|string|min:10',
             'attachment' => 'nullable|'.UploadRules::LOGBOOK_ATTACHMENT,
         ], [
             'date.required' => 'Tanggal kegiatan logbook wajib diisi.',
+            'date.before_or_equal' => 'Tanggal kegiatan tidak boleh melewati hari ini.',
+            'date.after_or_equal' => 'Tanggal kegiatan tidak boleh sebelum periode magang Anda dimulai.',
             'activity.required' => 'Uraian aktivitas harian magang wajib diisi.',
             'activity.min' => 'Uraian aktivitas harian minimal 10 karakter agar informatif.',
             'attachment.mimes' => 'Lampiran logbook harus berformat PDF, JPG, JPEG, atau PNG.',
             'attachment.max' => 'Ukuran file lampiran logbook maksimal 2MB (2048 KB).',
         ]);
+
+        // Tombol Kembali browser menampilkan lagi form yang masih terisi; kirim ulang jangan membuat entri kembar.
+        $sudahTersimpan = Logbook::where('placement_id', $placement->id)
+            ->whereDate('date', $request->date)
+            ->where('activity', $request->activity)
+            ->exists();
+        if ($sudahTersimpan) {
+            return redirect()->route('student.logbook.index')
+                ->with('warning', 'Logbook dengan tanggal dan uraian yang sama sudah tersimpan, jadi tidak disimpan dua kali.');
+        }
 
         $filePath = null;
         if ($request->hasFile('attachment')) {
@@ -185,7 +199,7 @@ class LogbookController extends Controller
             $application->update(['status' => ApplicationStatus::ACTIVE]);
             $application->status = ApplicationStatus::ACTIVE;
 
-            \App\Models\AuditLog::record('AUTO_ACTIVATE_ON_FIRST_LOGBOOK', 'Application', $application->id, [
+            AuditLog::record('AUTO_ACTIVATE_ON_FIRST_LOGBOOK', 'Application', $application->id, [
                 'student_name' => $user->name,
                 'activity_date' => $request->date,
                 'reason' => 'Otomatis diaktifkan ke status ACTIVE saat logbook pertama berhasil disimpan.',
@@ -196,6 +210,28 @@ class LogbookController extends Controller
         $placement->syncCompletionStatus();
 
         return redirect()->route('student.logbook.index')->with('success', 'Logbook kegiatan berhasil disimpan!');
+    }
+
+    /**
+     * Tanggal logbook harus masuk akal: tidak di masa depan dan tidak sebelum magang dimulai.
+     * Batas bawah memakai tanggal yang lebih awal antara tanggal mulai dan tanggal pengajuan dibuat,
+     * karena mahasiswa berstatus Diterima boleh mulai mencatat sebelum tanggal mulai resmi.
+     *
+     * @return array<int, string>
+     */
+    protected function logbookDateRules(Application $application): array
+    {
+        $rules = ['required', 'date', 'before_or_equal:today'];
+
+        $candidates = array_filter([
+            $application->start_date ? Carbon::parse($application->start_date)->startOfDay() : null,
+            $application->created_at?->copy()->startOfDay(),
+        ]);
+        if ($candidates !== []) {
+            $rules[] = 'after_or_equal:'.min($candidates)->toDateString();
+        }
+
+        return $rules;
     }
 
     /**
@@ -243,11 +279,13 @@ class LogbookController extends Controller
         }
 
         $request->validate([
-            'date' => 'required|date',
+            'date' => $this->logbookDateRules($application),
             'activity' => 'required|string|min:10',
             'attachment' => 'nullable|'.UploadRules::LOGBOOK_ATTACHMENT,
         ], [
             'date.required' => 'Tanggal kegiatan logbook wajib diisi.',
+            'date.before_or_equal' => 'Tanggal kegiatan tidak boleh melewati hari ini.',
+            'date.after_or_equal' => 'Tanggal kegiatan tidak boleh sebelum periode magang Anda dimulai.',
             'activity.required' => 'Uraian aktivitas harian magang wajib diisi.',
             'activity.min' => 'Uraian aktivitas harian minimal 10 karakter agar informatif.',
             'attachment.mimes' => 'Lampiran logbook harus berformat PDF, JPG, JPEG, atau PNG.',

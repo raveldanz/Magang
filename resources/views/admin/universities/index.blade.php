@@ -3,10 +3,10 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>Master Perguruan Tinggi Mitra (Universitas)</span>
+                    <span>Master Kampus & Sekolah Mitra</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Kelola profil kampus, PIC Rektorat/Fakultas, data logo, dan statistik mahasiswa magang
+                    Kelola profil kampus, PIC Rektorat/Fakultas, data logo, dan statistik peserta magang
                 </p>
             </div>
 
@@ -16,7 +16,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                 </svg>
-                <span>Tambah Universitas Baru</span>
+                <span>Tambah Kampus/Sekolah Baru</span>
             </a>
             @endif
         </div>
@@ -151,9 +151,9 @@
                         </div>
                         <div>
                             <h4 class="font-bold text-amber-900 text-xs sm:text-sm">Terdapat {{ $unregisteredCount }}
-                                Perguruan Tinggi yang Belum Memiliki Akun Admin</h4>
+                                Kampus/Sekolah yang Belum Memiliki Akun Admin</h4>
                             <p class="text-[11px] text-amber-700 mt-0.5">Buatkan akun agar perwakilan kampus dapat login
-                                untuk monitoring mahasiswa dan penugasan dosen pembimbing.</p>
+                                untuk monitoring peserta magang dan penugasan pembimbing.</p>
                         </div>
                     </div>
                 </div>
@@ -171,23 +171,23 @@
                     </div>
 
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-xs transition">
-                        <div class="text-xs font-semibold text-slate-500">Total Mahasiswa</div>
+                        <div class="text-xs font-semibold text-slate-500">Total Peserta Magang</div>
                         <div class="mt-2 text-3xl font-black text-slate-900 tracking-tight">
                             {{ $macroStats['total_students'] }}
                         </div>
-                        <div class="mt-1 text-xs text-slate-400">Mahasiswa terdaftar</div>
+                        <div class="mt-1 text-xs text-slate-400">Peserta Magang terdaftar</div>
                     </div>
 
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-xs transition">
-                        <div class="text-xs font-semibold text-slate-500">Dosen Pembimbing</div>
+                        <div class="text-xs font-semibold text-slate-500">Pembimbing</div>
                         <div class="mt-2 text-3xl font-black text-slate-900 tracking-tight">
                             {{ $macroStats['total_dosens'] }}
                         </div>
-                        <div class="mt-1 text-xs text-slate-400">Dosen pembimbing aktif</div>
+                        <div class="mt-1 text-xs text-slate-400">Pembimbing aktif</div>
                     </div>
 
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-xs transition">
-                        <div class="text-xs font-semibold text-slate-500">Mahasiswa Magang</div>
+                        <div class="text-xs font-semibold text-slate-500">Peserta Magang</div>
                         <div class="mt-2 text-3xl font-black text-slate-900 tracking-tight">
                             {{ $macroStats['total_active_interns'] }}
                         </div>
@@ -200,7 +200,7 @@
             @if(($pendingVerificationCount ?? 0) > 0)
                 <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <p class="text-xs text-yellow-900">
-                        <strong>{{ $pendingVerificationCount }} perguruan tinggi</strong> didaftarkan mandiri oleh mahasiswa dan menunggu verifikasi.
+                        <strong>{{ $pendingVerificationCount }} perguruan tinggi</strong> didaftarkan mandiri oleh peserta magang dan menunggu verifikasi.
                     </p>
                     @if(request('verification') === 'pending')
                         <a href="{{ route('admin.universities.index') }}" class="px-4 py-2 bg-white border border-yellow-300 text-yellow-800 text-xs font-bold rounded-xl shrink-0">Tampilkan Semua</a>
@@ -252,10 +252,10 @@
                             <!-- Header: Logo, Kode Kampus, Status Badge, & Menu Opsi Kanan Atas -->
                             <div class="flex items-start justify-between gap-3 mb-4">
                                 <a href="{{ route('admin.universities.show', $univ->id) }}"
-                                    class="w-13 h-13 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2.5 shrink-0 overflow-hidden shadow-2xs"
-                                    style="width: 52px; height: 52px;">
+                                    class="rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2 shrink-0 overflow-hidden shadow-2xs"
+                                    style="min-width: 64px; max-width: 88px; height: 64px;">
                                     <img src="{{ $univLogoUrl }}" alt="{{ $univ->name }}"
-                                        class="w-9 h-9 object-contain shrink-0">
+                                        class="object-contain shrink-0" style="height: 48px; width: auto; min-width: 48px; max-width: 72px;">
                                 </a>
 
                                 <div class="flex items-center gap-1.5 shrink-0">
@@ -289,7 +289,7 @@
                                     </span>
                                 @else
                                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-yellow-50 text-yellow-800 border border-yellow-300"
-                                        title="Kampus ini didaftarkan mandiri oleh mahasiswa melalui opsi Perguruan Tinggi Lainnya">
+                                        title="Kampus ini didaftarkan mandiri oleh peserta magang melalui opsi Lainnya">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                         {{ $univ->verification_label }}
                                     </span>
@@ -320,11 +320,11 @@
                                 class="grid grid-cols-3 gap-2 p-3 bg-slate-50/80 rounded-2xl border border-slate-100 text-center mb-5 select-none">
                                 <div>
                                     <div class="text-sm font-black text-slate-900">{{ $univ->students_count }}</div>
-                                    <div class="text-[10px] font-medium text-slate-500 mt-0.5">Mahasiswa</div>
+                                    <div class="text-[10px] font-medium text-slate-500 mt-0.5">Peserta Magang</div>
                                 </div>
                                 <div class="border-x border-slate-200/60">
                                     <div class="text-sm font-black text-blue-600">{{ $univ->dosens_count }}</div>
-                                    <div class="text-[10px] font-medium text-blue-600/90 mt-0.5">Dosen</div>
+                                    <div class="text-[10px] font-medium text-blue-600/90 mt-0.5">Pembimbing</div>
                                 </div>
                                 <div>
                                     <div class="text-sm font-black text-slate-900">{{ $univ->users_count }}</div>
@@ -340,11 +340,11 @@
                                 <button type="button"
                                     @click="$dispatch('open-confirm-modal', {
                                         form: $el.form,
-                                        title: 'Verifikasi Perguruan Tinggi',
-                                        message: 'Kampus ini didaftarkan mandiri oleh mahasiswa. Pastikan nama perguruan tinggi benar dan tidak duplikat dengan kampus yang sudah terdaftar.',
+                                        title: 'Verifikasi Kampus/Sekolah',
+                                        message: 'Kampus ini didaftarkan mandiri oleh peserta magang. Pastikan nama perguruan tinggi benar dan tidak duplikat dengan kampus yang sudah terdaftar.',
                                         label: 'Perguruan tinggi:',
                                         name: @js($univ->name),
-                                        desc: 'Setelah diverifikasi, kampus akan tampil di dropdown pendaftaran semua mahasiswa.',
+                                        desc: 'Setelah diverifikasi, kampus akan tampil di dropdown pendaftaran semua peserta magang.',
                                         confirmText: 'Ya, Verifikasi'
                                     })"
                                     class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs">
@@ -374,7 +374,7 @@
                                             @click="$dispatch('open-confirm-modal', {
                                                 form: $el.form,
                                                 title: 'Gabungkan Kampus Dobel',
-                                                message: 'Semua mahasiswa, dosen, dan akun yang tercatat di kampus ini akan dipindahkan ke kampus tujuan, lalu entri ini dihapus.',
+                                                message: 'Semua peserta magang, pembimbing, dan akun yang tercatat di kampus ini akan dipindahkan ke kampus tujuan, lalu entri ini dihapus.',
                                                 label: 'Kampus yang digabungkan:',
                                                 name: @js($univ->name),
                                                 desc: 'Tindakan ini tidak dapat dibatalkan.',
@@ -396,7 +396,7 @@
                                         @click="$dispatch('open-confirm-modal', {
                                             form: $el.form,
                                             title: 'Buat Akun Admin Kampus',
-                                            message: 'Sistem akan membuat akun login portal untuk perwakilan kampus agar dapat mengelola dosen pembimbing secara mandiri.',
+                                            message: 'Sistem akan membuat akun login portal untuk perwakilan kampus agar dapat mengelola pembimbing secara mandiri.',
                                             label: 'Perguruan tinggi:',
                                             name: @js($univ->name),
                                             desc: 'Password awal: password',
@@ -428,7 +428,7 @@
                 @empty
                     <div class="col-span-full py-12 text-center text-gray-400 bg-white rounded-2xl border border-gray-100">
                         <p class="font-bold text-gray-600">Belum ada universitas terdaftar</p>
-                        <p class="text-xs mt-1">Gunakan tombol "Tambah Universitas Baru" untuk mendaftarkan perguruan
+                        <p class="text-xs mt-1">Gunakan tombol "Tambah Kampus/Sekolah Baru" untuk mendaftarkan perguruan
                             tinggi.</p>
                     </div>
                 @endforelse

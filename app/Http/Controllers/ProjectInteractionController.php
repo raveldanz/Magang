@@ -21,7 +21,7 @@ class ProjectInteractionController extends Controller
     {
         $guestToken = $request->session()->get('guest_project_token');
         if (! $guestToken) {
-            $guestToken = 'gst_' . Str::random(32) . '_' . substr(md5($request->ip() . $request->userAgent()), 0, 12);
+            $guestToken = 'gst_'.Str::random(32).'_'.substr(md5($request->ip().$request->userAgent()), 0, 12);
             $request->session()->put('guest_project_token', $guestToken);
         }
 
@@ -35,11 +35,12 @@ class ProjectInteractionController extends Controller
     {
         $project = InternshipProject::findOrFail($id);
         $user = Auth::user();
+        abort_unless($project->isViewableBy($user), 403, 'Proyek inovasi ini berstatus privat.');
         $guestId = $user ? null : $this->getGuestIdentifier($request);
 
         $existingLike = ProjectLike::where('internship_project_id', $project->id)
             ->when($user, fn ($q) => $q->where('user_id', $user->id))
-            ->when(!$user, fn ($q) => $q->where('guest_identifier', $guestId))
+            ->when(! $user, fn ($q) => $q->where('guest_identifier', $guestId))
             ->first();
 
         if ($existingLike) {
@@ -77,6 +78,7 @@ class ProjectInteractionController extends Controller
     {
         $project = InternshipProject::findOrFail($id);
         $user = Auth::user();
+        abort_unless($project->isViewableBy($user), 403, 'Proyek inovasi ini berstatus privat.');
 
         // 1. Validasi Input
         $rules = [
@@ -96,12 +98,12 @@ class ProjectInteractionController extends Controller
         ]);
 
         // 2. Filter Ketat Kata Kotor dan Jorok (Tanpa False Positive)
-        $textToCheck = ($validated['author_name'] ?? '') . ' ' . $validated['comment'];
+        $textToCheck = ($validated['author_name'] ?? '').' '.$validated['comment'];
         $profanityResult = ProfanityFilterService::check($textToCheck);
 
         if (! $profanityResult['is_clean']) {
             $errorMessage = $profanityResult['message'] ?? 'Komentar mengandung kata tidak pantas. Mohon gunakan bahasa yang sopan dan santun.';
-            
+
             if ($request->expectsJson() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
@@ -162,7 +164,7 @@ class ProjectInteractionController extends Controller
 
         // Otorisasi: Hanya Super Admin, Admin Dinas, atau pemilik komentar yang berhak menghapus
         $isSuperAdmin = $user?->isSuperAdmin() ?? false;
-        $isAdminDinas = $user && in_array($user->role, ['admin', 'supervisor']);
+        $isAdminDinas = $project?->isModeratableBy($user) ?? false;
         $isOwner = $user && $comment->user_id === $user->id;
 
         if (! ($isSuperAdmin || $isAdminDinas || $isOwner)) {
@@ -199,11 +201,12 @@ class ProjectInteractionController extends Controller
     {
         $comment = ProjectComment::findOrFail($commentId);
         $user = Auth::user();
+        abort_unless($comment->project?->isViewableBy($user) ?? false, 403, 'Proyek inovasi ini berstatus privat.');
         $guestId = $user ? null : $this->getGuestIdentifier($request);
 
         $existingLike = ProjectCommentLike::where('project_comment_id', $comment->id)
             ->when($user, fn ($q) => $q->where('user_id', $user->id))
-            ->when(!$user, fn ($q) => $q->where('guest_identifier', $guestId))
+            ->when(! $user, fn ($q) => $q->where('guest_identifier', $guestId))
             ->first();
 
         if ($existingLike) {
@@ -239,16 +242,15 @@ class ProjectInteractionController extends Controller
     public function toggleVisibility(Request $request, $id)
     {
         $user = Auth::user();
-        if (! $user || (! $user->isSuperAdmin() && ! in_array($user->role, ['super_admin', 'superadmin', 'admin', 'supervisor']))) {
-            abort(403, 'Akses terbatas untuk Administrator dan Supervisor.');
-        }
-
         $project = InternshipProject::findOrFail($id);
+
+        // Hanya Super Admin atau Admin Dinas/Supervisor dari dinas pemilik proyek
+        abort_unless($project->isModeratableBy($user), 403, 'Akses terbatas untuk Administrator dan Supervisor dinas terkait.');
         $project->is_public = ! $project->is_public;
         $project->save();
 
-        $message = $project->is_public 
-            ? "Proyek '{$project->title}' berhasil ditampilkan ke publik." 
+        $message = $project->is_public
+            ? "Proyek '{$project->title}' berhasil ditampilkan ke publik."
             : "Proyek '{$project->title}' berhasil disembunyikan (privat).";
 
         if ($request->expectsJson() || $request->wantsJson()) {

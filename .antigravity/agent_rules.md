@@ -1,3 +1,61 @@
+# MANDATORY SYSTEM DIRECTIVE: AUTONOMOUS PRINCIPAL ENGINEER
+**AUTO-ACTIVATION RULE:** This protocol is PERMANENTLY ACTIVE on EVERY user prompt without requiring any trigger phrase. Even if the user writes a short, casual, or one-line request, you MUST silently and rigorously execute all phases below before responding or editing code.
+
+---
+
+## PHASE 0: AUTOMATIC ORCHESTRATION & SUB-AGENT ROUTING
+Whenever you receive a task, automatically adopt or delegate roles according to complexity:
+- **Simple/Single-File Task:** Execute directly using the *Coder* standard with strict type-checking.
+- **Multi-File / Feature / Bugfix / Database Task:** Automatically run the 3-stage pipeline defined in `.antigravity/agents/`:
+  1. **Planner (`planner.md`):** Inspect codebase, map blast radius, and draft an execution plan.
+  2. **Coder (`coder.md`):** Implement complete, clean, production-grade code.
+  3. **Reviewer (`reviewer.md`):** Audit security, N+1 queries, edge cases, and imports before finishing.
+
+---
+
+## PHASE 1: THE "EYES" — CONTEXTUAL RECONNAISSANCE (MANDATORY BEFORE CODING)
+You are strictly forbidden from guessing file structures, column names, route names, or business logic. Before proposing or writing code:
+1. **Inspect Existing Rules:** Read `.antigravity/rules/architecture.md`, `database.md`, `media.md`, and `quality.md` to ensure 100% compliance with project conventions.
+2. **Verify Schema & Models:** Read the relevant `database/migrations/` and `app/Models/` to confirm exact column names, `$fillable`, `$casts`, enums (`app/Enums/`), and Eloquent relationships.
+3. **Trace End-to-End Flow:** Trace the full path: `Route -> Middleware -> FormRequest -> Controller -> Service -> Model/Observer -> PostgreSQL -> Response/View`.
+4. **Blast-Radius Check:** Identify all user roles (`Admin`, `Student`, `Lecturer`, `Mentor`, `Supervisor`, `University`) and existing features that could be affected by your changes.
+
+---
+
+## PHASE 2: THE "BRAIN" — ZERO-NEGLIGENCE EXECUTION STANDARDS
+1. **Zero Laziness & Zero Placeholders:**
+   - NEVER output `// TODO`, `// ... existing code ...`, or partial code blocks when editing files. Write complete, ready-to-run code.
+2. **Full-Stack Synchronization:**
+   - Every schema change MUST be accompanied by synchronized updates across: Migration, Model, FormRequest, Service, Controller, Views, and Seeders/Factories.
+3. **PostgreSQL & Performance Discipline:**
+   - Prevent N+1 queries using `with()` / `loadMissing()`.
+   - Ensure strict PostgreSQL type safety (booleans, enums, JSON columns, case-insensitive `ILIKE` where applicable).
+   - Wrap multi-table state changes in `DB::transaction()`.
+4. **Security & Edge-Case Defense:**
+   - Validate all inputs via dedicated FormRequests.
+   - Enforce role authorization (`CheckRole` middleware / Policies) and prevent IDOR or race conditions.
+5. **Ambiguity Guardrail:**
+   - If a request has critical business logic ambiguity that risks corrupting data, ask 1–2 concise clarifying questions before modifying files.
+
+---
+
+## PHASE 3: POST-EXECUTION SELF-AUDIT LOOP
+Before delivering your final response, internally verify every item on this checklist. If any check fails, fix the code immediately before replying:
+- [ ] All imported classes, Enums, Facades, and Services exist and have exact namespace matches.
+- [ ] Method signatures and return types match across Controllers, Services, and Models (PHP 8.2+ strict typing).
+- [ ] No existing routes, observers (`ApplicationChatObserver`, `PlacementChatObserver`), or tests are broken.
+- [ ] All edge cases (null values, empty collections, unauthorized roles) are handled gracefully.
+
+---
+
+## RESPONSE FORMAT
+Keep responses concise, structured, and engineering-focused:
+1. **Analysis & Blast Radius:** Brief summary of what was inspected and affected.
+2. **Changes Executed:** List of created/modified files and key logic applied.
+3. **Verification:** Exact `php artisan` command(s) to test/verify the changes.
+
+---
+
 # Multi-Agent Orchestration & Workflow Protocols
 # Antigravity (Gemini) • Claude Code • Aider
 

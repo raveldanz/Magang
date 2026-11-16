@@ -4,9 +4,12 @@ namespace App\Http\Controllers\University;
 
 use App\Http\Controllers\Controller;
 use App\Models\University;
+use App\Services\UniversityResolver;
+use App\Support\SafeUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
@@ -52,9 +55,35 @@ class ProfileController extends Controller
             $user->update(['university_id' => $university->id]);
         }
 
+        // Kode disimpan huruf besar; samakan dulu agar cek unik tidak lolos karena beda huruf
+        if ($request->filled('code')) {
+            $request->merge(['code' => strtoupper(trim((string) $request->code))]);
+        }
+
+        // Pemeriksaan unik setelah normalisasi (huruf, tanda baca, spasi), dibandingkan dengan nama,
+        // akronim, kode, dan slug kampus lain — sama seperti cara UniversityResolver mencocokkan kampus.
+        $otherKeys = University::where('id', '!=', $university->id)
+            ->get(['name', 'acronym', 'code', 'slug'])
+            ->flatMap(fn ($u) => [
+                UniversityResolver::normalize($u->name),
+                UniversityResolver::normalize($u->acronym),
+                UniversityResolver::normalize($u->code),
+                UniversityResolver::normalize(str_replace('-', ' ', (string) $u->slug)),
+            ])
+            ->filter()
+            ->unique()
+            ->all();
+        $notAnotherCampus = function (string $attribute, $value, \Closure $fail) use ($otherKeys) {
+            $normalized = UniversityResolver::normalize((string) $value);
+            if ($normalized !== '' && in_array($normalized, $otherKeys, true)) {
+                $fail('Nama atau kode ini sudah dipakai kampus/sekolah lain.');
+            }
+        };
+
         $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => 'nullable|string|max:20',
+            // Nama & kode kampus harus unik: admin kampus tidak boleh menyamar sebagai kampus lain
+            'name' => ['required', 'string', 'max:255', Rule::unique('universities', 'name')->ignore($university->id), $notAnotherCampus],
+            'code' => ['nullable', 'string', 'min:2', 'max:20', Rule::unique('universities', 'code')->ignore($university->id), $notAnotherCampus],
             'address' => 'nullable|string|max:1000',
             'phone' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:255',
@@ -71,7 +100,7 @@ class ProfileController extends Controller
             'dpl_components' => 'nullable|array',
             'dpl_components.*' => 'nullable|string|max:255',
         ], [
-            'name.required' => 'Nama resmi universitas / perguruan tinggi wajib diisi.',
+            'name.required' => 'Nama resmi kampus/sekolah wajib diisi.',
             'logo.image' => 'File logo harus berupa gambar (PNG, JPG, WEBP, atau SVG).',
             'logo.max' => 'Ukuran file logo maksimal 2MB.',
         ]);
@@ -87,7 +116,7 @@ class ProfileController extends Controller
 
             if (($weightMentor + $weightLecturer) !== 100) {
                 throw ValidationException::withMessages([
-                    'weight_mentor' => 'Total bobot penilaian Mentor Dinas ('.$weightMentor.'%) dan DPL Kampus ('.$weightLecturer.'%) harus berjumlah tepat 100%.',
+                    'weight_mentor' => 'Total bobot penilaian Mentor Dinas ('.$weightMentor.'%) dan Pembimbing Kampus ('.$weightLecturer.'%) harus berjumlah tepat 100%.',
                 ]);
             }
 
@@ -119,7 +148,7 @@ class ProfileController extends Controller
                     $clean[$i++] = $val;
                 }
             }
-            $data['dinas_components'] = !empty($clean) ? $clean : null;
+            $data['dinas_components'] = ! empty($clean) ? $clean : null;
         }
 
         if ($request->has('dpl_components')) {
@@ -132,14 +161,14 @@ class ProfileController extends Controller
                     $clean[$i++] = $val;
                 }
             }
-            $data['dpl_components'] = !empty($clean) ? $clean : null;
+            $data['dpl_components'] = ! empty($clean) ? $clean : null;
         }
 
         // Handle upload logo
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $cleanCode = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->code ?? 'univ'));
-            $filename = $cleanCode.'_'.time().'.'.$file->getClientOriginalExtension();
+            $filename = $cleanCode.'_'.time().'.'.SafeUpload::extension($file, ['jpg', 'jpeg', 'png', 'webp'], 'png');
 
             $targetDir = public_path('images/logos');
             if (! File::exists($targetDir)) {
@@ -159,6 +188,6 @@ class ProfileController extends Controller
         ]);
 
         return redirect()->route('university.profile.index')
-            ->with('success', 'Profil Resmi Perguruan Tinggi & Kop Surat berhasil diperbarui!');
+            ->with('success', 'Profil Resmi Kampus/Sekolah & Kop Surat berhasil diperbarui!');
     }
 }

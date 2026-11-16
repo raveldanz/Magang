@@ -19,8 +19,8 @@
             @if(session('success'))
                 <div class="p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-300 text-emerald-900 flex items-center justify-between gap-3 shadow-sm">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold shrink-0">
-                            ✓
+                        <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                         </div>
                         <div class="text-sm font-bold">{{ session('success') }}</div>
                     </div>
@@ -55,12 +55,12 @@
                                 </span>
                             </div>
                             <p class="text-xs text-slate-500 mt-1">
-                                NIM: <span class="font-bold text-slate-800">{{ $profile?->nim ?? '-' }}</span> &bull; 
+                                NIM/NIS: <span class="font-bold text-slate-800">{{ $profile?->nim ?? '-' }}</span> &bull; 
                                 <span class="text-blue-700 font-semibold">{{ $profile?->universitas ?? $student?->university ?? '-' }}</span> &bull; 
                                 <span class="text-slate-600">{{ $profile?->jurusan ?? '-' }}</span>
                             </p>
                             <p class="text-[11px] text-slate-400 font-mono mt-0.5">
-                                Draft No: {{ $certificate->certificate_number ?? $placement->certificate_number ?? 'Nomor otomatis' }}
+                                No. Draf: {{ $certificate->certificate_number ?? $placement->certificate_number ?? 'Nomor otomatis' }}
                             </p>
                         </div>
                     </div>
@@ -69,7 +69,7 @@
                         <a href="{{ route('supervisor.certificates.show', $placement->id) }}" target="_blank"
                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs border border-slate-300 shadow-2xs transition cursor-pointer">
                             <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                            <span>Pratinjau Draft Sertifikat</span>
+                            <span>Pratinjau Draf Sertifikat</span>
                         </a>
                     </div>
                 </div>
@@ -148,7 +148,7 @@
                                         {{ $evaluation->final_score ?? '-' }}
                                     </span>
                                     <span class="px-2 py-0.5 rounded-md font-bold text-xs bg-emerald-100 text-emerald-800">
-                                        Grade: {{ $evaluation->grade ?? '-' }}
+                                        Predikat: {{ $evaluation->grade ?? '-' }}
                                     </span>
                                 </div>
                             </div>
@@ -181,7 +181,7 @@
                                 Catatan Khusus Aspek Nilai:
                             </label>
                             <textarea name="aspect_notes[nilai]" rows="2" 
-                                      placeholder="Contoh: Skor kedisiplinan presensi mohon diverifikasi ulang dengan buku absensi..."
+                                      placeholder="Contoh: Skor kedisiplinan mohon diverifikasi ulang dengan catatan logbook harian..."
                                       class="w-full text-xs p-3 rounded-xl border border-amber-300 focus:border-amber-600 focus:ring-0 bg-white shadow-2xs">{{ old('aspect_notes.nilai') }}</textarea>
                         </div>
                     </div>
@@ -199,7 +199,7 @@
                                        :class="selectedAspects.includes('identitas') ? 'border-amber-500' : 'border-slate-300'">
                                 <div>
                                     <span class="text-[10px] font-black uppercase tracking-wider text-amber-700 block">Aspek 2</span>
-                                    <h4 class="text-base font-black text-slate-900">Data Mahasiswa & Magang</h4>
+                                    <h4 class="text-base font-black text-slate-900">Data Peserta & Magang</h4>
                                 </div>
                             </label>
                             <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold"
@@ -212,15 +212,15 @@
                         {{-- Ringkasan Biodata & Periode Magang --}}
                         <div class="p-3.5 bg-white/90 rounded-2xl border border-slate-200/80 space-y-2 text-xs">
                             <div class="flex justify-between items-center py-1 border-b border-slate-100">
-                                <span class="text-slate-500">Nama Mahasiswa:</span>
+                                <span class="text-slate-500">Nama Peserta Magang:</span>
                                 <span class="font-bold text-slate-900 text-right">{{ $student?->name }}</span>
                             </div>
                             <div class="flex justify-between items-center py-1 border-b border-slate-100">
-                                <span class="text-slate-500">Nomor Induk Mahasiswa:</span>
+                                <span class="text-slate-500">NIM / NIS:</span>
                                 <span class="font-mono font-bold text-slate-800">{{ $profile?->nim ?? '-' }}</span>
                             </div>
                             <div class="flex justify-between items-center py-1 border-b border-slate-100">
-                                <span class="text-slate-500">Perguruan Tinggi:</span>
+                                <span class="text-slate-500">Kampus/Sekolah:</span>
                                 <span class="font-semibold text-blue-700 text-right">{{ $profile?->universitas ?? '-' }}</span>
                             </div>
                             <div class="flex justify-between items-center py-1 border-b border-slate-100">
@@ -241,7 +241,7 @@
                                 Catatan Khusus Aspek Identitas:
                             </label>
                             <textarea name="aspect_notes[identitas]" rows="2" 
-                                      placeholder="Contoh: Ejaan nama mahasiswa mohon disesuaikan dengan KTP atau format penulisan NIM..."
+                                      placeholder="Contoh: Ejaan nama peserta magang mohon disesuaikan dengan KTP atau format penulisan NIM/NIS..."
                                       class="w-full text-xs p-3 rounded-xl border border-amber-300 focus:border-amber-600 focus:ring-0 bg-white shadow-2xs">{{ old('aspect_notes.identitas') }}</textarea>
                         </div>
                     </div>
@@ -272,7 +272,7 @@
                         {{-- Ringkasan Status Logbook & Naskah Laporan --}}
                         <div class="p-3.5 bg-white/90 rounded-2xl border border-slate-200/80 space-y-2.5 text-xs">
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-500">Presensi & Logbook Aktivitas:</span>
+                                <span class="text-slate-500">Logbook Aktivitas Harian:</span>
                                 <span class="font-bold text-slate-900">
                                     {{ $logbookApproved }} disetujui dari {{ $logbookTotal }} entri
                                 </span>
@@ -315,11 +315,11 @@
                                        class="w-5 h-5 rounded-lg border-2 text-amber-600 focus:ring-0 cursor-pointer"
                                        :class="selectedAspects.includes('lainnya') ? 'border-amber-500' : 'border-slate-300'">
                                 <div>
-                                    <span class="text-[10px] font-black uppercase tracking-wider text-amber-700 block">Aspek 4</span>
+                                    <span class="text-xs font-black uppercase tracking-wider text-amber-800 block">Aspek 4</span>
                                     <h4 class="text-base font-black text-slate-900">Aspek Lainnya & Tata Persuratan</h4>
                                 </div>
                             </label>
-                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold"
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold"
                                   :class="selectedAspects.includes('lainnya') ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-600'">
                                 <span x-show="selectedAspects.includes('lainnya')">Dipilih untuk Revisi</span>
                                 <span x-show="!selectedAspects.includes('lainnya')">Sesuai / Valid</span>
@@ -346,7 +346,7 @@
                 {{-- INSTRUKSI & CATATAN UTAMA (WAJIB) --}}
                 <div class="bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-xs space-y-4">
                     <div>
-                        <span class="text-xs font-black uppercase tracking-wider text-amber-600">Instruksi Eksekutif</span>
+                        <span class="text-xs font-black uppercase tracking-wider text-amber-700">Instruksi Eksekutif</span>
                         <h3 class="text-base sm:text-lg font-black text-slate-900 mt-0.5">
                             Catatan Resmi Perbaikan untuk Admin Dinas
                         </h3>
@@ -357,15 +357,15 @@
 
                     {{-- Quick Template Chips --}}
                     <div>
-                        <span class="text-[11px] font-bold text-slate-500 block mb-2">Rekomendasi Template Catatan Cepat:</span>
+                        <span class="text-xs font-bold text-slate-600 block mb-2">Rekomendasi Template Catatan Cepat:</span>
                         <div class="flex flex-wrap gap-2">
-                            <button type="button" @click="appendNote('Mohon sesuaikan ejaan nama lengkap mahasiswa dengan KTP resmi.')"
+                            <button type="button" @click="appendNote('Mohon sesuaikan ejaan nama lengkap peserta magang dengan KTP resmi.')"
                                     class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
                                 + Ejaan nama sesuai KTP
                             </button>
-                            <button type="button" @click="appendNote('Nilai disiplin presensi perlu diperiksa ulang dengan logbook kehadiran.')"
+                            <button type="button" @click="appendNote('Nilai disiplin perlu diperiksa ulang dengan logbook harian.')"
                                     class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
-                                + Sinkronisasi nilai presensi
+                                + Cek nilai disiplin
                             </button>
                             <button type="button" @click="appendNote('Periksa kembali tanggal periode pelaksanaan magang pada sistem.')"
                                     class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
@@ -375,9 +375,9 @@
                                     class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
                                 + Pengesahan naskah laporan
                             </button>
-                            <button type="button" @click="appendNote('Format penulisan NIM dan Program Studi perlu disesuaikan.')"
+                            <button type="button" @click="appendNote('Format penulisan NIM/NIS dan Program Studi perlu disesuaikan.')"
                                     class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
-                                + Format NIM dan Prodi
+                                + Format NIM/NIS dan Prodi
                             </button>
                         </div>
                     </div>
@@ -386,7 +386,7 @@
                         <textarea name="notes" rows="4" required minlength="5" x-model="notesText"
                                   placeholder="Tuliskan rangkuman instruksi revisi yang jelas untuk Admin Dinas..."
                                   class="w-full text-sm p-4 rounded-2xl border-2 border-slate-300 focus:border-amber-600 focus:ring-0 text-slate-800 bg-slate-50/50 shadow-inner leading-relaxed"></textarea>
-                        <div class="flex items-center justify-between text-[11px] text-slate-400">
+                        <div class="flex items-center justify-between text-xs text-slate-600">
                             <span>Minimal 5 karakter instruksi</span>
                             <span x-text="notesText.length + ' karakter'"></span>
                         </div>

@@ -105,7 +105,7 @@ class ChatPriorityEngineTest extends ChatTestCase
         $mentorBadge = $this->presenter->stageBadge($directConv, $this->mentorX);
         $this->assertNotNull($mentorBadge);
         $this->assertSame('staff', $mentorBadge['code']);
-        $this->assertSame('Pembimbing Lapangan', $mentorBadge['label']);
+        $this->assertSame('Mentor Lapangan', $mentorBadge['label']);
         $this->assertSame('mentor', $mentorBadge['role_group']);
         $this->assertFalse($mentorBadge['is_urgent']);
     }
@@ -127,7 +127,7 @@ class ChatPriorityEngineTest extends ChatTestCase
         $this->assertArrayHasKey('stage_badge', $target);
         // Untuk Admin Dinas, mahasiswa BUKAN prioritas tindakan darurat
         $this->assertFalse($target['stage_badge']['is_urgent']);
-        $this->assertSame('Mahasiswa', $target['stage_badge']['label']);
+        $this->assertSame('Peserta Magang', $target['stage_badge']['label']);
     }
 
     public function test_dosen_priority_for_report_review_and_missing_grades(): void

@@ -6,7 +6,7 @@
                     <span>Master Instansi Dinas Pemerintah Kota Surabaya</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Kelola data instansi dinas resmi tempat pelaksanaan program magang MBKM
+                    Kelola data instansi dinas resmi tempat pelaksanaan program magang
                 </p>
             </div>
 
@@ -150,7 +150,7 @@
                             <h4 class="font-bold text-amber-900 text-xs sm:text-sm">Terdapat {{ $unregisteredCount }}
                                 Instansi yang Belum Memiliki Akun Admin</h4>
                             <p class="text-[11px] text-amber-700 mt-0.5">Buatkan akun agar perwakilan dinas dapat
-                                memverifikasi mahasiswa dan memonitor kuota.</p>
+                                memverifikasi peserta magang dan memonitor kuota.</p>
                         </div>
                     </div>
                 </div>
@@ -231,11 +231,12 @@
                         <div>
                             <!-- Header: Logo, Status Badge, & Menu Opsi Kanan Atas -->
                             <div class="flex items-start justify-between gap-3 mb-4">
-                                <div class="w-13 h-13 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2.5 shrink-0 overflow-hidden shadow-2xs"
-                                    style="width: 52px; height: 52px;">
+                                <a href="{{ route('admin.agencies.show', $agency->id) }}"
+                                    class="rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2 shrink-0 overflow-hidden shadow-2xs"
+                                    style="min-width: 64px; max-width: 88px; height: 64px;">
                                     <img src="{{ $agencyLogoUrl }}" alt="{{ $agency->agency_name }}"
-                                        class="w-9 h-9 object-contain shrink-0">
-                                </div>
+                                        class="object-contain shrink-0" style="height: 48px; width: auto; min-width: 48px; max-width: 72px;">
+                                </a>
 
                                 <div class="flex items-center gap-1.5 shrink-0">
                                     @if(($agency->total_admins ?? 0) > 0)

@@ -3,10 +3,10 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h2 class="font-bold text-xl sm:text-2xl text-slate-900 leading-tight">
-                    Laporan Mahasiswa
+                    Laporan Peserta Magang
                 </h2>
                 <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-                    Pemantauan luaran naskah laporan dan proyek inovasi mahasiswa magang
+                    Pemantauan luaran naskah laporan dan proyek inovasi peserta magang
                 </p>
             </div>
         </div>
@@ -18,37 +18,37 @@
             <!-- 1. Ringkasan Metrik Pemantauan (Style Dinas Bersih) -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-1">
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">
-                        Total Mahasiswa Magang
+                    <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider block">
+                        Total Peserta Magang
                     </span>
                     <div class="text-2xl font-bold text-slate-900">
                         {{ $totalPlacements }}
                     </div>
-                    <span class="text-[11px] text-slate-400 block">
+                    <span class="text-xs text-slate-600 block">
                         Peserta penempatan aktif dan selesai
                     </span>
                 </div>
 
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-1">
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">
+                    <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider block">
                         Proyek Inovasi Tercipta
                     </span>
                     <div class="text-2xl font-bold text-slate-900">
                         {{ $totalProjects }}
                     </div>
-                    <span class="text-[11px] text-slate-400 block">
+                    <span class="text-xs text-slate-600 block">
                         Karya luaran proyek untuk masyarakat
                     </span>
                 </div>
 
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-1">
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">
+                    <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider block">
                         Naskah Laporan Disetujui
                     </span>
                     <div class="text-2xl font-bold text-slate-900">
                         {{ $totalApprovedReports }}
                     </div>
-                    <span class="text-[11px] text-slate-400 block">
+                    <span class="text-xs text-slate-600 block">
                         Telah disetujui pembimbing
                     </span>
                 </div>
@@ -57,7 +57,7 @@
             <!-- 2. Filter Bar Rapi & Kondusif -->
             <form method="GET" action="{{ route('supervisor.reports.index') }}" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col md:flex-row gap-3">
                 <div class="flex-1">
-                    <input type="text" name="search" value="{{ $searchQuery }}" placeholder="Cari nama mahasiswa, NIM, atau universitas..." class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
+                    <input type="text" name="search" value="{{ $searchQuery }}" placeholder="Cari nama peserta magang, NIM/NIS, atau kampus/sekolah..." class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
                 </div>
 
                 <div class="w-full md:w-56">
@@ -72,10 +72,10 @@
                 </div>
 
                 <div class="w-full md:w-52">
-                    <select name="status" class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
+                    <select name="status" class="w-full text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
                         <option value="">Semua Status Laporan</option>
-                        <option value="approved" {{ $statusFilter === 'approved' ? 'selected' : '' }}>Laporan Disetujui</option>{{-- status-guard:ignore --}}
-                        <option value="pending" {{ $statusFilter === 'pending' ? 'selected' : '' }}>Menunggu Review</option> {{-- status-guard:ignore --}}{{-- status-guard:ignore --}}
+                        <option value="approved" {{ $statusFilter === 'approved' ? 'selected' : '' }}>Disetujui</option>{{-- status-guard:ignore --}}
+                        <option value="pending" {{ $statusFilter === 'pending' ? 'selected' : '' }}>Menunggu Tinjauan</option>{{-- status-guard:ignore --}}
                         <option value="revision" {{ $statusFilter === 'revision' ? 'selected' : '' }}>Perlu Revisi</option>{{-- status-guard:ignore --}}
                         <option value="not_uploaded" {{ $statusFilter === 'not_uploaded' ? 'selected' : '' }}>Belum Mengunggah</option>{{-- status-guard:ignore --}}
                     </select>
@@ -98,15 +98,15 @@
                 <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 text-[11px] uppercase tracking-wider font-bold select-none">
-                                <th class="py-3.5 px-5 min-w-[220px]">Mahasiswa</th>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 text-xs uppercase tracking-wider font-bold select-none">
+                                <th class="py-3.5 px-5 min-w-[220px]">Peserta Magang</th>
                                 <th class="py-3.5 px-5 min-w-[200px]">Unit Bidang</th>
                                 <th class="py-3.5 px-5 min-w-[180px]">Proyek Inovasi</th>
                                 <th class="py-3.5 px-5 whitespace-nowrap min-w-[150px]">Status Laporan</th>
                                 <th class="py-3.5 pl-4 pr-6 text-right whitespace-nowrap w-24">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100 text-xs sm:text-sm">
+                        <tbody class="divide-y divide-slate-100 text-sm">
                             @forelse ($placements as $item)
                                 @php
                                     $student = $item->application?->user;
@@ -123,33 +123,33 @@
                                                 {{ strtoupper(substr($student?->name ?? 'M', 0, 1)) }}
                                             </div>
                                             <div class="min-w-0 max-w-[200px] lg:max-w-[240px]">
-                                                <div class="font-bold text-slate-900 text-xs sm:text-sm leading-tight truncate" title="{{ $student?->name ?? '-' }}">
+                                                <div class="font-bold text-slate-900 text-sm leading-tight truncate" title="{{ $student?->name ?? '-' }}">
                                                     {{ $student?->name ?? '-' }}
                                                 </div>
-                                                <div class="text-[11px] text-slate-500 font-mono mt-0.5 truncate" title="NIM: {{ $profile?->nim ?? '-' }} &bull; {{ $profile?->universitas ?? '-' }}">
-                                                    NIM: {{ $profile?->nim ?? '-' }} &bull; {{ $profile?->universitas ?? '-' }}
+                                                <div class="text-xs text-slate-600 font-mono mt-0.5 truncate" title="NIM: {{ $profile?->nim ?? '-' }} &bull; {{ $profile?->universitas ?? '-' }}">
+                                                    NIM/NIS: {{ $profile?->nim ?? '-' }} &bull; {{ $profile?->universitas ?? '-' }}
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="py-3.5 px-5">
                                         <div class="font-semibold text-slate-800 leading-snug">{{ $unit?->name ?? '-' }}</div>
-                                        <div class="text-[11px] text-slate-500 mt-0.5">
+                                        <div class="text-xs text-slate-600 mt-0.5">
                                             Mentor: {{ $mentor?->name ?? 'Belum Ditugaskan' }}
                                         </div>
                                     </td>
                                     <td class="py-3.5 px-5">
                                         @if ($projectsCount > 0)
                                             <div>
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/80">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/80">
                                                     {{ $projectsCount }} Proyek
                                                 </span>
-                                                <span class="block text-[11px] text-slate-600 font-medium truncate max-w-[190px] mt-0.5" title="{{ $item->internshipProjects->first()->title ?? '' }}">
+                                                <span class="block text-xs text-slate-600 font-medium truncate max-w-[190px] mt-0.5" title="{{ $item->internshipProjects->first()->title ?? '' }}">
                                                     {{ $item->internshipProjects->first()->title ?? '' }}
                                                 </span>
                                             </div>
                                         @else
-                                            <span class="text-slate-400 text-xs">Belum Ada Proyek</span>
+                                            <span class="text-slate-600 text-xs">Belum Ada Proyek</span>
                                         @endif
                                     </td>
                                     <td class="py-3.5 px-5 whitespace-nowrap">
@@ -171,7 +171,7 @@
                             @empty
                                 <tr>
                                     <td colspan="5" class="py-10 text-center text-slate-500 text-xs">
-                                        Tidak ada data mahasiswa yang sesuai dengan filter pencarian.
+                                        Tidak ada data peserta magang yang sesuai dengan filter pencarian.
                                     </td>
                                 </tr>
                             @endforelse
@@ -199,8 +199,8 @@
                                     @if ($finalReport)
                                         <x-status-badge type="review" :status="$finalReport->status" />
                                     @else
-                                        <span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-[11px] font-medium">
-                                            Belum Upload
+                                        <span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
+                                            Belum Mengunggah
                                         </span>
                                     @endif
                                 </div>
@@ -219,7 +219,7 @@
                         </div>
                     @empty
                         <div class="p-8 text-center text-slate-500 text-xs">
-                            Tidak ada data mahasiswa ditemukan.
+                            Tidak ada data peserta magang ditemukan.
                         </div>
                     @endforelse
                 </div>

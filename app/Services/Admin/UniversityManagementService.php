@@ -25,17 +25,17 @@ class UniversityManagementService
         return DB::transaction(function () use ($source, $target) {
             $users = User::where('university_id', $source->id)
                 ->update(['university_id' => $target->id, 'university' => $target->name]);
-            
+
             $profiles = StudentProfile::where('university_id', $source->id)
                 ->update(['university_id' => $target->id, 'universitas' => $target->name]);
-            
+
             SystemFeedback::where('target_university_id', $source->id)
                 ->update(['target_university_id' => $target->id]);
-            
+
             if (Schema::hasColumn('chat_conversations', 'university_id')) {
                 DB::table('chat_conversations')->where('university_id', $source->id)->update(['university_id' => $target->id]);
             }
-            
+
             $source->delete();
 
             AuditLog::record('UNIVERSITY_MERGE', 'University', $target->id, [

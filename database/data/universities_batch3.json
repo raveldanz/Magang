@@ -1,0 +1,1253 @@
+[
+  {
+    "order": 101,
+    "name": "Politeknik Negeri Medan",
+    "code": "POLMED",
+    "acronym": "POLMED",
+    "city": "Kota Medan",
+    "province": "Sumatera Utara",
+    "address": "Jl. Almamater No. 1, Kampus USU, Padang Bulan, Medan Baru, Kota Medan, Sumatera Utara 20155",
+    "phone": "(061) 8210371",
+    "email": "humas@polmed.ac.id",
+    "logo": "images/logos/polmed.svg",
+    "pic_name": "Dr. Ir. Idham Kamil, S.T., M.T.",
+    "pic_position": "Direktur Politeknik Negeri Medan",
+    "pic_nip": "196808241994031002",
+    "admin_account": {
+      "name": "Admin Politeknik Negeri Medan",
+      "email": "admin@polmed.ac.id"
+    },
+    "dosen_account": {
+      "name": "Ferry Fachrizal, S.T., M.Kom.",
+      "email": "ferry@polmed.ac.id",
+      "phone": "081234560101",
+      "bidang": "Teknik Komputer & Informatika"
+    }
+  },
+  {
+    "order": 102,
+    "name": "Universitas Riau",
+    "code": "UNRI",
+    "acronym": "UNRI",
+    "city": "Kota Pekanbaru",
+    "province": "Riau",
+    "address": "Kampus Bina Widya Km 12.5, Simpang Baru, Tampan, Kota Pekanbaru, Riau 28293",
+    "phone": "(0761) 63266",
+    "email": "rektorat@unri.ac.id",
+    "logo": "images/logos/unri.svg",
+    "pic_name": "Prof. Dr. Sri Indarti, S.E., M.Si.",
+    "pic_position": "Rektor Universitas Riau",
+    "pic_nip": "196410141990022001",
+    "admin_account": {
+      "name": "Admin Universitas Riau",
+      "email": "admin@unri.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dr. Iswandi, M.Kom.",
+      "email": "iswandi@eng.unri.ac.id",
+      "phone": "081234560102",
+      "bidang": "Teknik Informatika & Kecerdasan Buatan"
+    }
+  },
+  {
+    "order": 103,
+    "name": "Universitas Andalas",
+    "code": "UNAND",
+    "acronym": "UNAND",
+    "city": "Kota Padang",
+    "province": "Sumatera Barat",
+    "address": "Limau Manis, Kec. Pauh, Kota Padang, Sumatera Barat 25163",
+    "phone": "(0751) 71181",
+    "email": "rektorat@unand.ac.id",
+    "logo": "images/logos/unand.svg",
+    "pic_name": "Dr. Efa Yonnedi, S.E., MPPM., Akt., CA., CRMP.",
+    "pic_position": "Rektor Universitas Andalas",
+    "pic_nip": "197205021996021001",
+    "admin_account": {
+      "name": "Admin Universitas Andalas",
+      "email": "admin@unand.ac.id"
+    },
+    "dosen_account": {
+      "name": "Hasdi Putra, S.T., M.T.",
+      "email": "hasdi@it.unand.ac.id",
+      "phone": "081234560103",
+      "bidang": "Sistem Informasi & Rekayasa Perangkat Lunak"
+    }
+  },
+  {
+    "order": 104,
+    "name": "Universitas Negeri Padang",
+    "code": "UNP-PADANG",
+    "acronym": "UNP",
+    "city": "Kota Padang",
+    "province": "Sumatera Barat",
+    "address": "Jl. Prof. Dr. Hamka, Air Tawar Barat, Padang Utara, Kota Padang, Sumatera Barat 25131",
+    "phone": "(0751) 7058692",
+    "email": "rektor@unp.ac.id",
+    "logo": "images/logos/unp-padang.svg",
+    "pic_name": "Krismadinata, S.T., M.T., Ph.D.",
+    "pic_position": "Rektor Universitas Negeri Padang",
+    "pic_nip": "197709252002121002",
+    "admin_account": {
+      "name": "Admin Universitas Negeri Padang",
+      "email": "admin@unp.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dr. Asrul Huda, S.Kom., M.Kom.",
+      "email": "asrulhuda@ft.unp.ac.id",
+      "phone": "081234560104",
+      "bidang": "Pendidikan Vokasi Teknik Informatika"
+    }
+  },
+  {
+    "order": 105,
+    "name": "Universitas Sriwijaya",
+    "code": "UNSRI",
+    "acronym": "UNSRI",
+    "city": "Kota Palembang / Indralaya",
+    "province": "Sumatera Selatan",
+    "address": "Jl. Raya Palembang-Prabumulih Km. 32, Indralaya, Ogan Ilir, Sumatera Selatan 30662",
+    "phone": "(0711) 580069",
+    "email": "rektor@unsri.ac.id",
+    "logo": "images/logos/unsri.svg",
+    "pic_name": "Prof. Dr. Taufiq Marwa, S.E., M.Si.",
+    "pic_position": "Rektor Universitas Sriwijaya",
+    "pic_nip": "196812241993031002",
+    "admin_account": {
+      "name": "Admin Universitas Sriwijaya",
+      "email": "admin@unsri.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dr. Jaidan Jauhari, S.Pd., M.T.",
+      "email": "jaidan@unsri.ac.id",
+      "phone": "081234560105",
+      "bidang": "Fakultas Ilmu Komputer & Jaringan"
+    }
+  },
+  {
+    "order": 106,
+    "name": "Politeknik Negeri Sriwijaya",
+    "code": "POLSRI",
+    "acronym": "POLSRI",
+    "city": "Kota Palembang",
+    "province": "Sumatera Selatan",
+    "address": "Jl. Srijaya Negara, Bukit Lama, Ilir Barat I, Kota Palembang, Sumatera Selatan 30139",
+    "phone": "(0711) 353414",
+    "email": "info@polsri.ac.id",
+    "logo": "images/logos/polsri.svg",
+    "pic_name": "Dr. Ing. Ahmad Taqwa, M.T.",
+    "pic_position": "Direktur Politeknik Negeri Sriwijaya",
+    "pic_nip": "196812051993031001",
+    "admin_account": {
+      "name": "Admin Politeknik Negeri Sriwijaya",
+      "email": "admin@polsri.ac.id"
+    },
+    "dosen_account": {
+      "name": "Carlos RS, S.T., M.T.",
+      "email": "carlos@polsri.ac.id",
+      "phone": "081234560106",
+      "bidang": "Manajemen Informatika & Database"
+    }
+  },
+  {
+    "order": 107,
+    "name": "Universitas Lampung",
+    "code": "UNILA",
+    "acronym": "UNILA",
+    "city": "Kota Bandar Lampung",
+    "province": "Lampung",
+    "address": "Jl. Prof. Dr. Sumantri Brojonegoro No. 1, Rajabasa, Kota Bandar Lampung 35145",
+    "phone": "(0721) 701609",
+    "email": "rektor@unila.ac.id",
+    "logo": "images/logos/unila.svg",
+    "pic_name": "Prof. Dr. Ir. Lusmeilia Afriani, D.E.A., I.P.M., ASEAN Eng.",
+    "pic_position": "Rektor Universitas Lampung",
+    "pic_nip": "196505101993032008",
+    "admin_account": {
+      "name": "Admin Universitas Lampung",
+      "email": "admin@unila.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dr. Favorisen Rosyking Lumbanraja, S.Kom., M.Si.",
+      "email": "favorisen.rosyking@fmipa.unila.ac.id",
+      "phone": "081234560107",
+      "bidang": "Ilmu Komputer & Bioinformatika"
+    }
+  },
+  {
+    "order": 108,
+    "name": "Institut Teknologi Sumatera",
+    "code": "ITERA",
+    "acronym": "ITERA",
+    "city": "Kabupaten Lampung Selatan",
+    "province": "Lampung",
+    "address": "Jl. Terusan Ryacudu, Way Hui, Jati Agung, Kabupaten Lampung Selatan, Lampung 35365",
+    "phone": "(0721) 8030188",
+    "email": "humas@itera.ac.id",
+    "logo": "images/logos/itera.svg",
+    "pic_name": "Prof. Dr. I Nyoman Pugeg Aryantha",
+    "pic_position": "Rektor Institut Teknologi Sumatera",
+    "pic_nip": "196504141991031003",
+    "admin_account": {
+      "name": "Admin Institut Teknologi Sumatera",
+      "email": "admin@itera.ac.id"
+    },
+    "dosen_account": {
+      "name": "Rajif Agung Yunmar, S.Kom., M.Cs.",
+      "email": "rajif@if.itera.ac.id",
+      "phone": "081234560108",
+      "bidang": "Teknik Informatika & Cloud Architecture"
+    }
+  },
+  {
+    "order": 109,
+    "name": "Universitas Bengkulu",
+    "code": "UNIB",
+    "acronym": "UNIB",
+    "city": "Kota Bengkulu",
+    "province": "Bengkulu",
+    "address": "Jl. WR. Supratman, Kandang Limun, Muara Bangka Hulu, Kota Bengkulu 38371",
+    "phone": "(0736) 21170",
+    "email": "rektorat@unib.ac.id",
+    "logo": "images/logos/unib.svg",
+    "pic_name": "Dr. Retno Agustina Ekaputri, S.E., M.Sc.",
+    "pic_position": "Rektor Universitas Bengkulu",
+    "pic_nip": "196208031988032001",
+    "admin_account": {
+      "name": "Admin Universitas Bengkulu",
+      "email": "admin@unib.ac.id"
+    },
+    "dosen_account": {
+      "name": "Aan Erlansari, S.T., M.Eng.",
+      "email": "aerlansari@unib.ac.id",
+      "phone": "081234560109",
+      "bidang": "Teknik Informatika & Sistem Pendukung Keputusan"
+    }
+  },
+  {
+    "order": 110,
+    "name": "Universitas Jambi",
+    "code": "UNJA",
+    "acronym": "UNJA",
+    "city": "Kota Jambi",
+    "province": "Jambi",
+    "address": "Jl. Jambi-Muaro Bulian Km. 15, Mendalo Darat, Muaro Jambi 36361",
+    "phone": "(0741) 583377",
+    "email": "humas@unja.ac.id",
+    "logo": "images/logos/unja.svg",
+    "pic_name": "Prof. Dr. Helmi, S.H., M.H.",
+    "pic_position": "Rektor Universitas Jambi",
+    "pic_nip": "197112021997021001",
+    "admin_account": {
+      "name": "Admin Universitas Jambi",
+      "email": "admin@unja.ac.id"
+    },
+    "dosen_account": {
+      "name": "Jefri Marzal, M.Sc., D.I.T.",
+      "email": "jefri.marzal@unja.ac.id",
+      "phone": "081234560110",
+      "bidang": "Sistem Informasi & Pemodelan Komputasi"
+    }
+  },
+  {
+    "order": 111,
+    "name": "Universitas Maritim Raja Ali Haji",
+    "code": "UMRAH",
+    "acronym": "UMRAH",
+    "city": "Kota Tanjungpinang",
+    "province": "Kepulauan Riau",
+    "address": "Jl. Politeknik, Senggarang, Kota Tanjungpinang, Kepulauan Riau 29115",
+    "phone": "(0771) 4500099",
+    "email": "info@umrah.ac.id",
+    "logo": "images/logos/umrah.svg",
+    "pic_name": "Prof. Dr. Agung Dhamar Syakti, S.Pi., M.Sc.",
+    "pic_position": "Rektor Universitas Maritim Raja Ali Haji",
+    "pic_nip": "197510272005011001",
+    "admin_account": {
+      "name": "Admin Universitas Maritim Raja Ali Haji",
+      "email": "admin@umrah.ac.id"
+    },
+    "dosen_account": {
+      "name": "Hendra Kurniawan, S.Kom., M.Sc.",
+      "email": "hendrakurniawan@umrah.ac.id",
+      "phone": "081234560111",
+      "bidang": "Teknik Informatika & Sistem Kemaritiman"
+    }
+  },
+  {
+    "order": 112,
+    "name": "Politeknik Negeri Batam",
+    "code": "POLIBATAM",
+    "acronym": "Polibatam",
+    "city": "Kota Batam",
+    "province": "Kepulauan Riau",
+    "address": "Jl. Ahmad Yani, Teluk Tering, Batam Kota, Kota Batam, Kepulauan Riau 29461",
+    "phone": "(0778) 469858",
+    "email": "info@polibatam.ac.id",
+    "logo": "images/logos/polibatam.svg",
+    "pic_name": "Ir. Bambang Hendrawan, S.T., M.S.M., CIPMP.",
+    "pic_position": "Direktur Politeknik Negeri Batam",
+    "pic_nip": "197410092001121002",
+    "admin_account": {
+      "name": "Admin Politeknik Negeri Batam",
+      "email": "admin@polibatam.ac.id"
+    },
+    "dosen_account": {
+      "name": "Ahmad Hamim Thohari, S.S.T., M.T.",
+      "email": "hamim@polibatam.ac.id",
+      "phone": "081234560112",
+      "bidang": "Teknik Informatika & Animasi Interaktif"
+    }
+  },
+  {
+    "order": 113,
+    "name": "Universitas Udayana",
+    "code": "UNUD",
+    "acronym": "UNUD",
+    "city": "Kabupaten Badung / Denpasar",
+    "province": "Bali",
+    "address": "Kampus Bukit Jimbaran, Kuta Selatan, Kabupaten Badung, Bali 80361",
+    "phone": "(0361) 701954",
+    "email": "rektorat@unud.ac.id",
+    "logo": "images/logos/unud.svg",
+    "pic_name": "Prof. Ir. I Ketut Sudarsana, S.T., Ph.D.",
+    "pic_position": "Rektor Universitas Udayana",
+    "pic_nip": "197107121998021001",
+    "admin_account": {
+      "name": "Admin Universitas Udayana",
+      "email": "admin@unud.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dr. Ir. I Ketut Gede Darma Putra, S.Kom., M.T.",
+      "email": "ikgdarmaputra@unud.ac.id",
+      "phone": "081234560113",
+      "bidang": "Teknologi Informasi & Biometrika Komputer"
+    }
+  },
+  {
+    "order": 114,
+    "name": "Universitas Pendidikan Ganesha",
+    "code": "UNDIKSHA",
+    "acronym": "UNDIKSHA",
+    "city": "Kabupaten Buleleng",
+    "province": "Bali",
+    "address": "Jl. Udayana No. 11, Banjar Jawa, Buleleng, Kabupaten Buleleng, Bali 81116",
+    "phone": "(0362) 22570",
+    "email": "humas@undiksha.ac.id",
+    "logo": "images/logos/undiksha.svg",
+    "pic_name": "Prof. Dr. I Wayan Lasmawan, M.Pd.",
+    "pic_position": "Rektor Universitas Pendidikan Ganesha",
+    "pic_nip": "196702211993031002",
+    "admin_account": {
+      "name": "Admin Universitas Pendidikan Ganesha",
+      "email": "admin@undiksha.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dr. I Gede Ratnaya, S.T., M.Pd.",
+      "email": "ratnaya@undiksha.ac.id",
+      "phone": "081234560114",
+      "bidang": "Pendidikan Teknik Informatika & Multimedia"
+    }
+  },
+  {
+    "order": 115,
+    "name": "Politeknik Negeri Bali",
+    "code": "PNB",
+    "acronym": "PNB",
+    "city": "Kabupaten Badung",
+    "province": "Bali",
+    "address": "Kampus Bukit Jimbaran, Kuta Selatan, Kabupaten Badung, Bali 80364",
+    "phone": "(0361) 701981",
+    "email": "poltek@pnb.ac.id",
+    "logo": "images/logos/pnb.svg",
+    "pic_name": "I Nyoman Abdi, S.E., M.eCom.",
+    "pic_position": "Direktur Politeknik Negeri Bali",
+    "pic_nip": "196712311993031005",
+    "admin_account": {
+      "name": "Admin Politeknik Negeri Bali",
+      "email": "admin@pnb.ac.id"
+    },
+    "dosen_account": {
+      "name": "I Gusti Agung Made Sunantara, S.T., M.T.",
+      "email": "sunantara@pnb.ac.id",
+      "phone": "081234560115",
+      "bidang": "Teknik Elektro & Rekayasa Komputer"
+    }
+  },
+  {
+    "order": 116,
+    "name": "Universitas Mataram",
+    "code": "UNRAM",
+    "acronym": "UNRAM",
+    "city": "Kota Mataram",
+    "province": "Nusa Tenggara Barat",
+    "address": "Jl. Majapahit No. 62, Gomong, Selaparang, Kota Mataram, Nusa Tenggara Barat 83125",
+    "phone": "(0370) 633007",
+    "email": "rektor@unram.ac.id",
+    "logo": "images/logos/unram.svg",
+    "pic_name": "Prof. Ir. Bambang Hari Kusumo, M.Agr.St., Ph.D.",
+    "pic_position": "Rektor Universitas Mataram",
+    "pic_nip": "196508101991031002",
+    "admin_account": {
+      "name": "Admin Universitas Mataram",
+      "email": "admin@unram.ac.id"
+    },
+    "dosen_account": {
+      "name": "Budi Wiryawan, S.Kom., M.Cs.",
+      "email": "budi.wiryawan@unram.ac.id",
+      "phone": "081234560116",
+      "bidang": "Teknik Informatika & Basis Data Terdistribusi"
+    }
+  },
+  {
+    "order": 117,
+    "name": "Universitas Nusa Cendana",
+    "code": "UNDANA",
+    "acronym": "UNDANA",
+    "city": "Kota Kupang",
+    "province": "Nusa Tenggara Timur",
+    "address": "Jl. Adisucipto, Penfui, Maulafa, Kota Kupang, Nusa Tenggara Timur 85001",
+    "phone": "(0380) 881580",
+    "email": "info@undana.ac.id",
+    "logo": "images/logos/undana.svg",
+    "pic_name": "Prof. Dr. drh. Maxs U. E. Sanam, M.Sc.",
+    "pic_position": "Rektor Universitas Nusa Cendana",
+    "pic_nip": "196507021990031001",
+    "admin_account": {
+      "name": "Admin Universitas Nusa Cendana",
+      "email": "admin@undana.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dr. Andreas Ch. Louk, S.Si., M.Sc.",
+      "email": "andreas.louk@staf.undana.ac.id",
+      "phone": "081234560117",
+      "bidang": "Ilmu Komputer & Instrumentasi Komputasi"
+    }
+  },
+  {
+    "order": 118,
+    "name": "Politeknik Negeri Kupang",
+    "code": "PNK",
+    "acronym": "PNK",
+    "city": "Kota Kupang",
+    "province": "Nusa Tenggara Timur",
+    "address": "Jl. Adi Sucipto, Penfui, Kelapa Lima, Kota Kupang, Nusa Tenggara Timur 85011",
+    "phone": "(0380) 881245",
+    "email": "pnk@pnk.ac.id",
+    "logo": "images/logos/pnk.svg",
+    "pic_name": "Frans Mangngi, S.T., M.Eng.",
+    "pic_position": "Direktur Politeknik Negeri Kupang",
+    "pic_nip": "196805121995121001",
+    "admin_account": {
+      "name": "Admin Politeknik Negeri Kupang",
+      "email": "admin@pnk.ac.id"
+    },
+    "dosen_account": {
+      "name": "Daniel O. D. Bell, S.T., M.Kom.",
+      "email": "daniel.bell@pnk.ac.id",
+      "phone": "081234560118",
+      "bidang": "Teknik Elektro & Jaringan Telekomunikasi"
+    }
+  },
+  {
+    "order": 119,
+    "name": "Universitas Tanjungpura",
+    "code": "UNTAN",
+    "acronym": "UNTAN",
+    "city": "Kota Pontianak",
+    "province": "Kalimantan Barat",
+    "address": "Jl. Prof. Dr. H. Hadari Nawawi, Bansir Laut, Kota Pontianak, Kalimantan Barat 78124",
+    "phone": "(0561) 739630",
+    "email": "rektorat@untan.ac.id",
+    "logo": "images/logos/untan.svg",
+    "pic_name": "Prof. Dr. Garuda Wiko, S.H., M.Si.",
+    "pic_position": "Rektor Universitas Tanjungpura",
+    "pic_nip": "196501281990021001",
+    "admin_account": {
+      "name": "Admin Universitas Tanjungpura",
+      "email": "admin@untan.ac.id"
+    },
+    "dosen_account": {
+      "name": "Herry Sujaini, S.T., M.T.",
+      "email": "herry.sujaini@untan.ac.id",
+      "phone": "081234560119",
+      "bidang": "Teknik Informatika & Natural Language Processing"
+    }
+  },
+  {
+    "order": 120,
+    "name": "Politeknik Negeri Pontianak",
+    "code": "POLNEP",
+    "acronym": "POLNEP",
+    "city": "Kota Pontianak",
+    "province": "Kalimantan Barat",
+    "address": "Jl. Jenderal Ahmad Yani, Bansir Laut, Pontianak Tenggara, Kota Pontianak, Kalimantan Barat 78124",
+    "phone": "(0561) 736180",
+    "email": "polnep@polnep.ac.id",
+    "logo": "images/logos/polnep.svg",
+    "pic_name": "Dr. H. Widodo PS, S.T., M.T.",
+    "pic_position": "Direktur Politeknik Negeri Pontianak",
+    "pic_nip": "196706121993031002",
+    "admin_account": {
+      "name": "Admin Politeknik Negeri Pontianak",
+      "email": "admin@polnep.ac.id"
+    },
+    "dosen_account": {
+      "name": "Lindung Siswanto, S.Kom., M.Cs.",
+      "email": "lindung@polnep.ac.id",
+      "phone": "081234560120",
+      "bidang": "Teknik Informatika & Rekayasa Perangkat Lunak"
+    }
+  },
+  {
+    "order": 121,
+    "name": "Universitas Palangka Raya",
+    "code": "UPR",
+    "acronym": "UPR",
+    "city": "Kota Palangka Raya",
+    "province": "Kalimantan Tengah",
+    "address": "Jl. Yos Sudarso, Palangka, Jekan Raya, Kota Palangka Raya, Kalimantan Tengah 73111",
+    "phone": "(0536) 3226343",
+    "email": "info@upr.ac.id",
+    "logo": "images/logos/upr.svg",
+    "pic_name": "Prof. Dr. Ir. Salampak, M.S.",
+    "pic_position": "Rektor Universitas Palangka Raya",
+    "pic_nip": "196302031989031003",
+    "admin_account": {
+      "name": "Admin Universitas Palangka Raya",
+      "email": "admin@upr.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dr. Lili Rusdiana, S.T., M.T.",
+      "email": "lili.rusdiana@it.upr.ac.id",
+      "phone": "081234560121",
+      "bidang": "Teknik Informatika & Pemodelan Sistem"
+    }
+  },
+  {
+    "order": 122,
+    "name": "Universitas Lambung Mangkurat",
+    "code": "ULM",
+    "acronym": "ULM",
+    "city": "Kota Banjarmasin",
+    "province": "Kalimantan Selatan",
+    "address": "Jl. Brigjen H. Hasan Basry, Pangeran, Kota Banjarmasin, Kalimantan Selatan 70123",
+    "phone": "(0511) 3306603",
+    "email": "humas@ulm.ac.id",
+    "logo": "images/logos/ulm.svg",
+    "pic_name": "Prof. Dr. Ahmad Alim Bachri, S.E., M.Si.",
+    "pic_position": "Rektor Universitas Lambung Mangkurat",
+    "pic_nip": "196712311993031009",
+    "admin_account": {
+      "name": "Admin Universitas Lambung Mangkurat",
+      "email": "admin@ulm.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dr. Harja Santana Purba, M.Kom.",
+      "email": "harja@ulm.ac.id",
+      "phone": "081234560122",
+      "bidang": "Ilmu Komputer & Sistem Cerdas"
+    }
+  },
+  {
+    "order": 123,
+    "name": "Politeknik Negeri Banjarmasin",
+    "code": "POLIBAN",
+    "acronym": "POLIBAN",
+    "city": "Kota Banjarmasin",
+    "province": "Kalimantan Selatan",
+    "address": "Jl. Brigjen H. Hasan Basry, Pangeran, Banjarmasin Utara, Kota Banjarmasin, Kalimantan Selatan 70123",
+    "phone": "(0511) 3305052",
+    "email": "poliban@poliban.ac.id",
+    "logo": "images/logos/poliban.svg",
+    "pic_name": "Joni Riadi, S.S.T., M.T.",
+    "pic_position": "Direktur Politeknik Negeri Banjarmasin",
+    "pic_nip": "197106091999031001",
+    "admin_account": {
+      "name": "Admin Politeknik Negeri Banjarmasin",
+      "email": "admin@poliban.ac.id"
+    },
+    "dosen_account": {
+      "name": "Agus Setyo Budi, S.Kom., M.Kom.",
+      "email": "agus.setyo@poliban.ac.id",
+      "phone": "081234560123",
+      "bidang": "Teknik Informatika & Cloud Networking"
+    }
+  },
+  {
+    "order": 124,
+    "name": "Universitas Mulawarman",
+    "code": "UNMUL",
+    "acronym": "UNMUL",
+    "city": "Kota Samarinda",
+    "province": "Kalimantan Timur",
+    "address": "Jl. Kuaro, Gn. Kelua, Samarinda Ulu, Kota Samarinda, Kalimantan Timur 75119",
+    "phone": "(0541) 741118",
+    "email": "humas@unmul.ac.id",
+    "logo": "images/logos/unmul.svg",
+    "pic_name": "Prof. Dr. Ir. H. Abdunnur, M.Si., IPU., ASEAN Eng.",
+    "pic_position": "Rektor Universitas Mulawarman",
+    "pic_nip": "196703081992031002",
+    "admin_account": {
+      "name": "Admin Universitas Mulawarman",
+      "email": "admin@unmul.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dr. Indah Fitri Astuti, S.Kom., M.Cs.",
+      "email": "indahfitriastuti@unmul.ac.id",
+      "phone": "081234560124",
+      "bidang": "Informatika & Rekayasa Perangkat Lunak"
+    }
+  },
+  {
+    "order": 125,
+    "name": "Politeknik Negeri Samarinda",
+    "code": "POLNES",
+    "acronym": "POLNES",
+    "city": "Kota Samarinda",
+    "province": "Kalimantan Timur",
+    "address": "Jl. Samratulangi, Sungai Keledang, Samarinda Seberang, Kota Samarinda, Kalimantan Timur 75131",
+    "phone": "(0541) 260588",
+    "email": "polnes@polnes.ac.id",
+    "logo": "images/logos/polnes.svg",
+    "pic_name": "Ahyar M. Diah, S.E., M.M., Ph.D.",
+    "pic_position": "Direktur Politeknik Negeri Samarinda",
+    "pic_nip": "196812311993031004",
+    "admin_account": {
+      "name": "Admin Politeknik Negeri Samarinda",
+      "email": "admin@polnes.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dedy Cahyadi, S.Kom., M.Eng.",
+      "email": "dedy@polnes.ac.id",
+      "phone": "081234560125",
+      "bidang": "Teknologi Informasi & Rekayasa Jaringan"
+    }
+  },
+  {
+    "order": 126,
+    "name": "Institut Teknologi Kalimantan",
+    "code": "ITK",
+    "acronym": "ITK",
+    "city": "Kota Balikpapan",
+    "province": "Kalimantan Timur",
+    "address": "Jl. Soekarno-Hatta Km. 15, Karang Joang, Kota Balikpapan, Kalimantan Timur 76127",
+    "phone": "(0542) 8530801",
+    "email": "humas@itk.ac.id",
+    "logo": "images/logos/itk.svg",
+    "pic_name": "Prof. Dr. rer. nat. Agus Rubiyanto, M.Eng.Sc.",
+    "pic_position": "Rektor Institut Teknologi Kalimantan",
+    "pic_nip": "196506191989031001",
+    "admin_account": {
+      "name": "Admin Institut Teknologi Kalimantan",
+      "email": "admin@itk.ac.id"
+    },
+    "dosen_account": {
+      "name": "Lovinta Happy Atrinawati, S.T., M.T.",
+      "email": "lovinta@lecturer.itk.ac.id",
+      "phone": "081234560126",
+      "bidang": "Sistem Informasi & Tata Kelola IT"
+    }
+  },
+  {
+    "order": 127,
+    "name": "Politeknik Negeri Balikpapan",
+    "code": "POLTEKBA",
+    "acronym": "POLTEKBA",
+    "city": "Kota Balikpapan",
+    "province": "Kalimantan Timur",
+    "address": "Jl. Soekarno-Hatta Km. 8, Batu Ampar, Kota Balikpapan, Kalimantan Timur 76126",
+    "phone": "(0542) 860895",
+    "email": "poltekba@poltekba.ac.id",
+    "logo": "images/logos/poltekba.svg",
+    "pic_name": "Ramli, S.T., M.T.",
+    "pic_position": "Direktur Politeknik Negeri Balikpapan",
+    "pic_nip": "197412102001121001",
+    "admin_account": {
+      "name": "Admin Politeknik Negeri Balikpapan",
+      "email": "admin@poltekba.ac.id"
+    },
+    "dosen_account": {
+      "name": "Tuatul Mahfud, S.Pd., M.Pd.",
+      "email": "tuatul@poltekba.ac.id",
+      "phone": "081234560127",
+      "bidang": "Rekayasa Perangkat Lunak Terapan"
+    }
+  },
+  {
+    "order": 128,
+    "name": "Universitas Borneo Tarakan",
+    "code": "UBT",
+    "acronym": "UBT",
+    "city": "Kota Tarakan",
+    "province": "Kalimantan Utara",
+    "address": "Jl. Amal Lama No. 1, Pantai Amal, Kota Tarakan, Kalimantan Utara 77115",
+    "phone": "(0551) 2052558",
+    "email": "ubt@borneo.ac.id",
+    "logo": "images/logos/ubt.svg",
+    "pic_name": "Prof. Dr. Adri Patton, M.Si.",
+    "pic_position": "Rektor Universitas Borneo Tarakan",
+    "pic_nip": "196308151992031003",
+    "admin_account": {
+      "name": "Admin Universitas Borneo Tarakan",
+      "email": "admin@borneo.ac.id"
+    },
+    "dosen_account": {
+      "name": "Budi Nugroho, S.Kom., M.Eng.",
+      "email": "budinugroho@borneo.ac.id",
+      "phone": "081234560128",
+      "bidang": "Teknik Komputer & Sistem Kontrol"
+    }
+  },
+  {
+    "order": 129,
+    "name": "Universitas Hasanuddin",
+    "code": "UNHAS",
+    "acronym": "UNHAS",
+    "city": "Kota Makassar",
+    "province": "Sulawesi Selatan",
+    "address": "Jl. Perintis Kemerdekaan Km. 10, Tamalanrea Indah, Kota Makassar, Sulawesi Selatan 90245",
+    "phone": "(0411) 586200",
+    "email": "info@unhas.ac.id",
+    "logo": "images/logos/unhas.svg",
+    "pic_name": "Prof. Dr. Ir. Jamaluddin Jompa, M.Sc.",
+    "pic_position": "Rektor Universitas Hasanuddin",
+    "pic_nip": "196703081990031001",
+    "admin_account": {
+      "name": "Admin Universitas Hasanuddin",
+      "email": "admin@unhas.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dr. Eng. Armin Lawi, S.Si., M.Eng.",
+      "email": "armin@unhas.ac.id",
+      "phone": "081234560129",
+      "bidang": "Ilmu Komputer & Sistem Terdistribusi"
+    }
+  },
+  {
+    "order": 130,
+    "name": "Universitas Negeri Makassar",
+    "code": "UNM",
+    "acronym": "UNM",
+    "city": "Kota Makassar",
+    "province": "Sulawesi Selatan",
+    "address": "Jl. A. P. Pettarani, Tidung, Rappocini, Kota Makassar, Sulawesi Selatan 90222",
+    "phone": "(0411) 865677",
+    "email": "humas@unm.ac.id",
+    "logo": "images/logos/unm.svg",
+    "pic_name": "Prof. Dr. Karta Jayadi, M.Sn.",
+    "pic_position": "Rektor Universitas Negeri Makassar",
+    "pic_nip": "196507081989031002",
+    "admin_account": {
+      "name": "Admin Universitas Negeri Makassar",
+      "email": "admin@unm.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dr. Hendra Jaya, S.Pd., M.T.",
+      "email": "hendra@unm.ac.id",
+      "phone": "081234560130",
+      "bidang": "Teknik Informatika & Komputer"
+    }
+  },
+  {
+    "order": 131,
+    "name": "Politeknik Negeri Ujung Pandang",
+    "code": "PNUP",
+    "acronym": "PNUP",
+    "city": "Kota Makassar",
+    "province": "Sulawesi Selatan",
+    "address": "Jl. Perintis Kemerdekaan Km. 10, Tamalanrea, Kota Makassar, Sulawesi Selatan 90245",
+    "phone": "(0411) 585032",
+    "email": "pnup@poliupg.ac.id",
+    "logo": "images/logos/pnup.svg",
+    "pic_name": "Ilyas Mansur, M.T.",
+    "pic_position": "Direktur Politeknik Negeri Ujung Pandang",
+    "pic_nip": "196803121994031002",
+    "admin_account": {
+      "name": "Admin Politeknik Negeri Ujung Pandang",
+      "email": "admin@poliupg.ac.id"
+    },
+    "dosen_account": {
+      "name": "Zulhajji, S.T., M.T.",
+      "email": "zulhajji@poliupg.ac.id",
+      "phone": "081234560131",
+      "bidang": "Teknik Elektro & Sistem Telekomunikasi"
+    }
+  },
+  {
+    "order": 132,
+    "name": "UIN Alauddin Makassar",
+    "code": "UIN-ALAUDDIN",
+    "acronym": "UIN Alauddin",
+    "city": "Kabupaten Gowa / Makassar",
+    "province": "Sulawesi Selatan",
+    "address": "Jl. H. M. Yasin Limpo No. 36, Somba Opu, Kabupaten Gowa, Sulawesi Selatan 92118",
+    "phone": "(0411) 841879",
+    "email": "humas@uin-alauddin.ac.id",
+    "logo": "images/logos/uin-alauddin.svg",
+    "pic_name": "Prof. Drs. Hamdan Juhannis, M.A., Ph.D.",
+    "pic_position": "Rektor UIN Alauddin Makassar",
+    "pic_nip": "197012311996031005",
+    "admin_account": {
+      "name": "Admin UIN Alauddin Makassar",
+      "email": "admin@uin-alauddin.ac.id"
+    },
+    "dosen_account": {
+      "name": "Faisal, S.T., M.T.",
+      "email": "faisal@uin-alauddin.ac.id",
+      "phone": "081234560132",
+      "bidang": "Teknik Informatika Sains & Teknologi"
+    }
+  },
+  {
+    "order": 133,
+    "name": "Universitas Muslim Indonesia",
+    "code": "UMI-MAKASSAR",
+    "acronym": "UMI Makassar",
+    "city": "Kota Makassar",
+    "province": "Sulawesi Selatan",
+    "address": "Jl. Urip Sumoharjo Km. 5, Panakkukang, Kota Makassar, Sulawesi Selatan 90231",
+    "phone": "(0411) 455666",
+    "email": "info@umi.ac.id",
+    "logo": "images/logos/umi-makassar.svg",
+    "pic_name": "Prof. Dr. H. Sufirman Rahman, S.H., M.H.",
+    "pic_position": "Rektor Universitas Muslim Indonesia",
+    "pic_nip": "0927056401",
+    "admin_account": {
+      "name": "Admin Universitas Muslim Indonesia",
+      "email": "admin@umi.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dr. Ir. Tasrif Hasanuddin, S.T., M.Cs., M.T.",
+      "email": "tasrif.hasanuddin@umi.ac.id",
+      "phone": "081234560133",
+      "bidang": "Ilmu Komputer & Sistem Enterprise"
+    }
+  },
+  {
+    "order": 134,
+    "name": "Universitas Sam Ratulangi",
+    "code": "UNSRAT",
+    "acronym": "UNSRAT",
+    "city": "Kota Manado",
+    "province": "Sulawesi Utara",
+    "address": "Jl. Kampus Unsrat Bahu, Malalayang, Kota Manado, Sulawesi Utara 95115",
+    "phone": "(0431) 863886",
+    "email": "humas@unsrat.ac.id",
+    "logo": "images/logos/unsrat.svg",
+    "pic_name": "Prof. Dr. Ir. Oktovian Berty Alexander Sompie, M.Eng., IPU., ASEAN Eng.",
+    "pic_position": "Rektor Universitas Sam Ratulangi",
+    "pic_nip": "196610051992031003",
+    "admin_account": {
+      "name": "Admin Universitas Sam Ratulangi",
+      "email": "admin@unsrat.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dr. Eng. Steven R. Sentinuwo, S.T., M.T.I.",
+      "email": "steven.sentinuwo@unsrat.ac.id",
+      "phone": "081234560134",
+      "bidang": "Teknik Informatika & Rekayasa Perangkat Lunak"
+    }
+  },
+  {
+    "order": 135,
+    "name": "Politeknik Negeri Manado",
+    "code": "POLIMDO",
+    "acronym": "POLIMDO",
+    "city": "Kota Manado",
+    "province": "Sulawesi Utara",
+    "address": "Jl. Raya Politeknik, Buha, Mapanget, Kota Manado, Sulawesi Utara 95252",
+    "phone": "(0431) 811568",
+    "email": "info@polimdo.ac.id",
+    "logo": "images/logos/polimdo.svg",
+    "pic_name": "Dra. Mareyke Alelo, MBA.",
+    "pic_position": "Direktur Politeknik Negeri Manado",
+    "pic_nip": "196303241988032001",
+    "admin_account": {
+      "name": "Admin Politeknik Negeri Manado",
+      "email": "admin@polimdo.ac.id"
+    },
+    "dosen_account": {
+      "name": "Harson Kapoh, S.T., M.T.",
+      "email": "harson@polimdo.ac.id",
+      "phone": "081234560135",
+      "bidang": "Teknik Elektro & Rekayasa Komputer"
+    }
+  },
+  {
+    "order": 136,
+    "name": "Universitas Tadulako",
+    "code": "UNTAD",
+    "acronym": "UNTAD",
+    "city": "Kota Palu",
+    "province": "Sulawesi Tengah",
+    "address": "Jl. Soekarno-Hatta Km. 9, Tondo, Mantikulore, Kota Palu, Sulawesi Tengah 94118",
+    "phone": "(0451) 422611",
+    "email": "untad@untad.ac.id",
+    "logo": "images/logos/untad.svg",
+    "pic_name": "Prof. Dr. Ir. Amar, S.T., M.T., IPU., ASEAN Eng.",
+    "pic_position": "Rektor Universitas Tadulako",
+    "pic_nip": "196811231998031001",
+    "admin_account": {
+      "name": "Admin Universitas Tadulako",
+      "email": "admin@untad.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dr. Anita Ahmad Kasim, S.Kom., M.Cs.",
+      "email": "anita@untad.ac.id",
+      "phone": "081234560136",
+      "bidang": "Teknik Informatika & Pengolahan Citra"
+    }
+  },
+  {
+    "order": 137,
+    "name": "Universitas Halu Oleo",
+    "code": "UHO",
+    "acronym": "UHO",
+    "city": "Kota Kendari",
+    "province": "Sulawesi Tenggara",
+    "address": "Kampus Hijau Bumi Tridharma Anduonohu, Kota Kendari, Sulawesi Tenggara 93232",
+    "phone": "(0401) 3190105",
+    "email": "info@uho.ac.id",
+    "logo": "images/logos/uho.svg",
+    "pic_name": "Prof. Dr. Muhammad Zamrun Firihu, S.Si., M.Si., M.Sc.",
+    "pic_position": "Rektor Universitas Halu Oleo",
+    "pic_nip": "197204221998031001",
+    "admin_account": {
+      "name": "Admin Universitas Halu Oleo",
+      "email": "admin@uho.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dr. Bambang Pramono, S.Si., M.T.",
+      "email": "bambang.pramono@uho.ac.id",
+      "phone": "081234560137",
+      "bidang": "Teknik Informatika & Jaringan Sensor"
+    }
+  },
+  {
+    "order": 138,
+    "name": "Universitas Negeri Gorontalo",
+    "code": "UNG",
+    "acronym": "UNG",
+    "city": "Kota Gorontalo",
+    "province": "Gorontalo",
+    "address": "Jl. Jend. Sudirman No. 6, Dulalowo Timur, Kota Gorontalo 96128",
+    "phone": "(0435) 821125",
+    "email": "rektorat@ung.ac.id",
+    "logo": "images/logos/ung.svg",
+    "pic_name": "Prof. Dr. Ir. Eduart Wolok, S.T., M.T., IPM.",
+    "pic_position": "Rektor Universitas Negeri Gorontalo",
+    "pic_nip": "197605202001121001",
+    "admin_account": {
+      "name": "Admin Universitas Negeri Gorontalo",
+      "email": "admin@ung.ac.id"
+    },
+    "dosen_account": {
+      "name": "Rahman Takdir, S.Kom., M.Cs.",
+      "email": "rahman.takdir@ung.ac.id",
+      "phone": "081234560138",
+      "bidang": "Teknik Informatika & Analitika Data"
+    }
+  },
+  {
+    "order": 139,
+    "name": "Universitas Sulawesi Barat",
+    "code": "UNSULBAR",
+    "acronym": "UNSULBAR",
+    "city": "Kabupaten Majene",
+    "province": "Sulawesi Barat",
+    "address": "Jl. Prof. Dr. Baharuddin Lopa, S.H., Talumung, Majene, Sulawesi Barat 91412",
+    "phone": "(0422) 22559",
+    "email": "info@unsulbar.ac.id",
+    "logo": "images/logos/unsulbar.svg",
+    "pic_name": "Prof. Dr. Muhammad Abdy, M.Si.",
+    "pic_position": "Rektor Universitas Sulawesi Barat",
+    "pic_nip": "196903271994031001",
+    "admin_account": {
+      "name": "Admin Universitas Sulawesi Barat",
+      "email": "admin@unsulbar.ac.id"
+    },
+    "dosen_account": {
+      "name": "Sugiarto Cokrowibowo, S.Si., M.Si.",
+      "email": "sugiarto@unsulbar.ac.id",
+      "phone": "081234560139",
+      "bidang": "Informatika & Pemrograman Web"
+    }
+  },
+  {
+    "order": 140,
+    "name": "Universitas Pattimura",
+    "code": "UNPATTI",
+    "acronym": "UNPATTI",
+    "city": "Kota Ambon",
+    "province": "Maluku",
+    "address": "Jl. Ir. M. Putuhena, Poka, Kota Ambon, Maluku 97233",
+    "phone": "(0911) 3825003",
+    "email": "info@unpatti.ac.id",
+    "logo": "images/logos/unpatti.svg",
+    "pic_name": "Prof. Dr. Fredy Leiwakabessy, M.Pd.",
+    "pic_position": "Rektor Universitas Pattimura",
+    "pic_nip": "196403071989031001",
+    "admin_account": {
+      "name": "Admin Universitas Pattimura",
+      "email": "admin@unpatti.ac.id"
+    },
+    "dosen_account": {
+      "name": "Dr. Hendry Izaac Elim, Ph.D.",
+      "email": "hendry.elim@fmipa.unpatti.ac.id",
+      "phone": "081234560140",
+      "bidang": "Fisika Komputasi & Nanoteknologi"
+    }
+  },
+  {
+    "order": 141,
+    "name": "Universitas Khairun",
+    "code": "UNKHAIR",
+    "acronym": "UNKHAIR",
+    "city": "Kota Ternate",
+    "province": "Maluku Utara",
+    "address": "Jl. Pertamina Kampus II Gambesi, Kota Ternate, Maluku Utara 97719",
+    "phone": "(0921) 3110905",
+    "email": "humas@unkhair.ac.id",
+    "logo": "images/logos/unkhair.svg",
+    "pic_name": "Dr. M. Ridha Ajam, M.Hum.",
+    "pic_position": "Rektor Universitas Khairun",
+    "pic_nip": "196608241991031003",
+    "admin_account": {
+      "name": "Admin Universitas Khairun",
+      "email": "admin@unkhair.ac.id"
+    },
+    "dosen_account": {
+      "name": "Wahidin Nur, S.T., M.Eng.",
+      "email": "wahidin@unkhair.ac.id",
+      "phone": "081234560141",
+      "bidang": "Teknik Informatika & Rekayasa Jaringan"
+    }
+  },
+  {
+    "order": 142,
+    "name": "Universitas Cenderawasih",
+    "code": "UNCEN",
+    "acronym": "UNCEN",
+    "city": "Kota Jayapura",
+    "province": "Papua",
+    "address": "Jl. Kamp Wolker, Yabansai, Heram, Kota Jayapura, Papua 99351",
+    "phone": "(0967) 572115",
+    "email": "humas@uncen.ac.id",
+    "logo": "images/logos/uncen.svg",
+    "pic_name": "Dr. Oscar Oswald O. Wambraw, S.E., M.Sc.Agr.",
+    "pic_position": "Rektor Universitas Cenderawasih",
+    "pic_nip": "197410052003121001",
+    "admin_account": {
+      "name": "Admin Universitas Cenderawasih",
+      "email": "admin@uncen.ac.id"
+    },
+    "dosen_account": {
+      "name": "Jonathan K. L. Worabai, S.Si., M.Cs.",
+      "email": "jonathan.worabai@fmipa.uncen.ac.id",
+      "phone": "081234560142",
+      "bidang": "Ilmu Komputer & Sistem Informasi Geografis"
+    }
+  },
+  {
+    "order": 143,
+    "name": "Universitas Papua",
+    "code": "UNIPA-PAPUA",
+    "acronym": "UNIPA Papua",
+    "city": "Kabupaten Manokwari",
+    "province": "Papua Barat",
+    "address": "Jl. Gunung Salju, Amban, Manokwari Barat, Kabupaten Manokwari, Papua Barat 98314",
+    "phone": "(0986) 211065",
+    "email": "rektorat@unipa.ac.id",
+    "logo": "images/logos/unipa-papua.svg",
+    "pic_name": "Dr. Meky Sagrim, S.P., M.Si.",
+    "pic_position": "Rektor Universitas Papua",
+    "pic_nip": "197305142000031002",
+    "admin_account": {
+      "name": "Admin Universitas Papua",
+      "email": "admin@unipa.ac.id"
+    },
+    "dosen_account": {
+      "name": "Yohanes Soumokil, S.Si., M.T.",
+      "email": "y.soumokil@unipa.ac.id",
+      "phone": "081234560143",
+      "bidang": "Teknik Informatika & Pemrograman Sistem"
+    }
+  },
+  {
+    "order": 144,
+    "name": "Universitas Musamus Merauke",
+    "code": "UNMUS",
+    "acronym": "UNMUS",
+    "city": "Kabupaten Merauke",
+    "province": "Papua Selatan",
+    "address": "Jl. Kamizaun Mopah Lama, Rimba Jaya, Merauke, Papua Selatan 99611",
+    "phone": "(0971) 325923",
+    "email": "info@unmus.ac.id",
+    "logo": "images/logos/unmus.svg",
+    "pic_name": "Dr. Drs. Beatus Tambaip, M.A.",
+    "pic_position": "Rektor Universitas Musamus Merauke",
+    "pic_nip": "196805091994031004",
+    "admin_account": {
+      "name": "Admin Universitas Musamus Merauke",
+      "email": "admin@unmus.ac.id"
+    },
+    "dosen_account": {
+      "name": "Maria V. I. Heriyanti, S.Kom., M.Cs.",
+      "email": "heriyanti@unmus.ac.id",
+      "phone": "081234560144",
+      "bidang": "Teknik Informatika & Sistem Database"
+    }
+  },
+  {
+    "order": 145,
+    "name": "Universitas Terbuka",
+    "code": "UT",
+    "acronym": "UT",
+    "city": "Kota Tangerang Selatan",
+    "province": "Banten",
+    "address": "Jl. Cabe Raya, Pondok Cabe, Pamulang, Kota Tangerang Selatan, Banten 15418",
+    "phone": "(021) 7490941",
+    "email": "informasi@ecampus.ut.ac.id",
+    "logo": "images/logos/ut.png",
+    "pic_name": "Prof. Ojat Darojat, M.Bus., Ph.D.",
+    "pic_position": "Rektor Universitas Terbuka",
+    "pic_nip": "196610261991031001",
+    "admin_account": {
+      "name": "Admin Universitas Terbuka",
+      "email": "admin@ut.ac.id"
+    },
+    "dosen_account": {
+      "name": "Hendrian, S.E., M.Si.",
+      "email": "hendrian@ecampus.ut.ac.id",
+      "phone": "081234560145",
+      "bidang": "Teknologi Sistem Pembelajaran Jarak Jauh"
+    }
+  },
+  {
+    "order": 146,
+    "name": "Universitas Nusa Putra",
+    "code": "NUSA-PUTRA",
+    "acronym": "Nusa Putra",
+    "city": "Kabupaten Sukabumi",
+    "province": "Jawa Barat",
+    "address": "Jl. Raya Cibolang No. 21, Cisaat, Kabupaten Sukabumi, Jawa Barat 43152",
+    "phone": "(0266) 210594",
+    "email": "info@nusaputra.ac.id",
+    "logo": "images/logos/nusa-putra.svg",
+    "pic_name": "Dr. Kurniawan, S.T., M.Si., MM.",
+    "pic_position": "Rektor Universitas Nusa Putra",
+    "pic_nip": "0418047501",
+    "admin_account": {
+      "name": "Admin Universitas Nusa Putra",
+      "email": "admin@nusaputra.ac.id"
+    },
+    "dosen_account": {
+      "name": "Ir. Somantri, M.T.",
+      "email": "somantri@nusaputra.ac.id",
+      "phone": "081234560146",
+      "bidang": "Ilmu Komputer & Sistem Rekayasa Cerdas"
+    }
+  },
+  {
+    "order": 147,
+    "name": "Institut Sains & Teknologi AKPRIND Yogyakarta",
+    "code": "AKPRIND",
+    "acronym": "AKPRIND",
+    "city": "Kota Yogyakarta",
+    "province": "D.I. Yogyakarta",
+    "address": "Jl. Kalisahak No. 28, Kompleks Balapan, Klitren, Kota Yogyakarta 55222",
+    "phone": "(0274) 563029",
+    "email": "akprind@akprind.ac.id",
+    "logo": "images/logos/akprind.svg",
+    "pic_name": "Dr. Sri Mulyaningsih, S.T., M.T.",
+    "pic_position": "Rektor Institut Sains & Teknologi AKPRIND",
+    "pic_nip": "0515086801",
+    "admin_account": {
+      "name": "Admin IST AKPRIND Yogyakarta",
+      "email": "admin@akprind.ac.id"
+    },
+    "dosen_account": {
+      "name": "Erfanti Fatkhiyah, S.T., M.Cs.",
+      "email": "erfanti@akprind.ac.id",
+      "phone": "081234560147",
+      "bidang": "Teknik Informatika & Sistem Pakar"
+    }
+  },
+  {
+    "order": 148,
+    "name": "Institut Teknologi Telkom Purwokerto",
+    "code": "IT-TELKOM-PWT",
+    "acronym": "IT Telkom Purwokerto",
+    "city": "Kabupaten Banyumas",
+    "province": "Jawa Tengah",
+    "address": "Jl. D. I. Panjaitan No. 128, Karangreja, Purwokerto Selatan, Banyumas, Jawa Tengah 53147",
+    "phone": "(0281) 641629",
+    "email": "info@ittelkom-pwt.ac.id",
+    "logo": "images/logos/it-telkom-pwt.svg",
+    "pic_name": "Dr. Tenia Wahyuningrum, S.Kom., M.T.",
+    "pic_position": "Rektor IT Telkom Purwokerto",
+    "pic_nip": "14780018",
+    "admin_account": {
+      "name": "Admin IT Telkom Purwokerto",
+      "email": "admin@ittelkom-pwt.ac.id"
+    },
+    "dosen_account": {
+      "name": "Novanda Alim Setya Nugraha, S.S.T., M.Eng.",
+      "email": "novanda@ittelkom-pwt.ac.id",
+      "phone": "081234560148",
+      "bidang": "Rekayasa Perangkat Lunak & Human Computer Interaction"
+    }
+  },
+  {
+    "order": 149,
+    "name": "Universitas Dhyana Pura",
+    "code": "UNDHIRA",
+    "acronym": "UNDHIRA",
+    "city": "Kabupaten Badung",
+    "province": "Bali",
+    "address": "Jl. Raya Padang Luwih, Tegaljaya, Dalung, Kuta Utara, Kabupaten Badung, Bali 80361",
+    "phone": "(0361) 426450",
+    "email": "info@undhirabali.ac.id",
+    "logo": "images/logos/undhira.svg",
+    "pic_name": "Dr. I Gusti Bagus Rai Utama, S.E., M.MA., M.A.",
+    "pic_position": "Rektor Universitas Dhyana Pura",
+    "pic_nip": "0801087101",
+    "admin_account": {
+      "name": "Admin Universitas Dhyana Pura",
+      "email": "admin@undhirabali.ac.id"
+    },
+    "dosen_account": {
+      "name": "Putu Sugiartawan, S.Kom., M.Cs.",
+      "email": "sugiartawan@undhirabali.ac.id",
+      "phone": "081234560149",
+      "bidang": "Sistem Informasi & Data Mining"
+    }
+  },
+  {
+    "order": 150,
+    "name": "Universitas Katolik De La Salle Manado",
+    "code": "DELASALLE",
+    "acronym": "De La Salle",
+    "city": "Kota Manado",
+    "province": "Sulawesi Utara",
+    "address": "Kairagi I, Kombos Timur, Kec. Tikala, Kota Manado, Sulawesi Utara 95253",
+    "phone": "(0431) 814896",
+    "email": "info@unikadelasalle.ac.id",
+    "logo": "images/logos/delasalle.svg",
+    "pic_name": "Prof. Dr. Johanis Ohoitimur",
+    "pic_position": "Rektor Universitas Katolik De La Salle Manado",
+    "pic_nip": "0914045901",
+    "admin_account": {
+      "name": "Admin Universitas Katolik De La Salle Manado",
+      "email": "admin@unikadelasalle.ac.id"
+    },
+    "dosen_account": {
+      "name": "Juddy J. E. Rotinsulu, S.Kom., M.T.",
+      "email": "jrotinsulu@unikadelasalle.ac.id",
+      "phone": "081234560150",
+      "bidang": "Teknik Informatika & Mobile Computing"
+    }
+  }
+]
+

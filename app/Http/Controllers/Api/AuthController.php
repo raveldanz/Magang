@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Middleware\EnsureAccountIsActive;
+use App\Http\Middleware\EnsurePasswordChanged;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -31,6 +32,13 @@ class AuthController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => EnsureAccountIsActive::MESSAGE,
+            ], 403);
+        }
+
+        if (config('auth.force_password_change') && $user->must_change_password) {
+            return response()->json([
+                'status' => 'error',
+                'message' => EnsurePasswordChanged::MESSAGE,
             ], 403);
         }
 

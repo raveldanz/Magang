@@ -26,6 +26,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
         $placements = Placement::with(['application.user.studentProfile'])->get();
         if ($placements->isEmpty()) {
             echo "Tidak ada placement ditemukan. Lewati seeder proyek.\n";
+
             return;
         }
 
@@ -50,7 +51,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'repository_url' => 'https://drive.google.com/drive/folders/antologi-literasi-surabaya',
                 'video_url' => 'https://youtu.be/jlKU3exv4Oc',
                 'screenshots' => [
-                    'projects/koleksi_buku_rak_perpustakaan.jpg',
+                    'projects/ruang_baca_modern_interior.jpg',
                     'projects/community_doc_desa_1.png',
                 ],
                 'community_photos' => [
@@ -77,17 +78,17 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'category' => 'preservasi',
                 'custom_category' => null,
                 'project_type' => 'individual',
-                'photo_path' => 'projects/koleksi_buku_rak_perpustakaan.jpg',
+                'photo_path' => 'projects/ruang_baca_modern_interior.jpg',
                 'description' => "Kegiatan konservasi kuratif terhadap naskah beraksara Jawa dan kertas Eropa abad ke-19 yang mengalami asam tinggi dan kerapuhan biologis.\n\nMetode meliputi netralisasi keasaman (*deacidification*), perbaikan serat kertas dengan tisu Jepang (*Japanese tissue*), serta enkapsulasi poliester bebas asam guna melindungi fisik asli arsip.",
                 'community_benefit' => 'Berhasil menyelamatkan 45 naskah manuskrip bersejarah dari ancaman kerusakan permanen, sehingga dapat diteliti dengan aman oleh akademisi dan sejarawan nusantara.',
                 'demo_url' => null,
                 'repository_url' => 'https://drive.google.com/drive/folders/dokumentasi-preservasi-naskah',
                 'video_url' => null,
                 'screenshots' => [
-                    'projects/mahasiswi_membaca_koleksi.jpg',
+                    'projects/meja_layanan_sirkulasi.jpg',
                 ],
                 'community_photos' => [
-                    'projects/koleksi_buku_rak_perpustakaan.jpg',
+                    'projects/ruang_baca_modern_interior.jpg',
                 ],
                 'documents' => [
                     ['name' => 'Laporan_Teknis_Preservasi_Enkapsulasi.pdf', 'path' => 'projects/manual_book_kearsipan.pdf', 'size' => '2.1 MB'],
@@ -150,7 +151,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'repository_url' => 'https://drive.google.com/drive/folders/sop-layanan-sirkulasi-dispusip',
                 'video_url' => null,
                 'screenshots' => [
-                    'projects/mahasiswi_membaca_koleksi.jpg',
+                    'projects/meja_layanan_sirkulasi.jpg',
                 ],
                 'community_photos' => [
                     'projects/meja_layanan_sirkulasi.jpg',
@@ -176,7 +177,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'category' => 'teknologi',
                 'custom_category' => null,
                 'project_type' => 'group',
-                'photo_path' => 'projects/mahasiswi_membaca_koleksi.jpg',
+                'photo_path' => 'projects/meja_layanan_sirkulasi.jpg',
                 'description' => "Pengembangan portal pencarian bibliografi terintegrasi katalog umum (*Online Public Access Catalog*) yang dioptimalkan untuk perangkat seluler.\n\nSistem mendukung pelacakan rak presisi dengan denah visual interaktif dan fitur pesan pengingat pengembalian otomatis.",
                 'community_benefit' => 'Mempermudah ribuan mahasiswa dan akademisi menemukan koleksi langka tanpa harus mencari manual di lorong rak buku.',
                 'demo_url' => 'https://dispusip.surabaya.go.id',
@@ -188,7 +189,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                     'projects/screenshot_2_kampus.png',
                 ],
                 'community_photos' => [
-                    'projects/mahasiswi_membaca_koleksi.jpg',
+                    'projects/meja_layanan_sirkulasi.jpg',
                 ],
                 'documents' => [
                     ['name' => 'Dokumentasi_API_dan_Arsitektur_OPAC.pdf', 'path' => 'projects/laporan_luaran_inovasi.pdf', 'size' => '3.4 MB'],
@@ -211,8 +212,8 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'category' => 'buku',
                 'custom_category' => null,
                 'project_type' => 'individual',
-                'photo_path' => 'projects/koleksi_buku_rak_perpustakaan.jpg',
-                'description' => "Penyusunan modul buku saku praktis bagi masyarakat mengenai cara menyimpan, merawat, dan memilah dokumen penting keluarga seperti sertifikat tanah, akta kelahiran, dan ijazah agar terhindar dari kerusakan akibat banjir atau kebakaran.",
+                'photo_path' => 'projects/ruang_baca_modern_interior.jpg',
+                'description' => 'Penyusunan modul buku saku praktis bagi masyarakat mengenai cara menyimpan, merawat, dan memilah dokumen penting keluarga seperti sertifikat tanah, akta kelahiran, dan ijazah agar terhindar dari kerusakan akibat banjir atau kebakaran.',
                 'community_benefit' => 'Telah didiseminasikan kepada kader PKK di 10 kelurahan rawan genangan air di Surabaya untuk membangun kesadaran tertib arsip mandiri.',
                 'demo_url' => 'https://anyflip.com/buku-sadar-arsip-keluarga',
                 'repository_url' => 'https://drive.google.com/drive/folders/modul-sadar-arsip',
@@ -221,7 +222,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                     'projects/anak_membaca_rak_melingkar.jpg',
                 ],
                 'community_photos' => [
-                    'projects/koleksi_buku_rak_perpustakaan.jpg',
+                    'projects/ruang_baca_modern_interior.jpg',
                 ],
                 'documents' => [
                     ['name' => 'Buku_Saku_Sadar_Arsip_Keluarga.pdf', 'path' => 'projects/manual_book_kearsipan.pdf', 'size' => '2.8 MB'],
@@ -243,18 +244,18 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'category' => 'preservasi',
                 'custom_category' => null,
                 'project_type' => 'group',
-                'photo_path' => 'projects/koleksi_buku_rak_perpustakaan.jpg',
+                'photo_path' => 'projects/ruang_baca_modern_interior.jpg',
                 'description' => "Proyek digitalisasi lembaran peta historis berukuran besar (*oversized cartography*) periode Gemeente Soerabaia hingga pendudukan Jepang.\n\nMenggunakan scanner format lebar khusus tanpa panas (*cold lamp*) dan pembubuhan metadata berbasis standar kearsipan internasional ISAD(G).",
                 'community_benefit' => 'Menghasilkan 120 berkas peta geospasial resolusi tinggi yang dapat diakses oleh dinas tata kota, arsitek cagar budaya, dan peneliti sejarah tata kota.',
                 'demo_url' => 'https://dispusip.surabaya.go.id',
                 'repository_url' => 'https://drive.google.com/drive/folders/arsip-peta-surabaya-highres',
                 'video_url' => 'https://youtu.be/jlKU3exv4Oc',
                 'screenshots' => [
-                    'projects/mahasiswi_membaca_koleksi.jpg',
+                    'projects/meja_layanan_sirkulasi.jpg',
                     'projects/demo_arsip_list.png',
                 ],
                 'community_photos' => [
-                    'projects/koleksi_buku_rak_perpustakaan.jpg',
+                    'projects/ruang_baca_modern_interior.jpg',
                 ],
                 'documents' => [
                     ['name' => 'Katalog_Metadata_Peta_Kuno_Surabaya.pdf', 'path' => 'projects/laporan_luaran_inovasi.pdf', 'size' => '4.8 MB'],
@@ -310,13 +311,13 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'custom_category' => null,
                 'project_type' => 'individual',
                 'photo_path' => 'projects/meja_layanan_sirkulasi.jpg',
-                'description' => "Penyusunan petunjuk teknis pengelolaan berkas inaktif pada instansi pemerintahan tingkat kelurahan se-Surabaya, mencakup jadwal retensi arsip (JRA), tata cara pemindahan berkas, dan prosedur pemusnahan arsip aman.",
+                'description' => 'Penyusunan petunjuk teknis pengelolaan berkas inaktif pada instansi pemerintahan tingkat kelurahan se-Surabaya, mencakup jadwal retensi arsip (JRA), tata cara pemindahan berkas, dan prosedur pemusnahan arsip aman.',
                 'community_benefit' => 'Membantu 31 kecamatan dan 154 kelurahan menertibkan gudang arsip dan mempercepat penemuan kembali warkat kependudukan warga.',
                 'demo_url' => null,
                 'repository_url' => 'https://drive.google.com/drive/folders/pedoman-tata-kelola-arsip-kelurahan',
                 'video_url' => null,
                 'screenshots' => [
-                    'projects/koleksi_buku_rak_perpustakaan.jpg',
+                    'projects/ruang_baca_modern_interior.jpg',
                 ],
                 'community_photos' => [
                     'projects/meja_layanan_sirkulasi.jpg',
@@ -341,9 +342,9 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'category' => 'teknologi',
                 'custom_category' => null,
                 'project_type' => 'group',
-                'photo_path' => 'projects/mahasiswi_membaca_koleksi.jpg',
-                'description' => "Pengembangan platform terpadu untuk efisiensi pendaftaran mahasiswa magang, verifikasi penempatan, pencatatan logbook harian, penilaian pembimbing dinas/dosen, dan etalase terbuka proyek inovasi kedinasan.",
-                'community_benefit' => 'Mengeliminasi penggunaan berkas fisik proposal kertas, memfasilitasi ratusan mahasiswa magang dari perguruan tinggi terkemuka, dan mempublikasikan karya nyata mahasiswa kepada masyarakat.',
+                'photo_path' => 'projects/meja_layanan_sirkulasi.jpg',
+                'description' => 'Pengembangan platform terpadu untuk efisiensi pendaftaran peserta magang, verifikasi penempatan, pencatatan logbook harian, penilaian mentor dinas dan pembimbing, dan etalase terbuka proyek inovasi kedinasan.',
+                'community_benefit' => 'Mengeliminasi penggunaan berkas fisik proposal kertas, memfasilitasi ratusan peserta magang dari kampus dan sekolah mitra, dan mempublikasikan karya nyata peserta magang kepada masyarakat.',
                 'demo_url' => 'https://dispusip.surabaya.go.id',
                 'repository_url' => 'https://github.com/surabaya-dev/sim-magang-dispusip',
                 'video_url' => 'https://youtu.be/jlKU3exv4Oc',
@@ -380,14 +381,14 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'custom_category' => 'Klinik Literasi Inklusif',
                 'project_type' => 'group',
                 'photo_path' => 'projects/anak_membaca_rak_melingkar.jpg',
-                'description' => "Inisiatif penyediaan layanan audio book naratif lokal, buku berhuruf Braille, dan bimbingan membaca intensif bagi anak-anak dan pemustaka penyandang disabilitas sensorik netra di Kota Surabaya.",
+                'description' => 'Inisiatif penyediaan layanan audio book naratif lokal, buku berhuruf Braille, dan bimbingan membaca intensif bagi anak-anak dan pemustaka penyandang disabilitas sensorik netra di Kota Surabaya.',
                 'community_benefit' => 'Memberikan hak akses literasi yang setara bagi 60 pemustaka disabilitas dan telah memproduksi 25 buku suara berbahasa Indonesia.',
                 'demo_url' => 'https://anyflip.com/klinik-literasi-inklusif-dispusip',
                 'repository_url' => 'https://drive.google.com/drive/folders/klinik-literasi-inklusif',
                 'video_url' => null,
                 'screenshots' => [
                     'projects/ruang_baca_modern_interior.jpg',
-                    'projects/koleksi_buku_rak_perpustakaan.jpg',
+                    'projects/ruang_baca_modern_interior.jpg',
                 ],
                 'community_photos' => [
                     'projects/anak_membaca_rak_melingkar.jpg',
@@ -413,7 +414,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'custom_category' => null,
                 'project_type' => 'individual',
                 'photo_path' => 'projects/ruang_baca_modern_interior.jpg',
-                'description' => "Perancangan sistem penunjuk arah fisik (*wayfinding signage*), peta direktori gedung, dan rambu keselamatan terpadu untuk depo penyimpanan arsip dinas kearsipan dan perpustakaan Surabaya.",
+                'description' => 'Perancangan sistem penunjuk arah fisik (*wayfinding signage*), peta direktori gedung, dan rambu keselamatan terpadu untuk depo penyimpanan arsip dinas kearsipan dan perpustakaan Surabaya.',
                 'community_benefit' => 'Mempermudah navigasi pengunjung publik menuju ruang baca umum, ruang konsultasi naskah, dan zona pelayanan kearsipan secara efisien dan estetis.',
                 'demo_url' => 'https://behance.net/gallery/wayfinding-signage-dispusip',
                 'repository_url' => 'https://drive.google.com/drive/folders/desain-signage-kearsipan',
@@ -471,7 +472,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
             ]);
 
             // Buat relasi anggota tim jika ada
-            if (!empty($item['members'])) {
+            if (! empty($item['members'])) {
                 foreach ($item['members'] as $mIdx => $mConfig) {
                     if ($mIdx === 0) {
                         // Leader adalah pemilik placement proyek
@@ -506,35 +507,35 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
         $storageProjectsDir = storage_path('app/public/projects/');
         $publicProjectsDir = public_path('storage/projects/');
 
-        if (!File::isDirectory($storageProjectsDir)) {
+        if (! File::isDirectory($storageProjectsDir)) {
             File::makeDirectory($storageProjectsDir, 0755, true);
         }
-        if (!File::isDirectory($publicProjectsDir)) {
+        if (! File::isDirectory($publicProjectsDir)) {
             File::makeDirectory($publicProjectsDir, 0755, true);
         }
 
         // Dummy PDF jika belum ada
         foreach (['manual_book_kearsipan.pdf', 'laporan_luaran_inovasi.pdf'] as $pdfName) {
-            $dest = $storageProjectsDir . $pdfName;
-            if (!File::exists($dest)) {
+            $dest = $storageProjectsDir.$pdfName;
+            if (! File::exists($dest)) {
                 File::put($dest, "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj\nxref\n0 4\n0000000000 65535 f\n0000000010 00000 n\n0000000053 00000 n\n0000000102 00000 n\ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n185\n%%EOF");
             }
-            if (!File::exists($publicProjectsDir . $pdfName)) {
-                @copy($dest, $publicProjectsDir . $pdfName);
+            if (! File::exists($publicProjectsDir.$pdfName)) {
+                @copy($dest, $publicProjectsDir.$pdfName);
             }
         }
 
         // Dummy ZIP jika belum ada
-        $zipDest = $storageProjectsDir . 'sim_magang_v1.0_source.zip';
-        if (!File::exists($zipDest)) {
-            $zip = new \ZipArchive();
+        $zipDest = $storageProjectsDir.'sim_magang_v1.0_source.zip';
+        if (! File::exists($zipDest)) {
+            $zip = new \ZipArchive;
             if ($zip->open($zipDest, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
-                $zip->addFromString('README.md', "# SIM Magang Dispusip Surabaya\n\nBerkas arsip kode & karya luaran inovasi mahasiswa.");
+                $zip->addFromString('README.md', "# SIM Magang Dispusip Surabaya\n\nBerkas arsip kode & karya luaran inovasi peserta magang.");
                 $zip->close();
             }
         }
-        if (!File::exists($publicProjectsDir . 'sim_magang_v1.0_source.zip')) {
-            @copy($zipDest, $publicProjectsDir . 'sim_magang_v1.0_source.zip');
+        if (! File::exists($publicProjectsDir.'sim_magang_v1.0_source.zip')) {
+            @copy($zipDest, $publicProjectsDir.'sim_magang_v1.0_source.zip');
         }
     }
 }

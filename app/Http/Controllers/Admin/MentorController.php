@@ -7,10 +7,12 @@ use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\AuditLog;
 use App\Models\Placement;
+use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class MentorController extends Controller
@@ -64,8 +66,8 @@ class MentorController extends Controller
         $agencies = AgencyProfile::all();
         $currentAgency = $agencyId ? AgencyProfile::find($agencyId) : null;
         $units = (! $isSuperAdmin && $user->unit_id)
-            ? \App\Models\Unit::where('id', $user->unit_id)->get()
-            : \App\Models\Unit::when($agencyId, fn ($q) => $q->where('agency_profile_id', $agencyId))->orderBy('name')->get();
+            ? Unit::where('id', $user->unit_id)->get()
+            : Unit::when($agencyId, fn ($q) => $q->where('agency_profile_id', $agencyId))->orderBy('name')->get();
 
         return view('admin.mentors.index', compact('mentors', 'agencies', 'currentAgency', 'units', 'isSuperAdmin', 'agencyId'));
     }
@@ -82,8 +84,8 @@ class MentorController extends Controller
         $agencies = AgencyProfile::all();
         $currentAgency = $user->agency_profile_id ? AgencyProfile::find($user->agency_profile_id) : AgencyProfile::first();
         $units = (! $isSuperAdmin && $user->unit_id)
-            ? \App\Models\Unit::where('id', $user->unit_id)->get()
-            : \App\Models\Unit::when($currentAgency, fn ($q) => $q->where('agency_profile_id', $currentAgency->id))->orderBy('name')->get();
+            ? Unit::where('id', $user->unit_id)->get()
+            : Unit::when($currentAgency, fn ($q) => $q->where('agency_profile_id', $currentAgency->id))->orderBy('name')->get();
 
         return view('admin.mentors.create', compact('agencies', 'currentAgency', 'units', 'isSuperAdmin'));
     }
@@ -107,13 +109,14 @@ class MentorController extends Controller
         $mentor = User::create([
             'name' => trim($request->name),
             'email' => strtolower(trim($request->email)),
-            'password' => Hash::make('password'),
+            'password' => Hash::make(Str::random(40)),
             'role' => 'mentor',
             'agency_profile_id' => $agencyId,
             'unit_id' => $assignedUnitId,
             'status' => $request->status ?? 'active',
             'email_verified_at' => now(),
         ]);
+        $this->issueTemporaryPasswordFor($mentor);
 
         AuditLog::record('MENTOR_CREATE', 'User', $mentor->id, [
             'name' => $mentor->name,
@@ -141,8 +144,8 @@ class MentorController extends Controller
         $agencies = AgencyProfile::all();
         $currentAgency = $mentor->agency_profile_id ? AgencyProfile::find($mentor->agency_profile_id) : AgencyProfile::first();
         $units = (! $isSuperAdmin && $user->unit_id)
-            ? \App\Models\Unit::where('id', $user->unit_id)->get()
-            : \App\Models\Unit::when($currentAgency, fn ($q) => $q->where('agency_profile_id', $currentAgency->id))->orderBy('name')->get();
+            ? Unit::where('id', $user->unit_id)->get()
+            : Unit::when($currentAgency, fn ($q) => $q->where('agency_profile_id', $currentAgency->id))->orderBy('name')->get();
 
         return view('admin.mentors.edit', compact('mentor', 'agencies', 'currentAgency', 'units', 'isSuperAdmin'));
     }
@@ -203,13 +206,13 @@ class MentorController extends Controller
             abort(403, 'Anda tidak memiliki hak akses mereset password mentor bidang lain.');
         }
 
-        $mentor->update(['password' => Hash::make('password')]);
+        $this->issueTemporaryPasswordFor($mentor);
 
         AuditLog::record('MENTOR_PASSWORD_RESET', 'User', $mentor->id, [
             'name' => $mentor->name,
         ]);
 
-        return redirect()->back()->with('success', "Password mentor '{$mentor->name}' berhasil direset ke 'password'.");
+        return redirect()->back()->with('success', "Password mentor '{$mentor->name}' berhasil direset. Password sementara ditampilkan sekali di layar ini.");
     }
 
     public function destroy($id)
@@ -234,7 +237,7 @@ class MentorController extends Controller
         })->count();
 
         if ($historyCount > 0) {
-            return redirect()->back()->with('error', "Gagal menghapus: Mentor '{$mentor->name}' tercatat membimbing {$historyCount} mahasiswa (termasuk arsip alumni). Ubah status akun menjadi Nonaktif untuk mencabut aksesnya.");
+            return redirect()->back()->with('error', "Gagal menghapus: Mentor '{$mentor->name}' tercatat membimbing {$historyCount} peserta magang (termasuk arsip alumni). Ubah status akun menjadi Nonaktif untuk mencabut aksesnya.");
         }
 
         $name = $mentor->name;

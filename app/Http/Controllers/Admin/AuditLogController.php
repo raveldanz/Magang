@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AuditLogController extends Controller
 {
@@ -13,6 +14,9 @@ class AuditLogController extends Controller
      */
     public function index(Request $request)
     {
+        // Log audit memuat aksi lintas dinas, IP, dan detail reset password/penyamaran
+        $this->ensureSuperAdmin('Log audit sistem hanya dapat dibuka oleh Super Administrator.');
+
         $query = AuditLog::with('user')->latest();
 
         if ($request->filled('action')) {
@@ -24,13 +28,14 @@ class AuditLogController extends Controller
         }
 
         if ($request->filled('search')) {
-            $search = strtolower($request->search);
-            $query->where(function ($q) use ($search) {
-                $q->where('action', 'like', "%{$search}%")
-                    ->orWhere('user_name', 'like', "%{$search}%")
-                    ->orWhere('target_type', 'like', "%{$search}%")
-                    ->orWhere('details', 'like', "%{$search}%")
-                    ->orWhere('ip_address', 'like', "%{$search}%");
+            $search = trim($request->search);
+            $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+            $query->where(function ($q) use ($search, $like) {
+                $q->where('action', $like, "%{$search}%")
+                    ->orWhere('user_name', $like, "%{$search}%")
+                    ->orWhere('target_type', $like, "%{$search}%")
+                    ->orWhere('details', $like, "%{$search}%")
+                    ->orWhere('ip_address', $like, "%{$search}%");
             });
         }
 

@@ -91,7 +91,7 @@
                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Sisa Kuota Tersedia</p>
                     <h3 class="text-2xl font-black text-gray-900 mt-1" id="stat-total-remaining">{{ $stats['total_remaining'] }}</h3>
-                    <p class="text-xs text-gray-500 mt-1">Slot mahasiswa baru</p>
+                    <p class="text-xs text-gray-500 mt-1">Slot peserta magang baru</p>
                 </div>
             </div>
 
@@ -190,7 +190,7 @@
                                                 @click="$dispatch('open-delete-modal', {
                                                     action: '{{ route('admin.units.destroy', $unit->id) }}',
                                                     title: 'Hapus Unit Bidang',
-                                                    name: '{{ addslashes($unit->name) }}',
+                                                    name: @js((string) ($unit->name)),
                                                     desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dispusip Surabaya') }} &bull; Kuota: {{ $unit->quota }}'
                                                 })"
                                                 class="mbtn mbtn-danger">Hapus</button>
@@ -325,7 +325,7 @@
                                                         @click="$dispatch('open-delete-modal', {
                                                             action: '{{ route('admin.units.destroy', $unit->id) }}',
                                                             title: 'Hapus Unit Bidang',
-                                                            name: '{{ addslashes($unit->name) }}',
+                                                            name: @js((string) ($unit->name)),
                                                             desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dispusip Surabaya') }} &bull; Kuota: {{ $unit->quota }}'
                                                         })" 
                                                         class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white"
@@ -373,7 +373,7 @@
             }
 
             if (val < filled) {
-                notify(`Kuota tidak boleh kurang dari jumlah mahasiswa yang sudah diterima (${filled} orang).`);
+                notify(`Kuota tidak boleh kurang dari jumlah peserta magang yang sudah diterima (${filled} orang).`);
                 input.value = input.dataset.currentVal;
                 return;
             }

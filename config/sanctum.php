@@ -50,7 +50,8 @@ return [
     |
     */
 
-    'expiration' => null,
+    // Token API kedaluwarsa (menit); bawaan 30 hari agar token yang bocor tidak berlaku selamanya
+    'expiration' => env('SANCTUM_EXPIRATION', 43200),
 
     /*
     |--------------------------------------------------------------------------

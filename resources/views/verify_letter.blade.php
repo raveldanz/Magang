@@ -12,9 +12,12 @@
             
             <!-- Header Logo / Instansi -->
             <div class="text-center pb-4 border-b">
-                @if($agency)
-                    <img src="{{ $agency->logo_url }}" alt="Logo {{ $agencyName }}" class="w-16 h-16 mx-auto mb-2 object-contain">
-                @endif
+                <div class="flex items-center justify-center gap-3 mb-2">
+                    <img src="{{ asset('images/logos/surabaya.png') }}" alt="Logo {{ $govName }}" class="h-14 w-auto object-contain">
+                    @if($agency)
+                        <img src="{{ $agency->logo_url }}" alt="Logo {{ $agencyName }}" class="w-14 h-14 object-contain">
+                    @endif
+                </div>
                 <h2 class="text-lg font-bold text-gray-800 uppercase tracking-wide">{{ $govName }}</h2>
                 <h1 class="text-xl font-extrabold text-blue-900 uppercase">{{ $agencyName }}</h1>
                 <p class="text-xs text-gray-500 mt-1">Sistem Informasi Pendaftaran & Validasi Magang Resmi</p>
@@ -61,15 +64,20 @@
                         <dd class="vvalue">{{ $fmtDate($application->letter_date) }}</dd>
                     </div>
                     @if($application->group_id && $application->group)
+                        @php
+                            $verifiedGroupMembers = $application->group->applications->filter(
+                                fn ($gApp) => in_array($gApp->statusValue(), ['accepted', 'active', 'completed', 'waiting_approval'], true)
+                            );
+                        @endphp
                         <div class="vrow">
                             <dt class="vlabel">Tipe Pengajuan</dt>
-                            <dd class="vvalue"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">Kelompok Magang ({{ $application->group->applications->count() }} Mahasiswa)</span></dd>
+                            <dd class="vvalue"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">Kelompok Magang ({{ $verifiedGroupMembers->count() }} Peserta Magang)</span></dd>
                         </div>
                         <div class="vrow">
                             <dt class="vlabel">Daftar Anggota Kelompok</dt>
                             <dd class="vvalue">
                                 <ul class="divide-y divide-slate-100 mt-1 border rounded-lg bg-slate-50 p-2 text-xs space-y-1.5">
-                                    @foreach($application->group->applications as $gApp)
+                                    @foreach($verifiedGroupMembers as $gApp)
                                         <li class="flex items-center justify-between py-1">
                                             <div>
                                                 <span class="font-bold text-slate-800">{{ $gApp->user?->name }}</span>
@@ -86,15 +94,15 @@
                         </div>
                     @else
                         <div class="vrow">
-                            <dt class="vlabel">Nama Mahasiswa</dt>
+                            <dt class="vlabel">Nama Peserta Magang</dt>
                             <dd class="vvalue">{{ $application->user->name }}</dd>
                         </div>
                         <div class="vrow">
-                            <dt class="vlabel">NIM / NPM</dt>
+                            <dt class="vlabel">{{ $sp?->identityNumberLabel() ?? 'NIM/NIS' }}</dt>
                             <dd class="vvalue is-mono">{{ $sp?->nim ?? '-' }}</dd>
                         </div>
                         <div class="vrow">
-                            <dt class="vlabel">Universitas / Jurusan</dt>
+                            <dt class="vlabel">{{ $sp?->isSchoolStudent() ? 'Sekolah / Jurusan' : 'Universitas / Jurusan' }}</dt>
                             <dd class="vvalue">{{ $sp?->universitas ?? '-' }}<span class="vsub">{{ $sp?->jurusan ?? '-' }}</span></dd>
                         </div>
                     @endif

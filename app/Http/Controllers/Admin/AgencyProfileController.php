@@ -10,10 +10,10 @@ use Illuminate\Support\Facades\Storage;
 
 class AgencyProfileController extends Controller
 {
-    // Helper to determine if the logged in user is Superadmin
+    // Hak Super Admin ditentukan dari peran akun, bukan dari alamat email tertentu.
     private function isSuperAdmin($user): bool
     {
-        return $user && ($user->email === 'admin@gmail.com' || $user->agency_profile_id === null);
+        return (bool) $user?->isSuperAdmin();
     }
 
     // Display the agency profile edit form

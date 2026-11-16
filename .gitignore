@@ -36,3 +36,7 @@ Thumbs.db
 *.tmp
 *.pptx
 
+/storage/framework/demo_server.txt
+
+/database/pgsql/
+/ALAMAT_DEMO.html

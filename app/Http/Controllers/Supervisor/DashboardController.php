@@ -10,7 +10,6 @@ use App\Models\Certificate;
 use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -19,6 +18,9 @@ class DashboardController extends Controller
      */
     public function index(Request $request)
     {
+        // Sinkronkan seluruh pengajuan magang yang tanggal mulainya telah tiba ke ACTIVE (on-demand batch sync)
+        Application::syncStartedApplications();
+
         $dispusip = AgencyProfile::where('agency_name', 'like', '%Perpustakaan%')->first()
             ?? AgencyProfile::first();
 

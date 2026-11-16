@@ -33,17 +33,15 @@ class NotificationService
         // 1. SUPER ADMIN NOTIFICATIONS
         if ($isSuperAdmin) {
             // A. Universitas Baru Tanpa Akun
-            $pendingUnivs = University::whereDoesntHave('users', function ($q) {
-                $q->where('role', 'universitas');
-            })->withCount('students')->get();
+            $pendingUnivs = University::needingAdminAccount()->withCount('students')->get();
 
             foreach ($pendingUnivs as $u) {
                 $actionable[] = [
                     'id' => 'univ_'.$u->id,
                     'type' => 'urgent',
                     'category' => 'university',
-                    'title' => "Perguruan Tinggi Baru: {$u->name}",
-                    'message' => "Terdaftar otomatis dari pendaftaran {$u->students_count} mahasiswa. Belum memiliki akun Admin Kampus / PIC.",
+                    'title' => "Kampus/Sekolah Baru: {$u->name}",
+                    'message' => "Terdaftar otomatis dari pendaftaran {$u->students_count} peserta magang. Belum memiliki akun Admin Kampus / PIC.",
                     'time' => $u->created_at ? $u->created_at->diffForHumans() : 'Baru saja',
                     'action_url' => route('admin.universities.index'),
                     'action_label' => 'Buat Akun Kampus',
@@ -70,6 +68,22 @@ class NotificationService
                 ];
             }
 
+            // B2. Pembimbing daftar mandiri dari institusi yang belum punya Admin Kampus/Sekolah
+            $pendingAdvisorCount = app(AdvisorApprovalService::class)->pendingWithoutInstitutionAdmin()->count();
+            if ($pendingAdvisorCount > 0) {
+                $actionable[] = [
+                    'id' => 'advisors_pending_approval',
+                    'type' => 'warning',
+                    'category' => 'account',
+                    'title' => "{$pendingAdvisorCount} Pembimbing Menunggu Persetujuan",
+                    'message' => 'Dosen/guru mendaftar sendiri dari institusi yang belum punya Admin Kampus/Sekolah. Periksa lalu setujui agar peserta magang dapat memilihnya.',
+                    'time' => 'Perlu persetujuan',
+                    'action_url' => route('admin.users.index', ['role' => 'dosen', 'account_status' => 'pending']),
+                    'action_label' => 'Periksa Pembimbing',
+                    'is_action_required' => true,
+                ];
+            }
+
             // C. Pengajuan Magang Baru Menunggu Verifikasi
             $pendingAppsCount = Application::where('status', 'pending')->count();
             if ($pendingAppsCount > 0) {
@@ -78,7 +92,7 @@ class NotificationService
                     'type' => 'warning',
                     'category' => 'application',
                     'title' => "{$pendingAppsCount} Pengajuan Magang Menunggu Verifikasi",
-                    'message' => 'Terdapat permohonan magang mahasiswa yang menunggu pemeriksaan berkas oleh instansi dinas.',
+                    'message' => 'Terdapat permohonan magang peserta yang menunggu pemeriksaan berkas oleh instansi dinas.',
                     'time' => 'Memerlukan tindakan',
                     'action_url' => route('admin.applications.index'),
                     'action_label' => 'Tinjau Pengajuan',
@@ -105,7 +119,7 @@ class NotificationService
                         'error_bug' => '⚠️', 'laporan_chat' => '🚩', default => '💬'
                     },
                     'title' => "Feedback: [{$catLabel}] {$fb->subject}",
-                    'message' => "Dari {$fb->sender_name} (".strtoupper($fb->sender_role).'): '.Str::limit($fb->message, 80),
+                    'message' => "Dari {$fb->sender_name} (".$fb->senderRoleLabel().'): '.Str::limit($fb->message, 80),
                     'time' => $fb->created_at->diffForHumans(),
                     'action_url' => route('admin.feedbacks.show', $fb->id),
                     'action_label' => '✉️ Buka Tiket',
@@ -144,8 +158,8 @@ class NotificationService
                     'id' => 'unassigned_dpl',
                     'type' => 'info',
                     'category' => 'academic',
-                    'title' => "{$unassignedDpl} Mahasiswa Belum Memiliki Dosen Pembimbing",
-                    'message' => 'Mahasiswa telah diterima di instansi dinas namun data Dosen Pembimbing belum ditentukan.',
+                    'title' => "{$unassignedDpl} Peserta Magang Belum Memiliki Pembimbing",
+                    'message' => 'Peserta Magang telah diterima di instansi dinas namun data Pembimbing belum ditentukan.',
                     'time' => 'Perlu penetapan',
                     'action_url' => route('admin.applications.index'),
                     'action_label' => 'Lihat Penempatan',
@@ -163,7 +177,7 @@ class NotificationService
                     'type' => 'urgent',
                     'category' => 'application',
                     'title' => "Terdapat {$waitingApps} Pengajuan Magang Menunggu ACC Atasan",
-                    'message' => 'Admin telah memverifikasi berkas mahasiswa dan menentukan pembimbing lapangan. Silakan periksa dan berikan pengesahan (Double ACC).',
+                    'message' => 'Admin telah memverifikasi berkas peserta magang dan menentukan pembimbing lapangan. Silakan periksa dan berikan pengesahan (Double ACC).',
                     'time' => 'Menunggu ACC',
                     'action_url' => route('supervisor.applications.index'),
                     'action_label' => 'Periksa & Sahkan',
@@ -227,8 +241,8 @@ class NotificationService
                     'id' => 'agency_logbooks_pending',
                     'type' => 'info',
                     'category' => 'logbook',
-                    'title' => "{$pendingLogbooks} Logbook Mahasiswa Perlu Review",
-                    'message' => 'Mahasiswa magang telah mengunggah logbook harian aktivitas kerja.',
+                    'title' => "{$pendingLogbooks} Logbook Peserta Magang Perlu Review",
+                    'message' => 'Peserta Magang telah mengunggah logbook harian aktivitas kerja.',
                     'time' => 'Monitoring dinas',
                     'action_url' => route('admin.logbooks.index'),
                     'action_label' => 'Cek Logbook',
@@ -257,7 +271,7 @@ class NotificationService
                     'type' => 'warning',
                     'category' => 'logbook',
                     'title' => "{$pendingLogbooksCount} Logbook Bimbingan Menunggu Evaluasi",
-                    'message' => 'Mahasiswa bimbingan Anda telah mengisi logbook aktivitas harian yang perlu diberi catatan/tinjauan.',
+                    'message' => 'Peserta bimbingan Anda telah mengisi logbook aktivitas harian yang perlu diberi catatan/tinjauan.',
                     'time' => 'Menunggu review',
                     'action_url' => route('lecturer.logbooks.index'),
                     'action_label' => 'Review Logbook',
@@ -275,8 +289,8 @@ class NotificationService
                     'id' => 'dosen_report_pending',
                     'type' => 'urgent',
                     'category' => 'evaluation',
-                    'title' => "{$pendingReportsCount} Laporan Akhir Mahasiswa Siap Dinilai",
-                    'message' => 'Mahasiswa telah menyelesaikan masa magang dan mengunggah laporan akhir magang.',
+                    'title' => "{$pendingReportsCount} Laporan Akhir Peserta Magang Siap Dinilai",
+                    'message' => 'Peserta Magang telah menyelesaikan masa magang dan mengunggah laporan akhir magang.',
                     'time' => 'Perlu penilaian',
                     'action_url' => route('lecturer.monitoring.index'),
                     'action_label' => 'Beri Nilai Akhir',
@@ -289,9 +303,9 @@ class NotificationService
                     'id' => 'dosen_students_active',
                     'type' => 'info',
                     'category' => 'academic',
-                    'title' => "Total {$placements->count()} Mahasiswa dalam Bimbingan Anda",
-                    'message' => 'Pantau kemajuan kegiatan magang mahasiswa bimbingan di instansi Pemkot Surabaya.',
-                    'time' => 'Portal DPL',
+                    'title' => "Total {$placements->count()} Peserta Magang dalam Bimbingan Anda",
+                    'message' => 'Pantau kemajuan kegiatan magang peserta bimbingan di instansi Pemkot Surabaya.',
+                    'time' => 'Portal Pembimbing',
                     'action_url' => route('lecturer.monitoring.index'),
                     'is_action_required' => false,
                 ];
@@ -300,41 +314,49 @@ class NotificationService
 
         // 4. MENTOR LAPANGAN NOTIFICATIONS
         elseif ($role === 'mentor' || $role === 'pembimbing') {
-            // Lingkup sama persis dengan halaman Logbook mentor: mahasiswa bimbingan sendiri
-            // (mentor_id / pembimbing_id) + fallback Kepala Unit — bukan seluruh mahasiswa instansi.
-            $mentorPlacements = Placement::fieldReviewableBy($user)
-                ->whereHas('application', fn ($q) => $q->whereNotIn('status', ['resigned', 'rejected']))
-                ->get();
+            // Lingkup & hitungan sama persis dengan Daftar Tugas di dasbor mentor (MentorTaskList):
+            // mahasiswa bimbingan sendiri + fallback Kepala Unit, bukan seluruh mahasiswa instansi.
+            ['tasks' => $mentorTasks, 'summary' => $mentorSummary] = app(MentorTaskList::class)->forMentor($user);
 
-            $pendingMentorLogbooks = Logbook::where('status', 'pending')
-                ->whereIn('placement_id', $mentorPlacements->pluck('id'))
-                ->count();
-
-            if ($pendingMentorLogbooks > 0) {
+            if ($mentorSummary['pending_logbook_days'] > 0) {
                 $actionable[] = [
                     'id' => 'mentor_logbook_pending',
                     'type' => 'warning',
                     'category' => 'logbook',
-                    'title' => "{$pendingMentorLogbooks} Logbook Menunggu Validasi Mentor",
-                    'message' => 'Mahasiswa di divisi Anda telah mengisi logbook aktivitas magang.',
-                    'time' => 'Menunggu persetujuan',
+                    'title' => "{$mentorSummary['pending_logbook_days']} Logbook Harian Menunggu Pemeriksaan Anda",
+                    'message' => "Dari {$mentorSummary['pending_logbook_students']} peserta bimbingan. Buka untuk memeriksa per minggu.",
+                    'time' => 'Menunggu pemeriksaan',
                     'action_url' => route('mentor.logbooks.index'),
-                    'action_label' => 'Validasi Logbook',
+                    'action_label' => 'Periksa Logbook',
                     'is_action_required' => true,
                 ];
             }
 
-            if ($mentorPlacements->count() > 0) {
+            foreach ($mentorTasks->where('type', 'report') as $task) {
                 $actionable[] = [
-                    'id' => 'mentor_active_students',
-                    'type' => 'info',
-                    'category' => 'mentor',
-                    'title' => "Supervisi {$mentorPlacements->count()} Mahasiswa di Unit Kerja",
-                    'message' => 'Pantau kehadiran, kinerja harian, dan berikan evaluasi lapangan.',
-                    'time' => 'Portal Mentor',
-                    'action_url' => route('mentor.dashboard'),
-                    'action_label' => 'Dashboard Mentor',
-                    'is_action_required' => false,
+                    'id' => 'mentor_report_pending_'.$task['placement_id'],
+                    'type' => 'warning',
+                    'category' => 'laporan',
+                    'title' => "Laporan Akhir {$task['student_name']} Menunggu Persetujuan",
+                    'message' => $task['description'],
+                    'time' => 'Menunggu pemeriksaan',
+                    'action_url' => $task['url'],
+                    'action_label' => $task['button'],
+                    'is_action_required' => true,
+                ];
+            }
+
+            foreach ($mentorTasks->where('type', 'evaluation') as $task) {
+                $actionable[] = [
+                    'id' => 'mentor_evaluation_due_'.$task['placement_id'],
+                    'type' => $task['urgent'] ? 'urgent' : 'warning',
+                    'category' => 'nilai',
+                    'title' => "Nilai Akhir {$task['student_name']} Belum Diisi",
+                    'message' => $task['description'],
+                    'time' => $task['badge'] ?? 'Segera diisi',
+                    'action_url' => $task['url'],
+                    'action_label' => $task['button'],
+                    'is_action_required' => true,
                 ];
             }
         }
@@ -376,11 +398,11 @@ class NotificationService
                             'id' => 'student_need_dpl',
                             'type' => 'urgent',
                             'category' => 'academic',
-                            'title' => 'Selamat! Pengajuan Diterima - Silakan Pilih Dosen Pembimbing',
-                            'message' => 'Permohonan magang Anda telah disetujui. Lengkapi data Dosen Pembimbing pada dashboard.',
+                            'title' => 'Selamat! Pengajuan Diterima - Silakan Pilih Pembimbing',
+                            'message' => 'Permohonan magang Anda telah disetujui. Lengkapi data Pembimbing pada dashboard.',
                             'time' => 'Tindakan diperlukan',
                             'action_url' => route('dashboard'),
-                            'action_label' => 'Pilih Dosen',
+                            'action_label' => 'Pilih Pembimbing',
                             'is_action_required' => true,
                         ];
                     } else {
@@ -390,7 +412,7 @@ class NotificationService
                             'category' => 'academic',
                             'title' => 'Data Pembimbing Lengkap & Magang Siap Dilaksanakan',
                             'message' => $requiresAdvisor
-                                ? 'Mentor Dinas & Dosen Pembimbing telah terhubung. Jangan lupa untuk mengisi logbook harian secara berkala.'
+                                ? 'Mentor Dinas & Pembimbing telah terhubung. Jangan lupa untuk mengisi logbook harian secara berkala.'
                                 : 'Mentor Dinas telah terhubung. Jangan lupa untuk mengisi logbook harian secara berkala.',
                             'time' => 'Aktif',
                             'action_url' => route('student.logbook.index'),
@@ -404,7 +426,7 @@ class NotificationService
                         'type' => 'urgent',
                         'category' => 'application',
                         'title' => 'Pengajuan Magang Belum Diterima',
-                        'message' => 'Catatan: "'.($latestApp->rejection_reason ?? 'Kuota instansi belum mencukupi').'". Anda dapat mengajukan ulang.',
+                        'message' => 'Catatan: "'.($latestApp->rejection_reason ?? $latestApp->rejection_note ?? 'Kuota instansi belum mencukupi').'". Anda dapat mengajukan ulang.',
                         'time' => 'Pemberitahuan',
                         'action_url' => route('student.application.create'),
                         'action_label' => 'Ajukan Ulang',
@@ -455,16 +477,31 @@ class NotificationService
                 $dosenCount = User::whereIn('role', ['dosen', 'academic_advisor'])->where('university_id', $univ->id)->count();
                 $studentCount = User::where('role', 'mahasiswa')->where('university_id', $univ->id)->count();
 
+                $pendingAdvisorCount = app(AdvisorApprovalService::class)->pendingForInstitutionAdmin($user)->count();
+                if ($pendingAdvisorCount > 0) {
+                    $actionable[] = [
+                        'id' => 'univ_advisors_pending_approval',
+                        'type' => 'urgent',
+                        'category' => 'account',
+                        'title' => "{$pendingAdvisorCount} Pembimbing Menunggu Persetujuan Anda",
+                        'message' => 'Dosen/guru dari institusi Anda mendaftar sendiri. Setujui agar peserta magang dapat memilihnya sebagai pembimbing.',
+                        'time' => 'Perlu persetujuan',
+                        'action_url' => route('university.lecturers.index'),
+                        'action_label' => 'Periksa Pembimbing',
+                        'is_action_required' => true,
+                    ];
+                }
+
                 if ($dosenCount === 0) {
                     $actionable[] = [
                         'id' => 'univ_no_dosen',
                         'type' => 'warning',
                         'category' => 'university',
-                        'title' => 'Belum Ada Dosen Pembimbing Terdaftar',
-                        'message' => 'Daftarkan akun Dosen Pembimbing resmi kampus agar mahasiswa dapat memilih DPL dengan mudah.',
+                        'title' => 'Belum Ada Pembimbing Terdaftar',
+                        'message' => 'Daftarkan akun Pembimbing resmi kampus agar peserta magang dapat memilih Pembimbing dengan mudah.',
                         'time' => 'Perlu kelengkapan',
                         'action_url' => route('university.lecturers.index'),
-                        'action_label' => 'Tambah DPL',
+                        'action_label' => 'Tambah Pembimbing',
                         'is_action_required' => true,
                     ];
                 }
@@ -475,7 +512,7 @@ class NotificationService
                         'type' => 'info',
                         'category' => 'university',
                         'title' => 'Lengkapi Data Profil & Kop Surat Kampus',
-                        'message' => 'Lengkapi data PIC Rektorat/Dekanat dan format kop surat resmi untuk penerbitan surat pengantar mahasiswa.',
+                        'message' => 'Lengkapi data PIC Rektorat/Dekanat dan format kop surat resmi untuk penerbitan surat pengantar peserta magang.',
                         'time' => 'Profil instansi',
                         'action_url' => route('university.profile.index'),
                         'action_label' => 'Lengkapi Profil',
@@ -487,8 +524,8 @@ class NotificationService
                     'id' => 'univ_overview',
                     'type' => 'info',
                     'category' => 'university',
-                    'title' => "Portal Mitra MBKM: {$univ->name}",
-                    'message' => "Tercatat {$studentCount} Mahasiswa dan {$dosenCount} Dosen DPL aktif pada program magang Pemkot Surabaya.",
+                    'title' => "Portal Mitra Magang: {$univ->name}",
+                    'message' => "Tercatat {$studentCount} Peserta Magang dan {$dosenCount} Pembimbing aktif pada program magang Pemkot Surabaya.",
                     'time' => 'Terhubung',
                     'action_url' => route('university.profile.index'),
                     'action_label' => 'Buka Profil Kampus',
@@ -537,9 +574,9 @@ class NotificationService
     /**
      * Determine if the notification red dot badge should be visible
      */
-    public static function hasUnreadDot(User $user): bool
+    public static function hasUnreadDot(User $user, ?array $preloadedNotifs = null): bool
     {
-        $notifs = self::getNotificationsForUser($user);
+        $notifs = $preloadedNotifs ?? self::getNotificationsForUser($user);
         if (empty($notifs)) {
             return false;
         }
@@ -580,7 +617,7 @@ class NotificationService
      */
     public static function notifySupervisorForApplication(Application $application): void
     {
-        $studentName = $application->user?->name ?? 'Mahasiswa';
+        $studentName = $application->user?->name ?? 'Peserta Magang';
         SystemNotification::send(
             title: 'Pengajuan Magang Menunggu Persetujuan Atasan',
             message: "Pengajuan magang atas nama {$studentName} telah diverifikasi oleh Admin Dispusip dan menunggu persetujuan Anda.",
@@ -598,7 +635,7 @@ class NotificationService
      */
     public static function notifySupervisorForCertificate(Certificate $certificate): void
     {
-        $studentName = $certificate->placement?->application?->user?->name ?? 'Mahasiswa';
+        $studentName = $certificate->placement?->application?->user?->name ?? 'Peserta Magang';
         SystemNotification::send(
             title: 'Sertifikat Kelulusan Menunggu Pengesahan Atasan',
             message: "Sertifikat magang untuk peserta {$studentName} telah diterbitkan dan menunggu pengesahan resmi Anda.",

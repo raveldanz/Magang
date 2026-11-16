@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\Application;
+use App\Models\ApplicationDocument;
 use App\Models\AuditLog;
 use App\Models\StudentProfile;
 use App\Models\University;
@@ -31,7 +33,9 @@ class ProfileController extends Controller
             })
             ->where(fn ($q) => $q->whereNull('code')->orWhere('code', '!=', 'LAINNYA'))
             ->orderBy('name', 'asc')
-            ->get(['id', 'name', 'code', 'acronym', 'slug', 'is_verified']);
+            ->get(['id', 'name', 'code', 'acronym', 'slug', 'is_verified', 'institution_type'])
+            // Keterangan kecil di daftar pilihan agar sekolah dan kampus mudah dibedakan
+            ->each(fn (University $u) => $u->setAttribute('meta', $u->institutionTypeLabel()));
 
         return view('student.profile.edit', compact('user', 'profile', 'universities', 'currentUniversityId'));
     }
@@ -71,7 +75,7 @@ class ProfileController extends Controller
                 }
             }
 
-            $university = University::findOrCreateUnverified($typed);
+            $university = University::findOrCreateUnverified($typed, $this->educationLevel($request));
 
             if ($university->wasRecentlyCreated) {
                 AuditLog::record('UNIVERSITY_SELF_REGISTER', 'University', $university->id, [
@@ -83,17 +87,38 @@ class ProfileController extends Controller
             return $university;
         }
 
-        return University::findOrFail((int) $request->input('university_id'));
+        $university = University::findOrFail((int) $request->input('university_id'));
+
+        // Jenjang yang dipilih harus cocok dengan jenis institusi (sekolah vs perguruan tinggi)
+        if ($university->isSchool() !== ($this->educationLevel($request) === University::TYPE_SCHOOL)) {
+            throw ValidationException::withMessages([
+                'university_id' => $university->isSchool()
+                    ? "\"{$university->name}\" terdaftar sebagai sekolah. Ubah jenjang menjadi Sekolah, atau pilih kampus/sekolah Anda."
+                    : "\"{$university->name}\" terdaftar sebagai perguruan tinggi. Ubah jenjang menjadi Perguruan Tinggi, atau pilih sekolah Anda.",
+            ]);
+        }
+
+        return $university;
+    }
+
+    /** Jenjang peserta dari form profil: perguruan_tinggi (bawaan) atau sekolah. */
+    protected function educationLevel(Request $request): string
+    {
+        return $request->input('education_level') === University::TYPE_SCHOOL
+            ? University::TYPE_SCHOOL
+            : University::TYPE_COLLEGE;
     }
 
     public function update(Request $request)
     {
         $user = Auth::user();
+        $isSchool = $this->educationLevel($request) === University::TYPE_SCHOOL;
 
         // 2. Tambahkan validasi untuk photo
         $request->validate([
+            'education_level' => 'nullable|in:perguruan_tinggi,sekolah',
             'name' => 'required|string|max:255',
-            'nim' => 'required|string|max:50',
+            'nim' => ['required', 'string', 'max:30', 'regex:/^[A-Za-z0-9][A-Za-z0-9.\-\/ ]*$/'],
             'university_id' => [
                 'required',
                 function ($attribute, $value, $fail) {
@@ -101,15 +126,16 @@ class ProfileController extends Controller
                         return;
                     }
                     if (! ctype_digit((string) $value) || ! University::whereKey((int) $value)->exists()) {
-                        $fail('Perguruan tinggi yang dipilih tidak valid.');
+                        $fail('Kampus/sekolah yang dipilih tidak valid.');
                     }
                 },
             ],
             'custom_university_name' => 'nullable|required_if:university_id,other|string|min:3|max:255',
             'faculty' => 'nullable|string|max:255',
             'jurusan' => 'required|string|max:255',
-            'semester' => 'nullable|string|max:20',
-            'phone' => 'required|string|max:20',
+            // Mahasiswa: semester 1-16; siswa SMK/SMA: kelas 10-13 (disimpan di kolom yang sama)
+            'semester' => $isSchool ? 'nullable|integer|between:10,13' : 'nullable|integer|between:1,16',
+            'phone' => ['required', 'string', 'max:20', 'regex:/^\+?[0-9][0-9 \-]{7,18}$/'],
             'alamat' => 'nullable|string',
             'emergency_contact_name' => 'nullable|string|max:255',
             'emergency_contact_phone' => 'nullable|string|max:30',
@@ -118,14 +144,19 @@ class ProfileController extends Controller
             'transkrip' => 'nullable|mimes:pdf|max:2048',
             'id_card' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
         ], [
-            'university_id.required' => 'Silakan pilih perguruan tinggi Anda.',
-            'custom_university_name.required_if' => 'Nama perguruan tinggi wajib diisi jika memilih "Perguruan Tinggi Lainnya".',
+            'university_id.required' => $isSchool ? 'Silakan pilih sekolah Anda.' : 'Silakan pilih kampus/sekolah Anda.',
+            'nim.required' => $isSchool ? 'NIS wajib diisi.' : 'NIM wajib diisi.',
+            'nim.regex' => ($isSchool ? 'NIS' : 'NIM').' hanya boleh berisi huruf, angka, titik, garis miring, atau tanda hubung.',
+            'phone.regex' => 'Nomor telepon harus berupa 8 sampai 19 angka, boleh diawali tanda +.',
+            'semester.integer' => $isSchool ? 'Kelas harus berupa angka (10, 11, 12, atau 13).' : 'Semester harus berupa angka.',
+            'semester.between' => $isSchool ? 'Kelas harus antara 10 sampai 13.' : 'Semester harus antara 1 sampai 16.',
+            'custom_university_name.required_if' => 'Nama kampus/sekolah wajib diisi jika memilih "Lainnya".',
             'cv.mimes' => 'File CV harus berformat PDF.',
             'cv.max' => 'Ukuran file CV maksimal 2MB.',
             'transkrip.mimes' => 'File Transkrip Nilai harus berformat PDF.',
             'transkrip.max' => 'Ukuran file Transkrip Nilai maksimal 2MB.',
-            'id_card.mimes' => 'File KTM atau Kartu Identitas harus berformat PDF, JPG, JPEG, atau PNG.',
-            'id_card.max' => 'Ukuran file KTM atau Kartu Identitas maksimal 2MB.',
+            'id_card.mimes' => 'File KTM / Kartu Pelajar harus berformat PDF, JPG, JPEG, atau PNG.',
+            'id_card.max' => 'Ukuran file KTM / Kartu Pelajar maksimal 2MB.',
         ]);
 
         $university = DB::transaction(fn () => $this->resolveUniversity($request));
@@ -150,26 +181,28 @@ class ProfileController extends Controller
         $idCardPath = $currentProfile?->id_card_path;
 
         $storage = app(PrivateDocumentStorage::class);
+        // Berkas lama baru dihapus di akhir, setelah dipastikan tidak ada data lain yang masih merujuknya.
+        $replacedPaths = [];
 
         // Upload Foto Profil
         if ($request->hasFile('photo')) {
-            $storage->delete($photoPath);
+            $replacedPaths[] = $photoPath;
             $photoPath = $storage->store($request->file('photo'), PrivateDocumentStorage::PROFILE_PHOTO_DIR);
         }
 
         // Upload Dokumen Personal Mahasiswa
         if ($request->hasFile('cv')) {
-            $storage->delete($cvPath);
+            $replacedPaths[] = $cvPath;
             $cvPath = $storage->store($request->file('cv'), 'documents/student-profiles');
         }
 
         if ($request->hasFile('transkrip')) {
-            $storage->delete($transcriptPath);
+            $replacedPaths[] = $transcriptPath;
             $transcriptPath = $storage->store($request->file('transkrip'), 'documents/student-profiles');
         }
 
         if ($request->hasFile('id_card')) {
-            $storage->delete($idCardPath);
+            $replacedPaths[] = $idCardPath;
             $idCardPath = $storage->store($request->file('id_card'), 'documents/student-profiles');
         }
 
@@ -184,6 +217,7 @@ class ProfileController extends Controller
                 'jurusan' => $major,
                 'major' => $major,
                 'semester' => $request->semester,
+                'education_level' => $isSchool ? University::TYPE_SCHOOL : University::TYPE_COLLEGE,
                 'phone' => $request->phone,
                 'alamat' => $address,
                 'address' => $address,
@@ -196,12 +230,75 @@ class ProfileController extends Controller
             ]
         );
 
+        // Sinkronkan path berkas personal terbaru ke pengajuan yang sedang berjalan atau menunggu perbaikan
+        if ($request->hasFile('cv') || $request->hasFile('transkrip') || $request->hasFile('id_card')) {
+            $syncableApps = Application::where('user_id', $user->id)
+                ->whereIn('status', ['draft', 'pending', 'waiting_approval', 'rejected'])
+                ->get();
+
+            foreach ($syncableApps as $app) {
+                $app->update([
+                    'cv_path' => $cvPath,
+                    'transcript_path' => $transcriptPath,
+                    'id_card_path' => $idCardPath,
+                ]);
+
+                if ($cvPath) {
+                    ApplicationDocument::updateOrCreate(
+                        ['application_id' => $app->id, 'document_type' => 'CV'],
+                        ['file_path' => $cvPath]
+                    );
+                }
+                if ($transcriptPath) {
+                    ApplicationDocument::updateOrCreate(
+                        ['application_id' => $app->id, 'document_type' => 'Transkrip Nilai'],
+                        ['file_path' => $transcriptPath]
+                    );
+                }
+                if ($idCardPath) {
+                    ApplicationDocument::updateOrCreate(
+                        ['application_id' => $app->id, 'document_type' => 'KTM / Kartu Identitas'],
+                        ['file_path' => $idCardPath]
+                    );
+                }
+            }
+        }
+
+        $this->deleteUnreferencedFiles($storage, $replacedPaths);
+
         $message = $university->is_verified
             ? (session('university_auto_matched')
                 ? "Profil berhasil disimpan. Kampus yang Anda ketik ternyata sudah terdaftar sebagai '{$university->name}', jadi kami pilihkan otomatis."
-                : 'Profil mahasiswa berhasil diperbarui dan disinkronkan!')
-            : "Profil berhasil disimpan! Perguruan tinggi '{$university->name}' tercatat sebagai kampus baru dan sedang menunggu verifikasi Admin. Anda tetap dapat melanjutkan pengajuan magang.";
+                : 'Profil peserta magang berhasil diperbarui dan disinkronkan!')
+            : "Profil berhasil disimpan! {$university->institutionTypeLabel()} '{$university->name}' tercatat sebagai institusi baru dan sedang menunggu verifikasi Admin. Anda tetap dapat melanjutkan pengajuan magang.";
 
         return redirect()->back()->with('success', $message);
+    }
+
+    /**
+     * Hapus berkas lama hanya bila tidak ada lagi yang merujuknya. Pengajuan yang sudah
+     * diterima/aktif/selesai tetap menunjuk berkas saat dikirim, jadi berkas itu tidak boleh
+     * ikut terhapus ketika mahasiswa mengganti dokumen di profil.
+     *
+     * @param  array<int, string|null>  $paths
+     */
+    private function deleteUnreferencedFiles(PrivateDocumentStorage $storage, array $paths): void
+    {
+        foreach (array_unique(array_filter($paths)) as $path) {
+            $stillUsed = Application::where('cv_path', $path)
+                ->orWhere('transcript_path', $path)
+                ->orWhere('id_card_path', $path)
+                ->exists()
+                || ApplicationDocument::where('file_path', $path)->exists()
+                || StudentProfile::where('photo', $path)
+                    ->orWhere('cv_path', $path)
+                    ->orWhere('transcript_path', $path)
+                    ->orWhere('id_card_path', $path)
+                    ->exists();
+
+            if (! $stillUsed) {
+                $storage->delete($path);
+            }
+        }
     }
 }

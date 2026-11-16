@@ -163,10 +163,19 @@
                     </h2>
                 </div>
                 <p class="font-cert-body text-sm sm:text-base md:text-[19px] font-medium text-black leading-normal pt-1.5">
-                    Mahasiswa Program Studi {{ $profile->jurusan ?? 'Semua Jurusan' }}{{ !empty($profile->fakultas) ? ' Fakultas ' . $profile->fakultas : '' }}
+                    @php
+                        // Data profil sering sudah memuat awalan ("Fakultas Teknik", "Prodi Informatika"): buang agar tidak dobel.
+                        $certJurusan = trim(preg_replace('/^\s*(program\s+studi|prodi|jurusan)\s+/i', '', (string) ($profile->jurusan ?? '')));
+                        $certFakultas = trim(preg_replace('/^\s*fakultas\s+/i', '', (string) ($profile->fakultas ?? '')));
+                    @endphp
+                    @if ($profile?->isSchoolStudent())
+                Peserta Magang Jurusan {{ $certJurusan !== '' ? $certJurusan : 'Semua Jurusan' }}
+                @else
+                Peserta Magang Program Studi {{ $certJurusan !== '' ? $certJurusan : 'Semua Jurusan' }}{{ $certFakultas !== '' ? ' Fakultas ' . $certFakultas : '' }}
+                @endif
                 </p>
                 <p class="font-cert-body text-sm sm:text-base md:text-[19px] font-medium text-black leading-normal">
-                    {{ $profile->universitas ?? ($university->name ?? 'Universitas') }}
+                    {{ $profile->universitas ?? ($university->name ?? 'Kampus / Sekolah') }}
                 </p>
             </div>
 
@@ -307,24 +316,24 @@
             <div class="tr-bio shrink-0 grid grid-cols-2 gap-x-10 rounded-2xl px-6" data-tr-bio style="background-color: {{ $tBand }}; border: 1px solid {{ $tLine }};">
                 <table class="w-full">
                     <tr>
-                        <td class="w-36 text-slate-500">Nama Mahasiswa</td>
+                        <td class="w-36 text-slate-500">Nama Peserta Magang</td>
                         <td class="w-3 text-slate-400">:</td>
                         <td class="font-bold text-slate-900">{{ $student->name }}</td>
                     </tr>
                     <tr>
-                        <td class="text-slate-500">NIM</td>
+                        <td class="text-slate-500">{{ $profile?->identityNumberLabel() ?? 'NIM/NIS' }}</td>
                         <td class="text-slate-400">:</td>
                         <td class="font-bold text-slate-900">{{ $profile->nim ?? '-' }}</td>
                     </tr>
                     <tr>
-                        <td class="text-slate-500">Program Studi</td>
+                        <td class="text-slate-500">{{ $profile?->isSchoolStudent() ? 'Jurusan' : 'Program Studi' }}</td>
                         <td class="text-slate-400">:</td>
                         <td class="text-slate-800">{{ $profile->jurusan ?? 'Semua Jurusan' }}</td>
                     </tr>
                 </table>
                 <table class="w-full">
                     <tr>
-                        <td class="w-36 text-slate-500">Universitas Asal</td>
+                        <td class="w-36 text-slate-500">{{ $profile?->isSchoolStudent() ? 'Sekolah Asal' : 'Universitas Asal' }}</td>
                         <td class="w-3 text-slate-400">:</td>
                         <td class="font-bold text-slate-900">{{ $profile->universitas ?? ($university->name ?? '-') }}</td>
                     </tr>
@@ -384,7 +393,7 @@
                             <tr data-row="band" style="background-color: {{ $tBand }}; border-top: 1px solid {{ $tLine }};">
                                 <td class="text-center font-black text-slate-900">{{ $isLecturerOnly ? 'A' : 'B' }}</td>
                                 <td colspan="4" class="font-bold uppercase tracking-wide text-slate-900">
-                                    Penilaian Akademik Dosen Pembimbing Lapangan (DPL Kampus)
+                                    Penilaian Akademik Pembimbing
                                 </td>
                             </tr>
                             @foreach ($lecturerComponents as $idx => $lComp)
@@ -397,7 +406,7 @@
                                 </tr>
                             @endforeach
                             <tr data-row="subtotal" class="font-bold" style="background-color: #f8fafc; border-top: 1px solid {{ $tLine }};">
-                                <td colspan="2" class="text-right text-slate-700">Subtotal Nilai DPL (Rata-rata):</td>
+                                <td colspan="2" class="text-right text-slate-700">Subtotal Nilai Pembimbing (Rata-rata):</td>
                                 <td class="text-center">{{ $isLecturerOnly ? '100%' : ($weightLecturer . '%') }}</td>
                                 <td class="text-center">{{ $eval?->nilai_dosen_calculated ?? 0 }}</td>
                                 <td class="text-center font-black text-slate-900">

@@ -58,6 +58,23 @@ class AgencyProfile extends Model
             : asset('images/default-agency.svg');
     }
 
+    /**
+     * ID instansi penerbit sertifikat. Tidak boleh ditentukan dari nama saja karena Admin Dinas
+     * Utama bisa mengganti nama instansinya: pakai config bila diisi, selain itu profil Perpustakaan
+     * yang paling awal dibuat (instansi yang dibuat belakangan tidak bisa merebutnya dengan ganti nama).
+     */
+    public static function certificateIssuerId(): ?int
+    {
+        $configured = config('app.certificate_issuer_agency_id');
+        if (filled($configured)) {
+            return (int) $configured;
+        }
+
+        $id = static::where('agency_name', 'like', '%Perpustakaan%')->orderBy('id')->value('id');
+
+        return $id !== null ? (int) $id : null;
+    }
+
     public function units()
     {
         return $this->hasMany(Unit::class, 'agency_profile_id');

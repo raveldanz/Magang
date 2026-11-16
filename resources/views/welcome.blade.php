@@ -13,12 +13,12 @@
         <!-- Fonts: Plus Jakarta Sans -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
         <!-- Scripts & Styles -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-700 min-h-screen lg:h-screen lg:h-[100dvh] lg:overflow-hidden flex flex-col justify-between"
+    <body class="app-readable bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-700 min-h-screen lg:h-screen lg:h-[100dvh] lg:overflow-hidden flex flex-col justify-between"
           x-data="{ mobileMenuOpen: false, openQuotaModal: false }">
 
         @php
@@ -278,7 +278,7 @@
                                 <h2 class="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">Bidang Pilihan Magang</h2>
                                 <p class="text-[11px] text-slate-500 font-medium">4 Bidang Kerja Aktif di Dispusip Surabaya</p>
                             </div>
-                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">Terbuka MBKM</span>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">Terbuka MBKM & SMK</span>
                         </div>
 
                         <!-- 4 Unit Divisi Dispusip -->

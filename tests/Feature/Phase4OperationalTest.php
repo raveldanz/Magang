@@ -97,7 +97,7 @@ class Phase4OperationalTest extends TestCase
 
         foreach (['dosen', 'mahasiswa', 'admin', 'policy'] as $tab) {
             $this->actingAs($superAdmin)->get(route('admin.universities.show', ['university' => $univ->id, 'tab' => $tab]))
-                ->assertOk()->assertSee('Pusat Kendali Perguruan Tinggi');
+                ->assertOk()->assertSee('Pusat Kendali Kampus/Sekolah');
         }
         $this->actingAs($superAdmin)->get(route('admin.universities.show', ['university' => $univ->id, 'student_status' => 'no_application', 'student_search' => 'x']))->assertOk();
 

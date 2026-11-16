@@ -26,7 +26,7 @@
         $currentTab = request('tab', 'students');
     @endphp
 
-    <div class="py-8" x-data="{ activeTab: '{{ $currentTab }}' }">
+    <div class="py-8" x-data="{ activeTab: @js($currentTab) }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             @if (session('success'))
@@ -57,7 +57,7 @@
                         :class="activeTab === 'students' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'"
                         class="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    <span>Daftar Mahasiswa & Cetak</span>
+                    <span>Daftar Peserta Magang & Cetak</span>
                     <span class="ml-1.5 px-2 py-0.5 text-[10px] rounded-full" :class="activeTab === 'students' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'">
                         {{ $applications->total() ?? 0 }}
                     </span>
@@ -84,7 +84,7 @@
                         <input type="hidden" name="tab" value="students">
                         <div class="relative flex-1 max-w-md">
                             <input type="text" name="search" value="{{ request('search') }}" 
-                                   placeholder="Cari nama mahasiswa, NIM, atau universitas..."
+                                   placeholder="Cari nama peserta magang, NIM/NIS, atau kampus/sekolah..."
                                    class="w-full text-xs rounded-xl border-gray-200 pl-9 pr-4 py-2 focus:border-blue-600 focus:ring-blue-600">
                             <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         </div>
@@ -99,7 +99,7 @@
                     </form>
 
                     <div class="text-xs text-gray-500 font-medium">
-                        Menampilkan <strong>{{ $applications->count() }}</strong> dari total <strong>{{ $applications->total() }}</strong> mahasiswa siap cetak
+                        Menampilkan <strong>{{ $applications->count() }}</strong> dari total <strong>{{ $applications->total() }}</strong> peserta magang siap cetak
                     </div>
                 </div>
 
@@ -107,7 +107,7 @@
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
                     <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-                            <h3 class="text-base font-bold text-gray-900">Mahasiswa Memenuhi Kriteria Kelulusan</h3>
+                            <h3 class="text-base font-bold text-gray-900">Peserta Magang Memenuhi Kriteria Kelulusan</h3>
                             <p class="text-xs text-gray-500 mt-0.5">Seluruh laporan akhir telah disetujui dan nilai evaluasi lengkap</p>
                         </div>
                         <div class="flex items-center gap-2">
@@ -178,6 +178,11 @@
                                     </div>
                                 </div>
                                 <div class="mcard-foot">
+                                    @if(!$mCert)
+                                        <a href="{{ route('admin.certificates.generate', $app->placement->id) }}" class="mbtn mbtn-primary mbtn-block">
+                                            Terbitkan &amp; Ajukan ke Atasan
+                                        </a>
+                                    @endif
                                     @if(!$mCert || $mCert->approval_status === 'waiting_approval')
                                         <a href="{{ route('admin.certificates.show', $app->placement->id) }}" target="_blank" class="mbtn mbtn-block bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold border border-slate-300">
                                             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
@@ -198,8 +203,8 @@
                             </div>
                         @empty
                             <div class="mempty">
-                                <p style="font-weight:700;color:#475569">Belum ada mahasiswa yang memenuhi syarat kelulusan.</p>
-                                <p style="margin-top:4px">Pastikan mahasiswa telah mengumpulkan laporan dan dinilai oleh pembimbing.</p>
+                                <p style="font-weight:700;color:#475569">Belum ada peserta magang yang memenuhi syarat kelulusan.</p>
+                                <p style="margin-top:4px">Pastikan peserta magang telah mengumpulkan laporan dan dinilai oleh pembimbing.</p>
                             </div>
                         @endforelse
                     </div>
@@ -209,8 +214,8 @@
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
                                 <tr class="border-b border-gray-100 bg-gray-50/75 text-gray-500 font-bold uppercase tracking-wider text-[11px]">
-                                    <th class="py-3.5 px-4">Nama Mahasiswa</th>
-                                    <th class="py-3.5 px-4">Universitas / NIM</th>
+                                    <th class="py-3.5 px-4">Nama Peserta Magang</th>
+                                    <th class="py-3.5 px-4">Kampus/Sekolah / NIM/NIS</th>
                                     <th class="py-3.5 px-4">Unit Tempat Magang</th>
                                     <th class="py-3.5 px-4 text-center">Nilai Akhir</th>
                                     <th class="py-3.5 px-4 text-center">Status ACC Atasan</th>
@@ -230,7 +235,7 @@
                                         </td>
                                         <td class="py-4 px-4">
                                             <div class="text-gray-800 font-semibold">{{ $app->user->studentProfile->universitas ?? '-' }}</div>
-                                            <div class="text-[11px] text-blue-600 font-mono">NIM: {{ $app->user->studentProfile->nim ?? '-' }}</div>
+                                            <div class="text-[11px] text-blue-600 font-mono">NIM/NIS: {{ $app->user->studentProfile->nim ?? '-' }}</div>
                                         </td>
                                         <td class="py-4 px-4 text-gray-700 font-medium">
                                             {{ $app->unit->name ?? '-' }}
@@ -265,6 +270,11 @@
                                             @endif
                                         </td>
                                         <td class="py-4 px-4 text-right whitespace-nowrap">
+                                            @if(!$cert)
+                                                <a href="{{ route('admin.certificates.generate', $app->placement->id) }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition mr-1">
+                                                    <span>Terbitkan &amp; Ajukan ke Atasan</span>
+                                                </a>
+                                            @endif
                                             @if(!$cert || $cert->approval_status === 'waiting_approval')
                                                 <a href="{{ route('admin.certificates.show', $app->placement->id) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold border border-slate-300 shadow-2xs transition active:scale-95 cursor-pointer" title="Pratinjau Draf Sertifikat">
                                                     <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
@@ -286,8 +296,8 @@
                                 @empty
                                     <tr>
                                         <td colspan="6" class="py-12 text-center text-gray-400">
-                                            <p class="font-bold text-gray-600 text-sm">Belum ada mahasiswa yang memenuhi syarat kelulusan.</p>
-                                            <p class="text-xs text-gray-400 mt-1">Pastikan mahasiswa telah mengumpulkan laporan dan dinilai oleh pembimbing.</p>
+                                            <p class="font-bold text-gray-600 text-sm">Belum ada peserta magang yang memenuhi syarat kelulusan.</p>
+                                            <p class="text-xs text-gray-400 mt-1">Pastikan peserta magang telah mengumpulkan laporan dan dinilai oleh pembimbing.</p>
                                         </td>
                                     </tr>
                                 @endforelse
@@ -309,6 +319,11 @@
             <!-- TAB 2: PENGATURAN DESAIN & TTE RESMI TAHUNAN                      -->
             <!-- ================================================================= -->
             <div x-show="activeTab === 'settings'" x-cloak class="space-y-6">
+                @unless($canManageTheme ?? true)
+                    <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                        Tema dan penandatangan sertifikat berlaku untuk seluruh instansi, sehingga hanya dapat diubah oleh Super Admin atau Admin Utama Dispusip. Anda dapat melihat pengaturannya, tetapi tidak dapat menyimpannya.
+                    </div>
+                @endunless
                 
                 <form action="{{ route('admin.certificates.updateTheme') }}" method="POST" class="space-y-6">
                     @csrf
@@ -322,8 +337,10 @@
                             <div class="bg-white rounded-3xl p-6 sm:p-7 border border-slate-100 shadow-sm space-y-5">
                                 <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
                                     <div class="flex items-center gap-2.5">
-                                        <div class="w-8 h-8 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-600 font-bold">
-                                            🎨
+                                        <div class="w-8 h-8 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-blue-600 shadow-2xs">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                                            </svg>
                                         </div>
                                         <div>
                                             <h3 class="text-base font-bold text-slate-800">Tema Desain & Palet Warna Tahunan</h3>
@@ -435,8 +452,10 @@
                             <!-- 2. KARTU PEJABAT PENANDATANGAN TTE RESMI (STANDAR BSrE) -->
                             <div class="bg-white rounded-3xl p-6 sm:p-7 border border-slate-100 shadow-sm space-y-4">
                                 <div class="border-b border-slate-100 pb-3 flex items-center gap-2.5">
-                                    <div class="w-8 h-8 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600 font-bold">
-                                        ✍️
+                                    <div class="w-8 h-8 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600 shadow-2xs">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                        </svg>
                                     </div>
                                     <div>
                                         <h3 class="text-base font-bold text-slate-800">Pejabat Penandatangan TTE Resmi (BSrE/Dispusip)</h3>
@@ -504,8 +523,18 @@
                             </div>
 
                             <!-- Tombol Simpan -->
-                            <div class="flex items-center justify-end gap-3 pt-2">
-                                <button type="submit" class="w-full sm:w-auto px-7 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md transition transform active:scale-95 cursor-pointer flex items-center justify-center gap-2">
+                            <div class="flex flex-col sm:flex-row items-center justify-end gap-3 pt-2">
+                                <button type="submit" 
+                                        name="save_mode" 
+                                        value="design_only" 
+                                        class="w-full sm:w-auto px-5 py-3 bg-white hover:bg-slate-50 text-blue-700 border border-blue-300 rounded-xl text-xs sm:text-sm font-bold shadow-xs transition transform active:scale-95 cursor-pointer flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+                                    <span>Simpan Desain Saja</span>
+                                </button>
+                                <button type="submit" 
+                                        name="save_mode" 
+                                        value="full" 
+                                        class="w-full sm:w-auto px-7 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md transition transform active:scale-95 cursor-pointer flex items-center justify-center gap-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                     <span>Simpan Pengaturan Tema & TTE</span>
                                 </button>
@@ -519,8 +548,11 @@
                             <!-- LIVE MINI PREVIEW SERTIFIKAT HALAMAN 1 -->
                             <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm space-y-3 sticky top-24">
                                 <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                                    <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                                        <span>👁️</span>
+                                    <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
                                         <span>Pratinjau Langsung (Live)</span>
                                     </h4>
                                     <span class="text-[10px] px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-bold">Halaman 1</span>
@@ -537,7 +569,7 @@
                                         'base' => $activeTheme->secondary_color ?? '#FF6700', 'medium' => '#ff8d38', 'light' => '#ffb37a'
                                     ];
                                 @endphp
-                                <div id="previewCard" class="relative w-full aspect-[297/210] bg-white border border-slate-300 rounded-xl overflow-hidden shadow-sm flex flex-col justify-between p-2 select-none text-[8px] leading-tight" style="font-family: 'Times New Roman', Times, serif;">
+                                <div id="previewCard" class="keep-size relative w-full aspect-[297/210] bg-white border border-slate-300 rounded-xl overflow-hidden shadow-sm flex flex-col justify-between p-2 select-none text-[8px] leading-tight" style="font-family: 'Times New Roman', Times, serif;">
                                     
                                     <!-- Dynamic SVG Vector Artwork -->
                                     <svg viewBox="0 0 297 210" class="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
@@ -568,7 +600,7 @@
                                         <div class="pt-1">
                                             <span class="inline-block border-b border-black pb-0.5 font-bold text-[10px] text-black">Achmad Dhafa Sholahudin F</span>
                                         </div>
-                                        <div class="text-[6px] text-black">Mahasiswa Program Studi Manajemen Fakultas Ekonomi dan Bisnis</div>
+                                        <div class="text-[6px] text-black">Peserta Magang Program Studi Manajemen Fakultas Ekonomi dan Bisnis</div>
                                         <div class="text-[6px] text-black">Universitas 17 Agustus 1945 Surabaya</div>
                                         <div class="text-[6px] text-black italic pt-0.5">10 Agustus {{ $activeTheme->year ?? date('Y') }} s.d. 10 Oktober {{ $activeTheme->year ?? date('Y') }}</div>
                                     </div>
@@ -590,37 +622,50 @@
                                     </div>
                                 </div>
 
-                                <div class="text-[11px] text-slate-500 leading-relaxed text-center">
-                                    Warna dan teks di atas berubah secara real-time saat Anda mengedit form di samping.
-                                </div>
+                                <!-- Pratinjau hasil generate nyata (2 halaman) dengan isian form yang belum disimpan -->
+                                <div class="border-t border-slate-100 pt-3 space-y-2.5">
+                                    <div>
+                                        <label for="sample_placement_id" class="text-[11px] font-bold text-slate-600 uppercase tracking-wider block mb-1">Contoh peserta magang untuk pratinjau:</label>
+                                        <select id="sample_placement_id" name="sample_placement_id" class="w-full rounded-xl border-slate-200 text-xs focus:border-blue-600 focus:ring-blue-600">
+                                            <option value="">Otomatis</option>
+                                            @foreach (($eligibleApps ?? collect())->take(40) as $sampleApp)
+                                                @if ($sampleApp->placement)
+                                                    <option value="{{ $sampleApp->placement->id }}">{{ $sampleApp->user->name }} — {{ $sampleApp->user->studentProfile->universitas ?? '-' }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
 
-                                <!-- Pratinjau ukuran penuh: hasil generate nyata (2 halaman) dengan isian form yang belum disimpan -->
-                                <div class="border-t border-slate-100 pt-3 space-y-2">
-                                    <label for="sample_placement_id" class="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">Contoh mahasiswa untuk pratinjau penuh:</label>
-                                    <select id="sample_placement_id" name="sample_placement_id" class="w-full rounded-xl border-slate-200 text-xs focus:border-blue-600 focus:ring-blue-600">
-                                        <option value="">Otomatis (lulusan terbaru)</option>
-                                        @foreach (($eligibleApps ?? collect())->take(40) as $sampleApp)
-                                            @if ($sampleApp->placement)
-                                                <option value="{{ $sampleApp->placement->id }}">{{ $sampleApp->user->name }} — {{ $sampleApp->user->studentProfile->universitas ?? '-' }}</option>
-                                            @endif
-                                        @endforeach
-                                    </select>
-                                    <button type="submit"
-                                            formaction="{{ route('admin.certificates.previewTheme') }}"
-                                            formmethod="post"
-                                            formtarget="_blank"
-                                            class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 rounded-xl text-xs font-bold shadow-sm transition cursor-pointer">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                        <span>Lihat Hasil Generate (Ukuran Penuh)</span>
-                                    </button>
-                                    <p class="text-[10.5px] text-slate-400 text-center leading-snug">Dibuka di tab baru dengan isian form saat ini. Tidak menyimpan perubahan apa pun.</p>
+                                    <div class="grid grid-cols-1 gap-2 pt-1">
+                                        <button type="submit"
+                                                formaction="{{ route('admin.certificates.previewTheme') }}"
+                                                formmethod="post"
+                                                formtarget="_blank"
+                                                class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 rounded-xl text-xs font-bold shadow-xs transition cursor-pointer">
+                                            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            <span>Lihat Hasil Generate</span>
+                                        </button>
+
+                                        <!-- Tombol Simpan Desain Saja (tepat di atas Riwayat Tema Tahunan) -->
+                                        <button type="submit"
+                                                name="save_mode"
+                                                value="design_only"
+                                                class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm transition transform active:scale-95 cursor-pointer">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                            <span>Simpan Desain Saja</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- RIWAYAT TEMA TAHUNAN -->
                             <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm space-y-3">
-                                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
-                                    <span>📚</span>
+                                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
+                                    <svg class="w-4 h-4 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
                                     <span>Riwayat Tema Tahunan</span>
                                 </h4>
 
@@ -708,6 +753,7 @@
                 document.getElementById('city').value = theme.city;
             }
             updateLivePreview();
+            window.scrollTo({ top: 120, behavior: 'smooth' });
         }
 
         function applyPreset(name, primary, secondary, accent) {

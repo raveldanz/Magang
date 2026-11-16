@@ -9,7 +9,7 @@
                     Pusat Kendali Instansi: {{ $agency->agency_name }}
                 </h2>
                 <p class="text-xs text-slate-500 mt-0.5">
-                    Manajemen terpadu Unit Bidang Magang, Personel Kedinasan, Pengajuan, dan Penempatan Mahasiswa
+                    Manajemen terpadu Unit Bidang Magang, Personel Kedinasan, Pengajuan, dan Penempatan Peserta Magang
                 </p>
             </div>
 
@@ -58,8 +58,8 @@
                             $agencyLogoUrl = $agency->logo_url;
                         @endphp
                         <div class="cc-logo border border-slate-200 rounded-xl p-2 bg-white shadow-2xs flex items-center justify-center shrink-0 overflow-hidden"
-                             style="width: 88px; height: 88px; min-width: 88px; min-height: 88px; max-width: 88px; max-height: 88px;">
-                            <img src="{{ $agencyLogoUrl }}" alt="Logo {{ $agency->agency_name }}" class="w-16 h-16 object-contain shrink-0" style="width: 64px; height: 64px; max-width: 64px; max-height: 64px; object-fit: contain;">
+                             style="height: 88px; min-width: 88px; max-width: 180px;">
+                            <img src="{{ $agencyLogoUrl }}" alt="Logo {{ $agency->agency_name }}" class="w-16 h-16 object-contain shrink-0" style="height: 64px; width: auto; max-width: 160px; object-fit: contain;">
                         </div>
 
                         <div class="space-y-2 min-w-0 flex-1">
@@ -251,13 +251,13 @@
                     <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</div>
                     <div class="mt-1.5 flex items-baseline gap-1.5">
                         <span class="text-2xl font-bold text-slate-900">{{ $stats['active_students'] }}</span>
-                        <span class="text-sm text-slate-500">mahasiswa</span>
+                        <span class="text-sm text-slate-500">peserta magang</span>
                     </div>
                 </div>
                 <div class="bg-white p-4 sm:p-5 col-span-2 sm:col-span-1">
                     <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Lulus / Sertifikat</div>
                     <div class="mt-1.5 flex items-baseline gap-1.5">
-                        <span class="text-2xl font-bold text-emerald-600">{{ $stats['completed_students'] ?? 0 }}</span>
+                        <span class="text-2xl font-bold text-slate-900">{{ $stats['completed_students'] ?? 0 }}</span>
                         <span class="text-sm text-slate-500">alumni selesai</span>
                     </div>
                 </div>
@@ -291,11 +291,6 @@
                             class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         <span>Pengajuan Magang Masuk</span>
-                        @if(($stats['pending_applications'] ?? 0) > 0)
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
-                                {{ $stats['pending_applications'] }}
-                            </span>
-                        @endif
                     </button>
 
                     <!-- Tab 4: Mahasiswa Aktif Magang -->
@@ -304,10 +299,7 @@
                             :class="activeTab === 'students' ? 'cc-active border-blue-600 text-blue-600 font-black' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold'"
                             class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>
-                        <span>Mahasiswa Aktif</span>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
-                            {{ $stats['active_students'] }}
-                        </span>
+                        <span>Peserta Aktif</span>
                     </button>
 
                     <!-- Tab 5: Kelulusan & Sertifikat -->
@@ -317,11 +309,6 @@
                             class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
                         <span>Kelulusan & Sertifikat</span>
-                        @if(($stats['completed_students'] ?? 0) > 0)
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                                {{ $stats['completed_students'] }}
-                            </span>
-                        @endif
                     </button>
                 </nav>
             </div>
@@ -638,8 +625,8 @@
                         <table class="rtable min-w-full divide-y divide-slate-100 text-left text-[13px]">
                             <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-xs whitespace-nowrap">
                                 <tr>
-                                    <th class="py-3 px-4">Mahasiswa</th>
-                                    <th class="py-3 px-4">Universitas / Prodi</th>
+                                    <th class="py-3 px-4">Peserta Magang</th>
+                                    <th class="py-3 px-4">Kampus/Sekolah / Jurusan</th>
                                     <th class="py-3 px-4">Bidang Dituju</th>
                                     <th class="py-3 px-4">Tanggal Daftar</th>
                                     <th class="py-3 px-4 text-center">Status</th>
@@ -649,11 +636,11 @@
                             <tbody class="divide-y divide-slate-100">
                                 @forelse($applications as $app)
                                     <tr class="hover:bg-slate-50/70 transition" x-show="unitFilter === 'all' || unitFilter === '{{ $app->unit_id }}'">
-                                        <td class="rt-title py-3.5 px-4 font-bold text-slate-900" data-label="Mahasiswa">
+                                        <td class="rt-title py-3.5 px-4 font-bold text-slate-900" data-label="Peserta Magang">
                                             {{ $app->user->name ?? '-' }}
                                             <span class="block text-xs font-mono text-slate-400">{{ $app->user->studentProfile->nim ?? '-' }}</span>
                                         </td>
-                                        <td class="py-3.5 px-4 text-slate-600" data-label="Universitas / Prodi">
+                                        <td class="py-3.5 px-4 text-slate-600" data-label="Kampus/Sekolah / Jurusan">
                                             {{ $app->user->studentProfile->universitas ?? '-' }}
                                             <span class="block text-xs text-slate-400">{{ $app->user->studentProfile->jurusan ?? '-' }}</span>
                                         </td>
@@ -661,7 +648,7 @@
                                             {{ $app->unit->name ?? '-' }}
                                         </td>
                                         <td class="py-3.5 px-4 text-slate-500 text-xs" data-label="Tanggal Daftar">
-                                            {{ $app->created_at ? $app->created_at->format('d M Y') : '-' }}
+                                            {{ $app->created_at ? $app->created_at->translatedFormat('d M Y') : '-' }}
                                         </td>
                                         <td class="py-3.5 px-4 text-center" data-label="Status">
                                             @php $actionHint = $app->actionHint(); @endphp
@@ -709,7 +696,7 @@
                                     <div class="mavatar">{{ strtoupper(substr($appName, 0, 2)) }}</div>
                                     <div class="mcard-main">
                                         <div class="mcard-title">{{ $appName }}</div>
-                                        <div class="mcard-sub"><span class="mono">{{ $app->user->studentProfile->nim ?? '-' }}</span> &middot; {{ $app->created_at ? $app->created_at->format('d M Y') : '-' }}</div>
+                                        <div class="mcard-sub"><span class="mono">{{ $app->user->studentProfile->nim ?? '-' }}</span> &middot; {{ $app->created_at ? $app->created_at->translatedFormat('d M Y') : '-' }}</div>
                                     </div>
                                 </div>
                                 <div class="mcard-body cc-grid2">
@@ -726,7 +713,7 @@
                                         @endif
                                     </div>
                                     <div class="cc-span2">
-                                        <div class="mfield-label">Universitas / Prodi</div>
+                                        <div class="mfield-label">Kampus/Sekolah / Jurusan</div>
                                         <div class="mfield-value">{{ $app->user->studentProfile->universitas ?? '-' }}<span class="block text-xs text-slate-400 font-medium">{{ $app->user->studentProfile->jurusan ?? '-' }}</span></div>
                                     </div>
                                     <div class="cc-span2">
@@ -749,14 +736,14 @@
             <!-- ============================================================== -->
             <div x-show="activeTab === 'students'" class="cc-card bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden" style="display: none;">
                 <div class="cc-panel-head px-4 sm:px-6 pt-4 sm:pt-5 pb-6 sm:pb-7 border-b border-slate-100">
-                    <h3 class="text-sm font-black text-slate-900">Mahasiswa Aktif Magang & Mentor Pembimbing</h3>
+                    <h3 class="text-sm font-black text-slate-900">Peserta Aktif Magang & Mentor Pembimbing</h3>
                 </div>
 
                     <div class="d-only overflow-x-auto rounded-2xl border border-slate-100">
                         <table class="rtable min-w-full divide-y divide-slate-100 text-left text-[13px]">
                             <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-xs whitespace-nowrap">
                                 <tr>
-                                    <th class="py-3 px-4">Mahasiswa Magang</th>
+                                    <th class="py-3 px-4">Peserta Magang</th>
                                     <th class="py-3 px-4">Bidang Penempatan</th>
                                     <th class="py-3 px-4">Mentor Pembimbing Lapangan</th>
                                     <th class="py-3 px-4 text-center">Aktivitas Logbook</th>
@@ -766,7 +753,7 @@
                             <tbody class="divide-y divide-slate-100">
                                 @forelse($activePlacements as $placement)
                                     <tr class="hover:bg-slate-50/70 transition">
-                                        <td class="rt-title py-3.5 px-4 font-bold text-slate-900" data-label="Mahasiswa Magang">
+                                        <td class="rt-title py-3.5 px-4 font-bold text-slate-900" data-label="Peserta Magang">
                                             {{ $placement->application->user->name ?? '-' }}
                                             <span class="block text-xs font-mono text-slate-400">{{ $placement->application->user->studentProfile->universitas ?? '-' }}</span>
                                         </td>
@@ -795,7 +782,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="5" class="py-8 text-center text-slate-400 font-medium">
-                                            Belum ada mahasiswa yang aktif magang di dinas ini.
+                                            Belum ada peserta magang yang aktif magang di dinas ini.
                                         </td>
                                     </tr>
                                 @endforelse
@@ -838,7 +825,7 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="mempty">Belum ada mahasiswa yang aktif magang di dinas ini.</div>
+                            <div class="mempty">Belum ada peserta magang yang aktif magang di dinas ini.</div>
                         @endforelse
                     </div>
                 </div>
@@ -849,7 +836,7 @@
             <div x-show="activeTab === 'certificates'" class="cc-card bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden" style="display: none;">
                 <div class="cc-panel-head flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 pt-4 sm:pt-5 pb-6 sm:pb-7 border-b border-slate-100">
                     <div>
-                        <h3 class="text-sm font-black text-slate-900">Daftar Mahasiswa Lulus & Status E-Sertifikat</h3>
+                        <h3 class="text-sm font-black text-slate-900">Daftar Peserta Magang Lulus & Status E-Sertifikat</h3>
                         <p class="text-xs text-slate-500 mt-0.5">Alumni yang telah menyelesaikan magang dan status pengesahan sertifikat oleh atasan</p>
                     </div>
                     <div class="cc-head-actions flex items-center gap-2">
@@ -865,8 +852,8 @@
                         <table class="rtable min-w-full divide-y divide-slate-100 text-left text-[13px]">
                             <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-xs whitespace-nowrap">
                                 <tr>
-                                    <th class="py-3 px-4">Nama Mahasiswa</th>
-                                    <th class="py-3 px-4">Universitas / NIM</th>
+                                    <th class="py-3 px-4">Nama Peserta Magang</th>
+                                    <th class="py-3 px-4">Kampus/Sekolah / NIM/NIS</th>
                                     <th class="py-3 px-4">Bidang Penempatan</th>
                                     <th class="py-3 px-4 text-center">Nilai Akhir</th>
                                     <th class="py-3 px-4 text-center">Status ACC Sertifikat</th>
@@ -881,12 +868,12 @@
                                         $cCert = $cp->certificate;
                                     @endphp
                                     <tr class="hover:bg-slate-50/70 transition">
-                                        <td class="rt-title py-3.5 px-4 font-bold text-slate-900" data-label="Nama Mahasiswa">
+                                        <td class="rt-title py-3.5 px-4 font-bold text-slate-900" data-label="Nama Peserta Magang">
                                             {{ $cp->application->user->name ?? '-' }}
                                         </td>
-                                        <td class="py-3.5 px-4" data-label="Universitas / NIM">
+                                        <td class="py-3.5 px-4" data-label="Kampus/Sekolah / NIM/NIS">
                                             <span class="block font-semibold text-slate-800">{{ $cp->application->user->studentProfile->universitas ?? '-' }}</span>
-                                            <span class="block text-xs font-mono text-slate-400">NIM: {{ $cp->application->user->studentProfile->nim ?? '-' }}</span>
+                                            <span class="block text-xs font-mono text-slate-400">NIM/NIS: {{ $cp->application->user->studentProfile->nim ?? '-' }}</span>
                                         </td>
                                         <td class="py-3.5 px-4 font-semibold text-slate-800" data-label="Bidang Penempatan">
                                             {{ $cp->application->unit->name ?? '-' }}
@@ -932,7 +919,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="6" class="py-8 text-center text-slate-400 font-medium">
-                                            Belum ada mahasiswa yang berstatus lulus (completed) di dinas ini.
+                                            Belum ada peserta magang yang berstatus lulus (completed) di dinas ini.
                                         </td>
                                     </tr>
                                 @endforelse
@@ -987,7 +974,7 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="mempty">Belum ada mahasiswa yang berstatus lulus (completed) di dinas ini.</div>
+                            <div class="mempty">Belum ada peserta magang yang berstatus lulus (completed) di dinas ini.</div>
                         @endforelse
                     </div>
                 </div>

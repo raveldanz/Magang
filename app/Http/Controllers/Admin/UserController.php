@@ -5,14 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\AccountStatus;
 use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
+use App\Models\Application;
 use App\Models\AuditLog;
 use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
+use App\Services\AdvisorApprovalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -47,6 +50,12 @@ class UserController extends Controller
             return false;
         }
 
+        // Akun Atasan (Supervisor) adalah pengesah akhir Double ACC. Bila Admin Dinas/Bidang bisa mereset
+        // password, mengubah peran, atau menghapusnya, pengesahan itu bisa dilompati. Hanya Super Admin.
+        if ($target->role === 'supervisor') {
+            return false;
+        }
+
         // Akun pihak kampus (dosen/DPL & admin universitas) hanya dikelola Super Admin
         if (in_array($target->role, self::CAMPUS_ROLES, true)) {
             return false;
@@ -54,7 +63,8 @@ class UserController extends Controller
 
         // Isolasi Admin Bidang: Admin Bidang hanya boleh mengelola akun di bidangnya sendiri
         if ($current->unit_id) {
-            if ($target->unit_id && (int) $target->unit_id !== (int) $current->unit_id) {
+            // Akun staf tanpa bidang (unit_id null) dianggap di luar bidang Admin Bidang
+            if ($target->role !== 'mahasiswa' && (int) $target->unit_id !== (int) $current->unit_id) {
                 return false;
             }
             if ($target->role === 'admin' && (int) $target->id !== (int) $current->id) {
@@ -67,7 +77,30 @@ class UserController extends Controller
                 && (int) $target->agency_profile_id === (int) $current->agency_profile_id;
         }
 
-        return true;
+        // Mahasiswa tidak punya agency_profile_id: hanya boleh dikelola Admin Dinas yang menerima
+        // pengajuannya (unit di instansinya), atau Admin Bidang untuk unit bidangnya sendiri.
+        if ($target->role === 'mahasiswa') {
+            return $this->studentAppliedToCurrentAdminScope($target, $current);
+        }
+
+        // Role lain yang tidak dikenali: tolak (default-deny).
+        return false;
+    }
+
+    private function studentAppliedToCurrentAdminScope(User $student, User $current): bool
+    {
+        if ($current->agency_profile_id === null) {
+            return false;
+        }
+
+        return Application::where('user_id', $student->id)
+            ->whereHas('unit', function ($q) use ($current) {
+                $q->where('agency_profile_id', $current->agency_profile_id);
+                if ($current->unit_id) {
+                    $q->whereKey($current->unit_id);
+                }
+            })
+            ->exists();
     }
 
     private function authorizeManageUser(User $target): void
@@ -90,10 +123,27 @@ class UserController extends Controller
         $query = User::with(['agencyProfile', 'university', 'studentProfile', 'unit']);
 
         // Isolasi Bidang & Multi-Tenant
-        if (! $isSuperAdmin && $currentUser->unit_id) {
-            $query->where('unit_id', $currentUser->unit_id);
-        } elseif (! $isSuperAdmin && $currentUser->agency_profile_id) {
-            $query->where('agency_profile_id', $currentUser->agency_profile_id);
+        // Daftar mengikuti wewenang canManageUser(): staf instansi/bidang sendiri (tanpa akun Supervisor, yang
+        // hanya dikelola Super Admin) ditambah mahasiswa yang mengajukan ke instansi/bidang tersebut.
+        if (! $isSuperAdmin && ($currentUser->unit_id || $currentUser->agency_profile_id)) {
+            $query->where(function ($scope) use ($currentUser) {
+                $scope->where(function ($staff) use ($currentUser) {
+                    $staff->where('role', '!=', 'supervisor');
+                    if ($currentUser->unit_id) {
+                        $staff->where('unit_id', $currentUser->unit_id);
+                    } else {
+                        $staff->where('agency_profile_id', $currentUser->agency_profile_id);
+                    }
+                })->orWhere(function ($students) use ($currentUser) {
+                    $students->where('role', 'mahasiswa')
+                        ->whereHas('applications.unit', function ($unit) use ($currentUser) {
+                            $unit->where('agency_profile_id', $currentUser->agency_profile_id);
+                            if ($currentUser->unit_id) {
+                                $unit->whereKey($currentUser->unit_id);
+                            }
+                        });
+                });
+            });
         }
 
         // Filter Role
@@ -106,6 +156,14 @@ class UserController extends Controller
             } else {
                 $query->where('role', $roleFilter);
             }
+        }
+
+        // Filter status akun (mis. Pembimbing daftar mandiri yang Menunggu Persetujuan)
+        $accountStatus = AccountStatus::tryFrom((string) $request->input('account_status'));
+        if ($accountStatus === AccountStatus::ACTIVE) {
+            $query->where(fn ($q) => $q->whereNull('status')->orWhere('status', AccountStatus::ACTIVE->value));
+        } elseif ($accountStatus) {
+            $query->where('status', $accountStatus->value);
         }
 
         // Filter Unit / Bidang Dinas
@@ -180,7 +238,7 @@ class UserController extends Controller
     {
         $agencies = AgencyProfile::all();
         $universities = University::all();
-        $returnTo = $request->query('return_to', url()->previous());
+        $returnTo = $this->safeReturnTo($request->query('return_to', url()->previous())) ?? route('admin.users.index');
 
         return view('admin.users.create', compact('agencies', 'universities', 'returnTo'));
     }
@@ -208,7 +266,8 @@ class UserController extends Controller
             $agencyProfileId = Auth::user()->agency_profile_id;
         }
 
-        $password = $request->filled('password') ? $request->password : 'password';
+        // Tanpa password dari form: pakai password sementara acak (bukan 'password' yang diketahui umum).
+        $password = $request->filled('password') ? $request->password : Str::random(40);
         $assignedUnitId = (! $this->currentUserIsSuperAdmin() && Auth::user()->unit_id) ? Auth::user()->unit_id : null;
 
         $user = User::create([
@@ -222,6 +281,10 @@ class UserController extends Controller
             'status' => $request->status ?? 'active',
             'email_verified_at' => now(),
         ]);
+
+        if (! $request->filled('password')) {
+            $this->issueTemporaryPasswordFor($user);
+        }
 
         AuditLog::record('USER_CREATE', 'User', $user->id, [
             'name' => $user->name,
@@ -268,7 +331,7 @@ class UserController extends Controller
         $this->authorizeManageUser($user);
         $agencies = AgencyProfile::all();
         $universities = University::all();
-        $returnTo = $request->query('return_to', url()->previous());
+        $returnTo = $this->safeReturnTo($request->query('return_to', url()->previous())) ?? route('admin.users.index');
 
         return view('admin.users.edit', compact('user', 'agencies', 'universities', 'returnTo'));
     }
@@ -347,13 +410,13 @@ class UserController extends Controller
     }
 
     /**
-     * Reset Password Akun ke Default ('password')
+     * Reset Password Akun ke password sementara acak (wajib diganti pemilik saat login).
      */
     public function resetPassword($id)
     {
         $user = User::findOrFail($id);
         $this->authorizeManageUser($user);
-        $user->update(['password' => Hash::make('password')]);
+        $this->issueTemporaryPasswordFor($user);
 
         AuditLog::record('USER_PASSWORD_RESET', 'User', $user->id, [
             'name' => $user->name,
@@ -361,7 +424,26 @@ class UserController extends Controller
         ]);
 
         return redirect()->back()
-            ->with('success', "Password untuk '{$user->name}' berhasil direset ke 'password'.");
+            ->with('success', "Password untuk '{$user->name}' berhasil direset. Password sementara ditampilkan sekali di layar ini.");
+    }
+
+    /**
+     * Setujui akun Pembimbing yang mendaftar sendiri (Super Admin; terutama sekolah tanpa Admin Sekolah).
+     */
+    public function approveAdvisor($id, AdvisorApprovalService $approvals)
+    {
+        $advisor = User::whereIn('role', User::ADVISOR_ROLES)->findOrFail($id);
+
+        abort_unless($approvals->canApprove(Auth::user(), $advisor), 403, 'Hanya Super Admin yang dapat menyetujui akun pembimbing dari halaman ini.');
+
+        if (! $advisor->isPendingApproval()) {
+            return redirect()->back()->with('success', "Akun '{$advisor->name}' sudah aktif sebelumnya.");
+        }
+
+        $approvals->approve(Auth::user(), $advisor);
+
+        return redirect()->back()
+            ->with('success', "Akun pembimbing '{$advisor->name}' disetujui. Peserta magang kini dapat memilihnya sebagai pembimbing.");
     }
 
     /**
@@ -398,10 +480,8 @@ class UserController extends Controller
 
         $resetCount = 0;
         $affectedNames = [];
-        $hashedPassword = Hash::make('password');
-
         foreach ($users as $user) {
-            $user->update(['password' => $hashedPassword]);
+            $this->issueTemporaryPasswordFor($user);
             $resetCount++;
             $affectedNames[] = "{$user->name} ({$user->email})";
         }
@@ -412,7 +492,7 @@ class UserController extends Controller
         ]);
 
         return redirect()->back()
-            ->with('success', "Berhasil mereset password untuk {$resetCount} akun pengguna ke nilai default ('password').");
+            ->with('success', "Berhasil mereset password untuk {$resetCount} akun pengguna. Password sementara masing-masing ditampilkan sekali di layar ini.");
     }
 
     /**

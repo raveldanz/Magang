@@ -5,8 +5,8 @@
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
                     <span>Master Pengguna Sistem</span>
                 </h2>
-                <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Kelola akun seluruh role: Mahasiswa, Admin Bidang, Mentor Lapangan, Pembimbing, & Universitas
+                <p class="text-xs sm:text-sm text-gray-600 mt-1">
+                    Kelola akun seluruh role: Peserta Magang, Admin Bidang, Mentor Lapangan, Pembimbing, &amp; Admin Kampus/Sekolah
                 </p>
             </div>
 
@@ -87,7 +87,7 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
                         </div>
                         <div>
-                            <span class="font-medium text-indigo-700">Filter Aktif Sivitas Perguruan Tinggi:</span>
+                            <span class="font-medium text-indigo-700">Filter Aktif Kampus/Sekolah:</span>
                             <h4 class="font-black text-sm text-indigo-950">{{ $selectedUniversity->name }} ({{ $selectedUniversity->code }})</h4>
                         </div>
                     </div>
@@ -96,7 +96,7 @@
                             Pusat Kendali Kampus
                         </a>
                         <a href="{{ route('admin.applications.index', ['university_id' => $selectedUniversity->id]) }}" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold rounded-xl transition">
-                            Pengajuan Mahasiswa
+                            Pengajuan Peserta Magang
                         </a>
                         <a href="{{ route('admin.users.index') }}" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-xl transition">
                             Reset Filter
@@ -130,7 +130,7 @@
 
             <!-- Search & Filter Card -->
             <div class="bg-white rounded-2xl border border-gray-100 p-3.5 sm:p-4 shadow-xs">
-                <form method="GET" action="{{ route('admin.users.index') }}" x-data="{ role: '{{ request('role', '') }}' }" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+                <form method="GET" action="{{ route('admin.users.index') }}" x-data="{ role: @js(request('role', '')) }" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
                     <!-- Search Input -->
                     <div class="relative w-full">
                         <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400" style="padding-left: 1rem !important;">
@@ -138,7 +138,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                         </div>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, email, NIM..." 
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, email, NIM/NIS..." 
                                class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
                                style="padding-left: 2.75rem !important; padding-right: 1rem !important; padding-top: 0.65rem !important; padding-bottom: 0.65rem !important;">
                     </div>
@@ -146,12 +146,12 @@
                     <!-- Filter Role -->
                     <select name="role" x-model="role" class="w-full py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                         <option value="">Semua Role Pengguna</option>
-                        <option value="mahasiswa" {{ request('role') === 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
+                        <option value="mahasiswa" {{ request('role') === 'mahasiswa' ? 'selected' : '' }}>Peserta Magang</option>
                         <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin Bidang / Dispusip</option>
                         <option value="supervisor" {{ request('role') === 'supervisor' ? 'selected' : '' }}>Supervisor</option>
                         <option value="mentor" {{ request('role') === 'mentor' ? 'selected' : '' }}>Mentor Lapangan</option>
                         <option value="dosen" {{ request('role') === 'dosen' ? 'selected' : '' }}>Pembimbing</option>
-                        <option value="universitas" {{ request('role') === 'universitas' ? 'selected' : '' }}>Akun Universitas</option>
+                        <option value="universitas" {{ request('role') === 'universitas' ? 'selected' : '' }}>Akun Kampus/Sekolah</option>
                     </select>
 
                     <!-- Filter Afiliasi / Bidang Dinas / Universitas Dinamis -->
@@ -159,7 +159,7 @@
                         <!-- Case 1: Universitas / Mahasiswa / Dosen -->
                         <div x-show="['universitas', 'dosen', 'mahasiswa'].includes(role)">
                             <select name="university_id" :disabled="!['universitas', 'dosen', 'mahasiswa'].includes(role)" class="w-full py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
-                                <option value="">Semua Universitas / Kampus</option>
+                                <option value="">Semua Kampus / Sekolah</option>
                                 @foreach($universities as $u)
                                     <option value="{{ $u->id }}" {{ request('university_id') == $u->id ? 'selected' : '' }}>
                                         {{ $u->name }}
@@ -232,7 +232,7 @@
                                         @if($canSelect)
                                             <input type="checkbox" 
                                                    :checked="isSelected({{ $u->id }})" 
-                                                   @change="toggleSelectUser({ id: {{ $u->id }}, name: '{{ addslashes($u->name) }}', email: '{{ addslashes($u->email) }}', role: '{{ $u->role }}' })"
+                                                   @change="toggleSelectUser({ id: {{ $u->id }}, name: @js((string) ($u->name)), email: @js((string) ($u->email)), role: '{{ $u->role }}' })"
                                                    class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
                                         @else
                                             <span class="inline-flex text-slate-300 cursor-not-allowed" title="Akun Super Admin / Akun Sendiri Dilindungi">
@@ -247,7 +247,7 @@
                                             <div class="font-bold text-gray-900 text-xs sm:text-sm leading-snug break-words">{{ $u->name }}</div>
                                             <div class="text-[11px] text-gray-500 font-mono mt-0.5 truncate" title="{{ $u->email }}">{{ $u->email }}</div>
                                             @if($u->studentProfile?->nim)
-                                                <div class="text-[10px] text-blue-600 font-mono mt-0.5">NIM: {{ $u->studentProfile?->nim }}</div>
+                                                <div class="text-[10px] text-blue-600 font-mono mt-0.5">NIM/NIS: {{ $u->studentProfile?->nim }}</div>
                                             @endif
                                         </div>
                                     </td>
@@ -298,17 +298,17 @@
                                             </span>
                                         @elseif($u->role === 'universitas')
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-100 text-sky-800 border border-sky-200 whitespace-nowrap">
-                                                Universitas
+                                                Admin Kampus/Sekolah
                                             </span>
                                         @else
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 whitespace-nowrap">
-                                                Mahasiswa
+                                                Peserta Magang
                                             </span>
                                         @endif
                                     </td>
 
                                     <!-- Instansi (Ringkas & Proporsional, teks membungkus rapi) -->
-                                    <td class="py-4 px-4 text-xs text-slate-600 max-w-[220px]">
+                                    <td class="py-4 px-4 text-xs text-slate-600 min-w-[200px] max-w-[260px]">
                                         @if($u->agencyProfile || in_array($u->role, ['admin', 'supervisor', 'mentor', 'pembimbing']))
                                             <div class="font-semibold text-gray-800 text-xs">Dispusip Surabaya</div>
                                             <div class="text-[10px] text-gray-400">Pemerintah Kota Surabaya</div>
@@ -350,6 +350,10 @@
                                                 </form>
                                             @endif
 
+                                            @if($isSuperAdmin && $u->isAdvisor() && $u->isPendingApproval())
+                                                @include('admin.users.partials.approve-advisor-button', ['advisor' => $u])
+                                            @endif
+
                                             <!-- Tombol Edit -->
                                             <a href="{{ route('admin.users.edit', $u->id) }}"
                                                class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white">
@@ -358,14 +362,14 @@
 
                                             <!-- Reset Password (Double Confirmation Modal) -->
                                             @if(!$isSuperAdminUser || $u->id !== $currentUser->id)
-                                                <button type="button" 
+                                                <button type="button"
                                                         @click="$dispatch('open-reset-modal', {
                                                             action: '{{ route('admin.users.reset_password', $u->id) }}',
-                                                            name: '{{ addslashes($u->name) }}',
-                                                            email: '{{ addslashes($u->email) }}',
-                                                            role: '{{ addslashes($u->roleLabel()) }}'
-                                                        })" 
-                                                        class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-amber-50 border-amber-200 text-amber-600 hover:bg-amber-600 hover:text-white cursor-pointer" 
+                                                            name: @js((string) ($u->name)),
+                                                            email: @js((string) ($u->email)),
+                                                            role: @js((string) ($u->roleLabel()))
+                                                        })"
+                                                        class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-amber-50 border-amber-200 text-amber-600 hover:bg-amber-600 hover:text-white cursor-pointer"
                                                         title="Reset password ke default: password">
                                                     Reset
                                                 </button>
@@ -373,11 +377,11 @@
 
                                             <!-- Hapus User (Double Confirmation Modal) -->
                                             @if($u->id !== $currentUser->id && !$isSuperAdminUser)
-                                                <button type="button" 
+                                                <button type="button"
                                                         @click="$dispatch('open-delete-modal', {
                                                             action: '{{ route('admin.users.destroy', $u->id) }}',
                                                             title: 'Hapus Akun Pengguna',
-                                                            name: '{{ addslashes($u->name) }}',
+                                                            name: @js((string) ($u->name)),
                                                             desc: 'Email: {{ $u->email }} &bull; Role: {{ addslashes($u->roleLabel()) }}'
                                                         })" 
                                                         class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white cursor-pointer" 
@@ -437,7 +441,7 @@
                                             @if($canSelect)
                                                 <input type="checkbox" 
                                                        :checked="isSelected({{ $u->id }})" 
-                                                       @change="toggleSelectUser({ id: {{ $u->id }}, name: '{{ addslashes($u->name) }}', email: '{{ addslashes($u->email) }}', role: '{{ $u->role }}' })"
+                                                       @change="toggleSelectUser({ id: {{ $u->id }}, name: @js((string) ($u->name)), email: @js((string) ($u->email)), role: '{{ $u->role }}' })"
                                                        class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
                                             @else
                                                 <span class="inline-flex text-slate-300 cursor-not-allowed" title="Akun Super Admin / Akun Sendiri Dilindungi">
@@ -451,7 +455,7 @@
                                             <div class="text-[11px] text-slate-500 font-mono mt-0.5 break-all">{{ $u->email }}</div>
                                             @if($u->studentProfile?->nim)
                                                 <div class="inline-flex items-center mt-1 text-[10px] font-mono font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
-                                                    NIM: {{ $u->studentProfile?->nim }}
+                                                    NIM/NIS: {{ $u->studentProfile?->nim }}
                                                 </div>
                                             @endif
                                         </div>
@@ -507,11 +511,11 @@
                                             </span>
                                         @elseif($u->role === 'universitas')
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
-                                                Universitas
+                                                Admin Kampus/Sekolah
                                             </span>
                                         @else
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                Mahasiswa
+                                                Peserta Magang
                                             </span>
                                         @endif
                                     </div>
@@ -535,6 +539,11 @@
 
                                 <!-- 3. Action Buttons Mobile: Dedicated Symmetrical Grid Action Bar -->
                                 <div class="pt-2.5 border-t border-slate-100">
+                                    @if($isSuperAdmin && $u->isAdvisor() && $u->isPendingApproval())
+                                        <div class="mb-2">
+                                            @include('admin.users.partials.approve-advisor-button', ['advisor' => $u, 'fullWidth' => true])
+                                        </div>
+                                    @endif
                                     @if($showLoginAs)
                                         <!-- Format 4 Tombol: 2x2 Grid Simetris Sempurna -->
                                         <div class="grid grid-cols-2 gap-2">
@@ -561,9 +570,9 @@
                                                 <button type="button" 
                                                         @click="$dispatch('open-reset-modal', {
                                                             action: '{{ route('admin.users.reset_password', $u->id) }}',
-                                                            name: '{{ addslashes($u->name) }}',
-                                                            email: '{{ addslashes($u->email) }}',
-                                                            role: '{{ addslashes($u->roleLabel()) }}'
+                                                            name: @js((string) ($u->name)),
+                                                            email: @js((string) ($u->email)),
+                                                            role: @js((string) ($u->roleLabel()))
                                                         })" 
                                                         class="w-full py-2 px-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer" 
                                                         title="Reset password ke default: password">
@@ -578,7 +587,7 @@
                                                         @click="$dispatch('open-delete-modal', {
                                                             action: '{{ route('admin.users.destroy', $u->id) }}',
                                                             title: 'Hapus Akun Pengguna',
-                                                            name: '{{ addslashes($u->name) }}',
+                                                            name: @js((string) ($u->name)),
                                                             desc: 'Email: {{ $u->email }} &bull; Role: {{ addslashes($u->roleLabel()) }}'
                                                         })" 
                                                         class="w-full py-2 px-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
@@ -603,9 +612,9 @@
                                                 <button type="button" 
                                                         @click="$dispatch('open-reset-modal', {
                                                             action: '{{ route('admin.users.reset_password', $u->id) }}',
-                                                            name: '{{ addslashes($u->name) }}',
-                                                            email: '{{ addslashes($u->email) }}',
-                                                            role: '{{ addslashes($u->roleLabel()) }}'
+                                                            name: @js((string) ($u->name)),
+                                                            email: @js((string) ($u->email)),
+                                                            role: @js((string) ($u->roleLabel()))
                                                         })" 
                                                         class="w-full py-2 px-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer" 
                                                         title="Reset password ke default: password">
@@ -620,7 +629,7 @@
                                                         @click="$dispatch('open-delete-modal', {
                                                             action: '{{ route('admin.users.destroy', $u->id) }}',
                                                             title: 'Hapus Akun Pengguna',
-                                                            name: '{{ addslashes($u->name) }}',
+                                                            name: @js((string) ($u->name)),
                                                             desc: 'Email: {{ $u->email }} &bull; Role: {{ addslashes($u->roleLabel()) }}'
                                                         })" 
                                                         class="w-full py-2 px-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
@@ -764,8 +773,8 @@
                         @endphp
                         {
                             id: {{ $u->id }},
-                            name: '{{ addslashes($u->name) }}',
-                            email: '{{ addslashes($u->email) }}',
+                            name: @js((string) ($u->name)),
+                            email: @js((string) ($u->email)),
                             role: '{{ $u->role }}',
                             selectable: {{ $canSelect ? 'true' : 'false' }}
                         },

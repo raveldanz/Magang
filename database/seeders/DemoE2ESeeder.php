@@ -128,7 +128,8 @@ class DemoE2ESeeder extends Seeder
             ['email' => 'admin@gmail.com'],
             [
                 'name' => 'Super Admin Dispusip',
-                'password' => Hash::make('admin123'),
+                // Sengaja bukan 'password' agar banner "password bawaan" tidak muncul saat demo.
+                'password' => Hash::make(config('auth.demo_admin_password')),
                 'role' => 'super_admin',
                 'agency_profile_id' => $dispusip->id,
                 'status' => 'active',
@@ -166,6 +167,19 @@ class DemoE2ESeeder extends Seeder
             ['email' => 'supervisor@dispusip.surabaya.go.id'],
             [
                 'name' => 'Bambang Supriyadi, S.Sos., M.AP',
+                'password' => $defaultPassword,
+                'role' => 'supervisor',
+                'agency_profile_id' => $dispusip->id,
+                'unit_id' => $unitSekretariat->id,
+                'status' => 'active',
+                'email_verified_at' => now(),
+            ]
+        );
+
+        $supervisorKepegawaian = User::updateOrCreate(
+            ['email' => 'kepegawaian@dispusip.surabaya.go.id'],
+            [
+                'name' => 'Tim Kerja dan Kepegawaian',
                 'password' => $defaultPassword,
                 'role' => 'supervisor',
                 'agency_profile_id' => $dispusip->id,
@@ -332,7 +346,7 @@ class DemoE2ESeeder extends Seeder
                     'date' => Carbon::now()->subMonths(2)->addDays($day)->toDateString(),
                 ],
                 [
-                    'activity' => 'Melaksanakan kegiatan magang Dispusip hari ke-' . $day . ': Digitalisasi dan penataan arsip.',
+                    'activity' => 'Melaksanakan kegiatan magang Dispusip hari ke-'.$day.': Digitalisasi dan penataan arsip.',
                     'status' => 'approved',
                 ]
             );

@@ -147,7 +147,12 @@ class DocumentController extends Controller
             'mahasiswa' => $group->applications()->where('user_id', $user->id)->exists(),
             'admin', 'supervisor' => $user->agency_profile_id !== null
                 && (int) optional($group->unit)->agency_profile_id === (int) $user->agency_profile_id,
-            'mentor' => (int) optional($group->unit)->agency_profile_id === (int) $user->agency_profile_id,
+            'mentor', 'pembimbing' => ($user->agency_profile_id !== null
+                && (int) optional($group->unit)->agency_profile_id === (int) $user->agency_profile_id)
+                || $group->applications()->whereHas('placement', fn ($q) => $q->where('mentor_id', $user->id))->exists(),
+            'dosen', 'academic_advisor' => $group->applications()
+                ->whereHas('placement', fn ($q) => $q->where('academic_advisor_id', $user->id))
+                ->exists(),
             'universitas' => $user->university_id !== null && $group->applications->contains(function ($app) use ($user) {
                 return (int) $app->user?->university_id === (int) $user->university_id;
             }),
@@ -221,8 +226,13 @@ class DocumentController extends Controller
             // Admin Dinas atau Atasan Kepegawaian (Supervisor) dari instansi yang dilamar
             'admin', 'supervisor' => $user->agency_profile_id !== null
                 && (int) optional($application?->unit)->agency_profile_id === (int) $user->agency_profile_id,
-            // Mentor yang bertugas di unit instansi tersebut
-            'mentor' => (int) optional($application?->unit)->agency_profile_id === (int) $user->agency_profile_id,
+            // Mentor yang bertugas di unit instansi tersebut atau yang ditugaskan langsung ke placement mahasiswa
+            'mentor', 'pembimbing' => ($user->agency_profile_id !== null
+                && (int) optional($application?->unit)->agency_profile_id === (int) $user->agency_profile_id)
+                || (int) optional($application?->placement)->mentor_id === (int) $user->id,
+            // Dosen Pembimbing Lapangan (DPL) mahasiswa terkait
+            'dosen', 'academic_advisor' => $application?->placement !== null
+                && (int) $application->placement->academic_advisor_id === (int) $user->id,
             // Admin Kampus asal mahasiswa
             'universitas' => $user->university_id !== null && in_array((int) $user->university_id, array_filter([
                 (int) $student?->university_id,

@@ -48,7 +48,7 @@
                     <!-- Card 2: Dosen Pembimbing (Mobile) -->
                     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                         <div class="flex items-center justify-between">
-                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Dosen Pembimbing</p>
+                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pembimbing</p>
                             @if ($academicAdvisor)
                                 <span class="px-2 py-0.5 text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md">
                                     Terpilih
@@ -67,7 +67,7 @@
                                     <p class="truncate">{{ is_string($academicAdvisor->university) ? $academicAdvisor->university : ($academicAdvisor->universityRelation?->name ?? $academicAdvisor->university?->name ?? $univName ?? $profile->universitas) }}</p>
                                 </div>
                             @elseif ($application && in_array($rawAppSt, ['accepted', 'active', 'completed'], true))
-                                <p class="text-xs text-slate-600">Belum memilih dosen pembimbing</p>
+                                <p class="text-xs text-slate-600">Belum memilih pembimbing</p>
                             @else
                                 <p class="text-xs text-slate-400">Belum Tersedia</p>
                             @endif
@@ -77,7 +77,7 @@
                                 <button type="button"
                                     onclick="const el = document.getElementById('change-advisor-box-mobile'); el.classList.toggle('hidden'); if(!el.classList.contains('hidden')) el.scrollIntoView({behavior: 'smooth'});"
                                     class="text-xs font-bold text-blue-600 hover:text-blue-800 cursor-pointer">
-                                    {{ $academicAdvisor ? 'Ganti Dosen Pembimbing' : 'Pilih Dosen Pembimbing' }}
+                                    {{ $academicAdvisor ? 'Ganti Pembimbing' : 'Pilih Pembimbing' }}
                                 </button>
                             </div>
                         @endif
@@ -87,7 +87,7 @@
                     @if ($application && in_array($rawAppSt, ['accepted', 'active', 'completed'], true))
                         <div id="change-advisor-box-mobile" class="{{ $academicAdvisor ? 'hidden' : '' }} bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3 scroll-mt-6">
                             <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                                <h4 class="font-bold text-slate-800 text-sm">Pilih Dosen Pembimbing</h4>
+                                <h4 class="font-bold text-slate-800 text-sm">Pilih Pembimbing</h4>
                                 @if ($academicAdvisor)
                                     <button type="button"
                                         onclick="document.getElementById('change-advisor-box-mobile').classList.add('hidden')"
@@ -101,16 +101,16 @@
                                 <div>
                                     <label for="academic_advisor_id_mobile"
                                         class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                                        Pilih Dosen Terdaftar: {{ $univName ?? $profile->universitas ?? 'Kampus Mahasiswa' }}
+                                        Pilih Pembimbing Terdaftar: {{ $univName ?? $profile->universitas ?? 'Kampus Peserta Magang' }}
                                     </label>
                                     <select id="academic_advisor_id_mobile" name="academic_advisor_id" required
                                         class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs p-2.5">
-                                        <option value="">-- Pilih Dosen Pembimbing --</option>
+                                        <option value="">-- Pilih Pembimbing --</option>
                                         @if(isset($availableDosens))
                                             @foreach ($availableDosens as $dosen)
                                                 <option value="{{ $dosen->id }}" {{ optional($placement)->academic_advisor_id == $dosen->id ? 'selected' : '' }}>
                                                     {{ $dosen->name }} —
-                                                    {{ is_string($dosen->university) ? $dosen->university : ($dosen->universityRelation?->name ?? $dosen->university?->name ?? 'Dosen') }}
+                                                    {{ is_string($dosen->university) ? $dosen->university : ($dosen->universityRelation?->name ?? $dosen->university?->name ?? 'Pembimbing') }}
                                                     ({{ $dosen->email }})
                                                 </option>
                                             @endforeach
@@ -121,7 +121,7 @@
                                 <div class="pt-1 flex flex-col gap-2">
                                     <button type="submit"
                                         class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
-                                        {{ __('Simpan Dosen Pembimbing') }}
+                                        {{ __('Simpan Pembimbing') }}
                                     </button>
                                     @if ($academicAdvisor)
                                         <button type="button"
@@ -132,7 +132,7 @@
                                     @endif
                                     <button type="button" @click="openNewDosenModal = true"
                                         class="text-xs text-blue-600 hover:text-blue-800 font-semibold underline cursor-pointer text-center pt-1">
-                                        Dosen tidak ditemukan? Input Dosen Baru
+                                        Pembimbing tidak ditemukan? Input Pembimbing Baru
                                     </button>
                                 </div>
                             </form>
@@ -213,7 +213,7 @@
                             </div>
                             <a href="{{ route('student.application.create') }}"
                                 class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs transition shadow-sm shrink-0">
-                                <span>Daftar Akun</span>
+                                <span>Ajukan Magang</span>
                             </a>
                         </div>
                     @endif

@@ -7,9 +7,12 @@ use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\University;
 use App\Models\User;
+use App\Services\AdvisorApprovalService;
+use App\Services\UniversityResolver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class LecturerController extends Controller
@@ -81,11 +84,15 @@ class LecturerController extends Controller
             'total_assigned_students' => $totalActiveStudents + $totalCompletedStudents,
         ];
 
+        // Pembimbing yang mendaftar sendiri dan menunggu persetujuan Admin Kampus/Sekolah
+        $pendingLecturers = $lecturers->filter(fn (User $lecturer) => $lecturer->isPendingApproval())->values();
+
         return view('university.lecturers.index', compact(
             'user',
             'university',
             'univName',
             'lecturers',
+            'pendingLecturers',
             'stats'
         ));
     }
@@ -100,15 +107,15 @@ class LecturerController extends Controller
         $university = $universityId
             ? University::find($universityId)
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
-        $univName = $university?->name ?? $user->university ?? 'Perguruan Tinggi';
+        $univName = $university?->name ?? $user->university ?? 'Kampus/Sekolah';
 
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'nidn' => 'nullable|string|max:50',
         ], [
-            'name.required' => 'Nama lengkap beserta gelar dosen wajib diisi.',
-            'email.required' => 'Email resmi dosen wajib diisi.',
+            'name.required' => 'Nama lengkap beserta gelar pembimbing wajib diisi.',
+            'email.required' => 'Email resmi pembimbing wajib diisi.',
             'email.unique' => 'Email ini sudah terdaftar di dalam sistem.',
         ]);
 
@@ -120,15 +127,16 @@ class LecturerController extends Controller
         $lecturer = User::create([
             'name' => $dosenName,
             'email' => strtolower(trim($request->email)),
-            'password' => Hash::make('password'),
+            'password' => Hash::make(Str::random(40)),
             'role' => 'dosen',
             'university_id' => $universityId,
             'university' => $univName,
             'email_verified_at' => now(),
         ]);
+        $this->issueTemporaryPasswordFor($lecturer);
 
         return redirect()->route('university.lecturers.index')
-            ->with('success', "Dosen Pembimbing Baru '{$lecturer->name}' berhasil ditambahkan ke daftar dosen kampus!");
+            ->with('success', "Pembimbing Baru '{$lecturer->name}' berhasil ditambahkan ke daftar pembimbing kampus!");
     }
 
     /**
@@ -145,14 +153,11 @@ class LecturerController extends Controller
 
         $lecturer = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($id);
 
-        // Tenant Scoping Authorization Check
-        $isSameUniv = ($universityId && $lecturer->university_id === $universityId);
-        if (! $isSameUniv && $univName) {
-            $isSameUniv = ($lecturer->university === $univName);
-        }
+        // Tenant Scoping Authorization Check (kunci: university_id, bukan nama kampus yang bisa diubah)
+        $isSameUniv = app(UniversityResolver::class)->belongsTo($lecturer, $university);
 
         if (! $isSameUniv) {
-            abort(403, 'Anda tidak memiliki hak akses untuk mengedit data dosen kampus lain.');
+            abort(403, 'Anda tidak memiliki hak akses untuk mengedit data pembimbing kampus lain.');
         }
 
         $request->validate([
@@ -161,8 +166,8 @@ class LecturerController extends Controller
             'nidn' => 'nullable|string|max:50',
             'status' => ['nullable', 'string', Rule::in(AccountStatus::values())],
         ], [
-            'name.required' => 'Nama lengkap dosen wajib diisi.',
-            'email.required' => 'Email resmi dosen wajib diisi.',
+            'name.required' => 'Nama lengkap pembimbing wajib diisi.',
+            'email.required' => 'Email resmi pembimbing wajib diisi.',
             'email.unique' => 'Email ini sudah digunakan oleh akun lain.',
         ]);
 
@@ -178,7 +183,7 @@ class LecturerController extends Controller
         ]);
 
         return redirect()->route('university.lecturers.index')
-            ->with('success', "Data & Status Dosen Pembimbing '{$dosenName}' berhasil diperbarui!");
+            ->with('success', "Data & Status Pembimbing '{$dosenName}' berhasil diperbarui!");
     }
 
     /**
@@ -195,22 +200,37 @@ class LecturerController extends Controller
 
         $lecturer = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($id);
 
-        // Tenant Scoping Authorization Check
-        $isSameUniv = ($universityId && $lecturer->university_id === $universityId);
-        if (! $isSameUniv && $univName) {
-            $isSameUniv = ($lecturer->university === $univName);
-        }
+        // Tenant Scoping Authorization Check (kunci: university_id, bukan nama kampus yang bisa diubah)
+        $isSameUniv = app(UniversityResolver::class)->belongsTo($lecturer, $university);
 
         if (! $isSameUniv) {
-            abort(403, 'Anda tidak memiliki hak akses untuk mereset password dosen kampus lain.');
+            abort(403, 'Anda tidak memiliki hak akses untuk mereset password pembimbing kampus lain.');
         }
 
-        $lecturer->update([
-            'password' => Hash::make('password'),
-        ]);
+        $this->issueTemporaryPasswordFor($lecturer);
 
         return redirect()->route('university.lecturers.index')
-            ->with('success', "Password untuk Dosen '{$lecturer->name}' ({$lecturer->email}) berhasil direset ke default ('password')!");
+            ->with('success', "Password untuk Pembimbing '{$lecturer->name}' ({$lecturer->email}) berhasil direset. Password sementara ditampilkan sekali di layar ini.");
+    }
+
+    /**
+     * Setujui akun Pembimbing yang mendaftar sendiri (status Menunggu Persetujuan → Aktif).
+     */
+    public function approve($id, AdvisorApprovalService $approvals)
+    {
+        $lecturer = User::whereIn('role', User::ADVISOR_ROLES)->findOrFail($id);
+
+        abort_unless($approvals->canApprove(Auth::user(), $lecturer), 403, 'Anda tidak memiliki hak akses untuk menyetujui pembimbing dari institusi lain.');
+
+        if (! $lecturer->isPendingApproval()) {
+            return redirect()->route('university.lecturers.index')
+                ->with('success', "Akun '{$lecturer->name}' sudah aktif sebelumnya.");
+        }
+
+        $approvals->approve(Auth::user(), $lecturer);
+
+        return redirect()->route('university.lecturers.index')
+            ->with('success', "Akun pembimbing '{$lecturer->name}' disetujui. Peserta magang kini dapat memilihnya sebagai pembimbing.");
     }
 
     /**
@@ -227,14 +247,11 @@ class LecturerController extends Controller
 
         $lecturer = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($id);
 
-        // Tenant Scoping Authorization Check
-        $isSameUniv = ($universityId && $lecturer->university_id === $universityId);
-        if (! $isSameUniv && $univName) {
-            $isSameUniv = ($lecturer->university === $univName);
-        }
+        // Tenant Scoping Authorization Check (kunci: university_id, bukan nama kampus yang bisa diubah)
+        $isSameUniv = app(UniversityResolver::class)->belongsTo($lecturer, $university);
 
         if (! $isSameUniv) {
-            abort(403, 'Anda tidak memiliki hak akses untuk menghapus dosen kampus lain.');
+            abort(403, 'Anda tidak memiliki hak akses untuk menghapus pembimbing kampus lain.');
         }
 
         // Periksa riwayat bimbingan (aktif maupun alumni): placements.academic_advisor_id ON DELETE SET NULL
@@ -243,13 +260,13 @@ class LecturerController extends Controller
 
         if ($historyCount > 0) {
             return redirect()->route('university.lecturers.index')
-                ->with('error', "Dosen '{$lecturer->name}' tidak dapat dihapus karena tercatat membimbing {$historyCount} mahasiswa (termasuk arsip alumni). Ubah status dosen menjadi Nonaktif untuk mencabut aksesnya.");
+                ->with('error', "Pembimbing '{$lecturer->name}' tidak dapat dihapus karena tercatat membimbing {$historyCount} peserta magang (termasuk arsip alumni). Ubah status pembimbing menjadi Nonaktif untuk mencabut aksesnya.");
         }
 
         $lecturerName = $lecturer->name;
         $lecturer->delete();
 
         return redirect()->route('university.lecturers.index')
-            ->with('success', "Dosen Pembimbing '{$lecturerName}' berhasil dihapus dari daftar kampus.");
+            ->with('success', "Pembimbing '{$lecturerName}' berhasil dihapus dari daftar kampus.");
     }
 }

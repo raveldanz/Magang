@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\AuditLog;
 use App\Models\FinalReport;
+use App\Models\InternshipProject;
+use App\Support\SafeUpload;
 use App\Support\UploadRules;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -49,12 +51,12 @@ class FinalReportController extends Controller
         if ($placement) {
             // Syarat Wajib: DPL Harus Sudah Dipilih sebelum mengisi/mengakses Laporan Akhir
             if (empty($placement->academic_advisor_id) && empty($placement->pembimbing_id)) {
-                return redirect()->route('dashboard')->with('error', 'Silakan pilih Dosen Pembimbing Lapangan terlebih dahulu sebelum mengakses pengunggahan Laporan Akhir.');
+                return redirect()->route('dashboard')->with('error', 'Silakan pilih Pembimbing terlebih dahulu sebelum mengakses pengunggahan Laporan Akhir.');
             }
 
             $finalReport = $placement->finalreport;
             $evaluation = $placement->evaluation;
-            $projects = \App\Models\InternshipProject::with(['members.placement.application.user.studentProfile'])
+            $projects = InternshipProject::with(['members.placement.application.user.studentProfile'])
                 ->where(function ($q) use ($placement) {
                     $q->where('placement_id', $placement->id)
                         ->orWhereHas('members', fn ($m) => $m->where('placement_id', $placement->id));
@@ -95,7 +97,7 @@ class FinalReportController extends Controller
 
         // Syarat Wajib: DPL Harus Sudah Dipilih / Terdaftar
         if (empty($placement->academic_advisor_id) && empty($placement->pembimbing_id)) {
-            return redirect()->route('dashboard')->with('error', 'Akses ditolak: Silakan pilih Dosen Pembimbing Lapangan terlebih dahulu.');
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak: Silakan pilih Pembimbing terlebih dahulu.');
         }
 
         $placementId = $application->placement->id;
@@ -106,12 +108,17 @@ class FinalReportController extends Controller
             return redirect()->route('student.final_report.index')->with('error', 'Laporan akhir yang sudah disetujui tidak dapat diubah atau diunggah ulang.');
         }
 
+        $needsRevisedFile = $finalReport?->status === 'revision';
+
         $request->validate([
             'title' => 'nullable|string|max:255',
             'repository_url' => 'nullable|url|max:255',
-            'file_laporan' => ($hasExistingFile ? 'nullable' : 'required').'|'.UploadRules::FINAL_REPORT, // PDF maks 5MB
+            // Saat diminta revisi, naskah baru wajib diunggah: mengirim ulang berkas lama bukan perbaikan.
+            'file_laporan' => ($hasExistingFile && ! $needsRevisedFile ? 'nullable' : 'required').'|'.UploadRules::FINAL_REPORT, // PDF maks 5MB
         ], [
-            'file_laporan.required' => 'File naskah laporan akhir wajib diunggah.',
+            'file_laporan.required' => $needsRevisedFile
+                ? 'Laporan Anda diminta untuk direvisi. Unggah berkas naskah hasil perbaikan sebelum mengirim ulang.'
+                : 'File naskah laporan akhir wajib diunggah.',
             'file_laporan.mimes' => 'Format file naskah laporan akhir harus berupa PDF.',
             'file_laporan.max' => 'Ukuran file naskah laporan akhir maksimal 5 MB (5120 KB).',
             'repository_url.url' => 'Format tautan repositori proyek harus berupa URL valid.',
@@ -135,10 +142,10 @@ class FinalReportController extends Controller
 
             // Format nama file terstruktur: Laporan_Akhir_[NIM]_[Nama_Mahasiswa]_[Timestamp].[ext]
             $file = $request->file('file_laporan');
-            $ext = strtolower($file->getClientOriginalExtension());
+            $ext = SafeUpload::extension($file, ['pdf'], 'pdf');
             $nim = $user->studentProfile?->nim ?? 'NIM';
             $cleanNim = preg_replace('/[^A-Za-z0-9]/', '', $nim) ?: 'NIM';
-            $cleanName = Str::slug($user->name, '_') ?: 'Mahasiswa';
+            $cleanName = Str::slug($user->name, '_') ?: 'Peserta Magang';
             $timestamp = time();
             $customFilename = "Laporan_Akhir_{$cleanNim}_{$cleanName}_{$timestamp}.{$ext}";
 
@@ -147,12 +154,12 @@ class FinalReportController extends Controller
             $filePath = $file->storeAs('final_reports', $customFilename, 'local');
         }
 
-        $newStatus = ($request->hasFile('file_laporan') || $finalReport?->status === 'revision') ? 'pending' : ($finalReport?->status ?? 'pending');
+        $newStatus = $request->hasFile('file_laporan') ? 'pending' : ($finalReport?->status ?? 'pending');
 
         $report = FinalReport::updateOrCreate(
             ['placement_id' => $placementId],
             [
-                'title' => $request->title ?? 'Laporan Akhir Praktik Kerja Lapangan (PKL) / Magang MBKM',
+                'title' => $request->title ?? $finalReport?->title ?? 'Laporan Akhir Praktik Kerja Lapangan (PKL) / Magang',
                 'repository_url' => $request->repository_url,
                 'file_path' => $filePath,
                 'final_report_path' => $filePath,
@@ -261,14 +268,14 @@ class FinalReportController extends Controller
         }
 
         if (! $realPath || ! file_exists($realPath)) {
-            return redirect()->back()->with('error', 'Berkas naskah laporan akhir belum tersedia atau sedang disiapkan oleh mahasiswa.');
+            return redirect()->back()->with('error', 'Berkas naskah laporan akhir belum tersedia atau sedang disiapkan oleh peserta magang.');
         }
 
         // Susun Nama Berkas Bersih untuk Browser / Download: Laporan_Akhir_[NIM]_[Nama_Mahasiswa].[ext]
-        $studentName = $student?->name ?? 'Mahasiswa';
+        $studentName = $student?->name ?? 'Peserta Magang';
         $nim = $student?->studentProfile?->nim ?? 'NIM';
         $cleanNim = preg_replace('/[^A-Za-z0-9]/', '', $nim) ?: 'NIM';
-        $cleanName = Str::slug($studentName, '_') ?: 'Mahasiswa';
+        $cleanName = Str::slug($studentName, '_') ?: 'Peserta Magang';
         $ext = pathinfo($realPath, PATHINFO_EXTENSION) ?: 'pdf';
         $downloadFilename = "Laporan_Akhir_{$cleanNim}_{$cleanName}.{$ext}";
 

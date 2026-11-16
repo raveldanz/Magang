@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Enums\ApplicationStatus;
 use App\Models\AgencyProfile;
 use App\Models\Application;
-use App\Models\AuditLog;
 use App\Models\Logbook;
 use App\Models\Placement;
 use App\Models\Unit;
@@ -22,13 +21,21 @@ class ApplicationStatusPipelineReformTest extends TestCase
     use RefreshDatabase;
 
     private User $admin;
+
     private User $supervisor;
+
     private User $superAdmin;
+
     private User $student;
+
     private User $mentor;
+
     private User $dosen;
+
     private AgencyProfile $agency;
+
     private Unit $unit;
+
     private University $univ;
 
     protected function setUp(): void
@@ -129,6 +136,7 @@ class ApplicationStatusPipelineReformTest extends TestCase
 
     public function test_auto_activates_when_student_submits_first_logbook(): void
     {
+        Storage::fake('local');
         Storage::fake('public');
 
         $app = Application::create([

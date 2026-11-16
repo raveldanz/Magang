@@ -14,7 +14,7 @@
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight">
                     Tambah Unit Bidang
                 </h2>
-                <p class="text-xs text-gray-500 mt-0.5">Buka unit bidang baru dan tentukan kuota penerimaan mahasiswa
+                <p class="text-xs text-gray-500 mt-0.5">Buka unit bidang baru dan tentukan kuota penerimaan peserta magang
                 </p>
             </div>
         </div>
@@ -65,11 +65,11 @@
 
                     <!-- Kuota Penerimaan -->
                     <div>
-                        <x-input-label for="quota" value="Kapasitas Kuota Mahasiswa Magang" />
+                        <x-input-label for="quota" value="Kapasitas Kuota Peserta Magang" />
                         <input type="number" id="quota" name="quota" min="0" max="100" value="{{ old('quota', 5) }}"
                             class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
                             required>
-                        <p class="text-xs text-gray-500 mt-1">Jumlah maksimal mahasiswa yang dapat diterima di divisi
+                        <p class="text-xs text-gray-500 mt-1">Jumlah maksimal peserta magang yang dapat diterima di divisi
                             ini.</p>
                         @error('quota')
                             <span class="text-rose-600 text-xs font-medium block mt-1">{{ $message }}</span>

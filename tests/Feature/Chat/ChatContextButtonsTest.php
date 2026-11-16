@@ -12,7 +12,7 @@ class ChatContextButtonsTest extends ChatTestCase
 
         $this->actingAs($this->mentorX)->get(route('mentor.students.show', $placement->id))
             ->assertOk()
-            ->assertSee('Chat Mahasiswa')
+            ->assertSee('Chat Peserta Magang')
             ->assertSee(route('chat.placement', $placement->id), false);
     }
 

@@ -54,6 +54,10 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    // Alamat yang bisa dibuka perangkat lain (mis. http://192.168.1.10:8000). Dipakai App\Support\PublicUrl
+    // untuk QR verifikasi saat aplikasi dibuka lewat localhost. Diisi otomatis oleh start_demo.bat.
+    'public_url' => env('APP_PUBLIC_URL'),
+
     /*
     | Verifikasi QR (/verify-letter & /verify-certificate): izinkan pencarian dengan
     | ID angka untuk dokumen lama yang QR-nya masih berisi ID. Default MATI karena
@@ -130,5 +134,11 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+
+    /*
+    | ID instansi penerbit sertifikat (Dispusip). Admin Utama instansi ini boleh mengubah tema
+    | sertifikat global. Bila kosong, dipakai profil instansi Perpustakaan yang PALING AWAL dibuat.
+    */
+    'certificate_issuer_agency_id' => env('CERTIFICATE_ISSUER_AGENCY_ID'),
 
 ];

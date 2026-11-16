@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Application;
 use App\Models\Logbook;
 use App\Models\StudentProfile;
 use App\Models\SystemFeedback;
+use App\Models\User;
 use App\Services\PrivateDocumentStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -57,9 +59,7 @@ class PrivateFileController extends Controller
         $viewer = $request->user();
         $profile = StudentProfile::with('user')->where('user_id', $userId)->firstOrFail();
 
-        // Akses dokumen personal: pemilik sendiri atau staf
-        $allowed = (int) $viewer->id === (int) $userId || $viewer->role !== 'mahasiswa';
-        abort_unless($allowed, 403, 'Anda tidak memiliki hak akses ke dokumen ini.');
+        abort_unless($this->canViewStudentDocuments($viewer, $profile), 403, 'Anda tidak memiliki hak akses ke dokumen ini.');
 
         $typeMap = [
             'cv' => [$profile->cv_path, 'cv_'.Str::slug($profile->user?->name ?? 'mahasiswa', '_')],
@@ -76,5 +76,38 @@ class PrivateFileController extends Controller
         $forceDownload = $request->boolean('download');
 
         return PrivateDocumentStorage::response($path, $name, $forceDownload);
+    }
+
+    /**
+     * CV, transkrip, dan KTM hanya untuk pihak yang benar-benar terkait dengan mahasiswa
+     * (selaras dengan DocumentController::canAccessApplicationDocument untuk berkas yang sama):
+     * pemilik, Super Admin, Admin Dinas/Supervisor/Mentor dari instansi yang dilamar,
+     * Admin Kampus asal mahasiswa, dan DPL yang ditugaskan untuk mahasiswa tersebut.
+     */
+    private function canViewStudentDocuments(?User $viewer, StudentProfile $profile): bool
+    {
+        if (! $viewer) {
+            return false;
+        }
+
+        $studentId = (int) $profile->user_id;
+
+        if ((int) $viewer->id === $studentId || $this->currentUserIsSuperAdmin($viewer)) {
+            return true;
+        }
+
+        $applications = Application::where('user_id', $studentId);
+
+        return match ($viewer->role) {
+            'admin', 'supervisor', 'mentor', 'pembimbing' => $viewer->agency_profile_id !== null
+                && (clone $applications)->whereHas('unit', fn ($q) => $q->where('agency_profile_id', $viewer->agency_profile_id))->exists(),
+            'universitas' => $viewer->university_id !== null && in_array((int) $viewer->university_id, array_filter([
+                (int) $profile->user?->university_id,
+                (int) $profile->university_id,
+            ]), true),
+            'dosen', 'academic_advisor' => (clone $applications)
+                ->whereHas('placement', fn ($q) => $q->where('academic_advisor_id', $viewer->id))->exists(),
+            default => false,
+        };
     }
 }

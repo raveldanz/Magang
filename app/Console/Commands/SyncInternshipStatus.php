@@ -8,7 +8,6 @@ use App\Models\AuditLog;
 use App\Models\SystemNotification;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 class SyncInternshipStatus extends Command
 {
@@ -24,7 +23,7 @@ class SyncInternshipStatus extends Command
      *
      * @var string
      */
-    protected $description = 'Otomatisasi sinkronisasi status magang mahasiswa dari ACCEPTED ke ACTIVE saat tanggal mulai magang tiba';
+    protected $description = 'Otomatisasi sinkronisasi status magang peserta dari ACCEPTED ke ACTIVE saat tanggal mulai magang tiba';
 
     /**
      * Execute the console command.
@@ -45,40 +44,28 @@ class SyncInternshipStatus extends Command
      */
     private function activateStartedInternships(string $today): void
     {
-        $applications = Application::with('user.studentProfile', 'unit')
+        $applications = Application::with('user.studentProfile', 'unit', 'group')
             ->where('status', ApplicationStatus::ACCEPTED)
             ->whereNotNull('start_date')
             ->whereDate('start_date', '<=', $today)
             ->get();
 
         if ($applications->isEmpty()) {
-            $this->info('Tidak ada mahasiswa berstatus ACCEPTED yang siap diaktifkan hari ini.');
+            $this->info('Tidak ada peserta magang berstatus ACCEPTED yang siap diaktifkan hari ini.');
 
             return;
         }
 
-        $this->info("Ditemukan {$applications->count()} mahasiswa yang siap bertransisi ke status ACTIVE.");
+        $this->info("Ditemukan {$applications->count()} peserta magang yang siap bertransisi ke status ACTIVE.");
 
         $updatedCount = 0;
         foreach ($applications as $app) {
-            DB::transaction(function () use ($app, &$updatedCount) {
-                $app->update([
-                    'status' => ApplicationStatus::ACTIVE,
-                ]);
-
-                AuditLog::record('AUTO_ACTIVATE_INTERNSHIP', 'Application', $app->id, [
-                    'student_name' => $app->user?->name,
-                    'nim' => $app->user?->studentProfile?->nim,
-                    'unit_name' => $app->unit?->name,
-                    'start_date' => $app->start_date,
-                    'activated_at' => now()->toDateTimeString(),
-                    'reason' => 'Tanggal mulai magang telah tiba (Auto-synced via scheduler)',
-                ]);
-
-                $updatedCount++;
-            });
-
-            $this->line(" - Mahasiswa: {$app->user?->name} (ID: {$app->id}) -> Status diubah ke ACTIVE.");
+            if ($app->statusValue() === ApplicationStatus::ACCEPTED->value) {
+                if ($app->autoActivateIfStarted('AUTO_ACTIVATE_INTERNSHIP')) {
+                    $updatedCount++;
+                    $this->line(" - Peserta Magang: {$app->user?->name} (ID: {$app->id}) -> Status diubah ke ACTIVE.");
+                }
+            }
         }
 
         $this->info("Sukses mengaktifkan {$updatedCount} peserta magang.");
@@ -121,7 +108,7 @@ class SyncInternshipStatus extends Command
 
             // Jika syarat administratif belum lengkap: status tetap ACTIVE, beri flag peringatan "Menunggu Evaluasi Mentor/Kelulusan"
             $daysPast = $app->daysPastEndDate();
-            $this->line(" - Mahasiswa: {$app->user?->name} (ID: {$app->id}) -> Lewat {$daysPast} hari [Menunggu Evaluasi Mentor/Kelulusan]. Status tetap ACTIVE.");
+            $this->line(" - Peserta Magang: {$app->user?->name} (ID: {$app->id}) -> Lewat {$daysPast} hari [Menunggu Evaluasi Mentor/Kelulusan]. Status tetap ACTIVE.");
 
             if ($daysPast < 1 || ($daysPast - 1) % 7 !== 0) {
                 continue;
@@ -154,7 +141,7 @@ class SyncInternshipStatus extends Command
             $mentor = $app->placement?->mentor ?? $app->placement?->pembimbing;
             if ($mentor) {
                 SystemNotification::send(
-                    'Mahasiswa Melewati Masa Magang',
+                    'Peserta Magang Melewati Masa Magang',
                     "Masa magang {$app->user?->name} berakhir {$daysPast} hari lalu [Menunggu Evaluasi Mentor/Kelulusan], namun {$missingText}. Mohon tinjau laporan akhir & lengkapi evaluasi mentor lapangan.",
                     $mentor->id,
                     null,

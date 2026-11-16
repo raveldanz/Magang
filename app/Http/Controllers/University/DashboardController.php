@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\University;
 
+use App\Enums\AccountStatus;
 use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
@@ -10,6 +11,8 @@ use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
+use App\Services\UniversityResolver;
+use App\Support\CsvSafe;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,6 +24,9 @@ class DashboardController extends Controller
      */
     public function index(Request $request)
     {
+        // Sinkronkan seluruh pengajuan magang yang tanggal mulainya telah tiba ke ACTIVE
+        Application::syncStartedApplications();
+
         $user = Auth::user();
 
         // Cari master universitas terkait
@@ -171,6 +177,20 @@ class DashboardController extends Controller
             ->orderBy('name')
             ->get();
 
+        // Pembimbing yang mendaftar sendiri dan menunggu persetujuan Admin Kampus/Sekolah
+        $pendingAdvisorsCount = User::whereIn('role', User::ADVISOR_ROLES)
+            ->where('status', AccountStatus::PENDING->value)
+            ->where(function ($q) use ($user, $university) {
+                if ($user->university_id) {
+                    $q->where('university_id', $user->university_id);
+                } elseif ($university) {
+                    $q->where('university', $university->name);
+                } else {
+                    $q->whereRaw('1 = 0');
+                }
+            })
+            ->count();
+
         $stats = [
             'total_students' => $totalStudents,
             'total_active' => $totalActive,
@@ -193,7 +213,8 @@ class DashboardController extends Controller
             'agencies',
             'availableDosens',
             'totalAgenciesCount',
-            'activeAgenciesCount'
+            'activeAgenciesCount',
+            'pendingAdvisorsCount'
         ));
     }
 
@@ -211,31 +232,35 @@ class DashboardController extends Controller
         $request->validate([
             'academic_advisor_id' => 'required|exists:users,id',
         ], [
-            'academic_advisor_id.required' => 'Silakan pilih Dosen Pembimbing Lapangan.',
+            'academic_advisor_id.required' => 'Silakan pilih Pembimbing.',
         ]);
 
         $application = Application::with('user.studentProfile')->findOrFail($applicationId);
         $student = $application->user;
 
         // Pastikan mahasiswa berasal dari universitas yang sama
-        $isSameUniv = ($universityId && $student->university_id === $universityId);
-        if (! $isSameUniv && $university) {
-            $isSameUniv = ($student->university === $university->name || optional($student->studentProfile)->universitas === $university->name);
-        }
+        $isSameUniv = app(UniversityResolver::class)->belongsTo($student, $university);
 
         if (! $isSameUniv) {
-            abort(403, 'Anda tidak memiliki hak akses untuk memplot dosen mahasiswa kampus lain.');
+            abort(403, 'Anda tidak memiliki hak akses untuk memplot pembimbing peserta magang kampus lain.');
+        }
+
+        // Pengajuan yang ditolak, mengundurkan diri, atau masih draf tidak boleh mendapat penempatan/pembimbing
+        $closedStatus = ApplicationStatus::tryFrom($application->statusValue());
+        if (in_array($closedStatus, [ApplicationStatus::REJECTED, ApplicationStatus::RESIGNED, ApplicationStatus::DRAFT], true)) {
+            return redirect()->back()->with('error', "Pembimbing tidak dapat ditugaskan karena pengajuan {$student->name} berstatus {$closedStatus->description()}.");
         }
 
         // Pastikan dosen yang dipilih berasal dari universitas yang sama
         $advisor = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($request->academic_advisor_id);
-        $isAdvisorSameUniv = ($universityId && $advisor->university_id === $universityId);
-        if (! $isAdvisorSameUniv && $university) {
-            $isAdvisorSameUniv = ($advisor->university === $university->name);
-        }
+        $isAdvisorSameUniv = app(UniversityResolver::class)->belongsTo($advisor, $university);
 
         if (! $isAdvisorSameUniv) {
-            return redirect()->back()->with('error', 'Dosen yang dipilih harus terdaftar di perguruan tinggi Anda.');
+            return redirect()->back()->with('error', 'Pembimbing yang dipilih harus terdaftar di kampus/sekolah Anda.');
+        }
+
+        if ($advisor->isPendingApproval()) {
+            return redirect()->back()->with('error', "Akun pembimbing {$advisor->name} masih menunggu persetujuan. Setujui dulu di menu Pembimbing, lalu tugaskan kembali.");
         }
 
         $placement = Placement::updateOrCreate(
@@ -248,7 +273,7 @@ class DashboardController extends Controller
             ->where('id', '!=', $placement->id)
             ->delete();
 
-        return redirect()->back()->with('success', "Dosen Pembimbing Lapangan ({$advisor->name}) berhasil ditugaskan untuk mahasiswa {$student->name}!");
+        return redirect()->back()->with('success', "Pembimbing ({$advisor->name}) berhasil ditugaskan untuk peserta magang {$student->name}!");
     }
 
     /**
@@ -260,7 +285,7 @@ class DashboardController extends Controller
         $university = $user->university_id
             ? University::find($user->university_id)
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
-        $univName = $university?->name ?? $user->university ?? 'Universitas';
+        $univName = $university?->name ?? $user->university ?? 'Kampus/Sekolah';
 
         // Query Semua Pengajuan Mahasiswa Asal Kampus Ini
         $applications = Application::with([
@@ -300,19 +325,19 @@ class DashboardController extends Controller
             // Header Kolom
             fputcsv($handle, [
                 'No',
-                'NIM',
-                'Nama Mahasiswa',
+                'NIM/NIS',
+                'Nama Peserta Magang',
                 'Tipe Pendaftaran',
                 'Kelompok Magang',
                 'Program Studi',
                 'Instansi Magang',
                 'Unit / Bidang Kerja',
-                'Dosen Pembimbing',
+                'Pembimbing',
                 'Mentor Dinas',
                 'Periode Magang',
                 'Status Magang',
                 'Nilai Mentor',
-                'Nilai Dosen',
+                'Nilai Pembimbing',
                 'Nilai Akhir',
             ]);
 
@@ -343,7 +368,7 @@ class DashboardController extends Controller
                     : 'Individu';
                 $namaKelompok = $app->group?->name ?? '-';
 
-                fputcsv($handle, [
+                fputcsv($handle, CsvSafe::row([
                     $no++,
                     $profile?->nim ?? '-',
                     $student?->name ?? '-',
@@ -359,7 +384,7 @@ class DashboardController extends Controller
                     $mentorScore,
                     $dosenScore,
                     $finalScore,
-                ]);
+                ]));
             }
 
             fclose($handle);
@@ -376,44 +401,9 @@ class DashboardController extends Controller
             ? University::find($user->university_id)
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
 
-        $isMatchUniv = function ($student) use ($user, $university) {
-            if (! $student) {
-                return false;
-            }
-            if ($user->university_id && $student->university_id && (int) $user->university_id === (int) $student->university_id) {
-                return true;
-            }
-            if ($university) {
-                $studentUniv = strtolower(trim($student->university ?? ''));
-                $studentProfileUniv = strtolower(trim(optional($student->studentProfile)->universitas ?? ''));
-                $targetUnivName = strtolower(trim($university->name ?? ''));
-                $targetUnivCode = strtolower(trim($university->code ?? ''));
-
-                if (
-                    ($studentUniv && ($studentUniv === $targetUnivName || $studentUniv === $targetUnivCode)) ||
-                    ($studentProfileUniv && ($studentProfileUniv === $targetUnivName || $studentProfileUniv === $targetUnivCode)) ||
-                    ($targetUnivName && (str_contains($studentUniv, $targetUnivName) || str_contains($targetUnivName, $studentUniv))) ||
-                    ($targetUnivCode && (str_contains($studentUniv, $targetUnivCode) || str_contains($targetUnivCode, $studentUniv)))
-                ) {
-                    if (! $student->university_id && $university->id) {
-                        $student->update(['university_id' => $university->id]);
-                    }
-
-                    return true;
-                }
-            }
-            if ($user->university) {
-                $userUniv = strtolower(trim($user->university));
-                $studentUniv = strtolower(trim($student->university ?? ''));
-                $studentProfileUniv = strtolower(trim(optional($student->studentProfile)->universitas ?? ''));
-
-                if ($studentUniv === $userUniv || $studentProfileUniv === $userUniv || str_contains($studentUniv, $userUniv) || str_contains($userUniv, $studentUniv)) {
-                    return true;
-                }
-            }
-
-            return false;
-        };
+        // Batas tenant ketat: university_id, atau nama kampus yang sama persis untuk data lama.
+        // Tidak memakai substring, dan tidak menulis university_id mahasiswa sebagai efek samping.
+        $isMatchUniv = fn ($student) => app(UniversityResolver::class)->belongsTo($student, $university);
 
         // 1. Coba cari Placement terlebih dahulu (karena route param adalah {placementId})
         $placement = Placement::with([
@@ -457,12 +447,12 @@ class DashboardController extends Controller
                 $placement = $application->placement;
             } elseif ($placement) {
                 // Ada placement tapi tidak sesuai kampus yang login
-                abort(403, 'Anda tidak memiliki hak akses untuk melihat data mahasiswa kampus lain.');
+                abort(403, 'Anda tidak memiliki hak akses untuk melihat data peserta magang kampus lain.');
             } elseif ($appCandidate) {
                 // Ada application tapi tidak sesuai kampus yang login
-                abort(403, 'Anda tidak memiliki hak akses untuk melihat data mahasiswa kampus lain.');
+                abort(403, 'Anda tidak memiliki hak akses untuk melihat data peserta magang kampus lain.');
             } else {
-                abort(404, 'Data mahasiswa magang tidak ditemukan.');
+                abort(404, 'Data peserta magang tidak ditemukan.');
             }
         }
 

@@ -90,6 +90,8 @@ class LogbookWeeklyBundler
                 'rejected_count' => $rejectedCount,
                 'status' => $status,
                 'logbook_ids' => $group->pluck('id')->all(),
+                // Hanya hari yang masih menunggu yang diputuskan pada formulir pemeriksaan
+                'pending_ids' => $group->where($statusColumn, 'pending')->pluck('id')->values()->all(),
                 'feedback' => $group->pluck($feedbackColumn)->filter()->first() ?? null,
                 'entries' => $entries,
                 'is_fallback_unit_head' => (! $hasFieldMentor),

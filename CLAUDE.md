@@ -1,5 +1,15 @@
 # CLAUDE.md
 
+## PROJECT AGENT INSTRUCTIONS & AUTO-ACTIVATION RULE
+
+You MUST read and strictly obey `.antigravity/agent_rules.md` and all files inside `.antigravity/rules/` (`architecture.md`, `database.md`, `media.md`, `quality.md`) on every single interaction before taking any action, without requiring any manual trigger phrase:
+- **Phase 0 (Routing):** Direct *Coder* standard for simple single-file edits; `.antigravity/agents/` 3-stage pipeline (`planner.md` -> `coder.md` -> `reviewer.md`) for multi-file, feature, bugfix, or database tasks.
+- **Phase 1 (Contextual Reconnaissance):** Inspect `.antigravity/rules/*`, `database/migrations/`, `app/Models/`, `app/Enums/`, trace `Route -> Middleware -> FormRequest -> Controller -> Service -> Model/Observer -> PostgreSQL -> Response/View`, and check blast radius across all roles before editing.
+- **Phase 2 (Zero-Negligence Execution):** No placeholders (`// TODO`, `// ... existing code ...`), full-stack sync on schema changes, prevent N+1 (`with()`/`loadMissing()`), enforce `DB::transaction()`, `FormRequest` validation, and `CheckRole`/Policies.
+- **Phase 3 (Self-Audit Loop & Response Format):** Verify imports/namespaces, strict PHP 8.2+ signatures, observers/routes/tests, and edge cases before replying with **Analysis & Blast Radius**, **Changes Executed**, and **Verification**.
+
+---
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 **SIP-MAGANG** — internship lifecycle management system for Pemerintah Kota Surabaya (agencies ↔ universities ↔ students). UI text, labels, comments and most docs are in Bahasa Indonesia; keep new user-facing strings in Indonesian.
@@ -32,7 +42,22 @@ php artisan optimize:clear && php artisan view:clear               # clear cache
 npm run test:hermes    # Puppeteer multi-role E2E scripts in scripts/hermes_*.mjs (needs running app at 127.0.0.1:8000)
 ```
 
-Demo accounts (all password `password`): `admin@surabaya.go.id` (Super Admin), `admin.kominfo@surabaya.go.id`, `mentor.kominfo@surabaya.go.id`, `admin@unesa.ac.id`, `dosen.unesa@unesa.ac.id`, `mahasiswa@unesa.ac.id`.
+Demo accounts in the current `database/database.sqlite` (all password `password`): `admin@surabaya.go.id` (Super Admin), `admin.dispusip@surabaya.go.id` (Admin Dinas), `supervisor@dispusip.surabaya.go.id`, `mentor.dispusip@surabaya.go.id`, `dosen.unesa@unesa.ac.id`, `admin@unesa.ac.id` (universitas), `mahasiswa.aktif@unesa.ac.id` / `mahasiswa.lulus@unesa.ac.id`. Full list in `PANDUAN_DEMO.md`. Note the local `.env` uses SQLite (`database/database.sqlite`), not PostgreSQL.
+
+### LAN demo & distribution zip
+
+```bash
+start_demo.bat          # double-click: scripts/demo_preflight.php (env, migrate, storage link, cache purge, port/IP/firewall check) then php -S 0.0.0.0:<port> + schedule:work
+izinkan_firewall.bat    # run as administrator once: removes inbound Block rules for php.exe, adds an Allow rule
+php scripts/demo_preflight.php --check                               # read-only readiness check
+powershell -ExecutionPolicy Bypass -File scripts\make_demo_zip.ps1   # build → test → copy (no .git/node_modules/logs/tokens, APP_DEBUG=false, portable php/) → zip in parent folder
+```
+
+- The demo serves with `php -S` (not `artisan serve`) bound to `0.0.0.0`, with `-d upload_max_filesize=64M` etc.; the system php.ini only allows 2 MB uploads.
+- For 15-20 concurrent users `scripts/demo_serve.bat` runs N `php -S` app servers (main port+1..N, `DEMO_WORKERS`, default = CPU cores 4-8, OPcache via `-d zend_extension=opcache`) plus `scripts/demo_gateway.php` on the main port, which redirects visitors round-robin; each server gets its own `VIEW_COMPILED_PATH` (Windows `rename` race, LRN-160). Measure with `php scripts/demo_loadtest.php --url=... --users=20`.
+- Pages opened via `http://<LAN-IP>` are not a secure context: service worker/web push and chat voice recording are unavailable there; `navigator.clipboard` is polyfilled in `resources/js/app.js`.
+- QR verification links must use `App\Support\PublicUrl::route()` (replaces a loopback host with `APP_PUBLIC_URL`, which `start_demo.bat` sets to the LAN address) so phones can open them.
+- Never leave `public/hot` behind (Vite dev server is bound to 127.0.0.1, so other devices get unstyled pages); the preflight deletes it. Never load Tailwind/JS from a CDN — the demo may have no internet; external web fonts are loaded non-blocking.
 
 ## Architecture
 
@@ -63,11 +88,16 @@ Demo accounts (all password `password`): `admin@surabaya.go.id` (Super Admin), `
 - Resolve a user's university with `App\Services\UniversityResolver` (`university_id` → exact name/acronym/code), never `LIKE '%name%'`.
 - Production needs a cron for `php artisan schedule:run` (every minute) and a permanent `php artisan queue:work`; heartbeats are shown on the Super Admin dashboard (`App\Services\SystemHealth`). Never use external QR services — QR codes are generated locally (simple-qrcode).
 - Large Blade pages are split into `@include` partials (`student/dashboard/*`, `admin/universities/partials/*`); partials share the parent's variables, so a variable defined inside one partial is NOT visible to the next.
-- `users.must_change_password` is maintained automatically by `User::booted()` whenever the password changes (true when it equals `User::DEFAULT_PASSWORD`); the layout shows a persistent warning.
+- `users.must_change_password` is maintained automatically by `User::booted()` whenever the password changes (true when it equals `User::DEFAULT_PASSWORD`); the layout shows a persistent warning. When `config('auth.force_password_change')` is on (default only in production, env `AUTH_FORCE_PASSWORD_CHANGE`), `EnsurePasswordChanged` redirects flagged users to `profile.edit` and the API login refuses a token.
+- Accounts created/reset by staff get a random temporary password via `$this->issueTemporaryPasswordFor($user)` (base `Controller`) — shown once through the `temporary_credentials` flash (`layouts/partials/temporary-credentials`). Never hash the literal `'password'` in app code; student-created DPL accounts are created inactive with an undisclosed password.
+- Derive stored upload extensions from content with `App\Support\SafeUpload::extension()`, never `getClientOriginalExtension()` (files under `public/` are served by extension).
+- `DatabaseSeeder` only runs in `local`/`testing`/`development`; production bootstraps the first Super Admin with `php artisan app:create-super-admin {email}`. There is no hardcoded login fallback — authentication is `Auth::attempt` only.
+- Tenant checks: university membership only via `UniversityResolver::belongsTo()` (never `str_contains`/`LIKE` on names); agency staff actions must compare `application.unit.agency_profile_id` with the user's `agency_profile_id` (supervisors via `ensureSupervisorAgencyScope()`); private projects via `InternshipProject::isModeratableBy()/isViewableBy()/scopeVisibleTo()`. The Double ACC rule (non-supervisor admin → `waiting_approval`) covers both `accepted` and `active` targets. Certificate themes are global: only Super Admin or the Dispusip main admin may change them.
+- User-supplied redirects go through `Controller::safeReturnTo()`; user-supplied CSV cells through `App\Support\CsvSafe::row()`. A password change revokes Sanctum tokens, other DB sessions and `remember_token` (`User::booted()`); Sanctum tokens expire after `SANCTUM_EXPIRATION` minutes (default 30 days).
 
 ## Project conventions (from AGENTS.md / .antigravity/)
 
-- Multi-agent setup: Antigravity (Gemini) is architect/QA, Claude Code is the multi-file implementer, Aider does small diffs. See `AGENTS.md`, `AGENTS_WORKFLOW.md`, `.antigravity/agent_rules.md`, and modular rules in `.antigravity/rules/{architecture,database,media,quality}.md`.
+- Multi-agent setup: Antigravity (Gemini) is architect/QA, Claude Code is the multi-file implementer, Aider does small diffs. Antigravity may be editing the same working tree at the same time — check recent mtimes / `git status` before touching files you did not change, and don't overwrite its in-progress work. See `AGENTS.md`, `AGENTS_WORKFLOW.md`, `.antigravity/agent_rules.md`, and modular rules in `.antigravity/rules/{architecture,database,media,quality}.md`.
 - **Read `.antigravity/memory/learnings.md` before non-trivial changes** — it records past bugs with root causes and prevention rules. After fixing a notable bug, append an entry using its `[LRN-XXX]` template (Problem, Root Cause, Fix Applied, Prevention Rule).
 - Verify real column names against `database/migrations/` before writing queries or model changes; no raw SQL without parameter binding; use `DB::transaction` for multi-table writes.
 - Thin controllers: when a method exceeds ~15 lines or a controller ~100 lines, move logic into `app/Services/`.

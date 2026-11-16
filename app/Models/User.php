@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 
@@ -20,16 +22,13 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     // HasApiTokens wajib untuk API login Sanctum (createToken / tokens) di Api\AuthController
-    use HasApiTokens, HasFactory, Notifiable, HasPushSubscriptions;
+    use HasApiTokens, HasFactory, HasPushSubscriptions, Notifiable;
 
     /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
      */
-
-    
-
     protected function casts(): array
     {
         return [
@@ -42,15 +41,30 @@ class User extends Authenticatable
         ];
     }
 
-    /** Password bawaan untuk akun yang dibuat/di-reset oleh admin. */
+    /** Password bawaan lama (akun demo/seed). Akun baru dari staf memakai issueTemporaryPassword(). */
     public const DEFAULT_PASSWORD = 'password';
+
+    /** Penanda sementara (bukan kolom DB) untuk issueTemporaryPassword(). */
+    public bool $issuingTemporaryPassword = false;
 
     protected static function booted(): void
     {
         // Setiap kali password berubah, tandai apakah masih password bawaan. Berlaku untuk semua
         // jalur (buat akun, reset oleh admin, seeder) tanpa perlu mengubah tiap controller;
         // flag otomatis hilang saat pemilik akun mengganti passwordnya sendiri.
+        // Password sementara dari issueTemporaryPassword selalu wajib diganti (penanda tidak dihitung ulang).
         static::saving(function (User $user) {
+            // Password berganti → cookie "Ingat saya" lama tidak berlaku lagi
+            if ($user->exists && $user->isDirty('password') && ! $user->isDirty('remember_token')) {
+                $user->remember_token = Str::random(60);
+            }
+
+            if ($user->issuingTemporaryPassword) {
+                $user->must_change_password = true;
+                $user->issuingTemporaryPassword = false;
+
+                return;
+            }
             if ($user->isDirty('password') && ! empty($user->getAttributes()['password'] ?? null)) {
                 try {
                     $user->must_change_password = Hash::check(self::DEFAULT_PASSWORD, $user->getAttributes()['password']);
@@ -59,6 +73,48 @@ class User extends Authenticatable
                 }
             }
         });
+
+        // Password berganti (reset sendiri, ganti di profil, atau reset oleh staf) → semua token API
+        // lama dicabut dan sesi web lain milik akun ini diputus. Sesi yang sedang dipakai pemilik
+        // akun untuk mengganti passwordnya sendiri tetap dipertahankan.
+        static::updated(function (User $user) {
+            if (! $user->wasChanged('password')) {
+                return;
+            }
+
+            $user->tokens()->delete();
+
+            if (config('session.driver') === 'database') {
+                $keepSessionId = (auth()->id() === $user->id && request()->hasSession())
+                    ? request()->session()->getId()
+                    : null;
+
+                DB::connection(config('session.connection'))
+                    ->table(config('session.table', 'sessions'))
+                    ->where('user_id', $user->id)
+                    ->when($keepSessionId, fn ($q) => $q->where('id', '!=', $keepSessionId))
+                    ->delete();
+            }
+        });
+    }
+
+    /** Password acak untuk akun yang dibuat/di-reset staf; hanya ditampilkan sekali kepada staf tersebut. */
+    public static function generateTemporaryPassword(): string
+    {
+        return 'Mg-'.Str::password(12, letters: true, numbers: true, symbols: false);
+    }
+
+    /**
+     * Ganti password akun dengan password sementara acak dan wajibkan pemiliknya menggantinya
+     * saat login berikutnya. Mengembalikan password polos untuk ditampilkan sekali.
+     */
+    public function issueTemporaryPassword(): string
+    {
+        $plain = self::generateTemporaryPassword();
+        $this->issuingTemporaryPassword = true;
+        $this->forceFill(['password' => Hash::make($plain)])->save();
+
+        return $plain;
     }
 
     /**
@@ -76,6 +132,20 @@ class User extends Authenticatable
     public function isSupervisor(): bool
     {
         return $this->role === 'supervisor';
+    }
+
+    /**
+     * Peran lapangan/eksekutif yang antarmukanya menampilkan status berbahasa Indonesia terstandar
+     * demi kemudahan baca pengguna senior, tanpa mengubah kode status bahasa Inggris di sistem.
+     */
+    public static function isLocalizedStatusUiRole(?string $role): bool
+    {
+        return in_array($role, ['mentor', 'pembimbing', 'supervisor'], true);
+    }
+
+    public function usesLocalizedStatusUi(): bool
+    {
+        return self::isLocalizedStatusUiRole($this->role);
     }
 
     /**
@@ -106,18 +176,21 @@ class User extends Authenticatable
         if ($this->role === 'admin') {
             if ($this->unit_id) {
                 $unit = $this->relationLoaded('unit') ? $this->unit : Unit::find($this->unit_id);
-                return $unit ? 'Admin ' . $unit->name : 'Admin Bidang';
+
+                return $unit ? 'Admin '.$unit->name : 'Admin Bidang';
             }
+
             return 'Admin Dispusip';
         }
 
         return match ($this->role) {
             'super_admin' => 'Super Admin',
             'supervisor' => 'Supervisor',
-            'mentor' => 'Mentor Lapangan',
-            'pembimbing', 'lecturer', 'dosen', 'academic_advisor' => 'Pembimbing',
-            'university', 'universitas' => 'Admin Universitas',
-            'student', 'mahasiswa' => 'Mahasiswa Magang',
+            // Role 'pembimbing' adalah alias Mentor Lapangan (lihat CheckRole), bukan pembimbing kampus/sekolah.
+            'mentor', 'pembimbing' => 'Mentor Lapangan',
+            'lecturer', 'dosen', 'academic_advisor' => 'Pembimbing',
+            'university', 'universitas' => 'Admin Kampus/Sekolah',
+            'student', 'mahasiswa' => 'Peserta Magang',
             default => ucwords(str_replace('_', ' ', (string) $this->role)),
         };
     }
@@ -197,5 +270,32 @@ class User extends Authenticatable
     public function isInactive(): bool
     {
         return AccountStatus::resolve($this->status) === AccountStatus::INACTIVE && ! $this->isSuperAdmin();
+    }
+
+    /** Role Pembimbing kampus/sekolah (dosen atau guru), termasuk alias lama. */
+    public const ADVISOR_ROLES = ['dosen', 'academic_advisor'];
+
+    public function isAdvisor(): bool
+    {
+        return in_array($this->role, self::ADVISOR_ROLES, true);
+    }
+
+    /**
+     * Pembimbing yang mendaftar sendiri dan belum disetujui Admin Kampus/Sekolah atau Super Admin.
+     * Boleh login, tetapi belum boleh dipilih mahasiswa atau ditugaskan membimbing.
+     */
+    public function isPendingApproval(): bool
+    {
+        return AccountStatus::resolve($this->status) === AccountStatus::PENDING;
+    }
+
+    /**
+     * Pembimbing yang boleh dipilih / ditugaskan: semua akun pembimbing kecuali yang masih
+     * Menunggu Persetujuan (status kosong pada data lama dianggap Aktif).
+     */
+    public function scopeAssignableAdvisors($query)
+    {
+        return $query->whereIn('role', self::ADVISOR_ROLES)
+            ->where(fn ($q) => $q->whereNull('status')->orWhere('status', '!=', AccountStatus::PENDING->value));
     }
 }

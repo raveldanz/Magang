@@ -59,9 +59,9 @@
             <form action="{{ route('student.projects.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6" 
                   x-data="{ 
                       visibility: '{{ old('is_public', '1') == '1' ? 'public' : 'private' }}',
-                      category: '{{ old('category', '') }}',
-                      customCategory: '{{ old('custom_category', '') }}',
-                      projectType: '{{ old('project_type', 'individual') }}',
+                      category: @js(old('category', '')),
+                      customCategory: @js(old('custom_category', '')),
+                      projectType: @js(old('project_type', 'individual')),
                       roleRecommendations: @js($roleRecommendations),
                       categoryKeywords: @js($categoryKeywords),
                       categoryLabels: {
@@ -219,7 +219,7 @@
                             Deskripsi Lengkap & Latar Belakang Proyek <span class="text-rose-500">*</span>
                         </label>
                         <textarea name="description" rows="4" required 
-                                  placeholder="Jelaskan ruang lingkup inovasi, masalah yang diatasi, metodologi/teknologi/media yang digunakan, serta kontribusi mahasiswa selama masa magang..." 
+                                  placeholder="Jelaskan ruang lingkup inovasi, masalah yang diatasi, metodologi/teknologi/media yang digunakan, serta kontribusi peserta magang selama masa magang..." 
                                   class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 leading-relaxed">{{ old('description') }}</textarea>
                     </div>
                 </div>
@@ -314,9 +314,9 @@
                                             
                                             <div class="flex-1">
                                                 <label for="peer_check_{{ $peer->id }}" class="cursor-pointer block">
-                                                    <div class="font-bold text-xs sm:text-sm text-slate-900">{{ $peerUser?->name ?? 'Mahasiswa' }}</div>
+                                                    <div class="font-bold text-xs sm:text-sm text-slate-900">{{ $peerUser?->name ?? 'Peserta Magang' }}</div>
                                                     <div class="text-[11px] text-slate-500 mt-0.5">
-                                                        NIM: {{ $peerProfile?->nim ?? '-' }} &bull; {{ $peerProfile?->universitas ?? $peerUser?->university ?? '-' }} ({{ $peerProfile?->jurusan ?? '-' }})
+                                                        NIM/NIS: {{ $peerProfile?->nim ?? '-' }} &bull; {{ $peerProfile?->universitas ?? $peerUser?->university ?? '-' }} ({{ $peerProfile?->jurusan ?? '-' }})
                                                     </div>
                                                 </label>
 
@@ -366,7 +366,7 @@
                             <h3 class="font-bold text-base text-slate-900">Pusat Akses Proyek</h3>
                         </div>
                         <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                            Sediakan akses langsung ke karya inovasi Anda agar mentor dinas, dosen pembimbing, dan atasan dapat menguji atau meninjau karya Anda. Mahasiswa dapat mengisi salah satu atau seluruh opsi di bawah ini sesuai karakteristik proyek:
+                            Sediakan akses langsung ke karya inovasi Anda agar mentor dinas, pembimbing, dan atasan dapat menguji atau meninjau karya Anda. Peserta Magang dapat mengisi salah satu atau seluruh opsi di bawah ini sesuai karakteristik proyek:
                         </p>
                     </div>
 
@@ -418,7 +418,7 @@
                         </p>
 
                         <div class="flex items-center gap-2 w-full pt-1">
-                            <input type="file" 
+                            <input type="file" data-max-kb="51200" 
                                    id="source_code" 
                                    name="source_code" 
                                    accept=".zip,.rar,.7z,.tar,.gz" 
@@ -426,7 +426,7 @@
                                    @change="if($event.target.files.length) { 
                                        const f = $event.target.files[0];
                                        if(f.size > 50 * 1024 * 1024) {
-                                           alert('Ukuran file arsip maksimal 50MB.');
+                                           window.notify('Ukuran file arsip maksimal 50MB.');
                                            $event.target.value = '';
                                            zipName = '';
                                            return;
@@ -437,7 +437,7 @@
                             <button type="button" 
                                     @click="document.getElementById('source_code').click()"
                                     class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
-                                Choose File
+                                Pilih Berkas
                             </button>
 
                             <div class="min-w-0 flex-1 truncate text-xs">
@@ -445,7 +445,7 @@
                                     <span class="text-blue-700 font-bold truncate block" x-text="zipName"></span>
                                 </template>
                                 <template x-if="!zipName">
-                                    <span class="text-slate-400">No file chosen</span>
+                                    <span class="text-slate-400">Belum ada berkas dipilih</span>
                                 </template>
                             </div>
                         </div>
@@ -470,7 +470,7 @@
                         </p>
 
                         <div class="flex items-center gap-2 w-full pt-1">
-                            <input type="file" 
+                            <input type="file" data-max-kb="4096" 
                                    name="photo" 
                                    id="coverPhotoInput" 
                                    required 
@@ -482,7 +482,7 @@
                             <button type="button" 
                                     @click="document.getElementById('coverPhotoInput').click()"
                                     class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
-                                Choose File
+                                Pilih Berkas
                             </button>
 
                             <div class="min-w-0 flex-1 truncate text-xs">
@@ -490,7 +490,7 @@
                                     <span class="text-blue-700 font-bold truncate block" x-text="coverName"></span>
                                 </template>
                                 <template x-if="!coverName">
-                                    <span class="text-slate-400">No file chosen</span>
+                                    <span class="text-slate-400">Belum ada berkas dipilih</span>
                                 </template>
                             </div>
                         </div>
@@ -515,7 +515,7 @@
                         </p>
 
                         <div class="flex items-center gap-2 w-full pt-1">
-                            <input type="file" 
+                            <input type="file" data-max-kb="4096" 
                                    id="screenshotsInput" 
                                    name="screenshots[]" 
                                    multiple 
@@ -526,7 +526,7 @@
                             <button type="button" 
                                     @click="document.getElementById('screenshotsInput').click()"
                                     class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
-                                Choose File
+                                Pilih Berkas
                             </button>
 
                             <div class="min-w-0 flex-1 truncate text-xs">
@@ -534,7 +534,7 @@
                                     <span class="text-blue-700 font-bold truncate block" x-text="ssCountText"></span>
                                 </template>
                                 <template x-if="!ssCountText">
-                                    <span class="text-slate-400">No file chosen</span>
+                                    <span class="text-slate-400">Belum ada berkas dipilih</span>
                                 </template>
                             </div>
                         </div>
@@ -572,7 +572,7 @@
                         </p>
 
                         <div class="flex items-center gap-2 w-full pt-1">
-                            <input type="file" 
+                            <input type="file" data-max-kb="4096" 
                                    id="communityPhotosInput" 
                                    name="community_photos[]" 
                                    multiple 
@@ -583,7 +583,7 @@
                             <button type="button" 
                                     @click="document.getElementById('communityPhotosInput').click()"
                                     class="px-3.5 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
-                                Choose File
+                                Pilih Berkas
                             </button>
 
                             <div class="min-w-0 flex-1 truncate text-xs">
@@ -591,7 +591,7 @@
                                     <span class="text-emerald-800 font-bold truncate block" x-text="cpCountText"></span>
                                 </template>
                                 <template x-if="!cpCountText">
-                                    <span class="text-slate-400">No file chosen</span>
+                                    <span class="text-slate-400">Belum ada berkas dipilih</span>
                                 </template>
                             </div>
                         </div>
@@ -627,7 +627,7 @@
                         </p>
 
                         <div class="flex items-center gap-2 w-full pt-1">
-                            <input type="file" 
+                            <input type="file" data-max-kb="10240" 
                                    id="documentsInput" 
                                    name="documents[]" 
                                    multiple 
@@ -638,7 +638,7 @@
                             <button type="button" 
                                     @click="document.getElementById('documentsInput').click()"
                                     class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
-                                Choose File
+                                Pilih Berkas
                             </button>
 
                             <div class="min-w-0 flex-1 truncate text-xs">
@@ -646,7 +646,7 @@
                                     <span class="text-blue-700 font-bold truncate block" x-text="docCountText"></span>
                                 </template>
                                 <template x-if="!docCountText">
-                                    <span class="text-slate-400">No file chosen</span>
+                                    <span class="text-slate-400">Belum ada berkas dipilih</span>
                                 </template>
                             </div>
                         </div>
@@ -675,12 +675,12 @@
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 if (!['image/jpeg', 'image/png', 'image/jpg', 'image/webp'].includes(file.type)) {
-                    alert('Format foto sampul harus berupa JPG, PNG, atau WebP.');
+                    window.notify('Format foto sampul harus berupa JPG, PNG, atau WebP.');
                     input.value = '';
                     return;
                 }
                 if (file.size > 4 * 1024 * 1024) {
-                    alert('Ukuran foto maksimal 4 MB.');
+                    window.notify('Ukuran foto maksimal 4 MB.');
                     input.value = '';
                     return;
                 }

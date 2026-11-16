@@ -27,13 +27,13 @@
                 @endif
 
                 {{-- FORM CREATE (Mengirim POST ke route store) --}}
-                <form action="{{ route('student.logbook.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                <form action="{{ route('student.logbook.store') }}" data-autosave="logbook-baru-{{ auth()->id() }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
 
                     {{-- Tanggal --}}
                     <div>
                         <label for="date" class="block font-semibold text-sm text-gray-700 mb-1">Tanggal Kegiatan</label>
-                        <input type="date" id="date" name="date" value="{{ date('Y-m-d') }}" class="w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500 shadow-sm text-sm" required>
+                        <input type="date" id="date" name="date" value="{{ old('date', date('Y-m-d')) }}" max="{{ date('Y-m-d') }}" class="w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500 shadow-sm text-sm" required>
                     </div>
 
                     {{-- Deskripsi Kegiatan --}}
@@ -50,7 +50,7 @@
                         </label>
 
                         <div class="flex items-center gap-2 w-full">
-                            <input type="file" 
+                            <input type="file" data-max-kb="2048" 
                                    id="attachment" 
                                    name="attachment" 
                                    accept=".pdf,.jpg,.jpeg,.png" 
@@ -58,7 +58,7 @@
                                    @change="if($event.target.files.length) { 
                                        const file = $event.target.files[0];
                                        if(file.size > 2 * 1024 * 1024) {
-                                           alert('Ukuran berkas lampiran maksimal 2MB.');
+                                           window.notify('Ukuran berkas lampiran melebihi batas maksimal (Maksimal 2 MB). Silakan pilih berkas yang lebih kecil.');
                                            $event.target.value = '';
                                            selectedName = '';
                                            previewUrl = null;
@@ -68,11 +68,11 @@
                                        previewUrl = URL.createObjectURL(file); 
                                    }" />
 
-                            <!-- Tombol Choose File Mandiri -->
+                            <!-- Tombol Pilih Berkas Mandiri -->
                             <button type="button" 
                                     @click="document.getElementById('attachment').click()"
                                     class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
-                                Choose File
+                                Pilih Berkas
                             </button>
 
                             <!-- Nama File Terpilih yang Bisa Diklik Langsung untuk View -->
@@ -85,7 +85,7 @@
                                        x-text="selectedName"></a>
                                 </template>
                                 <template x-if="!selectedName">
-                                    <span class="text-slate-400">No file chosen</span>
+                                    <span class="text-slate-400">Belum ada berkas dipilih</span>
                                 </template>
                             </div>
                         </div>

@@ -34,7 +34,7 @@
                     </div>
 
                     <!-- Kategori & Target Role (Alpine.js Dynamic Form) -->
-                    <div x-data="{ targetRole: '{{ old('target_role', 'super_admin') }}' }" class="space-y-5">
+                    <div x-data="{ targetRole: @js(old('target_role', 'super_admin')) }" class="space-y-5">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
@@ -43,7 +43,7 @@
                                 <select name="category" required class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                                     <option value="error_bug" {{ old('category') == 'error_bug' ? 'selected' : '' }}>Kendala / Error / Bug Sistem</option>
                                     <option value="saran_fitur" {{ old('category') == 'saran_fitur' ? 'selected' : '' }}>Usulan / Saran Perbaikan Fitur</option>
-                                    <option value="pertanyaan" {{ old('category') == 'pertanyaan' ? 'selected' : '' }}>Pertanyaan Seputar Alur MBKM</option>
+                                    <option value="pertanyaan" {{ old('category') == 'pertanyaan' ? 'selected' : '' }}>Pertanyaan Seputar Alur Magang</option>
                                     <option value="koordinasi" {{ old('category') == 'koordinasi' ? 'selected' : '' }}>Koordinasi Kampus / Instansi</option>
                                     <option value="lainnya" {{ old('category') == 'lainnya' ? 'selected' : '' }}>Lain-lain</option>
                                 </select>
@@ -56,7 +56,7 @@
                                 <select name="target_role" x-model="targetRole" class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                                     <option value="super_admin">Super Admin Dispusip (Pengelola IT Sistem)</option>
                                     <option value="admin_dinas">Admin Instansi Kedinasan</option>
-                                    <option value="universitas">Pihak Perguruan Tinggi (Universitas)</option>
+                                    <option value="universitas">Pihak Kampus/Sekolah</option>
                                 </select>
                             </div>
                         </div>
@@ -97,11 +97,11 @@
                             <!-- Case 3: Universitas -->
                             <div x-show="targetRole === 'universitas'" x-cloak>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                                    Pilih Perguruan Tinggi / Kampus Terkait <span class="text-rose-500">*</span>
+                                    Pilih Kampus/Sekolah Terkait <span class="text-rose-500">*</span>
                                 </label>
                                 <x-searchable-select
                                     name="target_university_id"
-                                    placeholder="-- Cari atau Pilih Perguruan Tinggi --"
+                                    placeholder="-- Cari atau Pilih Kampus/Sekolah --"
                                     :items="$universities->map(fn($u) => ['id' => $u->id, 'name' => $u->name, 'acronym' => $u->acronym ?? $u->code, 'meta' => $u->code])"
                                     :selected="old('target_university_id')"
                                 />
@@ -147,7 +147,7 @@
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                             Lampiran Bukti / Screenshot (Opsional)
                         </label>
-                        <input type="file" name="attachment" id="feedbackAttachment" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.zip" 
+                        <input type="file" data-max-kb="5120" name="attachment" id="feedbackAttachment" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.zip" 
                                onchange="handleFeedbackAttachmentPreview(this)"
                                class="w-full text-xs sm:text-sm border border-slate-200 rounded-xl file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 shadow-2xs cursor-pointer">
                         <p class="text-[11px] text-slate-400 mt-1">Format yang didukung: JPG, PNG, PDF, DOCX, ZIP (Maksimal 5MB)</p>
@@ -173,7 +173,7 @@
                             <span class="text-slate-600">Pengirim: <strong>{{ $user->name }}</strong> ({{ $user->email }})</span>
                         </div>
                         <span class="px-2.5 py-0.5 bg-blue-100 text-blue-800 rounded-full font-bold text-[10px] uppercase">
-                            Role: {{ $user->role }}
+                            Peran: {{ $user->roleLabel() }}
                         </span>
                     </div>
 

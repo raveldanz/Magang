@@ -67,7 +67,7 @@
                     </div>
                     <div>
                         <span class="text-slate-400 block text-[10px] uppercase font-bold mb-0.5">Peran / Role</span>
-                        <span class="font-bold text-blue-600 uppercase">{{ $feedback->sender_role }}</span>
+                        <span class="font-bold text-blue-600">{{ $feedback->senderRoleLabel() }}</span>
                     </div>
                 </div>
 

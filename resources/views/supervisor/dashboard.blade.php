@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
         <x-page-header 
-            title="Monitoring Bidang & Kepegawaian Magang" 
-            description="Pantau kuota penempatan, sebaran mahasiswa magang aktif di 4 Bidang Resmi Dispusip, serta progres persetujuan." 
+            title="Pemantauan Bidang & Kepegawaian Magang" 
+            description="Pantau kuota penempatan, sebaran peserta magang aktif di 4 Bidang Resmi Dispusip, serta progres persetujuan." 
         />
     </x-slot>
 
@@ -44,7 +44,7 @@
                 <!-- Card 3: Mahasiswa Aktif -->
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs flex flex-col justify-between">
                     <div>
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Mahasiswa Aktif</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Peserta Aktif</span>
                         <div class="text-3xl sm:text-4xl font-black text-slate-900 mt-2">{{ $totalActiveInterns }}</div>
                         <p class="text-xs text-slate-500 mt-1">Sedang bertugas di unit kerja</p>
                     </div>
@@ -58,7 +58,7 @@
                     <div>
                         <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Alumni Selesai Magang</span>
                         <div class="text-3xl sm:text-4xl font-black text-slate-900 mt-2">{{ $totalCompletedInterns }}</div>
-                        <p class="text-xs text-slate-500 mt-1">Total mahasiswa telah tuntas magang</p>
+                        <p class="text-xs text-slate-500 mt-1">Total peserta magang telah tuntas magang</p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100">
                         <span class="text-xs text-slate-500 font-medium">Telah menyelesaikan program magang</span>
@@ -81,16 +81,16 @@
                             <tr class="border-b border-slate-200 bg-slate-100/70 text-slate-700 text-xs font-bold uppercase tracking-wider">
                                 <th class="py-3.5 px-6">Bidang</th>
                                 <th class="py-3.5 px-4 text-center">Kuota Total</th>
-                                <th class="py-3.5 px-4 text-center">Mhs Aktif</th>
+                                <th class="py-3.5 px-4 text-center">Peserta Aktif</th>
                                 <th class="py-3.5 px-4 text-center">Sisa Kuota</th>
                                 <th class="py-3.5 px-4 text-center">Menunggu ACC</th>
-                                <th class="py-3.5 px-4 text-center">Mhs Lulus</th>
+                                <th class="py-3.5 px-4 text-center">Peserta Lulus</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200 text-sm">
                             @forelse($units as $unit)
                                 @php
-                                    $unitActiveCount = $unit->applications->whereIn('status', ['accepted', 'active'])->count();
+                                    $unitActiveCount = $unit->applications->filter(fn ($a) => in_array($a->statusValue(), ['accepted', 'active'], true))->count();
                                     $unitWaitingCount = $unit->applications->where('status', \App\Enums\ApplicationStatus::WAITING_APPROVAL->value)->count();
                                     $unitCompletedCount = $unit->applications->where('status', \App\Enums\ApplicationStatus::COMPLETED->value)->count();
                                     $remainingQuota = max(0, $unit->quota - $unitActiveCount);
@@ -106,13 +106,13 @@
                                         {{ $unit->quota }}
                                     </td>
 
-                                    {{-- Mhs Aktif --}}
+                                    {{-- Peserta Aktif --}}
                                     <td class="py-4 px-4 text-center font-bold text-slate-900">
                                         {{ $unitActiveCount }}
                                     </td>
 
                                     {{-- Sisa Kuota --}}
-                                    <td class="py-4 px-4 text-center font-bold {{ $remainingQuota > 0 ? 'text-blue-600' : 'text-slate-400' }}">
+                                    <td class="py-4 px-4 text-center font-bold {{ $remainingQuota > 0 ? 'text-blue-600' : 'text-slate-500' }}">
                                         {{ $remainingQuota }}
                                     </td>
 
@@ -124,7 +124,7 @@
                                                 <span>{{ $unitWaitingCount }}</span>
                                             </a>
                                         @else
-                                            <span class="text-xs font-semibold text-slate-400">0</span>
+                                            <span class="text-xs font-semibold text-slate-500">0</span>
                                         @endif
                                     </td>
 
@@ -135,7 +135,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="py-8 text-center text-slate-400 font-medium">
+                                    <td colspan="6" class="py-8 text-center text-slate-600 font-medium">
                                         Belum ada data bidang penempatan.
                                     </td>
                                 </tr>
@@ -154,7 +154,7 @@
                 <div class="md:hidden p-4 space-y-3 bg-slate-50/50">
                     @foreach($units as $unit)
                         @php
-                            $unitActiveCount = $unit->applications->whereIn('status', ['accepted', 'active'])->count();
+                            $unitActiveCount = $unit->applications->filter(fn ($a) => in_array($a->statusValue(), ['accepted', 'active'], true))->count();
                             $unitWaitingCount = $unit->applications->where('status', \App\Enums\ApplicationStatus::WAITING_APPROVAL->value)->count();
                             $unitCompletedCount = $unit->applications->where('status', \App\Enums\ApplicationStatus::COMPLETED->value)->count();
                             $remainingQuota = max(0, $unit->quota - $unitActiveCount);
@@ -179,20 +179,20 @@
                             {{-- 4 Kotak Metrik Horizontal --}}
                             <div class="grid grid-cols-4 gap-2 pt-1 border-t border-slate-100" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem;">
                                 <div class="bg-slate-50/80 rounded-xl p-2 text-center border border-slate-200/60">
-                                    <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Kuota</div>
+                                    <div class="text-xs text-slate-600 uppercase font-bold tracking-wider">Kuota</div>
                                     <div class="text-sm font-extrabold text-slate-800 mt-0.5">{{ $unit->quota }}</div>
                                 </div>
                                 <div class="bg-emerald-50/50 rounded-xl p-2 text-center border border-emerald-100">
-                                    <div class="text-[10px] text-emerald-600 uppercase font-bold tracking-wider">Mhs Aktif</div>
-                                    <div class="text-sm font-extrabold text-emerald-700 mt-0.5">{{ $unitActiveCount }}</div>
+                                    <div class="text-xs text-emerald-700 uppercase font-bold tracking-wider">Peserta Aktif</div>
+                                    <div class="text-sm font-extrabold text-emerald-800 mt-0.5">{{ $unitActiveCount }}</div>
                                 </div>
-                                <div class="{{ $unitWaitingCount > 0 ? 'bg-purple-50/60 border-purple-200' : 'bg-slate-50/60 border-slate-100' }} rounded-xl p-2 text-center border">
-                                    <div class="text-[10px] {{ $unitWaitingCount > 0 ? 'text-purple-700' : 'text-slate-400' }} uppercase font-bold tracking-wider">ACC</div>
-                                    <div class="text-sm font-extrabold {{ $unitWaitingCount > 0 ? 'text-purple-700' : 'text-slate-400' }} mt-0.5">{{ $unitWaitingCount }}</div>
+                                <div class="{{ $unitWaitingCount > 0 ? 'bg-purple-50/60 border-purple-200' : 'bg-slate-50/60 border-slate-200' }} rounded-xl p-2 text-center border">
+                                    <div class="text-xs {{ $unitWaitingCount > 0 ? 'text-purple-700' : 'text-slate-600' }} uppercase font-bold tracking-wider">Menunggu</div>
+                                    <div class="text-sm font-extrabold {{ $unitWaitingCount > 0 ? 'text-purple-700' : 'text-slate-600' }} mt-0.5">{{ $unitWaitingCount }}</div>
                                 </div>
                                 <div class="bg-blue-50/50 rounded-xl p-2 text-center border border-blue-100">
-                                    <div class="text-[10px] text-blue-600 uppercase font-bold tracking-wider">Mhs Lulus</div>
-                                    <div class="text-sm font-extrabold text-blue-700 mt-0.5">{{ $unitCompletedCount }}</div>
+                                    <div class="text-xs text-blue-700 uppercase font-bold tracking-wider">Peserta Lulus</div>
+                                    <div class="text-sm font-extrabold text-blue-800 mt-0.5">{{ $unitCompletedCount }}</div>
                                 </div>
                             </div>
                         </div>

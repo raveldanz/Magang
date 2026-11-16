@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\ApplicationDocument;
+use App\Models\Certificate;
 use App\Models\Evaluation;
 use App\Models\FinalReport;
 use App\Models\Logbook;
@@ -201,6 +202,7 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
 
     public function test_logbook_attachment_limit_is_2mb(): void
     {
+        Storage::fake('local');
         Storage::fake('public');
         $this->placement('active', ['mentor_id' => $this->assignedMentor->id]);
 
@@ -249,7 +251,7 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
         // Status COMPLETED saja tidak cukup
         $this->actingAs($this->student)->get(route('student.certificate.show', $appId))
             ->assertForbidden()
-            ->assertSee('Sertifikat belum dapat diunduh karena nilai evaluasi dinas atau laporan akhir belum disetujui')
+            ->assertSee('Sertifikat resmi baru dapat dibuka setelah seluruh syarat di bawah ini terpenuhi')
             ->assertSee('Mentor Lapangan')
             ->assertSee('Laporan akhir magang belum disetujui');
         $this->actingAs($this->adminA)->get(route('admin.certificates.generate', $placement->id))->assertForbidden();
@@ -268,8 +270,20 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
 
         Logbook::create(['placement_id' => $placement->id, 'date' => now()->subDays(3)->toDateString(), 'activity' => 'Menyusun dokumentasi sistem', 'status' => 'approved']);
 
-        $this->actingAs($this->student)->get(route('student.certificate.download', $placement->id))->assertOk();
+        // Syarat lengkap, tetapi sertifikat belum diterbitkan Admin: mahasiswa masih terkunci
+        $this->actingAs($this->student)->get(route('student.certificate.download', $placement->id))
+            ->assertForbidden()
+            ->assertSee('belum diterbitkan oleh Admin Dinas');
+
+        // Admin menerbitkan: menunggu pengesahan Atasan, mahasiswa tetap terkunci
         $this->actingAs($this->adminA)->get(route('admin.certificates.generate', $placement->id))->assertOk();
+        $this->actingAs($this->student)->get(route('student.certificate.download', $placement->id))
+            ->assertForbidden()
+            ->assertSee('proses pengesahan');
+
+        // Setelah disahkan Atasan barulah mahasiswa bisa membuka sertifikat
+        Certificate::where('placement_id', $placement->id)->update(['approval_status' => 'approved']);
+        $this->actingAs($this->student)->get(route('student.certificate.download', $placement->id))->assertOk();
         $this->actingAs($superAdmin)->get(route('admin.certificates.index'))->assertOk();
     }
 
@@ -286,5 +300,23 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
         $this->actingAs($this->student)->get(route('student.certificate.show', $application->id))
             ->assertForbidden()
             ->assertSee('Status magang belum dinyatakan lulus');
+    }
+
+    public function test_logbook_kembar_dari_tombol_kembali_tidak_disimpan_dua_kali(): void
+    {
+        $placement = $this->placement('active', ['mentor_id' => $this->assignedMentor->id]);
+        $isian = ['date' => now()->toDateString(), 'activity' => 'Menata koleksi referensi dan memperbarui katalog.'];
+
+        $this->actingAs($this->student)->post(route('student.logbook.store'), $isian)
+            ->assertRedirect(route('student.logbook.index'))->assertSessionHas('success');
+        // Kirim ulang isi yang sama (tombol Kembali lalu Simpan lagi).
+        $this->actingAs($this->student)->post(route('student.logbook.store'), $isian)
+            ->assertRedirect(route('student.logbook.index'))->assertSessionHas('warning');
+        $this->assertSame(1, Logbook::where('placement_id', $placement->id)->count());
+
+        // Kegiatan lain di tanggal yang sama tetap boleh.
+        $this->actingAs($this->student)->post(route('student.logbook.store'), ['activity' => 'Rapat koordinasi bidang layanan.'] + $isian)
+            ->assertSessionHas('success');
+        $this->assertSame(2, Logbook::where('placement_id', $placement->id)->count());
     }
 }

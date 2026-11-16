@@ -16,10 +16,10 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-                    <span>Rekapitulasi Logbook Mahasiswa {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? '• ' . (auth()->user()->unit->name ?? 'Bidang') : '' }}</span>
+                    <span>Rekapitulasi Logbook Peserta Magang {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? '• ' . (auth()->user()->unit->name ?? 'Bidang') : '' }}</span>
                 </h2>
                 <p class="text-xs text-gray-500 mt-1">
-                    Pantau progres pengisian logbook harian mahasiswa magang {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? 'di ' . (auth()->user()->unit->name ?? 'bidang kerja') : 'per unit kerja' }} secara agregat
+                    Pantau progres pengisian logbook harian peserta magang {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? 'di ' . (auth()->user()->unit->name ?? 'bidang kerja') : 'per unit kerja' }} secara agregat
                 </p>
             </div>
         </div>
@@ -44,7 +44,7 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-gray-500 uppercase">Mahasiswa Aktif</span>
+                        <span class="text-xs font-bold text-slate-600 uppercase">Peserta Aktif</span>
                         <span class="p-2 bg-blue-50 text-blue-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -52,12 +52,12 @@
                         </span>
                     </div>
                     <div class="text-2xl font-black text-gray-900 mt-2">{{ $placements->total() }}</div>
-                    <div class="text-[11px] text-gray-400 mt-0.5">Total mahasiswa terdaftar</div>
+                    <div class="text-xs text-slate-600 mt-0.5">Total peserta magang terdaftar</div>
                 </div>
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-gray-500 uppercase">Total Logbook</span>
+                        <span class="text-xs font-bold text-slate-600 uppercase">Total Logbook</span>
                         <span class="p-2 bg-blue-50 text-blue-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -65,12 +65,12 @@
                         </span>
                     </div>
                     <div class="text-2xl font-black text-gray-900 mt-2">{{ $totalLogs }}</div>
-                    <div class="text-[11px] text-gray-400 mt-0.5">Kegiatan dilaporkan</div>
+                    <div class="text-xs text-slate-600 mt-0.5">Kegiatan dilaporkan</div>
                 </div>
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-gray-500 uppercase">{{ \App\Enums\ReviewStatus::APPROVED->label() }}</span>
+                        <span class="text-xs font-bold text-slate-600 uppercase">{{ \App\Enums\ReviewStatus::APPROVED->label() }}</span>
                         <span class="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -78,12 +78,12 @@
                         </span>
                     </div>
                     <div class="text-2xl font-black text-gray-900 mt-2">{{ $approvedLogs }}</div>
-                    <div class="text-[11px] text-gray-400 mt-0.5">Diverifikasi pembimbing</div>
+                    <div class="text-xs text-slate-600 mt-0.5">Diverifikasi pembimbing</div>
                 </div>
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-gray-500 uppercase">{{ \App\Enums\ReviewStatus::PENDING->label() }}</span>
+                        <span class="text-xs font-bold text-slate-600 uppercase">{{ \App\Enums\ReviewStatus::PENDING->label() }}</span>
                         <span class="p-2 bg-amber-50 text-amber-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -91,7 +91,7 @@
                         </span>
                     </div>
                     <div class="text-2xl font-black text-gray-900 mt-2">{{ $pendingLogs }}</div>
-                    <div class="text-[11px] text-gray-400 mt-0.5">Perlu approval mentor</div>
+                    <div class="text-xs text-slate-600 mt-0.5">Menunggu tinjauan mentor</div>
                 </div>
             </div>
 
@@ -125,8 +125,8 @@
                     <div class="lb-filter-selects w-full md:w-auto flex flex-wrap items-center gap-3">
                         <!-- Filter Universitas -->
                         @if(isset($universities))
-                            <select name="university_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">-- Semua Kampus --</option>
+                            <select name="university_id" onchange="this.form.submit()" class="w-full sm:w-auto min-h-[44px] py-2.5 pl-3.5 pr-9 text-xs border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">-- Semua Kampus/Sekolah --</option>
                                 @foreach ($universities as $unv)
                                     <option value="{{ $unv->id }}" {{ request('university_id') == $unv->id ? 'selected' : '' }}>
                                         {{ $unv->name }} ({{ $unv->code }})
@@ -137,12 +137,12 @@
 
                         <!-- Filter Unit -->
                         @if (auth()->user()->unit_id && ! auth()->user()->isSuperAdmin())
-                            <div class="w-full sm:w-auto flex items-center px-3 py-2 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold rounded-xl shadow-2xs">
+                            <div class="w-full sm:w-auto min-h-[44px] flex items-center px-3.5 py-2.5 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold rounded-xl shadow-2xs">
                                 <span class="truncate">Bidang: {{ auth()->user()->unit->name ?? 'Bidang Kerja' }}</span>
                                 <input type="hidden" name="unit_id" value="{{ auth()->user()->unit_id }}">
                             </div>
                         @else
-                            <select name="unit_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
+                            <select name="unit_id" onchange="this.form.submit()" class="w-full sm:w-auto min-h-[44px] py-2.5 pl-3.5 pr-9 text-xs border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">-- Semua Unit Penempatan --</option>
                                 @foreach ($units as $unit)
                                     <option value="{{ $unit->id }}" {{ request('unit_id') == $unit->id ? 'selected' : '' }}>
@@ -153,7 +153,7 @@
                         @endif
 
                         <!-- Filter Status Logbook -->
-                        <select name="status_filter" onchange="this.form.submit()" class="w-full sm:w-auto text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
+                        <select name="status_filter" onchange="this.form.submit()" class="w-full sm:w-auto min-h-[44px] py-2.5 pl-3.5 pr-9 text-xs border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Status Logbook --</option>
                             <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>Ada logbook PENDING</option>
                             <option value="approved" {{ request('status_filter') === 'approved' ? 'selected' : '' }}>Ada logbook APPROVED</option>
@@ -164,23 +164,24 @@
                     <!-- Search Input -->
                     <div class="w-full md:w-80 flex items-center gap-2">
                         <div class="relative w-full">
-                            <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400" style="padding-left: 0.85rem !important;">
-                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-600" style="padding-left: 0.85rem !important;">
+                                <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </div>
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa / NIM..." 
-                                   class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama peserta magang / NIM/NIS..." 
+                                   class="w-full min-h-[44px] text-xs border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
                                    style="padding-left: 2.5rem !important; padding-right: 0.75rem !important; padding-top: 0.55rem !important; padding-bottom: 0.55rem !important;">
                         </div>
-                        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
+                        <button type="submit" class="min-h-[44px] px-4 py-2.5 inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer shrink-0">
                             Cari
                         </button>
                         @if (request()->hasAny(['unit_id', 'university_id', 'status_filter', 'search', 'placement_id']))
-                            <a href="{{ route('admin.logbooks.index') }}" class="p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition" title="Reset Filter">
+                            <a href="{{ route('admin.logbooks.index') }}" class="min-h-[44px] px-3.5 py-2.5 inline-flex items-center justify-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition shrink-0" title="Reset Filter">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
+                                <span>Reset</span>
                             </a>
                         @endif
                     </div>
@@ -206,7 +207,7 @@
                                 <h3 class="font-bold text-gray-900 text-base flex items-center gap-2">
                                     Riwayat Logbook: {{ $selStudent->name }}
                                     <span class="text-xs font-mono font-normal bg-blue-100 text-blue-800 px-2 py-0.5 rounded-md">
-                                        NIM: {{ $selProfile->nim ?? '-' }}
+                                        NIM/NIS: {{ $selProfile->nim ?? '-' }}
                                     </span>
                                 </h3>
                                 <p class="text-xs text-gray-600 mt-0.5">
@@ -218,7 +219,7 @@
                             </div>
                         </div>
 
-                        <a href="{{ route('admin.logbooks.index', request()->except('placement_id')) }}" class="inline-flex items-center gap-1 text-xs font-bold text-gray-600 bg-white hover:bg-gray-100 px-3 py-1.5 rounded-xl border border-gray-200 shadow-sm transition">
+                        <a href="{{ route('admin.logbooks.index', request()->except('placement_id')) }}" class="inline-flex items-center gap-1.5 min-h-[44px] text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 px-3.5 py-2 rounded-xl border border-slate-200 shadow-sm transition">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -241,7 +242,7 @@
                                         {{ $log->activity }}
                                     </p>
                                     @if ($log->feedback)
-                                        <p class="text-[11px] text-blue-900 bg-blue-50/75 px-2.5 py-1 rounded-md">
+                                        <p class="text-xs text-blue-900 bg-blue-50/75 px-2.5 py-1 rounded-md">
                                             <strong>Feedback Mentor:</strong> "{{ $log->feedback }}"
                                         </p>
                                     @endif
@@ -249,18 +250,18 @@
 
                                 <div class="flex items-center gap-2 shrink-0">
                                     @if ($log->attachment)
-                                        <a href="{{ $log->attachment_url }}" target="_blank" class="px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition" title="Unduh Lampiran">
+                                        <a href="{{ $log->attachment_url }}" target="_blank" class="min-h-[44px] inline-flex items-center px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition" title="Unduh Lampiran">
                                              Lampiran
                                         </a>
                                     @endif
-                                    <a href="{{ route('admin.logbooks.show', $log->id) }}" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition">
+                                    <a href="{{ route('admin.logbooks.show', $log->id) }}" class="min-h-[44px] inline-flex items-center px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition">
                                         Detail 
                                     </a>
                                 </div>
                             </div>
                         @empty
-                            <div class="p-6 bg-white rounded-xl text-center text-gray-400 text-xs">
-                                Mahasiswa belum mengunggah entri logbook kegiatan.
+                            <div class="p-6 bg-white rounded-xl text-center text-slate-600 text-xs">
+                                Peserta Magang belum mengunggah entri logbook kegiatan.
                             </div>
                         @endforelse
                     </div>
@@ -272,9 +273,9 @@
                 <div class="overflow-x-auto">
                     <table class="rtable w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-gray-50/75 border-b border-gray-200 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                            <tr class="bg-gray-50/75 border-b border-gray-200 text-xs font-bold text-slate-600 uppercase tracking-wider">
                                 <th class="py-3.5 px-4 text-center w-12">No</th>
-                                <th class="py-3.5 px-4">Mahasiswa</th>
+                                <th class="py-3.5 px-4">Peserta Magang</th>
                                 <th class="py-3.5 px-4">Unit & Pembimbing</th>
                                 <th class="py-3.5 px-4 text-center">Pending Logbook</th>
                                 <th class="py-3.5 px-4 text-center">Progres Disetujui</th>
@@ -298,27 +299,27 @@
                                     $isSelected = $selectedPlacement && $selectedPlacement->id === $placement->id;
                                 @endphp
                                 <tr class="hover:bg-slate-50/75 transition-colors {{ $isSelected ? 'bg-blue-50/40 font-semibold' : '' }}">
-                                    <td class="rt-hide-mobile py-4 px-4 text-center text-xs text-gray-500" data-label="No">
+                                    <td class="rt-hide-mobile py-4 px-4 text-center text-xs text-slate-600" data-label="No">
                                         {{ $placements->firstItem() + $index }}
                                     </td>
 
-                                    <td class="rt-title py-4 px-4" data-label="Mahasiswa">
+                                    <td class="rt-title py-4 px-4" data-label="Peserta Magang">
                                         <div class="font-bold text-gray-900 leading-snug">{{ $student->name }}</div>
-                                        <div class="text-xs text-gray-500 mt-0.5 font-mono">
-                                            NIM: {{ $profile->nim ?? '-' }}
+                                        <div class="text-xs text-slate-600 mt-0.5 font-mono">
+                                            NIM/NIS: {{ $profile->nim ?? '-' }}
                                         </div>
-                                        <div class="text-[11px] text-blue-600 mt-0.5">
+                                        <div class="text-xs text-blue-700 mt-0.5">
                                             {{ $profile->universitas ?? '-' }} ({{ $profile->jurusan ?? '-' }})
                                         </div>
                                     </td>
 
                                     <td class="py-4 px-4" data-label="Unit &amp; Pembimbing">
                                         <div class="text-xs font-bold text-gray-800"> {{ $unit->name ?? '-' }}</div>
-                                        <div class="text-[11px] text-gray-500 mt-0.5">
+                                        <div class="text-xs text-slate-600 mt-0.5">
                                             Mentor: <strong>{{ $mentor->name ?? 'Belum Ditentukan' }}</strong>
                                         </div>
                                         @unless ($mentor)
-                                            <div class="mt-1 inline-flex px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold" title="{{ Auth::user()->isBidangAdmin() ? 'Mentor teknis belum ditunjuk: logbook divalidasi sementara oleh Admin Bidang' : 'Mentor teknis belum ditunjuk: logbook divalidasi sementara oleh Admin Dinas' }}">
+                                            <div class="mt-1 inline-flex px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold" title="{{ Auth::user()->isBidangAdmin() ? 'Mentor teknis belum ditunjuk: logbook divalidasi sementara oleh Admin Bidang' : 'Mentor teknis belum ditunjuk: logbook divalidasi sementara oleh Admin Dinas' }}">
                                                 {{ Auth::user()->isBidangAdmin() ? 'Validasi sementara oleh Admin Bidang' : 'Validasi sementara oleh Admin Dinas' }}
                                             </div>
                                         @endunless
@@ -332,7 +333,7 @@
 
                                     <td class="py-4 px-4 text-center" data-label="Progres Disetujui">
                                         <div class="w-32 mx-auto">
-                                            <div class="flex justify-between text-[10px] text-gray-500 font-bold mb-1">
+                                            <div class="flex justify-between text-xs text-slate-600 font-bold mb-1">
                                                 <span>{{ $approvedCount }}/{{ $totalStudentLogs }}</span>
                                                 <span>{{ $progressPercent }}%</span>
                                             </div>
@@ -344,14 +345,14 @@
 
                                     <td class="py-4 px-4 text-center whitespace-nowrap text-xs text-gray-600" data-label="Logbook Terakhir">
                                         @if ($latestLog)
-                                            <span class="font-mono">{{ \Carbon\Carbon::parse($latestLog->date)->format('d M Y') }}</span>
+                                            <span class="font-mono">{{ \Carbon\Carbon::parse($latestLog->date)->translatedFormat('d M Y') }}</span>
                                         @else
-                                            <span class="text-gray-400 italic text-[11px]">Belum Ada</span>
+                                            <span class="text-slate-600 italic text-xs">Belum Ada</span>
                                         @endif
                                     </td>
 
                                     <td class="rt-actions py-4 px-4 text-right whitespace-nowrap" data-label="Aksi">
-                                        <a href="{{ route('admin.logbooks.index', array_merge(request()->query(), ['placement_id' => $placement->id])) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 {{ $isSelected ? 'bg-blue-700 text-white' : 'bg-blue-50 text-blue-700 hover:bg-blue-100' }} text-xs font-bold rounded-xl transition shadow-xs">
+                                        <a href="{{ route('admin.logbooks.index', array_merge(request()->query(), ['placement_id' => $placement->id])) }}" class="inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 {{ $isSelected ? 'bg-blue-700 text-white' : 'bg-blue-50 text-blue-700 hover:bg-blue-100' }} text-xs font-bold rounded-xl transition shadow-xs">
                                             <span>Lihat Riwayat</span>
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -361,8 +362,8 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="py-12 text-center text-gray-400 text-xs">
-                                        Tidak ada data mahasiswa magang yang sesuai dengan kriteria pencarian.
+                                    <td colspan="7" class="py-12 text-center text-slate-600 text-xs">
+                                        Tidak ada data peserta magang yang sesuai dengan kriteria pencarian.
                                     </td>
                                 </tr>
                             @endforelse

@@ -81,7 +81,7 @@
                             </div>
                             <div>
                                 <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Kampus</div>
-                                <div class="text-[11px]" style="color: #bfdbfe !important;">Mitra MBKM</div>
+                                <div class="text-[11px]" style="color: #bfdbfe !important;">Mitra Kampus & Sekolah</div>
                             </div>
                         </a>
 
@@ -217,13 +217,10 @@
                     </div>
                     <div>
                         <h4 class="font-bold text-slate-900 text-sm">
-                            Pemberitahuan: Terdapat {{ $pendingUniversities->count() }} Perguruan Tinggi Baru yang Terdaftar
-                            Otomatis
+                            Terdapat {{ $pendingUniversities->count() }} Kampus/Sekolah yang Belum Memiliki Akun Admin Kampus/Sekolah
                         </h4>
                         <p class="text-xs text-slate-600 mt-0.5">
-                            Mahasiswa mendaftar dari kampus baru:
-                            <strong>{{ $pendingUniversities->pluck('name')->implode(', ') }}</strong>. Silakan lengkapi
-                            profil kampus dan buatkan akun login PIC/Admin Kampus.
+                            Di antaranya: <strong>{{ $pendingUniversities->take(5)->pluck('name')->implode(', ') }}</strong>{{ $pendingUniversities->count() > 5 ? ' dan '.($pendingUniversities->count() - 5).' kampus/sekolah lainnya' : '' }}. Buatkan akun login Admin Kampus/Sekolah bila institusi tersebut perlu memantau peserta magangnya.
                         </p>
                     </div>
                 </div>
@@ -264,10 +261,10 @@
             <div class="bg-white border-l-4 border-yellow-500 p-5 rounded-2xl shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                     <h4 class="font-bold text-slate-900 text-sm">
-                        {{ $unverifiedUniversities->count() }} Perguruan Tinggi Menunggu Verifikasi
+                        {{ $unverifiedUniversities->count() }} Kampus/Sekolah Menunggu Verifikasi
                     </h4>
                     <p class="text-xs text-slate-600 mt-0.5">
-                        Didaftarkan mandiri oleh mahasiswa melalui opsi "Perguruan Tinggi Lainnya":
+                        Didaftarkan mandiri oleh peserta magang melalui opsi "Lainnya":
                         <strong>{{ $unverifiedUniversities->pluck('name')->implode(', ') }}</strong>.
                     </p>
                 </div>
@@ -291,7 +288,7 @@
                     <div class="text-2xl font-black text-slate-800">{{ $stats['total_students'] ?? 0 }}</div>
                 </div>
                 <div class="text-[10px] text-slate-500 mt-2 leading-tight truncate">
-                    {{ $isSuperAdmin ? 'Mahasiswa kota' : 'Pendaftar dinas' }}
+                    {{ $isSuperAdmin ? 'Peserta Magang kota' : 'Pendaftar dinas' }}
                 </div>
             </div>
 
@@ -375,7 +372,7 @@
                             {{ $myUnit->name ?? 'Bidang Kerja Magang' }}
                         </h2>
                         <p class="text-xs text-slate-500 mt-0.5">
-                            Tata kelola kuota, tim pembimbing lapangan, dan supervisi langsung mahasiswa magang di bidang ini.
+                            Tata kelola kuota, tim pembimbing lapangan, dan supervisi langsung peserta magang di bidang ini.
                         </p>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
@@ -393,7 +390,7 @@
                         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
                             <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Lingkup Kerja Bidang</span>
                             <p class="text-xs text-slate-700 leading-relaxed">
-                                {{ $myUnit->description ?? 'Unit kerja resmi di lingkungan Dinas Perpustakaan dan Kearsipan Kota Surabaya yang menyelenggarakan penerimaan dan bimbingan teknis magang mahasiswa.' }}
+                                {{ $myUnit->description ?? 'Unit kerja resmi di lingkungan Dinas Perpustakaan dan Kearsipan Kota Surabaya yang menyelenggarakan penerimaan dan bimbingan teknis magang peserta.' }}
                             </p>
                         </div>
 
@@ -443,7 +440,7 @@
                                         </span>
                                     @endif
                                 </div>
-                                <p class="text-[11px] text-slate-500 mt-0.5">Pegawai pendamping teknis mahasiswa magang di bidang ini</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Pegawai pendamping teknis peserta magang di bidang ini</p>
                             </div>
                             <a href="{{ route('admin.mentors.create') }}"
                                class="self-start sm:self-auto inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl border border-blue-200 transition">
@@ -463,7 +460,7 @@
                                             <p class="text-[11px] text-slate-500 truncate mt-0.5" title="{{ $mentor->email }}">{{ $mentor->email }}</p>
                                         </div>
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-bold bg-blue-100 text-blue-800 shrink-0">
-                                            {{ $mentor->active_students_count ?? 0 }} Mhs
+                                            {{ $mentor->active_students_count ?? 0 }} Peserta
                                         </span>
                                     </div>
                                 @empty
@@ -495,16 +492,16 @@
                             <tr class="border-b border-slate-200 bg-slate-100/50 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
                                 <th class="py-3.5 px-6">Nama Unit Bidang</th>
                                 <th class="py-3.5 px-4 text-center">Kuota Total</th>
-                                <th class="py-3.5 px-4 text-center">Mhs Aktif</th>
+                                <th class="py-3.5 px-4 text-center">Peserta Aktif</th>
                                 <th class="py-3.5 px-4 text-center">Sisa Kuota</th>
                                 <th class="py-3.5 px-4 text-center">Menunggu ACC</th>
-                                <th class="py-3.5 px-4 text-center">Mhs Lulus</th>
+                                <th class="py-3.5 px-4 text-center">Peserta Lulus</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
                             @forelse($dispusipUnits ?? [] as $dUnit)
                                 @php
-                                    $uActive = $dUnit->applications->whereIn('status', ['accepted', 'active'])->count();
+                                    $uActive = $dUnit->applications->filter(fn ($a) => in_array($a->statusValue(), ['accepted', 'active'], true))->count();
                                     $uWaiting = $dUnit->applications->where('status', \App\Enums\ApplicationStatus::WAITING_APPROVAL->value)->count();
                                     $uCompleted = $dUnit->applications->where('status', \App\Enums\ApplicationStatus::COMPLETED->value)->count();
                                     $uRemaining = max(0, $dUnit->quota - $uActive);
@@ -555,7 +552,7 @@
                 <div class="md:hidden p-4 space-y-3 bg-slate-50/50">
                     @forelse($dispusipUnits ?? [] as $dUnit)
                         @php
-                            $uActive = $dUnit->applications->whereIn('status', ['accepted', 'active'])->count();
+                            $uActive = $dUnit->applications->filter(fn ($a) => in_array($a->statusValue(), ['accepted', 'active'], true))->count();
                             $uWaiting = $dUnit->applications->where('status', \App\Enums\ApplicationStatus::WAITING_APPROVAL->value)->count();
                             $uCompleted = $dUnit->applications->where('status', \App\Enums\ApplicationStatus::COMPLETED->value)->count();
                             $uRemaining = max(0, $dUnit->quota - $uActive);
@@ -588,7 +585,7 @@
                                     <div class="text-sm font-extrabold text-slate-800 mt-0.5">{{ $dUnit->quota }}</div>
                                 </div>
                                 <div class="bg-emerald-50/50 rounded-xl p-2 text-center border border-emerald-100">
-                                    <div class="text-[10px] text-emerald-600 uppercase font-bold tracking-wider">Mhs Aktif</div>
+                                    <div class="text-[10px] text-emerald-600 uppercase font-bold tracking-wider">Peserta Aktif</div>
                                     <div class="text-sm font-extrabold text-emerald-700 mt-0.5">{{ $uActive }}</div>
                                 </div>
                                 <div class="{{ $uWaiting > 0 ? 'bg-purple-50/60 border-purple-200' : 'bg-slate-50/60 border-slate-100' }} rounded-xl p-2 text-center border">
@@ -596,7 +593,7 @@
                                     <div class="text-sm font-extrabold {{ $uWaiting > 0 ? 'text-purple-700' : 'text-slate-400' }} mt-0.5">{{ $uWaiting }}</div>
                                 </div>
                                 <div class="bg-blue-50/50 rounded-xl p-2 text-center border border-blue-100">
-                                    <div class="text-[10px] text-blue-600 uppercase font-bold tracking-wider">Mhs Lulus</div>
+                                    <div class="text-[10px] text-blue-600 uppercase font-bold tracking-wider">Peserta Lulus</div>
                                     <div class="text-sm font-extrabold text-blue-700 mt-0.5">{{ $uCompleted }}</div>
                                 </div>
                             </div>
@@ -618,7 +615,7 @@
                     <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                         <div>
                             <h3 class="text-sm font-bold text-slate-800 leading-snug">Pendaftar Terbaru Bidang</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">Pengajuan berkas mahasiswa terkini yang masuk ke bidang ini</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Pengajuan berkas peserta magang terkini yang masuk ke bidang ini</p>
                         </div>
                         <a href="{{ route('admin.applications.index') }}"
                             class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 shadow-2xs">
@@ -632,7 +629,7 @@
                                 <div class="min-w-0 flex-1">
                                     <div class="flex items-center justify-between gap-2">
                                         <span class="font-bold text-xs sm:text-sm text-slate-900 truncate">
-                                            {{ $recentApp->user?->name ?? 'Mahasiswa' }}
+                                            {{ $recentApp->user?->name ?? 'Peserta Magang' }}
                                         </span>
                                         <div class="sm:hidden shrink-0">
                                             <x-status-badge :status="$recentApp->status" />
@@ -654,7 +651,7 @@
                             </div>
                         @empty
                             <div class="text-center py-8 text-xs text-slate-400">
-                                Belum ada pengajuan mahasiswa yang masuk pada bidang ini.
+                                Belum ada pengajuan peserta magang yang masuk pada bidang ini.
                             </div>
                         @endforelse
                     </div>
@@ -667,7 +664,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 pb-3 border-b border-slate-100">
                         <div class="min-w-0 flex-1">
                             <h3 class="text-sm font-bold text-slate-800 leading-snug">Distribusi Penempatan Unit Kerja</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">Sebaran mahasiswa magang di unit/bidang {{ $currentAgency->agency_name ?? 'Dispusip Surabaya' }}</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Sebaran peserta magang di unit/bidang {{ $currentAgency->agency_name ?? 'Dispusip Surabaya' }}</p>
                         </div>
                         <a href="{{ route('admin.units.index') }}"
                             class="self-start sm:self-auto shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 shadow-2xs">
@@ -694,7 +691,7 @@
                                         {{ $itemName }}
                                     </span>
                                     <span class="text-blue-700 font-bold shrink-0">
-                                        {{ $itemCount }} Mahasiswa
+                                        {{ $itemCount }} Peserta Magang
                                         @if($itemQuota > 0)
                                             <span class="text-slate-400 font-normal">/ Kuota {{ $itemQuota }}</span>
                                         @endif
@@ -724,29 +721,31 @@
                 </div>
             @endif
 
-            {{-- Distribusi Asal Perguruan Tinggi --}}
+            {{-- Distribusi Asal Kampus/Sekolah --}}
             <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4"
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;"
                 x-data="{ expanded: false }">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 pb-3 border-b border-slate-100">
                     <div class="min-w-0 flex-1">
                         <h3 class="text-sm font-bold text-slate-800 leading-snug">
-                            {{ $isSuperAdmin ? 'Distribusi Asal Kampus Surabaya' : (Auth::user()->isBidangAdmin() ? 'Distribusi Kampus Mahasiswa Bidang' : 'Distribusi Asal Kampus Mahasiswa Dinas') }}
+                            {{ $isSuperAdmin ? 'Distribusi Asal Kampus & Sekolah' : (Auth::user()->isBidangAdmin() ? 'Distribusi Kampus/Sekolah Peserta Magang Bidang' : 'Distribusi Asal Kampus/Sekolah Peserta Magang Dinas') }}
                         </h3>
-                        <p class="text-xs text-slate-400 mt-0.5">
-                            {{ $isSuperAdmin ? 'Sebaran perguruan tinggi mitra resmi program magang' : (Auth::user()->isBidangAdmin() ? 'Sebaran perguruan tinggi pendaftar magang di bidang ini' : 'Sebaran kampus pendaftar di ' . ($currentAgency->agency_name ?? 'dinas ini')) }}
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            {{ $isSuperAdmin ? 'Sebaran kampus dan sekolah asal peserta magang' : (Auth::user()->isBidangAdmin() ? 'Sebaran kampus/sekolah pendaftar magang di bidang ini' : 'Sebaran kampus/sekolah pendaftar di ' . ($currentAgency->agency_name ?? 'dinas ini')) }}
                         </p>
                     </div>
                     @if($isSuperAdmin)
                         <a href="{{ route('admin.universities.index') }}"
                             class="self-start sm:self-auto shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-sky-700 hover:text-sky-900 bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-xl transition border border-sky-200 shadow-2xs">
-                            <span>Kelola Kampus</span>
+                            <span>Kelola Kampus & Sekolah</span>
                         </a>
                     @endif
                 </div>
 
                 @php
+                    // Hanya institusi yang punya peserta: master sekolah/kampus tanpa peserta tidak perlu ditampilkan
                     $campusList = collect($universityStats ?? [])
+                        ->filter(fn ($row) => (int) data_get($row, 'count', 0) > 0)
                         ->sortByDesc(fn ($row) => data_get($row, 'count', 0))->values()->all();
                 @endphp
                 <div class="space-y-4 pt-1">
@@ -759,7 +758,7 @@
                         <div @if($loop->index >= 10) x-show="expanded" x-cloak @endif>
                             <div class="flex items-center justify-between text-xs font-semibold mb-1.5">
                                 <span class="text-slate-700 font-medium truncate max-w-[240px]">{{ $campName }}</span>
-                                <span class="text-sky-700 font-bold shrink-0">{{ $campCount }} Mahasiswa <span
+                                <span class="text-sky-700 font-bold shrink-0">{{ $campCount }} Peserta Magang <span
                                         class="text-slate-400 font-normal">({{ $campPercentage }}%)</span></span>
                             </div>
                             <div class="w-full rounded-full overflow-hidden mt-1.5"

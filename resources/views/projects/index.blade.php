@@ -13,7 +13,7 @@
                     Katalog Karya Inovasi dan Proyek Dinas
                 </h1>
                 <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-                    Dokumentasi perjalanan karya inovasi dan kontribusi nyata mahasiswa magang dari tahun ke tahun.
+                    Dokumentasi perjalanan karya inovasi dan kontribusi nyata peserta magang dari tahun ke tahun.
                 </p>
             </div>
 
@@ -76,7 +76,7 @@
                             <input type="text" 
                                    name="search" 
                                    value="{{ $search }}" 
-                                   placeholder="Cari judul proyek, nama mahasiswa, kampus, atau topik inovasi..." 
+                                   placeholder="Cari judul proyek, nama peserta magang, kampus, atau topik inovasi..." 
                                    class="w-full text-xs sm:text-sm bg-white border border-slate-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs font-medium placeholder:text-slate-400 h-11 transition"
                                    style="padding-left: 2.75rem !important; padding-right: 1rem !important;">
                         </div>
@@ -189,7 +189,7 @@
                                             </span>
                                         </div>
                                         <p class="text-xs text-slate-400 font-medium mt-0.5">
-                                            Dokumentasi luaran karya dan kontribusi nyata mahasiswa magang pada periode tahun {{ $yr }}
+                                            Dokumentasi luaran karya dan kontribusi nyata peserta magang pada periode tahun {{ $yr }}
                                         </p>
                                     </div>
                                 </div>
@@ -208,7 +208,7 @@
                                 @foreach($projectList as $project)
                                     @php
                                         $mhs = $project->placement?->application?->user;
-                                        $univ = $mhs?->studentProfile?->universitas ?? $mhs?->university ?? 'Perguruan Tinggi Mitra';
+                                        $univ = $mhs?->studentProfile?->universitas ?? $mhs?->university ?? 'Kampus/Sekolah Mitra';
                                         $unit = $project->placement?->application?->unit?->name ?? 'Dispusip Surabaya';
                                     @endphp
 
@@ -337,7 +337,7 @@
                                             <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
                                                 <div class="min-w-0">
                                                     <div class="text-xs font-bold text-slate-800 truncate">
-                                                        {{ $mhs->name ?? 'Mahasiswa Magang' }}
+                                                        {{ $mhs->name ?? 'Peserta Magang' }}
                                                     </div>
                                                     <div class="text-[10px] text-slate-400 font-medium truncate">
                                                         {{ $univ }}

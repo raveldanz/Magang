@@ -32,7 +32,13 @@ class University extends Model
         'require_dpl',
         'dinas_components',
         'dpl_components',
+        'institution_type',
     ];
+
+    /** Jenis institusi asal peserta magang (kolom institution_type). */
+    public const TYPE_COLLEGE = 'perguruan_tinggi';
+
+    public const TYPE_SCHOOL = 'sekolah';
 
     protected $attributes = [
         'evaluation_scheme' => 'mentor_only',
@@ -67,6 +73,7 @@ class University extends Model
     /**
      * Mengambil array komponen penilaian dinas dengan fallback ke default.
      * Mendukung jumlah komponen dinamis (bisa diedit, ditambah, atau dihapus).
+     *
      * @return array<int, string>
      */
     public function getDinasComponents(): array
@@ -92,6 +99,7 @@ class University extends Model
     /**
      * Mengambil array komponen penilaian DPL dengan fallback ke default.
      * Mendukung jumlah komponen dinamis (bisa diedit, ditambah, atau dihapus).
+     *
      * @return array<int, string>
      */
     public function getDplComponents(): array
@@ -174,9 +182,10 @@ class University extends Model
     /**
      * Cari kampus berdasarkan nama (tidak peka huruf besar/kecil) atau buat entri baru
      * berstatus "Menunggu Verifikasi" (is_verified = false) untuk kampus yang belum terdaftar.
-     * Dipakai alur onboarding mahasiswa (opsi "Perguruan Tinggi Lainnya").
+     * Dipakai alur onboarding peserta (opsi "Lainnya") dan daftar akun Pembimbing.
+     * Jenis institusi entri baru: $type bila diberikan, selain itu ditebak dari nama (SMK/SMA/MA → sekolah).
      */
-    public static function findOrCreateUnverified(string $name): self
+    public static function findOrCreateUnverified(string $name, ?string $type = null): self
     {
         $name = static::normalizeName($name);
 
@@ -187,7 +196,28 @@ class University extends Model
             return $existing;
         }
 
-        return static::firstOrCreate(['name' => $name], ['is_verified' => false, 'status' => 'active']);
+        $type = in_array($type, [self::TYPE_COLLEGE, self::TYPE_SCHOOL], true) ? $type : static::guessInstitutionType($name);
+
+        return static::firstOrCreate(['name' => $name], ['is_verified' => false, 'status' => 'active', 'institution_type' => $type]);
+    }
+
+    /** Tebak jenis institusi dari namanya: SMK/SMA/MA/SLB atau "Sekolah Menengah" → sekolah. */
+    public static function guessInstitutionType(string $name): string
+    {
+        return preg_match('/^\s*(SMKN?|SMAN?|SMKS|SMAS|MAN?|MAS|SLB)\b|sekolah menengah/i', $name) === 1
+            ? self::TYPE_SCHOOL
+            : self::TYPE_COLLEGE;
+    }
+
+    public function isSchool(): bool
+    {
+        return $this->institution_type === self::TYPE_SCHOOL;
+    }
+
+    /** Label jenis institusi untuk tampilan. */
+    public function institutionTypeLabel(): string
+    {
+        return $this->isSchool() ? 'Sekolah' : 'Perguruan Tinggi';
     }
 
     /**
@@ -207,6 +237,16 @@ class University extends Model
     public function scopePendingVerification(Builder $query): Builder
     {
         return $query->where('is_verified', false);
+    }
+
+    /**
+     * Kampus/sekolah yang sudah punya peserta magang tetapi belum punya akun Admin Kampus/Sekolah.
+     * Master institusi tanpa peserta (mis. 283 sekolah hasil impor) tidak perlu dibuatkan akun.
+     */
+    public function scopeNeedingAdminAccount(Builder $query): Builder
+    {
+        return $query->whereDoesntHave('users', fn ($q) => $q->where('role', 'universitas'))
+            ->whereHas('students');
     }
 
     /**

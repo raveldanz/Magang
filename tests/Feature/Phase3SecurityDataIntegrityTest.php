@@ -160,7 +160,9 @@ class Phase3SecurityDataIntegrityTest extends TestCase
         $this->actingAs($this->admin)->post(route('admin.mentors.reset_password', $mentor->id));
 
         $this->assertTrue($mentor->fresh()->must_change_password);
-        $this->assertTrue(Hash::check('password', $mentor->fresh()->password));
+        // Password sementara acak, bukan 'password' yang diketahui umum
+        $this->assertFalse(Hash::check('PunyaSendiri99', $mentor->fresh()->password));
+        $this->assertFalse(Hash::check('password', $mentor->fresh()->password));
     }
 
     // ---- 4. Mentor & DPL di form ubah status ---------------------------------------------
@@ -230,7 +232,7 @@ class Phase3SecurityDataIntegrityTest extends TestCase
 
     public function test_feedback_attachment_and_student_photo_are_private(): void
     {
-        if (!extension_loaded('gd')) {
+        if (! extension_loaded('gd')) {
             $this->markTestSkipped('GD extension is not installed.');
         }
 
@@ -251,7 +253,7 @@ class Phase3SecurityDataIntegrityTest extends TestCase
 
         // Foto profil
         $this->actingAs($this->student)->post(route('student.profile.update'), [
-            'name' => 'Mhs', 'nim' => '1', 'university_id' => (string) $this->unesa->id, 'jurusan' => 'TI', 'phone' => '08',
+            'name' => 'Mhs', 'nim' => '1', 'university_id' => (string) $this->unesa->id, 'jurusan' => 'TI', 'phone' => '081234567890',
             'photo' => UploadedFile::fake()->image('foto.jpg'),
         ])->assertSessionHasNoErrors();
         $photo = $this->student->studentProfile()->first()->photo;
@@ -330,7 +332,7 @@ class Phase3SecurityDataIntegrityTest extends TestCase
 
     public function test_student_typing_existing_campus_is_matched_or_asked_to_confirm(): void
     {
-        $payload = ['name' => 'Mhs', 'nim' => '1', 'jurusan' => 'TI', 'phone' => '08', 'university_id' => 'other'];
+        $payload = ['name' => 'Mhs', 'nim' => '1', 'jurusan' => 'TI', 'phone' => '081234567890', 'university_id' => 'other'];
 
         // Akronim persis → otomatis memakai kampus yang ada, tidak membuat entri baru
         $this->actingAs($this->student)->post(route('student.profile.update'), $payload + ['custom_university_name' => 'its'])

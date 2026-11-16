@@ -1,6 +1,7 @@
 <!-- Global Double-Confirmation Reset Password Modal (Alpine.js) -->
 <div x-data="{
     open: false,
+    openedAt: 0,
     action: '',
     title: 'Konfirmasi Reset Password',
     name: '',
@@ -14,10 +15,16 @@
         this.email = data.email || '';
         this.role = data.role || '';
         this.confirmed = false;
+        this.openedAt = Date.now();
         this.open = true;
         this.$nextTick(() => {
             if (this.$refs.cancelBtn) this.$refs.cancelBtn.focus();
         });
+    },
+    // Abaikan klik yang sama dengan klik pembuka modal (lihat confirm-action-modal).
+    closeFromOutside() {
+        if (Date.now() - this.openedAt < 400) return;
+        this.closeModal();
     },
     closeModal() {
         this.open = false;
@@ -54,7 +61,7 @@ x-cloak>
              x-transition:leave="transition ease-in duration-150"
              x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
              x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-             @click.outside="closeModal()"
+             @click.outside="closeFromOutside()"
              class="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-md w-full overflow-hidden p-6 sm:p-7 space-y-5 text-left relative">
             
             <!-- Hidden Form to execute POST reset -->
@@ -72,7 +79,7 @@ x-cloak>
                 <div class="flex-1 space-y-1">
                     <h3 class="text-base font-black text-slate-900 leading-tight" x-text="title"></h3>
                     <p class="text-xs text-slate-500 leading-relaxed">
-                        Tindakan ini akan mengembalikan kata sandi akun pengguna ke kata sandi baku sistem.
+                        Tindakan ini mengganti kata sandi akun dengan kata sandi sementara acak. Pemilik akun wajib menggantinya saat masuk.
                     </p>
                 </div>
                 <button type="button" @click="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg transition" title="Tutup">
@@ -90,7 +97,7 @@ x-cloak>
                 <div class="text-xs text-slate-500 font-medium break-words" x-text="email"></div>
                 <div class="pt-2 border-t border-slate-200/60 text-xs text-slate-600 flex items-center gap-1.5">
                     <span class="text-slate-400">Password baru:</span>
-                    <code class="px-2 py-0.5 bg-amber-100/70 border border-amber-200 text-amber-900 font-mono font-bold rounded text-xs">password</code>
+                    <code class="px-2 py-0.5 bg-amber-100/70 border border-amber-200 text-amber-900 font-bold rounded text-xs">dibuat acak, tampil satu kali setelah reset</code>
                 </div>
             </div>
 
@@ -100,7 +107,7 @@ x-cloak>
                        x-model="confirmed" 
                        class="mt-0.5 w-4 h-4 rounded text-amber-600 border-amber-300 focus:ring-amber-500 cursor-pointer shrink-0">
                 <span class="text-xs text-amber-950 font-semibold leading-snug">
-                    Saya mengonfirmasi bahwa saya ingin mereset password akun ini ke nilai default ('password').
+                    Saya mengonfirmasi bahwa saya ingin mereset password akun ini dan akan mencatat password sementaranya.
                 </span>
             </label>
 

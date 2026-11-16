@@ -45,7 +45,7 @@ class EvaluationController extends Controller
         $isSuperAdmin = $lecturer->isSuperAdmin();
 
         if (! $isAssignedAdvisor && ! $isSuperAdmin) {
-            abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing Lapangan yang ditugaskan untuk mahasiswa ini.');
+            abort(403, 'Akses Ditolak: Anda bukan Pembimbing yang ditugaskan untuk peserta magang ini.');
         }
 
         return $placement;
@@ -132,6 +132,7 @@ class EvaluationController extends Controller
             'aspects.min' => 'Setidaknya satu aspek penilaian wajib diisi.',
             'aspects.*.name.required' => 'Nama aspek penilaian tidak boleh kosong.',
             'aspects.*.score.required' => 'Nilai aspek penilaian wajib diisi.',
+            'aspects.*.score.numeric' => 'Nilai aspek penilaian harus berupa angka.',
             'aspects.*.score.min' => 'Nilai minimal adalah 0.',
             'aspects.*.score.max' => 'Nilai maksimal adalah 100.',
             'score_mastery.required' => 'Nilai penguasaan materi wajib diisi.',
@@ -186,7 +187,7 @@ class EvaluationController extends Controller
                 $lecturerComps = [];
                 $scores = [];
                 foreach ($request->custom_components as $comp) {
-                    if (!empty($comp['name'])) {
+                    if (! empty($comp['name'])) {
                         $val = isset($comp['score']) && is_numeric($comp['score']) ? (float) $comp['score'] : null;
                         $lecturerComps[] = [
                             'name' => trim($comp['name']),
@@ -197,7 +198,7 @@ class EvaluationController extends Controller
                         }
                     }
                 }
-                if (!empty($lecturerComps)) {
+                if (! empty($lecturerComps)) {
                     $custom['lecturer'] = $lecturerComps;
                     $evaluation->custom_components = $custom;
                     $evaluation->dosen_aspects = $lecturerComps;
@@ -214,7 +215,7 @@ class EvaluationController extends Controller
                 $attitude = (float) $request->score_attitude;
                 $nilaiDosen = round(($mastery + $report + $attitude) / 3, 2);
 
-                $univ = $placement->application?->user ? app(\App\Services\UniversityResolver::class)->forUser($placement->application->user) : null;
+                $univ = $placement->application?->user ? app(UniversityResolver::class)->forUser($placement->application->user) : null;
                 $evaluation->dosen_aspects = [
                     ['name' => $univ ? $univ->getDplComponent(1) : 'Penguasaan Materi & Relevansi CPL', 'score' => $mastery],
                     ['name' => $univ ? $univ->getDplComponent(2) : 'Kualitas Laporan Akhir Magang', 'score' => $report],
@@ -227,7 +228,6 @@ class EvaluationController extends Controller
                 $evaluation->nilai_dosen = $nilaiDosen;
             }
         }
-
 
         // Hitung Nilai Akhir dengan Pembobotan Kampus Adaptif
         $nilaiDinas = $evaluation->nilai_pembimbing ?? 0;
@@ -272,8 +272,8 @@ class EvaluationController extends Controller
         }
 
         $successMsg = $isMentorOnly
-            ? 'Catatan bimbingan DPL berhasil disimpan!'
-            : 'Nilai bimbingan akademik DPL dan catatan berhasil disimpan!';
+            ? 'Catatan bimbingan Pembimbing berhasil disimpan!'
+            : 'Nilai bimbingan akademik Pembimbing dan catatan berhasil disimpan!';
 
         return redirect()->route('lecturer.students.show', $placement->id)
             ->with('success', $successMsg);
@@ -288,16 +288,21 @@ class EvaluationController extends Controller
 
         $request->validate([
             'status' => 'required|in:approved,revision,rejected,pending',
-            'feedback' => 'nullable|string|max:1500',
+            'feedback' => 'nullable|required_if:status,revision,rejected|string|max:1500',
         ]);
 
-        $finalReport = FinalReport::firstOrCreate(
-            ['placement_id' => $placement->id],
-            [
-                'file_path' => 'final_reports/default.pdf',
-                'status' => 'pending',
-            ]
-        );
+        // Laporan yang sudah mengantar mahasiswa lulus tidak boleh diubah lagi: mengembalikannya ke revisi
+        // akan mengunci ulang sertifikat yang sudah terbit.
+        if ($placement->application?->statusValue() === 'completed') {
+            return redirect()->back()->with('error', 'Laporan akhir tidak dapat diubah karena magang sudah dinyatakan selesai.');
+        }
+
+        // Hanya naskah yang benar-benar diunggah mahasiswa yang bisa ditinjau. Sebelumnya persetujuan di sini
+        // membuat laporan kosong berstatus disetujui, sehingga syarat laporan terlewati.
+        $finalReport = FinalReport::where('placement_id', $placement->id)->first();
+        if (! $finalReport || empty($finalReport->file_path) || basename((string) $finalReport->file_path) === 'default.pdf') {
+            return redirect()->back()->with('error', 'Peserta Magang belum mengunggah naskah laporan akhir, sehingga belum ada yang dapat ditinjau.');
+        }
 
         $finalReport->update([
             'status' => $request->status,
@@ -320,7 +325,7 @@ class EvaluationController extends Controller
 
         $statusLabel = $request->status === 'approved' ? 'disetujui (ACC)' : 'diminta perbaikan (Revisi)';
 
-        return redirect()->back()->with('success', "Status laporan akhir mahasiswa berhasil {$statusLabel}!");
+        return redirect()->back()->with('success', "Status laporan akhir peserta magang berhasil {$statusLabel}!");
     }
 
     /**
@@ -342,20 +347,13 @@ class EvaluationController extends Controller
         $consultations = $placement->academicConsultations;
 
         $univ = $evaluation?->getUniversity();
-        if (!$univ && $student) {
-            if ($student->university_id) {
-                $univ = \App\Models\University::find($student->university_id);
-            } else {
-                $name = $student->university ?? ($profile?->universitas ?? null);
-                if ($name) {
-                    $univ = \App\Models\University::where('name', 'like', "%{$name}%")->orWhere('code', 'like', "%{$name}%")->first();
-                }
-            }
+        if (! $univ && $student) {
+            $univ = app(UniversityResolver::class)->forUser($student);
         }
 
         $scheme = $univ->evaluation_scheme ?? 'mentor_only';
-        $weightMentor = $univ ? (int)$univ->weight_mentor : 100;
-        $weightLecturer = $univ ? (int)$univ->weight_lecturer : 0;
+        $weightMentor = $univ ? (int) $univ->weight_mentor : 100;
+        $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
 
         return view('lecturer.grade-sheet', compact(
             'placement',

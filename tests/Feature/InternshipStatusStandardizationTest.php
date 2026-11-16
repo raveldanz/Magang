@@ -12,7 +12,6 @@ use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -21,10 +20,15 @@ class InternshipStatusStandardizationTest extends TestCase
     use RefreshDatabase;
 
     private User $superAdmin;
+
     private User $mentor;
+
     private User $dosen;
+
     private User $student;
+
     private Unit $unit;
+
     private University $univ;
 
     protected function setUp(): void
@@ -168,10 +172,11 @@ class InternshipStatusStandardizationTest extends TestCase
 
         $response = $this->actingAs($this->mentor)->get(route('mentor.dashboard'));
         $response->assertOk();
-        $response->assertSeeText('Daftar Mahasiswa Bimbingan Magang');
-        $response->assertSeeText('Mahasiswa');
-        $response->assertSeeText('Perguruan Tinggi & Unit');
-        $response->assertSeeText('Dosen Pembimbing');
+        $response->assertSeeText('Daftar Peserta Bimbingan Magang');
+        $response->assertSeeText('Peserta Magang');
+        $response->assertSeeText('Kampus/Sekolah & Unit');
+        $response->assertSeeText('Status');
+        $response->assertDontSee('Dosen Pembimbing');
         $response->assertSeeText('Logbook');
         $response->assertSeeText('Laporan Akhir');
         $response->assertSeeText('Nilai Mentor');

@@ -30,7 +30,7 @@ return new class extends Migration
 
         // 2. Dukungan role 'supervisor' pada users (PostgreSQL constraint guard)
         if (DB::getDriverName() === 'pgsql') {
-            DB::statement("ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check");
+            DB::statement('ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check');
         }
 
         // 3. Kolom approval_status, approved_by, approved_at, notes pada tabel certificates
@@ -58,18 +58,18 @@ return new class extends Migration
 
         // 5. Standarisasi 4 Bidang Resmi Dispusip Kota Surabaya
         $dispusipData = [
-            'agency_name'     => 'Dinas Perpustakaan dan Kearsipan',
+            'agency_name' => 'Dinas Perpustakaan dan Kearsipan',
             'government_name' => 'Pemerintah Kota Surabaya',
-            'address'         => 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Kec. Rungkut, Kota Surabaya, Jawa Timur 60293',
-            'phone'           => '(031) 8707682',
-            'email'           => 'dispusip@surabaya.go.id',
-            'website'         => 'https://dispusip.surabaya.go.id',
-            'logo'            => 'images/logos/dispusip.png',
-            'signee_name'     => 'Ir. Mia Santi Dewi, M.Si',
-            'signee_nip'      => '19680812 199403 2 007',
+            'address' => 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Kec. Rungkut, Kota Surabaya, Jawa Timur 60293',
+            'phone' => '(031) 8707682',
+            'email' => 'dispusip@surabaya.go.id',
+            'website' => 'https://dispusip.surabaya.go.id',
+            'logo' => 'images/logos/dispusip.png',
+            'signee_name' => 'Ir. Mia Santi Dewi, M.Si',
+            'signee_nip' => '19680812 199403 2 007',
             'signee_position' => 'Kepala Dinas Perpustakaan dan Kearsipan',
-            'city'            => 'Surabaya',
-            'updated_at'      => now(),
+            'city' => 'Surabaya',
+            'updated_at' => now(),
         ];
 
         // Cari record yang ada menggunakan Query Builder mentah agar tidak mentrigger insert

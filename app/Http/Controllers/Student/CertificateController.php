@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\AuditLog;
+use App\Models\Certificate;
+use App\Models\CertificateTheme;
 use App\Models\Placement;
 use App\Models\University;
 use App\Services\UniversityResolver;
+use App\Support\PublicUrl;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -155,9 +158,15 @@ class CertificateController extends Controller
         $blockers = $application->certificateBlockers();
 
         // Cek pengesahan Atasan (Double ACC): Mahasiswa, Dosen, dan Mitra Kampus hanya bisa mengunduh jika sudah disahkan oleh Atasan
-        $certRecord = \App\Models\Certificate::where('placement_id', $placement?->id)->first();
-        if (($isOwner || $isAdvisor || $isUnivAdmin) && $certRecord && $certRecord->approval_status !== 'approved') {
-            $blockers[] = 'Sertifikat magang telah diterbitkan oleh Admin dan saat ini sedang dalam proses pengesahan (ACC) oleh Atasan (Tim Kerja Umum & Kepegawaian Dispusip).';
+        $certRecord = Certificate::where('placement_id', $placement?->id)->first();
+        // Tanpa rekaman pun tetap terkunci: sebelumnya mahasiswa bisa membuka sertifikat selama Admin belum
+        // menerbitkannya, sehingga pengesahan Atasan terlewati.
+        if (($isOwner || $isAdvisor || $isUnivAdmin) && $blockers === []) {
+            if (! $certRecord) {
+                $blockers[] = 'Sertifikat magang belum diterbitkan oleh Admin Dinas. Setelah diterbitkan, sertifikat masih perlu disahkan (ACC) oleh Atasan sebelum dapat dibuka.';
+            } elseif ($certRecord->approval_status !== 'approved') {
+                $blockers[] = 'Sertifikat magang telah diterbitkan oleh Admin dan saat ini sedang dalam proses pengesahan (ACC) oleh Atasan (Tim Kerja Umum & Kepegawaian Dispusip).';
+            }
         }
 
         if (! $isSupervisor && ! $isSuperAdmin && ! $isAgencyAdmin && $blockers !== []) {
@@ -199,7 +208,7 @@ class CertificateController extends Controller
             $year = Carbon::parse($application->end_date)->format('Y');
         }
 
-        $theme = \App\Models\CertificateTheme::getActive((int) $year);
+        $theme = CertificateTheme::getActive((int) $year);
         $paddedId = str_pad($placement ? $placement->id : $application->id, 4, '0', STR_PAD_LEFT);
 
         if ($placement) {
@@ -220,7 +229,7 @@ class CertificateController extends Controller
         $regNumber = $placement?->certificate_number ?: $theme->formatNumber($paddedId, (int) $year);
         $certificateHash = $placement?->certificate_hash;
         // QR selalu memakai hash acak (bukan ID angka) agar sertifikat lain tidak bisa ditebak
-        $verifyCertificateUrl = $certificateHash ? route('verify.certificate', $certificateHash) : null;
+        $verifyCertificateUrl = $certificateHash ? PublicUrl::route('verify.certificate', $certificateHash) : null;
 
         // QR dibuat lokal (SVG) — dengan error correction H (High) agar logo pemkot di tengah tetap terbaca akurat
         $qrSvg = null;

@@ -3,7 +3,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-bold text-xl sm:text-2xl text-slate-900 leading-tight">
-                Logbook Mahasiswa Bimbingan
+                Logbook Peserta Bimbingan
             </h2>
         </div>
     </x-slot>
@@ -24,35 +24,35 @@
                     $currStatus = request('status', '');
                 @endphp
                 <div class="border-b border-slate-200">
-                    <nav class="flex items-center w-full sm:space-x-6 sm:w-auto" aria-label="Tabs">
+                    <nav class="flex items-center w-full sm:space-x-6 sm:w-auto overflow-x-auto" aria-label="Tabs">
                         <a href="{{ route('lecturer.logbooks.index', array_merge(request()->except('status'), ['status' => ''])) }}"
-                           class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ $currStatus === '' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
+                           class="flex-1 sm:flex-initial min-h-[44px] py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ $currStatus === '' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300 font-semibold' }}">
                             <span class="sm:hidden">Semua</span>
                             <span class="hidden sm:inline">Semua Status</span>
                         </a>
                         <a href="{{ route('lecturer.logbooks.index', array_merge(request()->except('status'), ['status' => 'pending'])) }}"
-                           class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ $currStatus === 'pending' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
+                           class="flex-1 sm:flex-initial min-h-[44px] py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ $currStatus === 'pending' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300 font-semibold' }}">
                             <span class="sm:hidden">Menunggu</span>
                             <span class="hidden sm:inline">{{ \App\Enums\ReviewStatus::PENDING->description() }}</span>
-                            <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold {{ $currStatus === 'pending' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $pendingCount }}</span>
+                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $currStatus === 'pending' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $pendingCount }}</span>
                         </a>
                         <a href="{{ route('lecturer.logbooks.index', array_merge(request()->except('status'), ['status' => 'approved'])) }}"
-                           class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ $currStatus === 'approved' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
+                           class="flex-1 sm:flex-initial min-h-[44px] py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ $currStatus === 'approved' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300 font-semibold' }}">
                             <span>{{ \App\Enums\ReviewStatus::APPROVED->description() }}</span>
-                            <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold {{ $currStatus === 'approved' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $approvedCount }}</span>
+                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $currStatus === 'approved' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $approvedCount }}</span>
                         </a>
                         <a href="{{ route('lecturer.logbooks.index', array_merge(request()->except('status'), ['status' => 'rejected'])) }}"
-                           class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ $currStatus === 'rejected' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
+                           class="flex-1 sm:flex-initial min-h-[44px] py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ $currStatus === 'rejected' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300 font-semibold' }}">
                             <span class="sm:hidden">Revisi</span> {{-- status-guard:ignore --}}
                             <span class="hidden sm:inline">{{ \App\Enums\ReviewStatus::REVISION->description() }}</span>
-                            <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold {{ $currStatus === 'rejected' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $rejectedCount }}</span>
+                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $currStatus === 'rejected' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $rejectedCount }}</span>
                         </a>
                         @if ($mentorApprovedPendingCount > 0 || $currStatus === 'mentor_approved')
                             <a href="{{ route('lecturer.logbooks.index', array_merge(request()->except('status'), ['status' => 'mentor_approved'])) }}"
-                               class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ $currStatus === 'mentor_approved' ? 'border-emerald-600 text-emerald-700 font-bold' : 'border-transparent text-emerald-600 hover:text-emerald-700 hover:border-emerald-300 font-semibold' }}">
-                                <span class="sm:hidden">Siap ACC</span>
-                                <span class="hidden sm:inline">Siap ACC Pembimbing</span>
-                                <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold {{ $currStatus === 'mentor_approved' ? 'bg-emerald-200 text-emerald-800' : 'bg-emerald-100 text-emerald-700' }}">{{ $mentorApprovedPendingCount }}</span>
+                               class="flex-1 sm:flex-initial min-h-[44px] py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ $currStatus === 'mentor_approved' ? 'border-emerald-600 text-emerald-700 font-bold' : 'border-transparent text-emerald-700 hover:text-emerald-800 hover:border-emerald-300 font-semibold' }}">
+                                <span class="sm:hidden">Siap Setujui</span>
+                                <span class="hidden sm:inline">Siap Disetujui Pembimbing</span>
+                                <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $currStatus === 'mentor_approved' ? 'bg-emerald-200 text-emerald-800' : 'bg-emerald-100 text-emerald-700' }}">{{ $mentorApprovedPendingCount }}</span>
                             </a>
                         @endif
                     </nav>
@@ -67,22 +67,22 @@
 
                         <div class="w-full sm:w-64 sm:max-w-xs shrink-0">
                             <select name="placement_id" onchange="this.form.submit()" 
-                                    class="w-full text-xs sm:text-sm bg-white border border-slate-200 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl py-2.5 px-3.5 font-medium transition shadow-2xs truncate">
-                                <option value="">Semua Mahasiswa</option>
+                                    class="w-full min-h-[44px] text-xs sm:text-sm bg-white border border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl py-2.5 pl-3.5 pr-9 font-medium transition shadow-2xs truncate">
+                                <option value="">Semua Peserta Magang</option>
                                 @foreach ($supervisedPlacements as $pl)
                                     @php
                                         $st = $pl->application?->user;
                                         $nim = $st?->studentProfile?->nim ?? '-';
                                     @endphp
                                     <option value="{{ $pl->id }}" {{ request('placement_id') == $pl->id ? 'selected' : '' }}>
-                                        {{ $st?->name ?? 'Mahasiswa' }} ({{ $nim }})
+                                        {{ $st?->name ?? 'Peserta Magang' }} ({{ $nim }})
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
                         <div class="relative flex-1 min-w-0">
-                            <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-3.5 text-slate-400">
+                            <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-3.5 text-slate-600">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
@@ -92,11 +92,11 @@
                         </div>
 
                         <div class="flex items-center gap-2 shrink-0">
-                            <button type="submit" class="flex-1 sm:flex-initial px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl transition cursor-pointer shadow-xs shrink-0">
+                            <button type="submit" class="flex-1 sm:flex-initial min-h-[44px] px-5 py-2.5 inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl transition cursor-pointer shadow-xs shrink-0">
                                 Cari
                             </button>
                             @if (request()->filled('search') || request()->filled('placement_id') || request()->filled('status'))
-                                <a href="{{ route('lecturer.logbooks.index') }}" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition text-center shrink-0">
+                                <a href="{{ route('lecturer.logbooks.index') }}" class="min-h-[44px] px-4 py-2.5 inline-flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition text-center shrink-0">
                                     Reset
                                 </a>
                             @endif
@@ -115,23 +115,31 @@
                         <div class="min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <h4 class="text-xs sm:text-sm font-bold text-emerald-950">Validasi Sekali Klik (One-Click Approval)</h4>
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-200/80 text-emerald-900">
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-200/80 text-emerald-900">
                                     {{ $mentorApprovedPendingCount }} Logbook Telah Di-ACC Mentor
                                 </span>
                             </div>
-                            <p class="text-xs text-emerald-800/90 mt-1">
+                            <p class="text-xs text-emerald-900 mt-1">
                                 Seluruh entri ini telah diverifikasi oleh Mentor Instansi terkait dan menunggu validasi Pembimbing kampus. Anda dapat menyetujui seluruhnya secara instan.
                             </p>
                         </div>
                     </div>
-                    <form method="POST" action="{{ route('lecturer.logbooks.approve_all_mentor_reviewed') }}"
-                          onsubmit="return confirm('Apakah Anda yakin ingin menyetujui seluruh {{ $mentorApprovedPendingCount }} logbook yang telah di-ACC mentor ini sekaligus?');">
+                    <form method="POST" action="{{ route('lecturer.logbooks.approve_all_mentor_reviewed') }}">
                         @csrf
                         @if (request()->filled('placement_id'))
                             <input type="hidden" name="placement_id" value="{{ request('placement_id') }}">
                         @endif
-                        <button type="submit"
-                                class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs shrink-0 cursor-pointer active:scale-95">
+                        <button type="button"
+                                @click="$dispatch('open-confirm-modal', {
+                                    form: $el.closest('form'),
+                                    title: 'Setujui Semua Logbook Terverifikasi Mentor?',
+                                    message: 'Seluruh {{ $mentorApprovedPendingCount }} logbook yang telah disetujui mentor instansi pada daftar ini akan langsung disetujui oleh Pembimbing.',
+                                    label: 'Jumlah entri:',
+                                    name: '{{ $mentorApprovedPendingCount }} Logbook',
+                                    confirmText: 'Ya, Setujui Semua',
+                                    tone: 'emerald'
+                                })"
+                                class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs shrink-0 cursor-pointer active:scale-95">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                             <span>Setujui Semua yang Di-ACC Mentor ({{ $mentorApprovedPendingCount }})</span>
                         </button>

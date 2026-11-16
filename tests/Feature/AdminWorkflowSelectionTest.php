@@ -3,8 +3,13 @@
 namespace Tests\Feature;
 
 use App\Enums\ApplicationStatus;
+use App\Models\AgencyProfile;
 use App\Models\Application;
+use App\Models\AuditLog;
 use App\Models\Placement;
+use App\Models\StudentProfile;
+use App\Models\Unit;
+use App\Models\University;
 use App\Models\User;
 use Database\Seeders\AdminWorkflowSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -318,18 +323,18 @@ class AdminWorkflowSelectionTest extends TestCase
     public function test_unified_form_can_update_mentor_and_dosen_on_active_application(): void
     {
         $admin = User::where('role', 'admin')->first() ?? User::factory()->create(['role' => 'admin']);
-        $unit = \App\Models\Unit::first();
+        $unit = Unit::first();
         if (! $unit) {
-            $agency = \App\Models\AgencyProfile::first() ?? \App\Models\AgencyProfile::create(['name' => 'Dispusip']);
-            $unit = \App\Models\Unit::create(['agency_profile_id' => $agency->id, 'name' => 'Bidang Kearsipan', 'quota' => 10]);
+            $agency = AgencyProfile::first() ?? AgencyProfile::create(['name' => 'Dispusip']);
+            $unit = Unit::create(['agency_profile_id' => $agency->id, 'name' => 'Bidang Kearsipan', 'quota' => 10]);
         }
         if ($admin->agency_profile_id === null && $unit->agency_profile_id) {
             $admin->update(['agency_profile_id' => $unit->agency_profile_id]);
         }
 
         $student = User::factory()->create(['role' => 'student']);
-        $univ = \App\Models\University::first() ?? \App\Models\University::create(['name' => 'Universitas Airlangga']);
-        \App\Models\StudentProfile::create([
+        $univ = University::first() ?? University::create(['name' => 'Universitas Airlangga']);
+        StudentProfile::create([
             'user_id' => $student->id,
             'university_id' => $univ->id,
             'nim' => '12345678',
@@ -363,7 +368,7 @@ class AdminWorkflowSelectionTest extends TestCase
             'letter_date' => now()->toDateString(),
         ]);
 
-        $placement = \App\Models\Placement::create([
+        $placement = Placement::create([
             'application_id' => $app->id,
             'mentor_id' => $mentorA->id,
             'pembimbing_id' => $mentorA->id,
@@ -395,7 +400,7 @@ class AdminWorkflowSelectionTest extends TestCase
         $this->assertEquals($dosen->id, $placement->academic_advisor_id);
 
         // Verifikasi audit log mutasi/reassign tercatat
-        $audit = \App\Models\AuditLog::where('action', 'PLACEMENT_SUPERVISOR_REASSIGN')
+        $audit = AuditLog::where('action', 'PLACEMENT_SUPERVISOR_REASSIGN')
             ->where('target_id', $placement->id)
             ->latest('id')
             ->first();
@@ -434,4 +439,3 @@ class AdminWorkflowSelectionTest extends TestCase
         $responseSupervisor->assertDontSee('Kunci ACC');
     }
 }
-

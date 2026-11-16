@@ -61,16 +61,17 @@
 @endphp
 
 <div 
+    @restore-value="restoreValue($event.detail)"
     x-data="{
         open: false,
         search: '',
         items: {{ \Illuminate\Support\Js::from($normalizedItems) }},
-        selectedId: '{{ $initialSelected }}',
+        selectedId: @js((string) ($initialSelected ?? '')),
         selectedItem: null,
         isCustom: {{ $hasInitialCustom ? 'true' : 'false' }},
-        customValue: '{{ addslashes((string) $initialCustom) }}',
-        name: '{{ $name }}',
-        placeholder: '{{ addslashes($placeholder) }}',
+        customValue: @js((string) $initialCustom),
+        name: @js((string) $name),
+        placeholder: @js((string) $placeholder),
         allowCustom: {{ $allowCustom ? 'true' : 'false' }},
         activeIndex: -1,
 
@@ -170,6 +171,22 @@
                     this.$refs.searchInput.focus();
                 }
             });
+        },
+
+        // Dipanggil simpan-isian otomatis (resources/js/forms.js) untuk memulihkan pilihan setelah halaman dimuat ulang.
+        restoreValue(value) {
+            value = String(value ?? '');
+            if (value === this.selectedId) return;
+            if (value === 'other') {
+                if (!this.allowCustom) return;
+                this.isCustom = true;
+                this.selectedId = 'other';
+                this.selectedItem = null;
+                this.dispatchChange();
+                return;
+            }
+            const item = this.items.find((i) => i.id === value);
+            if (item) this.select(item);
         },
 
         select(item) {

@@ -92,6 +92,8 @@ class StudentFinalReportTest extends TestCase
 
     public function test_accepted_student_can_upload_final_report()
     {
+        // Controller menyimpan ke disk privat 'local'; tanpa fake ini tiap run meninggalkan berkas kosong di storage asli.
+        Storage::fake('local');
         Storage::fake('public');
 
         [$student] = $this->createStudentWithPlacement();

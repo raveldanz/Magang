@@ -20,6 +20,9 @@ class DashboardController extends Controller
      */
     public function index(Request $request)
     {
+        // Sinkronisasi otomatis transisi status magang (ACCEPTED -> ACTIVE bila tanggal mulai telah tiba)
+        Application::syncStartedApplications();
+
         $user = Auth::user();
         $isSuperAdmin = $user->isSuperAdmin();
         $agencyId = $isSuperAdmin ? $request->agency_id : $user->agency_profile_id;
@@ -67,7 +70,7 @@ class DashboardController extends Controller
         $totalAgencies = AgencyProfile::count();
         $totalUniversities = University::count();
         $totalUsers = User::count();
-        
+
         $totalMentorsQuery = User::whereIn('role', ['mentor', 'pembimbing']);
         if (! $isSuperAdmin && $user->unit_id) {
             $totalMentorsQuery->where('unit_id', $user->unit_id);
@@ -167,9 +170,7 @@ class DashboardController extends Controller
         $recentApplications = (clone $appQuery)->latest()->take(6)->get();
 
         // Perguruan tinggi baru yang belum punya akun portal
-        $pendingUniversities = University::whereDoesntHave('users', function ($q) {
-            $q->where('role', 'universitas');
-        })->withCount('students')->get();
+        $pendingUniversities = University::needingAdminAccount()->withCount('students')->get();
 
         // Instansi dinas baru yang belum punya akun admin dinas
         $pendingAgencies = AgencyProfile::whereDoesntHave('users', function ($q) {

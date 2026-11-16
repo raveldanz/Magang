@@ -2,8 +2,14 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth overflow-x-hidden w-full">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        {{-- Dibaca penjaga unggah & simpan-isian otomatis di resources/js/app.js --}}
+        <meta name="upload-file-max-kb" content="{{ \App\Support\UploadLimits::phpFileMaxKb() }}">
+        <meta name="upload-post-max-kb" content="{{ \App\Support\UploadLimits::phpPostMaxKb() }}">
+        @if (session('success') || session('status'))
+            <meta name="flash-success" content="1">
+        @endif
 
         <title>@hasSection('title')@yield('title') - @endif{{ config('app.name', 'Portal Magang Dispusip — Dinas Perpustakaan dan Kearsipan Kota Surabaya') }}</title>
 
@@ -17,7 +23,7 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -34,7 +40,7 @@
         // Jumlah pesan chat belum dibaca (badge navbar); diperbarui live oleh resources/js/chat/notifier.js
         $chatUnread = auth()->check() ? app(\App\Services\Chat\ChatService::class)->unreadTotalForNavbar(auth()->user()) : 0;
     @endphp
-    <body class="font-sans antialiased bg-[#F5F8FC] text-slate-900 overflow-x-hidden w-full relative" x-data="{}"
+    <body class="app-readable font-sans antialiased bg-[#F5F8FC] text-slate-900 overflow-x-hidden w-full relative" x-data="{}"
           @auth
           data-chat-summary-url="{{ route('chat.api.summary', [], false) }}"
           data-chat-user="{{ auth()->id() }}"
@@ -76,16 +82,19 @@
                 @include('layouts.navigation')
             </header>
 
-            {{-- Peringatan password bawaan: tidak memaksa, tapi tetap tampil di setiap halaman sampai password diganti --}}
+            @include('layouts.partials.temporary-credentials')
+
+            {{-- Peringatan password bawaan/sementara: tampil di setiap halaman sampai password diganti
+                 (di production juga dipaksa oleh EnsurePasswordChanged) --}}
             @auth
                 @if (auth()->user()->must_change_password && !session()->has('impersonator_id'))
                     <aside aria-label="Peringatan Keamanan Password" class="bg-amber-50 border-b border-amber-300 w-full">
                         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <p class="text-xs sm:text-sm text-amber-900 flex items-start gap-2">
                                 <svg class="w-4 h-4 mt-0.5 shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                                <span><strong>Akun Anda masih memakai password bawaan.</strong> Siapa pun yang mengetahuinya bisa masuk ke akun ini. Segera ganti password Anda — peringatan ini akan terus tampil sampai password diganti.</span>
+                                <span><strong>Akun Anda masih memakai password bawaan/sementara.</strong> Password ini diketahui orang lain (pembuat akun atau publik). Segera ganti password Anda — peringatan ini akan terus tampil sampai password diganti.</span>
                             </p>
-                            <a href="{{ route('profile.edit') }}#update-password" class="shrink-0 inline-flex items-center justify-center px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg transition">
+                            <a href="{{ route('profile.edit') }}#update-password" class="shrink-0 inline-flex items-center justify-center min-h-[40px] px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold rounded-lg transition">
                                 Ganti Password Sekarang
                             </a>
                         </div>
@@ -114,22 +123,26 @@
             toasts: [],
             init() {
                 @if(session('success'))
-                    this.add('success', '{{ addslashes(session('success')) }}');
+                    this.add('success', @js((string) (session('success'))));
                 @endif
                 @if(session('error'))
-                    this.add('error', '{{ addslashes(session('error')) }}');
+                    this.add('error', @js((string) (session('error'))));
                 @endif
                 @if(session('warning'))
-                    this.add('warning', '{{ addslashes(session('warning')) }}');
+                    this.add('warning', @js((string) (session('warning'))));
                 @endif
                 @if(session('status'))
-                    this.add('info', '{{ addslashes(session('status')) }}');
+                    this.add('info', @js((string) (session('status'))));
+                @endif
+                @if($errors->any() && ! session('error'))
+                    this.add('error', 'Data belum tersimpan. Periksa tulisan berwarna merah pada halaman ini.');
                 @endif
             },
             add(type, message) {
                 const id = Date.now() + Math.random();
                 this.toasts.push({ id, type, message });
-                setTimeout(() => this.remove(id), 4500);
+                // Pesan galat tetap tampil sampai ditutup; pesan lain hilang setelah 8 detik.
+                if (type !== 'error') setTimeout(() => this.remove(id), 8000);
             },
             remove(id) {
                 this.toasts = this.toasts.filter(t => t.id !== id);
@@ -147,7 +160,8 @@
                      x-transition:leave="transition ease-in duration-200 transform"
                      x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                      x-transition:leave-end="opacity-0 translate-y-2 scale-95"
-                     class="pointer-events-auto p-3.5 rounded-2xl shadow-xl border flex items-start gap-2.5 backdrop-blur-md transition-all text-xs"
+                     :role="t.type === 'error' ? 'alert' : 'status'"
+                     class="pointer-events-auto p-4 rounded-2xl shadow-xl border-2 flex items-start gap-3 backdrop-blur-md transition-all text-base"
                      :class="{
                          'bg-white/95 border-emerald-200 text-emerald-900 shadow-emerald-500/10': t.type === 'success',
                          'bg-white/95 border-rose-200 text-rose-900 shadow-rose-500/10': t.type === 'error',
@@ -155,8 +169,8 @@
                          'bg-white/95 border-blue-200 text-blue-900 shadow-blue-500/10': t.type === 'info'
                      }">
                     <div class="flex-1 font-medium leading-snug" x-text="t.message"></div>
-                    <button @click="remove(t.id)" class="shrink-0 text-gray-400 hover:text-gray-600 transition p-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <button type="button" @click="remove(t.id)" class="shrink-0 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition" aria-label="Tutup pesan">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
             </template>
@@ -203,33 +217,45 @@
         @auth
         <script>
             document.addEventListener('DOMContentLoaded', () => {
+                function subscribePush(registration) {
+                    const vapidPublicKey = '{{ config("services.vapid.public_key", "") }}';
+                    if (!vapidPublicKey) return;
+                    const applicationServerKey = urlB64ToUint8Array(vapidPublicKey);
+                    registration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: applicationServerKey
+                    }).then(function(subscription) {
+                        fetch('/push-subscriptions', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: JSON.stringify(subscription)
+                        });
+                    }).catch(function(err) {
+                        console.log('Failed to subscribe the user: ', err);
+                    });
+                }
+
                 if ('serviceWorker' in navigator && 'PushManager' in window) {
                     navigator.serviceWorker.register('/sw.js').then(function(registration) {
                         console.log('Service Worker registered with scope:', registration.scope);
-                        
-                        Notification.requestPermission().then(function(permission) {
-                            if (permission === 'granted') {
-                                const vapidPublicKey = '{{ env("VAPID_PUBLIC_KEY") }}';
-                                if (vapidPublicKey) {
-                                    const applicationServerKey = urlB64ToUint8Array(vapidPublicKey);
-                                    registration.pushManager.subscribe({
-                                        userVisibleOnly: true,
-                                        applicationServerKey: applicationServerKey
-                                    }).then(function(subscription) {
-                                        fetch('/push-subscriptions', {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                                            },
-                                            body: JSON.stringify(subscription)
-                                        });
-                                    }).catch(function(err) {
-                                        console.log('Failed to subscribe the user: ', err);
-                                    });
+
+                        // Hanya sinkronkan langganan secara diam-diam jika izin notifikasi sudah diberikan sebelumnya.
+                        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+                            subscribePush(registration);
+                        }
+
+                        window.enableWebPushNotifications = function() {
+                            if (typeof Notification === 'undefined') return Promise.resolve('unsupported');
+                            return Notification.requestPermission().then(function(permission) {
+                                if (permission === 'granted') {
+                                    subscribePush(registration);
                                 }
-                            }
-                        });
+                                return permission;
+                            });
+                        };
                     }).catch(function(error) {
                         console.log('Service Worker registration failed:', error);
                     });

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\AgencyProfile;
 use App\Models\Application;
+use App\Models\Certificate;
 use App\Models\Evaluation;
 use App\Models\Placement;
 use App\Models\StudentProfile;
@@ -65,7 +66,7 @@ class CertificateTranscriptDensityTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('data-density="normal"', false);
         $response->assertSee('data-row="final"', false);
-        $response->assertDontSee('Subtotal Nilai DPL');
+        $response->assertDontSee('Subtotal Nilai Pembimbing');
     }
 
     public function test_two_party_transcript_starts_denser_and_renders_both_sections(): void
@@ -76,7 +77,7 @@ class CertificateTranscriptDensityTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Subtotal Nilai Dinas');
-        $response->assertSee('Subtotal Nilai DPL');
+        $response->assertSee('Subtotal Nilai Pembimbing');
         $response->assertDontSee('data-density="normal"', false);
     }
 
@@ -89,7 +90,7 @@ class CertificateTranscriptDensityTest extends TestCase
         $single->assertSee('transcript-sheet', false);
         $single->assertSee('layoutTranscript', false);
 
-        \App\Models\Certificate::create([
+        Certificate::create([
             'placement_id' => $placement->id,
             'certificate_number' => $placement->certificate_number,
             'file_path' => 'certificates/siti.pdf',

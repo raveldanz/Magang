@@ -5,12 +5,10 @@ namespace Tests\Feature;
 use App\Enums\ApplicationStatus;
 use App\Models\AgencyProfile;
 use App\Models\Application;
-use App\Models\AuditLog;
 use App\Models\Evaluation;
 use App\Models\FinalReport;
 use App\Models\Logbook;
 use App\Models\Placement;
-use App\Models\SystemNotification;
 use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
@@ -23,9 +21,13 @@ class SyncInternshipStatusTest extends TestCase
     use RefreshDatabase;
 
     private User $student;
+
     private User $mentor;
+
     private User $dosen;
+
     private Unit $unit;
+
     private University $univ;
 
     protected function setUp(): void
@@ -72,7 +74,7 @@ class SyncInternshipStatusTest extends TestCase
         ]);
 
         $this->artisan('app:sync-internship-status')
-            ->expectsOutputToContain('Ditemukan 1 mahasiswa yang siap bertransisi ke status ACTIVE.')
+            ->expectsOutputToContain('Ditemukan 1 peserta magang yang siap bertransisi ke status ACTIVE.')
             ->assertSuccessful();
 
         $this->assertSame(ApplicationStatus::ACTIVE, $app->fresh()->status);
@@ -93,7 +95,7 @@ class SyncInternshipStatusTest extends TestCase
         ]);
 
         $this->artisan('app:sync-internship-status')
-            ->expectsOutputToContain('Tidak ada mahasiswa berstatus ACCEPTED yang siap diaktifkan hari ini.')
+            ->expectsOutputToContain('Tidak ada peserta magang berstatus ACCEPTED yang siap diaktifkan hari ini.')
             ->assertSuccessful();
 
         $this->assertSame(ApplicationStatus::ACCEPTED, $app->fresh()->status);
@@ -180,7 +182,28 @@ class SyncInternshipStatusTest extends TestCase
         // Reminder notification created for mentor
         $this->assertDatabaseHas('system_notifications', [
             'user_id' => $this->mentor->id,
-            'title' => 'Mahasiswa Melewati Masa Magang',
+            'title' => 'Peserta Magang Melewati Masa Magang',
         ]);
+    }
+
+    public function test_admin_can_manually_sync_status_via_button(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $app = Application::create([
+            'user_id' => $this->student->id,
+            'unit_id' => $this->unit->id,
+            'status' => ApplicationStatus::ACCEPTED,
+            'start_date' => Carbon::today()->subDay()->toDateString(),
+            'end_date' => Carbon::today()->addMonths(3)->toDateString(),
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->post(route('admin.applications.sync_status'));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertSame(ApplicationStatus::ACTIVE, $app->fresh()->status);
     }
 }

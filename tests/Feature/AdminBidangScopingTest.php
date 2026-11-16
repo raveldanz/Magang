@@ -15,15 +15,25 @@ class AdminBidangScopingTest extends TestCase
     use RefreshDatabase;
 
     protected AgencyProfile $agency;
+
     protected Unit $unitSekretariat;
+
     protected Unit $unitPerpustakaan;
+
     protected User $adminSekretariat;
+
     protected User $adminPerpustakaan;
+
     protected User $superAdmin;
+
     protected User $adminDinasUtama;
+
     protected Application $appSekretariat;
+
     protected Application $appPerpustakaan;
+
     protected User $mentorSekretariat;
+
     protected User $mentorPerpustakaan;
 
     protected function setUp(): void
@@ -276,7 +286,7 @@ class AdminBidangScopingTest extends TestCase
         // Logbooks index memuat nama bidang pada header
         $logbookResp = $this->actingAs($this->adminSekretariat)->get(route('admin.logbooks.index'));
         $logbookResp->assertStatus(200);
-        $logbookResp->assertSee('Rekapitulasi Logbook Mahasiswa • Bidang Sekretariat');
+        $logbookResp->assertSee('Rekapitulasi Logbook Peserta Magang • Bidang Sekretariat');
 
         // Certificates index memuat nama bidang pada header
         $certResp = $this->actingAs($this->adminSekretariat)->get(route('admin.certificates.index'));

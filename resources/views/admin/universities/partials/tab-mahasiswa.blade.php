@@ -7,7 +7,7 @@
                 <div class="cc-panel-head p-4 space-y-3 border-b border-slate-100">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-                            <h3 class="text-sm font-black text-slate-900">Daftar Mahasiswa Asal {{ $university->name }}</h3>
+                            <h3 class="text-sm font-black text-slate-900">Daftar Peserta Magang Asal {{ $university->name }}</h3>
                         </div>
 
                         <div class="cc-head-actions flex items-center gap-2">
@@ -23,7 +23,7 @@
                         <input type="hidden" name="tab" value="mahasiswa">
                         
                         <div class="relative flex-1">
-                            <input type="text" name="student_search" value="{{ request('student_search') }}" placeholder="Cari nama mahasiswa, NIM, atau program studi..." 
+                            <input type="text" name="student_search" value="{{ request('student_search') }}" placeholder="Cari nama peserta magang, NIM/NIS, atau program studi..." 
                                    class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500"
                                    style="padding-left: 2.25rem !important; padding-right: 0.75rem !important; padding-top: 0.5rem !important; padding-bottom: 0.5rem !important;">
                             <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400 pl-3">
@@ -32,7 +32,7 @@
                         </div>
 
                         <select name="student_status" class="text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2">
-                            <option value="">Semua Status Mahasiswa</option>
+                            <option value="">Semua Status Peserta Magang</option>
                             <option value="action" {{ request('student_status') === 'action' ? 'selected' : '' }}>Perlu Tindakan</option>
                             <optgroup label="Status Pengajuan">
                                 @foreach(\App\Enums\ApplicationStatus::cases() as $statusCase)
@@ -62,7 +62,7 @@
                             </colgroup>
                             <thead>
                                 <tr class="bg-slate-50 border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider text-xs">
-                                    <th class="p-3.5 pl-4">Mahasiswa</th>
+                                    <th class="p-3.5 pl-4">Peserta Magang</th>
                                     <th class="p-3.5">Status</th>
                                     <th class="p-3.5">Penempatan</th>
                                     <th class="p-3.5">Pembimbing</th>
@@ -84,7 +84,7 @@
                                         $metaLine = collect([
                                             $profile?->jurusan,
                                             $profile?->nim ? 'NIM ' . $profile->nim : null,
-                                            $profile?->semester ? 'Smt ' . $profile->semester : null,
+                                            $profile?->periodLabel(),
                                         ])->filter()->implode(' · ');
                                     @endphp
                                     <tr class="hover:bg-slate-50/80 transition">
@@ -97,7 +97,7 @@
                                                 <div class="min-w-0">
                                                     <div class="stt-title" title="{{ $student->email }}">{{ $student->name }}</div>
                                                     <div class="stt-meta" title="{{ $metaLine }}">{{ $profile?->jurusan ?? '-' }}</div>
-                                                    <div class="stt-meta stt-mono">NIM {{ $profile?->nim ?? '-' }} · Smt {{ $profile?->semester ?? '-' }}</div>
+                                                    <div class="stt-meta stt-mono">{{ $profile?->identityNumberLabel() ?? 'NIM/NIS' }} {{ $profile?->nim ?? '-' }} · {{ $profile?->periodLabel() ?? '-' }}</div>
                                                     @if($latestApp?->group_id && $latestApp?->group)
                                                         <div class="mt-1">
                                                             <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
@@ -138,20 +138,20 @@
                                         <td class="p-3.5">
                                             <div class="stt-people">
                                                 <div class="stt-person">
-                                                    <span class="stt-role">Dosen</span>
+                                                    <span class="stt-role">Pembimbing</span>
                                                     @if($dosen)
                                                         <span class="stt-name text-indigo-700" title="{{ $dosen->name }}">{{ $dosen->name }}</span>
                                                         @if($isSuperAdmin && $latestApp)
                                                             <button type="button"
-                                                                    @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = '{{ addslashes($student->name) }}'; showAssignAdvisorModal = true;"
-                                                                    class="stt-link" title="Ganti Dosen Pembimbing" aria-label="Ganti Dosen Pembimbing">
+                                                                    @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = @js((string) ($student->name)); showAssignAdvisorModal = true;"
+                                                                    class="stt-link" title="Ganti Pembimbing" aria-label="Ganti Pembimbing">
                                                                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6.232-6.232a2.5 2.5 0 113.536 3.536L12.536 16.536 9 17l.464-3.536z"/></svg>
                                                             </button>
                                                         @endif
                                                     @elseif($canAssignDpl)
                                                         <button type="button"
-                                                                @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = '{{ addslashes($student->name) }}'; showAssignAdvisorModal = true;"
-                                                                class="stt-assign">+ Tugaskan Dosen</button>
+                                                                @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = @js((string) ($student->name)); showAssignAdvisorModal = true;"
+                                                                class="stt-assign">+ Tugaskan Pembimbing</button>
                                                     @else
                                                         <span class="stt-empty">Belum ada</span>
                                                     @endif
@@ -204,7 +204,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="6" class="p-8 text-center text-slate-400">
-                                            <p class="font-bold text-slate-600">Tidak ada data mahasiswa terdaftar</p>
+                                            <p class="font-bold text-slate-600">Tidak ada data peserta magang terdaftar</p>
                                         </td>
                                     </tr>
                                 @endforelse
@@ -232,7 +232,7 @@
                                 <div class="mavatar">{{ strtoupper(substr($student->name, 0, 2)) }}</div>
                                 <div class="mcard-main">
                                     <div class="mcard-title">{{ $student->name }}</div>
-                                    <div class="mcard-sub">{{ $profile?->jurusan ?? '-' }}<br><span class="mono">NIM {{ $profile?->nim ?? '-' }}</span> &middot; Smt {{ $profile?->semester ?? '-' }}</div>
+                                    <div class="mcard-sub">{{ $profile?->jurusan ?? '-' }}<br><span class="mono">{{ $profile?->identityNumberLabel() ?? 'NIM/NIS' }} {{ $profile?->nim ?? '-' }}</span> &middot; {{ $profile?->periodLabel() ?? '-' }}</div>
                                     @if($latestApp?->group_id && $latestApp?->group)
                                         <div class="mt-1">
                                             <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
@@ -261,12 +261,12 @@
                                     @endif
                                 </div>
                                 <div>
-                                    <div class="mfield-label">Dosen Pembimbing</div>
+                                    <div class="mfield-label">Pembimbing</div>
                                     <div class="mfield-value">{{ $dosen->name ?? '-' }}</div>
                                     @if($isSuperAdmin && $latestApp && ($dosen || in_array($mSt, ['accepted', 'active'], true)))
                                         <button type="button"
-                                                @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = '{{ addslashes($student->name) }}'; showAssignAdvisorModal = true;"
-                                                class="cc-link" style="margin-top:2px">{{ $dosen ? 'Ganti Dosen' : '+ Tugaskan Dosen' }}</button>
+                                                @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = @js((string) ($student->name)); showAssignAdvisorModal = true;"
+                                                class="cc-link" style="margin-top:2px">{{ $dosen ? 'Ganti Pembimbing' : '+ Tugaskan Pembimbing' }}</button>
                                     @endif
                                 </div>
                                 <div>
@@ -288,7 +288,7 @@
                             @endif
                         </div>
                     @empty
-                        <div class="mempty">Tidak ada data mahasiswa terdaftar.</div>
+                        <div class="mempty">Tidak ada data peserta magang terdaftar.</div>
                     @endforelse
                 </div>
             </div>

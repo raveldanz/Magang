@@ -94,8 +94,8 @@ class FeedbackController extends Controller
     {
         $request->validate([
             'category' => 'required|in:error_bug,saran_fitur,pertanyaan,koordinasi,lainnya',
-            'subject' => 'required|string|max:255',
-            'message' => 'required|string|max:5000',
+            'subject' => 'required|string|min:5|max:255',
+            'message' => 'required|string|min:10|max:5000',
             'target_role' => 'nullable|string|in:super_admin,admin_dinas,universitas',
             'target_agency_id' => 'nullable|exists:agency_profiles,id',
             'target_university_id' => 'nullable|exists:universities,id',
@@ -144,13 +144,13 @@ class FeedbackController extends Controller
         $catLabel = match ($feedback->category) {
             'error_bug' => 'Kendala / Bug Sistem',
             'saran_fitur' => 'Saran Fitur',
-            'pertanyaan' => 'Pertanyaan MBKM',
+            'pertanyaan' => 'Pertanyaan Alur Magang',
             default => 'Masukan Pengguna',
         };
 
         SystemNotification::send(
             title: "Masukan Baru: [{$catLabel}] {$feedback->subject}",
-            message: "Dari {$feedback->sender_name} (".strtoupper($feedback->sender_role).'): '.Str::limit($feedback->message, 80),
+            message: "Dari {$feedback->sender_name} (".$feedback->senderRoleLabel().'): '.Str::limit($feedback->message, 80),
             userId: null,
             targetRole: 'super_admin',
             actionUrl: route('admin.feedbacks.show', $feedback->id),
@@ -217,6 +217,11 @@ class FeedbackController extends Controller
         ]);
 
         $user = Auth::user();
+        abort_unless(
+            self::canAccess($user, $feedback),
+            403,
+            'Anda tidak memiliki akses untuk menanggapi tiket masukan ini.'
+        );
 
         $feedback->update([
             'status' => $request->status,

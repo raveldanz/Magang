@@ -82,12 +82,34 @@ class StatusLabelConsistencyTest extends TestCase
             $response->assertOk();
             $html = $response->getContent();
 
+            $expectedLabel = ApplicationStatus::ACTIVE->localizedLabel($user->role);
             $this->assertStringContainsString('data-status="active"', $html, "{$page}: badge standar tidak dipakai");
-            $this->assertStringContainsString('ACTIVE', $html, "{$page}: nama status bukan kode sistem");
+            $this->assertStringContainsString($expectedLabel, $html, "{$page}: nama status tidak sesuai standar role ({$expectedLabel})");
             foreach (['AKTIF (Sedang Magang)', '>Sedang Magang<', 'Magang Aktif'] as $legacy) {
                 $this->assertStringNotContainsString($legacy, $html, "{$page}: masih memakai nama lama \"{$legacy}\"");
             }
         }
+    }
+
+    public function test_elderly_roles_share_standardized_indonesian_status_ui_while_system_remains_english(): void
+    {
+        foreach (ApplicationStatus::cases() as $case) {
+            $this->assertSame($case->localizedLabel('mentor'), $case->localizedLabel('pembimbing'));
+            $this->assertSame($case->localizedLabel('mentor'), $case->localizedLabel('supervisor'));
+            $this->assertSame(str_replace('_', ' ', strtoupper($case->value)), $case->localizedLabel('admin'));
+        }
+
+        foreach (ReviewStatus::cases() as $case) {
+            $this->assertSame($case->localizedLabel('mentor'), $case->localizedLabel('pembimbing'));
+            $this->assertSame($case->localizedLabel('mentor'), $case->localizedLabel('supervisor'));
+            $this->assertSame(strtoupper($case->value), $case->localizedLabel('dosen'));
+        }
+
+        $this->assertSame('Menunggu ACC', ApplicationStatus::WAITING_APPROVAL->localizedLabel('mentor'));
+        $this->assertSame('Aktif Magang', ApplicationStatus::ACTIVE->localizedLabel('supervisor'));
+        $this->assertSame('Menunggu Tinjauan', ReviewStatus::PENDING->localizedLabel('mentor'));
+        $this->assertSame('Perlu Revisi', ReviewStatus::REJECTED->localizedLabel('mentor'));
+        $this->assertSame('Disetujui', ReviewStatus::APPROVED->localizedLabel('mentor'));
     }
 
     public function test_review_status_names_equal_system_codes(): void
@@ -113,9 +135,9 @@ class StatusLabelConsistencyTest extends TestCase
         }
         $this->assertSame('IN PROGRESS', FeedbackStatus::IN_PROGRESS->label());
 
-        // Status akun: hanya dua keadaan, label Bahasa Indonesia untuk semua role
-        $this->assertSame(['active', 'inactive'], AccountStatus::values());
-        $this->assertSame(['Aktif', 'Nonaktif'], array_map(fn ($c) => $c->label(), AccountStatus::cases()));
+        // Status akun: tiga keadaan (Menunggu Persetujuan = Pembimbing daftar sendiri), label Bahasa Indonesia untuk semua role
+        $this->assertSame(['active', 'pending', 'inactive'], AccountStatus::values());
+        $this->assertSame(['Aktif', 'Menunggu Persetujuan', 'Nonaktif'], array_map(fn ($c) => $c->label(), AccountStatus::cases()));
         $this->assertNull(AccountStatus::resolve('on_leave'));
     }
 
@@ -212,8 +234,9 @@ class StatusLabelConsistencyTest extends TestCase
         foreach ($pages as $page => [$user, $url, $codes]) {
             $html = $this->actingAs($user)->get($url)->assertOk()->getContent();
             foreach ($codes as $code) {
+                $expectedLabel = ReviewStatus::resolve($code)?->localizedLabel($user->role) ?? strtoupper($code);
                 $this->assertStringContainsString("data-status=\"{$code}\"", $html, "{$page}: badge {$code} tidak dipakai");
-                $this->assertStringContainsString(strtoupper($code), $html, "{$page}: nama {$code} bukan kode sistem");
+                $this->assertStringContainsString($expectedLabel, $html, "{$page}: nama {$code} tidak sesuai standar ({$expectedLabel})");
             }
             foreach (['Mentor: Pending', 'Laporan Disetujui (ACC)', 'Perlu Perbaikan (Revisi)', 'Minta Revisi (Rejected)'] as $legacy) {
                 $this->assertStringNotContainsString($legacy, $html, "{$page}: masih memakai nama lama \"{$legacy}\"");

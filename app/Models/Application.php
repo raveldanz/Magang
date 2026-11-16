@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ApplicationStatus;
+use App\Services\UniversityResolver;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -146,7 +147,7 @@ class Application extends Model
 
         $univ = $eval->getUniversity();
         if (! $univ && $this->user) {
-            $univ = app(\App\Services\UniversityResolver::class)->forUser($this->user);
+            $univ = app(UniversityResolver::class)->forUser($this->user);
         }
         $scheme = $univ->evaluation_scheme ?? 'mentor_only';
         $weightMentor = $univ ? (int) $univ->weight_mentor : 100;
@@ -187,45 +188,11 @@ class Application extends Model
      * Memeriksa dan melakukan transisi otomatis dari ACCEPTED ke ACTIVE secara on-demand
      * jika tanggal mulai magang telah tiba (start_date <= today).
      * Mencegah mahasiswa terblokir dari pengisian logbook akibat scheduler server belum berjalan.
+     * Menggunakan engine terpadu autoActivateIfStarted() agar seluruh anggota kelompok ikut aktif serentak.
      */
     public function checkAndSyncActiveStatus(): bool
     {
-        $rawStatus = $this->statusValue();
-        if ($rawStatus !== ApplicationStatus::ACCEPTED->value) {
-            return false;
-        }
-
-        if (! $this->start_date) {
-            return false;
-        }
-
-        $today = Carbon::today()->toDateString();
-        $startDateStr = Carbon::parse($this->start_date)->toDateString();
-
-        if ($startDateStr <= $today) {
-            // Jika ada end_date dan sudah lewat, jangan aktifkan di sini
-            if ($this->end_date && Carbon::parse($this->end_date)->toDateString() < $today) {
-                return false;
-            }
-
-            $this->update(['status' => ApplicationStatus::ACTIVE]);
-            $this->refresh();
-
-            if (class_exists(\App\Models\AuditLog::class)) {
-                \App\Models\AuditLog::record('AUTO_ACTIVATE_INTERNSHIP', 'Application', $this->id, [
-                    'student_name' => $this->user?->name,
-                    'nim' => $this->user?->studentProfile?->nim,
-                    'unit_name' => $this->unit?->name,
-                    'start_date' => $this->start_date,
-                    'activated_at' => now()->toDateTimeString(),
-                    'reason' => 'Tanggal mulai magang telah tiba (On-demand auto sync)',
-                ]);
-            }
-
-            return true;
-        }
-
-        return false;
+        return $this->autoActivateIfStarted();
     }
 
     /**
@@ -246,7 +213,7 @@ class Application extends Model
 
         $univ = $eval ? $eval->getUniversity() : null;
         if (! $univ && $this->user) {
-            $univ = app(\App\Services\UniversityResolver::class)->forUser($this->user);
+            $univ = app(UniversityResolver::class)->forUser($this->user);
         }
         $scheme = $univ->evaluation_scheme ?? 'mentor_only';
         $weightMentor = $univ ? (int) $univ->weight_mentor : 100;
@@ -283,7 +250,7 @@ class Application extends Model
         }
 
         if ($lecturerRequired && ! $lecturerEvalComplete) {
-            $blockers[] = 'Nilai evaluasi akademik dari Dosen Pembimbing Lapangan (kampus) belum lengkap.';
+            $blockers[] = 'Nilai evaluasi akademik dari Pembimbing (kampus) belum lengkap.';
         }
 
         if (! $this->has_approved_report) {
@@ -450,7 +417,7 @@ class Application extends Model
 
         return match ($this->actionPriority($requireAdvisor)) {
             2 => 'Siap diluluskan',
-            3 => $this->missingSupervisor($requireAdvisor) === 'mentor' ? 'Mentor belum ditetapkan' : 'Dosen pembimbing belum ditetapkan',
+            3 => $this->missingSupervisor($requireAdvisor) === 'mentor' ? 'Mentor belum ditetapkan' : 'Pembimbing belum ditetapkan',
             default => null,
         };
     }
@@ -458,30 +425,125 @@ class Application extends Model
     /**
      * Otomatisasi transisi status dari ACCEPTED ke ACTIVE secara on-the-fly jika tanggal mulai magang
      * telah tiba (today >= start_date) dan mahasiswa belum berstatus active.
+     * Jika pengajuan merupakan bagian dari kelompok, seluruh anggota kelompok yang memenuhi syarat
+     * (status accepted) beserta record InternshipGroup akan ikut diaktifkan serentak (Single Source of Truth).
      */
-    public function autoActivateIfStarted(): bool
+    public function autoActivateIfStarted(string $auditAction = 'AUTO_ACTIVATE_ON_THE_FLY'): bool
     {
         $rawStatus = $this->statusValue();
         $today = Carbon::today()->toDateString();
 
+        $effectiveStartDate = $this->start_date ? Carbon::parse($this->start_date)->toDateString() : null;
+        if (! $effectiveStartDate && $this->group_id && $this->group?->start_date) {
+            $effectiveStartDate = Carbon::parse($this->group->start_date)->toDateString();
+            $this->start_date = $effectiveStartDate;
+        }
+
         if ($rawStatus === ApplicationStatus::ACCEPTED->value
-            && $this->start_date
-            && Carbon::parse($this->start_date)->toDateString() <= $today) {
+            && $effectiveStartDate
+            && $effectiveStartDate <= $today) {
 
             $this->update(['status' => ApplicationStatus::ACTIVE]);
             $this->status = ApplicationStatus::ACTIVE;
 
-            AuditLog::record('AUTO_ACTIVATE_ON_THE_FLY', 'Application', $this->id, [
-                'student_name' => $this->user?->name,
-                'start_date' => $this->start_date,
-                'activated_at' => now()->toDateTimeString(),
-                'reason' => 'Otomatis diaktifkan secara on-the-fly karena tanggal mulai magang telah tiba.',
-            ]);
+            $year = date('Y');
+            $paddedId = str_pad($this->id, 3, '0', STR_PAD_LEFT);
+
+            // Pastikan Placement ada untuk mahasiswa ini
+            $placement = Placement::firstOrCreate(
+                ['application_id' => $this->id],
+                [
+                    'certificate_hash' => Str::random(32),
+                    'certificate_number' => "SERT/{$paddedId}/PEMKOT-SBY/{$year}",
+                ]
+            );
+
+            if (class_exists(AuditLog::class)) {
+                AuditLog::record($auditAction, 'Application', $this->id, [
+                    'student_name' => $this->user?->name,
+                    'start_date' => $this->start_date,
+                    'activated_at' => now()->toDateTimeString(),
+                    'reason' => 'Otomatis diaktifkan karena tanggal mulai magang telah tiba.',
+                ]);
+            }
+
+            // Jika pengajuan kelompok, sinkronkan seluruh anggota kelompok lainnya dan record grup!
+            if ($this->group_id) {
+                $group = $this->group ?: InternshipGroup::find($this->group_id);
+                if ($group) {
+                    $group->update(['status' => ApplicationStatus::ACTIVE->value]);
+
+                    $siblingApps = static::where('group_id', $group->id)
+                        ->where('id', '!=', $this->id)
+                        ->whereIn('status', [ApplicationStatus::ACCEPTED->value, 'accepted'])
+                        ->get();
+
+                    foreach ($siblingApps as $sibling) {
+                        $sibling->update(['status' => ApplicationStatus::ACTIVE]);
+                        $sibling->status = ApplicationStatus::ACTIVE;
+
+                        $sibPaddedId = str_pad($sibling->id, 3, '0', STR_PAD_LEFT);
+                        $sibPlacementData = [
+                            'certificate_hash' => Str::random(32),
+                            'certificate_number' => "SERT/{$sibPaddedId}/PEMKOT-SBY/{$year}",
+                        ];
+
+                        if ($placement->mentor_id) {
+                            $sibPlacementData['mentor_id'] = $placement->mentor_id;
+                            $sibPlacementData['pembimbing_id'] = $placement->mentor_id;
+                        }
+                        if ($placement->academic_advisor_id) {
+                            $sibPlacementData['academic_advisor_id'] = $placement->academic_advisor_id;
+                        }
+
+                        Placement::firstOrCreate(
+                            ['application_id' => $sibling->id],
+                            $sibPlacementData
+                        );
+
+                        if (class_exists(AuditLog::class)) {
+                            AuditLog::record('AUTO_ACTIVATE_ON_THE_FLY', 'Application', $sibling->id, [
+                                'student_name' => $sibling->user?->name,
+                                'group_id' => $group->id,
+                                'start_date' => $sibling->start_date ?: $this->start_date,
+                                'activated_at' => now()->toDateTimeString(),
+                                'reason' => 'Otomatis diaktifkan bersama kelompok karena tanggal mulai magang telah tiba.',
+                            ]);
+                        }
+                    }
+                }
+            }
 
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Batch sinkronisasi seluruh pengajuan magang yang tanggal mulainya telah tiba (start_date <= today)
+     * dari status ACCEPTED ke ACTIVE, mencakup pengajuan individu maupun kelompok secara menyeluruh.
+     * Sangat efisien, aman, dan idempotent.
+     */
+    public static function syncStartedApplications(): int
+    {
+        $today = Carbon::today()->toDateString();
+        $eligibleApps = static::with(['placement', 'group'])
+            ->whereIn('status', [ApplicationStatus::ACCEPTED->value, 'accepted'])
+            ->whereNotNull('start_date')
+            ->whereDate('start_date', '<=', $today)
+            ->get();
+
+        $activatedCount = 0;
+        foreach ($eligibleApps as $app) {
+            if ($app->statusValue() === ApplicationStatus::ACCEPTED->value) {
+                if ($app->autoActivateIfStarted()) {
+                    $activatedCount++;
+                }
+            }
+        }
+
+        return $activatedCount;
     }
 
     /**

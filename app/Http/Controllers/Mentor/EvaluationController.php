@@ -7,6 +7,7 @@ use App\Models\AuditLog;
 use App\Models\Evaluation;
 use App\Models\Placement;
 use App\Services\StudentNotifier;
+use App\Services\UniversityResolver;
 use App\Support\Grade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,13 +33,59 @@ class EvaluationController extends Controller
 
         // Multi-Tenant Authorization Check
         if ($mentor->agency_profile_id !== null && optional($placement->application?->unit)->agency_profile_id !== $mentor->agency_profile_id) {
-            abort(403, 'Anda tidak memiliki hak akses untuk menilai mahasiswa instansi lain.');
+            abort(403, 'Anda tidak memiliki hak akses untuk menilai peserta magang instansi lain.');
         }
 
         // Form tetap bisa dibuka untuk melihat nilai, tetapi terkunci bila magang belum berjalan / sudah selesai.
         $lockReason = $placement->evaluationLockReason();
 
         return view('mentor.evaluation', compact('placement', 'lockReason'));
+    }
+
+    /**
+     * Lembar nilai Mentor Lapangan siap cetak (untuk ditandatangani & diserahkan ke kampus).
+     */
+    public function print($placementId)
+    {
+        $mentor = Auth::user();
+
+        $placement = Placement::with([
+            'application.user.studentProfile',
+            'application.unit.agencyProfile',
+            'evaluation',
+            'mentor',
+            'pembimbing',
+            'academicAdvisor',
+        ])->where(function ($q) use ($mentor) {
+            $q->where('mentor_id', $mentor->id)
+                ->orWhere('pembimbing_id', $mentor->id);
+        })->findOrFail($placementId);
+
+        if ($mentor->agency_profile_id !== null && optional($placement->application?->unit)->agency_profile_id !== $mentor->agency_profile_id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mencetak nilai peserta magang instansi lain.');
+        }
+
+        $evaluation = $placement->evaluation;
+        if (! $evaluation || (float) $evaluation->nilai_pembimbing <= 0) {
+            return redirect()->route('mentor.students.show', $placement->id)
+                ->with('error', 'Lembar nilai baru dapat dicetak setelah Anda mengisi nilai akhir.');
+        }
+
+        $aspects = $evaluation->mentor_aspects_list ?? [];
+        $average = (float) $evaluation->nilai_pembimbing;
+
+        return view('mentor.grade-sheet', [
+            'placement' => $placement,
+            'student' => $placement->application?->user,
+            'profile' => $placement->application?->user?->studentProfile,
+            'unit' => $placement->application?->unit,
+            'agency' => $placement->application?->unit?->agencyProfile ?? $placement->agencyProfile,
+            'mentorUser' => $placement->mentor ?? $placement->pembimbing ?? $mentor,
+            'evaluation' => $evaluation,
+            'aspects' => $aspects,
+            'average' => $average,
+            'grade' => Grade::letter($average),
+        ]);
     }
 
     /**
@@ -56,7 +103,7 @@ class EvaluationController extends Controller
 
         // Multi-Tenant Authorization Check
         if ($mentor->agency_profile_id !== null && optional($placement->application?->unit)->agency_profile_id !== $mentor->agency_profile_id) {
-            abort(403, 'Anda tidak memiliki hak akses untuk menilai mahasiswa instansi lain.');
+            abort(403, 'Anda tidak memiliki hak akses untuk menilai peserta magang instansi lain.');
         }
 
         if ($lockReason = $placement->evaluationLockReason()) {
@@ -84,6 +131,7 @@ class EvaluationController extends Controller
             'aspects.min' => 'Setidaknya satu aspek penilaian wajib diisi.',
             'aspects.*.name.required' => 'Nama aspek penilaian tidak boleh kosong.',
             'aspects.*.score.required' => 'Nilai aspek penilaian wajib diisi.',
+            'aspects.*.score.numeric' => 'Nilai aspek penilaian harus berupa angka.',
             'aspects.*.score.min' => 'Nilai minimal adalah 0.',
             'aspects.*.score.max' => 'Nilai maksimal adalah 100.',
             'nilai_disiplin.required' => 'Nilai disiplin wajib diisi.',
@@ -123,7 +171,7 @@ class EvaluationController extends Controller
             $mentorComps = [];
             $scores = [];
             foreach ($request->custom_components as $comp) {
-                if (!empty($comp['name'])) {
+                if (! empty($comp['name'])) {
                     $val = isset($comp['score']) && is_numeric($comp['score']) ? (float) $comp['score'] : null;
                     $mentorComps[] = [
                         'name' => trim($comp['name']),
@@ -134,7 +182,7 @@ class EvaluationController extends Controller
                     }
                 }
             }
-            if (!empty($mentorComps)) {
+            if (! empty($mentorComps)) {
                 $custom['mentor'] = $mentorComps;
                 $evaluation->custom_components = $custom;
                 $evaluation->mentor_aspects = $mentorComps;
@@ -147,7 +195,7 @@ class EvaluationController extends Controller
             $evaluation->nilai_disiplin = $request->nilai_disiplin;
             $evaluation->nilai_kinerja = $request->nilai_kinerja;
             $evaluation->nilai_laporan = $request->nilai_laporan;
-            $univ = $placement->application?->user ? app(\App\Services\UniversityResolver::class)->forUser($placement->application->user) : null;
+            $univ = $placement->application?->user ? app(UniversityResolver::class)->forUser($placement->application->user) : null;
             $evaluation->mentor_aspects = [
                 ['name' => $univ ? $univ->getDinasComponent(1) : 'Kedisiplinan & Tata Tertib Kerja', 'score' => (float) $request->nilai_disiplin],
                 ['name' => $univ ? $univ->getDinasComponent(2) : 'Kinerja Teknis & Kerjasama Tim', 'score' => (float) $request->nilai_kinerja],
@@ -210,6 +258,6 @@ class EvaluationController extends Controller
         StudentNotifier::evaluationSubmitted($placement->application?->user, 'mentor');
 
         return redirect()->route('mentor.students.show', $placement->id)
-            ->with('success', 'Nilai evaluasi mahasiswa berhasil disimpan.');
+            ->with('success', 'Nilai evaluasi peserta magang berhasil disimpan.');
     }
 }

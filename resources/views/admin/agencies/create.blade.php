@@ -116,7 +116,7 @@
                                 </div>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <input type="file" id="agencyLogoInput" name="logo" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+                                <input type="file" data-max-kb="2048" id="agencyLogoInput" name="logo" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
                                        onchange="handleLogoPreview(this, 'agencyLogoPreview', '{{ asset('images/default-agency.svg') }}')"
                                        class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer shadow-2xs">
                                 <p class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Format: PNG, JPG, WEBP, SVG. Ukuran maksimal 2MB. Jika dikosongkan, menggunakan logo default dinas.</p>

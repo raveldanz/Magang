@@ -122,6 +122,28 @@ class UniversityResolver
     }
 
     /**
+     * Apakah $person (mahasiswa/dosen) termasuk kampus $university? Dipakai sebagai batas tenant.
+     * Bila akun sudah punya university_id, hanya id yang dibandingkan (nama kampus bisa diubah
+     * admin kampus sendiri, jadi tidak boleh dijadikan kunci). Data lama tanpa id dicocokkan
+     * dengan nama/akronim/kode yang SAMA PERSIS dan tidak ambigu — tidak pernah lewat substring.
+     */
+    public function belongsTo(?User $person, ?University $university): bool
+    {
+        if (! $person || ! $university) {
+            return false;
+        }
+
+        $id = $person->university_id ?: $person->studentProfile?->university_id;
+        if ($id) {
+            return (int) $id === (int) $university->id;
+        }
+
+        $resolved = $this->findExact($person->studentProfile?->universitas ?? $person->university);
+
+        return $resolved !== null && (int) $resolved->id === (int) $university->id;
+    }
+
+    /**
      * Kampus terdaftar yang mirip dengan teks input (urut paling mirip).
      *
      * @return Collection<int, array{university: University, score: float}>

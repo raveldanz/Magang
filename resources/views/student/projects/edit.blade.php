@@ -70,9 +70,9 @@
             <form action="{{ route('student.projects.update', $project->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6" 
                   x-data="{ 
                       visibility: '{{ old('is_public', $project->is_public ? '1' : '0') == '1' ? 'public' : 'private' }}',
-                      category: '{{ $curCat }}',
-                      customCategory: '{{ $curCustomCat }}',
-                      projectType: '{{ old('project_type', $isGroupProject ? 'group' : 'individual') }}',
+                      category: @js((string) $curCat),
+                      customCategory: @js((string) $curCustomCat),
+                      projectType: @js(old('project_type', $isGroupProject ? 'group' : 'individual')),
                       roleRecommendations: @js($roleRecommendations),
                       categoryKeywords: @js($categoryKeywords),
                       categoryLabels: {
@@ -334,9 +334,9 @@
                                             
                                             <div class="flex-1">
                                                 <label for="peer_check_edit_{{ $peer->id }}" class="cursor-pointer block">
-                                                    <div class="font-bold text-xs sm:text-sm text-slate-900">{{ $peerUser?->name ?? 'Mahasiswa' }}</div>
+                                                    <div class="font-bold text-xs sm:text-sm text-slate-900">{{ $peerUser?->name ?? 'Peserta Magang' }}</div>
                                                     <div class="text-[11px] text-slate-500 mt-0.5">
-                                                        NIM: {{ $peerProfile?->nim ?? '-' }} &bull; {{ $peerProfile?->universitas ?? $peerUser?->university ?? '-' }} ({{ $peerProfile?->jurusan ?? '-' }})
+                                                        NIM/NIS: {{ $peerProfile?->nim ?? '-' }} &bull; {{ $peerProfile?->universitas ?? $peerUser?->university ?? '-' }} ({{ $peerProfile?->jurusan ?? '-' }})
                                                     </div>
                                                 </label>
 
@@ -387,7 +387,7 @@
                             <h3 class="font-bold text-base text-slate-900">Pusat Akses Proyek</h3>
                         </div>
                         <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                            Sediakan akses langsung ke karya inovasi Anda agar mentor dinas, dosen pembimbing, dan atasan dapat menguji atau meninjau karya Anda. Mahasiswa dapat mengisi salah satu atau seluruh opsi di bawah ini sesuai karakteristik proyek (aplikasi, buku, desain fisik, dll):
+                            Sediakan akses langsung ke karya inovasi Anda agar mentor dinas, pembimbing, dan atasan dapat menguji atau meninjau karya Anda. Peserta Magang dapat mengisi salah satu atau seluruh opsi di bawah ini sesuai karakteristik proyek (aplikasi, buku, desain fisik, dll):
                         </p>
                     </div>
 
@@ -459,7 +459,7 @@
                             </div>
                         @endif
 
-                        <input type="file" name="source_code" accept=".zip,.rar,.7z,.tar,.gz"
+                        <input type="file" data-max-kb="51200" name="source_code" accept=".zip,.rar,.7z,.tar,.gz"
                                class="w-full text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-dashed border-slate-300 rounded-xl p-2 bg-white">
                     </div>
                 </div>
@@ -483,7 +483,7 @@
                         <p class="text-xs text-slate-500 leading-relaxed">
                             Biarkan kosong jika tidak ingin mengubah foto sampul saat ini. Format JPG, PNG, atau WebP (maksimal 4 MB).
                         </p>
-                        <input type="file" name="photo" id="coverPhotoInput" accept="image/jpeg,image/png,image/jpg,image/webp" 
+                        <input type="file" data-max-kb="4096" name="photo" id="coverPhotoInput" accept="image/jpeg,image/png,image/jpg,image/webp" 
                                onchange="previewCoverImage(this)"
                                class="w-full text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
 
@@ -520,7 +520,7 @@
                         <p class="text-xs text-slate-500 leading-relaxed">
                             Unggah berkas tangkapan layar baru jika ingin memperbarui / menambah koleksi (Maksimal 5 gambar, format JPG, PNG, WebP).
                         </p>
-                        <input type="file" name="screenshots[]" multiple accept="image/jpeg,image/png,image/jpg,image/webp" 
+                        <input type="file" data-max-kb="4096" name="screenshots[]" multiple accept="image/jpeg,image/png,image/jpg,image/webp" 
                                class="w-full text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-200 file:text-slate-800 hover:file:bg-slate-300">
                     </div>
                 </div>
@@ -571,7 +571,7 @@
                         <p class="text-xs text-emerald-800 leading-relaxed">
                             Unggah foto kegiatan baru untuk memperbarui dokumentasi di lapangan (Maksimal 5 foto, masing-masing maks 4 MB).
                         </p>
-                        <input type="file" name="community_photos[]" multiple accept="image/jpeg,image/png,image/jpg,image/webp" 
+                        <input type="file" data-max-kb="4096" name="community_photos[]" multiple accept="image/jpeg,image/png,image/jpg,image/webp" 
                                class="w-full text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-100 file:text-emerald-800 hover:file:bg-emerald-200">
                     </div>
 
@@ -632,7 +632,7 @@
                         <p class="text-xs text-blue-800 leading-relaxed">
                             Lampirkan buku panduan teknis (*manual book*), SOP penggunaan sistem, atau laporan teknis inovasi (Format: PDF, DOC, DOCX. Maksimal 10 berkas, masing-masing maks 10 MB).
                         </p>
-                        <input type="file" name="documents[]" multiple accept=".pdf,.doc,.docx,application/pdf" 
+                        <input type="file" data-max-kb="10240" name="documents[]" multiple accept=".pdf,.doc,.docx,application/pdf" 
                                class="w-full text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-800 hover:file:bg-blue-200">
                     </div>
                 </div>
@@ -659,12 +659,12 @@
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 if (!['image/jpeg', 'image/png', 'image/jpg', 'image/webp'].includes(file.type)) {
-                    alert('Format foto sampul harus berupa JPG, PNG, atau WebP.');
+                    window.notify('Format foto sampul harus berupa JPG, PNG, atau WebP.');
                     input.value = '';
                     return;
                 }
                 if (file.size > 4 * 1024 * 1024) {
-                    alert('Ukuran foto maksimal 4 MB.');
+                    window.notify('Ukuran foto maksimal 4 MB.');
                     input.value = '';
                     return;
                 }

@@ -47,7 +47,7 @@ class ProfileController extends Controller
     public function updatePhone(Request $request): RedirectResponse
     {
         if ($request->user()->role === 'mahasiswa') {
-            return Redirect::route('student.profile.edit')->with('warning', 'Nomor telepon mahasiswa diubah melalui halaman Profil Saya.');
+            return Redirect::route('student.profile.edit')->with('warning', 'Nomor telepon peserta magang diubah melalui halaman Profil Saya.');
         }
 
         $data = $request->validate([

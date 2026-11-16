@@ -52,7 +52,7 @@
                         <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-between">
                             <div>
                                 <div class="flex items-center justify-between">
-                                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Dosen Pembimbing</p>
+                                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pembimbing</p>
                                     @if ($academicAdvisor)
                                         <span class="px-2.5 py-0.5 text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
                                             Terpilih
@@ -73,8 +73,8 @@
                                             <p class="truncate"><span class="text-slate-400">Kampus:</span> <strong>{{ is_string($academicAdvisor->university) ? $academicAdvisor->university : ($academicAdvisor->universityRelation?->name ?? $academicAdvisor->university?->name ?? $univName ?? $profile->universitas) }}</strong></p>
                                         </div>
                                     @elseif ($application && in_array($rawAppSt, ['accepted', 'active', 'completed'], true))
-                                        <p class="text-sm font-semibold text-slate-700">Belum memilih dosen pembimbing</p>
-                                        <p class="text-xs text-slate-400 mt-1">Dosen akademik dari perguruan tinggi Anda.</p>
+                                        <p class="text-sm font-semibold text-slate-700">Belum memilih pembimbing</p>
+                                        <p class="text-xs text-slate-400 mt-1">Pembimbing akademik dari perguruan tinggi Anda.</p>
                                     @else
                                         <p class="text-sm font-semibold text-slate-400">Belum Tersedia</p>
                                         <p class="text-xs text-slate-400 mt-1">Tersedia setelah diterima magang.</p>
@@ -86,7 +86,7 @@
                                     <button type="button"
                                         onclick="const el = document.getElementById('change-advisor-box'); el.classList.toggle('hidden'); if(!el.classList.contains('hidden')) el.scrollIntoView({behavior: 'smooth'});"
                                         class="text-xs font-bold text-blue-600 hover:text-blue-800 cursor-pointer">
-                                        {{ $academicAdvisor ? 'Ganti Dosen Pembimbing' : 'Pilih Dosen Pembimbing' }} &rarr;
+                                        {{ $academicAdvisor ? 'Ganti Pembimbing' : 'Pilih Pembimbing' }} &rarr;
                                     </button>
                                 @else
                                     <span class="text-[11px] text-slate-400">-</span>
@@ -128,7 +128,7 @@
                     @if ($application && in_array($rawAppSt, ['accepted', 'active', 'completed'], true))
                         <div id="change-advisor-box" class="{{ $academicAdvisor ? 'hidden' : '' }} bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4 scroll-mt-6">
                             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                                <h4 class="font-bold text-slate-800 text-base">Pilih Dosen Pembimbing</h4>
+                                <h4 class="font-bold text-slate-800 text-base">Pilih Pembimbing</h4>
                                 @if ($academicAdvisor)
                                     <button type="button"
                                         onclick="document.getElementById('change-advisor-box').classList.add('hidden')"
@@ -142,16 +142,16 @@
                                 <div>
                                     <label for="academic_advisor_id"
                                         class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                        Pilih Dosen Terdaftar: {{ $univName ?? $profile->universitas ?? 'Kampus Mahasiswa' }}
+                                        Pilih Pembimbing Terdaftar: {{ $univName ?? $profile->universitas ?? 'Kampus Peserta Magang' }}
                                     </label>
                                     <select id="academic_advisor_id" name="academic_advisor_id" required
                                         class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs p-2.5">
-                                        <option value="">-- Pilih Dosen Pembimbing --</option>
+                                        <option value="">-- Pilih Pembimbing --</option>
                                         @if(isset($availableDosens))
                                             @foreach ($availableDosens as $dosen)
                                                 <option value="{{ $dosen->id }}" {{ optional($placement)->academic_advisor_id == $dosen->id ? 'selected' : '' }}>
                                                     {{ $dosen->name }} —
-                                                    {{ is_string($dosen->university) ? $dosen->university : ($dosen->universityRelation?->name ?? $dosen->university?->name ?? 'Dosen') }}
+                                                    {{ is_string($dosen->university) ? $dosen->university : ($dosen->universityRelation?->name ?? $dosen->university?->name ?? 'Pembimbing') }}
                                                     ({{ $dosen->email }})
                                                 </option>
                                             @endforeach
@@ -164,7 +164,7 @@
                                     <div class="flex items-center gap-2">
                                         <button type="submit"
                                             class="w-full sm:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
-                                            {{ __('Simpan Dosen Pembimbing') }}
+                                            {{ __('Simpan Pembimbing') }}
                                         </button>
                                         @if ($academicAdvisor)
                                             <button type="button"
@@ -176,7 +176,7 @@
                                     </div>
                                     <button type="button" @click="openNewDosenModal = true"
                                         class="text-xs text-blue-600 hover:text-blue-800 font-semibold underline cursor-pointer text-left sm:text-right">
-                                        Dosen tidak ditemukan? Input Dosen Baru
+                                        Pembimbing tidak ditemukan? Input Pembimbing Baru
                                     </button>
                                 </div>
                             </form>

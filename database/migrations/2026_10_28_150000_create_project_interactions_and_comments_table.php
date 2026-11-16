@@ -13,22 +13,22 @@ return new class extends Migration
     {
         // 1. Tambah kolom visibilitas dan metrik interaksi pada internship_projects
         Schema::table('internship_projects', function (Blueprint $table) {
-            if (!Schema::hasColumn('internship_projects', 'is_public')) {
+            if (! Schema::hasColumn('internship_projects', 'is_public')) {
                 $table->boolean('is_public')->default(true)->index();
             }
-            if (!Schema::hasColumn('internship_projects', 'likes_count')) {
+            if (! Schema::hasColumn('internship_projects', 'likes_count')) {
                 $table->unsignedInteger('likes_count')->default(0)->index();
             }
-            if (!Schema::hasColumn('internship_projects', 'comments_count')) {
+            if (! Schema::hasColumn('internship_projects', 'comments_count')) {
                 $table->unsignedInteger('comments_count')->default(0)->index();
             }
-            if (!Schema::hasColumn('internship_projects', 'views_count')) {
+            if (! Schema::hasColumn('internship_projects', 'views_count')) {
                 $table->unsignedInteger('views_count')->default(0);
             }
         });
 
         // 2. Tabel project_likes: Dukungan Suka untuk user login maupun tamu publik
-        if (!Schema::hasTable('project_likes')) {
+        if (! Schema::hasTable('project_likes')) {
             Schema::create('project_likes', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('internship_project_id')->constrained('internship_projects')->cascadeOnDelete();
@@ -43,7 +43,7 @@ return new class extends Migration
         }
 
         // 3. Tabel project_comments: Komentar publik & terautentikasi dengan moderasi admin
-        if (!Schema::hasTable('project_comments')) {
+        if (! Schema::hasTable('project_comments')) {
             Schema::create('project_comments', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('internship_project_id')->constrained('internship_projects')->cascadeOnDelete();
@@ -62,7 +62,7 @@ return new class extends Migration
         }
 
         // 4. Tabel project_comment_likes: Dukungan suka pada komentar
-        if (!Schema::hasTable('project_comment_likes')) {
+        if (! Schema::hasTable('project_comment_likes')) {
             Schema::create('project_comment_likes', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('project_comment_id')->constrained('project_comments')->cascadeOnDelete();

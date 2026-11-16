@@ -28,6 +28,7 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
 
     // Verifikasi Pengajuan Magang
     Route::get('/admin/applications', [AdminApplicationController::class, 'index'])->name('admin.applications.index');
+    Route::post('/admin/applications/sync-status', [AdminApplicationController::class, 'manualSyncStatus'])->name('admin.applications.sync_status');
     Route::post('/admin/applications/bulk-update', [AdminApplicationController::class, 'bulkUpdateStatus'])->name('admin.applications.bulk_update');
     Route::get('/admin/applications/{id}', [AdminApplicationController::class, 'show'])->name('admin.applications.show')->withoutMiddleware(['role:admin,super_admin'])->middleware('role:admin,super_admin,supervisor');
     Route::match(['put', 'patch'], '/admin/applications/{id}', [AdminApplicationController::class, 'updateStatus'])->name('admin.applications.updateStatus')->withoutMiddleware(['role:admin,super_admin'])->middleware('role:admin,super_admin,supervisor');
@@ -67,6 +68,7 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::post('/admin/users/bulk-reset-password', [AdminUserController::class, 'bulkResetPassword'])->name('admin.users.bulk_reset_password');
     Route::post('/admin/users/bulk-delete', [AdminUserController::class, 'bulkDelete'])->name('admin.users.bulk_delete');
     Route::post('/admin/users/{id}/reset-password', [AdminUserController::class, 'resetPassword'])->name('admin.users.reset_password');
+    Route::post('/admin/users/{id}/approve-advisor', [AdminUserController::class, 'approveAdvisor'])->name('admin.users.approve_advisor');
     Route::resource('/admin/users', AdminUserController::class)->names('admin.users');
 
     // Master Perguruan Tinggi (Universitas)

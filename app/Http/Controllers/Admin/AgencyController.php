@@ -9,10 +9,12 @@ use App\Models\AuditLog;
 use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\User;
+use App\Support\SafeUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AgencyController extends Controller
 {
@@ -230,7 +232,7 @@ class AgencyController extends Controller
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $cleanName = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->agency_name ?? 'agency'));
-            $filename = $cleanName.'_'.time().'.'.$file->getClientOriginalExtension();
+            $filename = $cleanName.'_'.time().'.'.SafeUpload::extension($file, ['jpg', 'jpeg', 'png', 'webp'], 'png');
             $targetDir = public_path('images/logos');
             if (! File::exists($targetDir)) {
                 File::makeDirectory($targetDir, 0755, true);
@@ -264,7 +266,7 @@ class AgencyController extends Controller
 
     public function edit($id)
     {
-        abort_unless($this->currentUserIsSuperAdmin() || (int) Auth::user()->agency_profile_id === (int) $id, 403, 'Anda tidak memiliki hak akses untuk mengelola instansi ini.');
+        abort_unless($this->canManageAgencyProfile((int) $id), 403, 'Profil Dinas hanya dapat dikelola oleh Admin Dinas Utama atau Super Admin.');
         $agency = AgencyProfile::with('units')->findOrFail($id);
 
         return view('admin.agencies.edit', compact('agency'));
@@ -272,7 +274,7 @@ class AgencyController extends Controller
 
     public function update(Request $request, $id)
     {
-        abort_unless($this->currentUserIsSuperAdmin() || (int) Auth::user()->agency_profile_id === (int) $id, 403, 'Anda tidak memiliki hak akses untuk mengelola instansi ini.');
+        abort_unless($this->canManageAgencyProfile((int) $id), 403, 'Profil Dinas hanya dapat dikelola oleh Admin Dinas Utama atau Super Admin.');
         $agency = AgencyProfile::findOrFail($id);
 
         $request->validate([
@@ -305,7 +307,7 @@ class AgencyController extends Controller
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $cleanName = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->agency_name ?? 'agency'));
-            $filename = $cleanName.'_'.time().'.'.$file->getClientOriginalExtension();
+            $filename = $cleanName.'_'.time().'.'.SafeUpload::extension($file, ['jpg', 'jpeg', 'png', 'webp'], 'png');
             $targetDir = public_path('images/logos');
             if (! File::exists($targetDir)) {
                 File::makeDirectory($targetDir, 0755, true);
@@ -344,7 +346,7 @@ class AgencyController extends Controller
             })->count();
 
         if ($activeMentorsCount > 0) {
-            return redirect()->back()->with('error', "Gagal menghapus: Terdapat {$activeMentorsCount} mahasiswa aktif yang sedang dibimbing oleh mentor dinas ini.");
+            return redirect()->back()->with('error', "Gagal menghapus: Terdapat {$activeMentorsCount} peserta magang aktif yang sedang dibimbing oleh mentor dinas ini.");
         }
 
         $name = $agency->agency_name;
@@ -399,16 +401,16 @@ class AgencyController extends Controller
             $counter++;
         }
 
-        $password = 'password';
-
         $user = User::create([
             'name' => 'Admin '.$agency->agency_name,
             'email' => $email,
-            'password' => Hash::make($password),
+            'password' => Hash::make(Str::random(40)),
             'role' => 'admin',
             'agency_profile_id' => $agency->id,
             'email_verified_at' => now(),
         ]);
+        // Password sementara acak; ditampilkan sekali di modal kredensial di bawah.
+        $password = $user->issueTemporaryPassword();
 
         AuditLog::record('AGENCY_ACCOUNT_CREATE', 'User', $user->id, [
             'agency_name' => $agency->agency_name,
@@ -426,5 +428,20 @@ class AgencyController extends Controller
 
         return redirect()->route('admin.agencies.index')
             ->with('success', "Akun Admin Dinas untuk '{$agency->agency_name}' berhasil dibuat! Email: {$email} | Password: {$password}");
+    }
+
+    /**
+     * Admin Dinas Utama (tanpa bidang) boleh mengubah profil dinasnya sendiri; Admin Bidang tidak,
+     * sama seperti aturan di AgencyProfileController.
+     */
+    private function canManageAgencyProfile(int $agencyId): bool
+    {
+        if ($this->currentUserIsSuperAdmin()) {
+            return true;
+        }
+
+        $user = Auth::user();
+
+        return $user->unit_id === null && (int) $user->agency_profile_id === $agencyId;
     }
 }

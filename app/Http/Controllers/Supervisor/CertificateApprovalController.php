@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Supervisor;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Student\CertificateController;
 use App\Models\AuditLog;
 use App\Models\Certificate;
 use App\Models\Placement;
@@ -62,7 +63,7 @@ class CertificateApprovalController extends Controller
      */
     public function show($placementId)
     {
-        $data = \App\Http\Controllers\Student\CertificateController::getCertificateData($placementId, Auth::user());
+        $data = CertificateController::getCertificateData($placementId, Auth::user());
         $certificate = Certificate::where('placement_id', $placementId)->first();
         $data['certificateRecord'] = $certificate;
 
@@ -74,8 +75,15 @@ class CertificateApprovalController extends Controller
      */
     public function approve(Request $request, $id)
     {
-        $certificate = Certificate::with(['placement.application.user'])->findOrFail($id);
+        $certificate = Certificate::with(['placement.application.user', 'placement.application.unit'])->findOrFail($id);
         $user = Auth::user();
+
+        $this->ensureSupervisorAgencyScope($certificate->placement?->application?->unit?->agency_profile_id);
+
+        // Hanya sertifikat yang sedang menunggu pengesahan yang boleh disahkan
+        if ($certificate->approval_status !== 'waiting_approval') {
+            return redirect()->back()->with('error', 'Sertifikat ini tidak sedang menunggu pengesahan, sehingga belum dapat disahkan.');
+        }
 
         $certificate->update([
             'approval_status' => 'approved',
@@ -93,7 +101,7 @@ class CertificateApprovalController extends Controller
         ]);
 
         return redirect()->route('supervisor.certificates.index')
-            ->with('success', "Sertifikat kelulusan atas nama {$certificate->placement?->application?->user?->name} berhasil disahkan dan siap diunduh oleh mahasiswa.");
+            ->with('success', "Sertifikat kelulusan atas nama {$certificate->placement?->application?->user?->name} berhasil disahkan dan siap diunduh oleh peserta magang.");
     }
 
     /**
@@ -115,6 +123,8 @@ class CertificateApprovalController extends Controller
             $q->where('id', $placementId);
         })->firstOrFail();
 
+        $this->ensureSupervisorAgencyScope($placement->application?->unit?->agency_profile_id);
+
         $certificate = $placement->certificate;
         if (! $certificate) {
             $year = date('Y');
@@ -123,7 +133,7 @@ class CertificateApprovalController extends Controller
                 ['placement_id' => $placement->id],
                 [
                     'certificate_number' => $placement->certificate_number ?: "SERT/{$paddedId}/DISPUSIP-SBY/{$year}",
-                    'file_path' => 'certificates/' . $placement->id . '.pdf',
+                    'file_path' => 'certificates/'.$placement->id.'.pdf',
                     'approval_status' => 'waiting_approval',
                     'issued_at' => now()->toDateString(),
                 ]
@@ -175,18 +185,20 @@ class CertificateApprovalController extends Controller
             'notes.min' => 'Catatan instruksi revisi minimal 5 karakter.',
         ]);
 
-        $placement = Placement::with(['application.user', 'certificate'])
+        $placement = Placement::with(['application.user', 'application.unit', 'certificate'])
             ->where('id', $placementId)
             ->orWhereHas('certificate', function ($q) use ($placementId) {
                 $q->where('id', $placementId);
             })->firstOrFail();
+
+        $this->ensureSupervisorAgencyScope($placement->application?->unit?->agency_profile_id);
 
         $certificate = $placement->certificate ?: Certificate::where('placement_id', $placement->id)->firstOrFail();
         $user = Auth::user();
 
         $aspectLabels = [
             'nilai' => 'Nilai Evaluasi & Transkrip',
-            'identitas' => 'Data Mahasiswa & Magang',
+            'identitas' => 'Data Peserta & Magang',
             'laporan' => 'Validasi Logbook & Laporan Akhir',
             'lainnya' => 'Aspek Lainnya',
         ];
@@ -195,13 +207,13 @@ class CertificateApprovalController extends Controller
         $aspectSummary = implode(', ', $selectedAspectNames);
 
         // Susun catatan komprehensif berstandar kedinasan
-        $compiledNotes = "Aspek Revisi: {$aspectSummary}\n" . trim($request->notes);
+        $compiledNotes = "Aspek Revisi: {$aspectSummary}\n".trim($request->notes);
 
         if (! empty($request->aspect_notes) && is_array($request->aspect_notes)) {
             foreach ($request->aspect_notes as $key => $aspekNote) {
                 if (! empty(trim($aspekNote)) && in_array($key, $request->aspects, true)) {
                     $lbl = $aspectLabels[$key] ?? ucfirst($key);
-                    $compiledNotes .= "\n• [{$lbl}]: " . trim($aspekNote);
+                    $compiledNotes .= "\n• [{$lbl}]: ".trim($aspekNote);
                 }
             }
         }
@@ -239,8 +251,10 @@ class CertificateApprovalController extends Controller
             'notes.min' => 'Catatan revisi minimal 5 karakter.',
         ]);
 
-        $certificate = Certificate::with(['placement.application.user'])->findOrFail($id);
+        $certificate = Certificate::with(['placement.application.user', 'placement.application.unit'])->findOrFail($id);
         $user = Auth::user();
+
+        $this->ensureSupervisorAgencyScope($certificate->placement?->application?->unit?->agency_profile_id);
 
         $certificate->update([
             'approval_status' => 'revision',

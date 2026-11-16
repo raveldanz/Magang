@@ -10,7 +10,7 @@
                 <h2 class="font-black text-xl text-gray-900 tracking-tight">
                     Tambah Mentor Lapangan Baru
                 </h2>
-                <p class="text-xs text-gray-500">Daftarkan akun pembimbing teknis dinas untuk membimbing mahasiswa magang</p>
+                <p class="text-xs text-gray-500">Daftarkan akun pembimbing teknis dinas untuk membimbing peserta magang</p>
             </div>
         </div>
     </x-slot>

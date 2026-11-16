@@ -68,7 +68,7 @@ class CertificateTheme extends Model
     {
         $hex = ltrim($hex, '#');
         if (strlen($hex) === 3) {
-            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+            $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
         }
         if (strlen($hex) !== 6) {
             return '#000000';
@@ -99,15 +99,16 @@ class CertificateTheme extends Model
     public function getPrimaryPalette(): array
     {
         $base = $this->primary_color ?: '#00A8E8';
+
         return [
             'darkest' => self::adjustBrightness($base, -22),
-            'darker'  => self::adjustBrightness($base, -13),
-            'dark'    => self::adjustBrightness($base, -6),
-            'base'    => $base,
-            'medium'  => self::adjustBrightness($base, 20),
-            'light'   => self::adjustBrightness($base, 42),
+            'darker' => self::adjustBrightness($base, -13),
+            'dark' => self::adjustBrightness($base, -6),
+            'base' => $base,
+            'medium' => self::adjustBrightness($base, 20),
+            'light' => self::adjustBrightness($base, 42),
             'lighter' => self::adjustBrightness($base, 64),
-            'pale'    => self::adjustBrightness($base, 85),
+            'pale' => self::adjustBrightness($base, 85),
         ];
     }
 
@@ -117,15 +118,16 @@ class CertificateTheme extends Model
     public function getSecondaryPalette(): array
     {
         $base = $this->secondary_color ?: '#FF6700';
+
         return [
             'darkest' => self::adjustBrightness($base, -22),
-            'darker'  => self::adjustBrightness($base, -13),
-            'dark'    => self::adjustBrightness($base, -6),
-            'base'    => $base,
-            'medium'  => self::adjustBrightness($base, 20),
-            'light'   => self::adjustBrightness($base, 42),
+            'darker' => self::adjustBrightness($base, -13),
+            'dark' => self::adjustBrightness($base, -6),
+            'base' => $base,
+            'medium' => self::adjustBrightness($base, 20),
+            'light' => self::adjustBrightness($base, 42),
             'lighter' => self::adjustBrightness($base, 64),
-            'pale'    => self::adjustBrightness($base, 85),
+            'pale' => self::adjustBrightness($base, 85),
         ];
     }
 
@@ -140,4 +142,3 @@ class CertificateTheme extends Model
         return str_replace(['{NUMBER}', '{YEAR}'], [(string) $sequenceNumber, (string) $yr], $pattern);
     }
 }
-

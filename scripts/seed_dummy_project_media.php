@@ -1,14 +1,15 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
 use App\Models\InternshipProject;
+use Illuminate\Contracts\Console\Kernel;
 
 $project = InternshipProject::first();
-if (!$project) {
+if (! $project) {
     echo "No project found.\n";
     exit(1);
 }
@@ -28,28 +29,28 @@ $project->update([
     'screenshots' => [
         'projects/project_sample_cover.png',
         'projects/screenshot_1_jalur.png',
-        'projects/screenshot_2_kampus.png'
+        'projects/screenshot_2_kampus.png',
     ],
     'community_photos' => [
         'projects/community_doc_desa_1.png',
-        'projects/community_doc_desa_2.png'
+        'projects/community_doc_desa_2.png',
     ],
     'documents' => [
         [
             'name' => 'Buku Panduan Teknis Sistem SIM-Magang.pdf',
             'path' => 'projects/manual_book_kearsipan.pdf',
-            'size' => '2.45 MB'
+            'size' => '2.45 MB',
         ],
         [
             'name' => 'Laporan Luaran Inovasi & Pengabdian.pdf',
             'path' => 'projects/laporan_luaran_inovasi.pdf',
-            'size' => '1.18 MB'
-        ]
-    ]
+            'size' => '1.18 MB',
+        ],
+    ],
 ]);
 
 $targetDir = storage_path('app/public/projects/');
-if (!is_dir($targetDir)) {
+if (! is_dir($targetDir)) {
     mkdir($targetDir, 0777, true);
 }
 $dummyImages = [
@@ -57,26 +58,26 @@ $dummyImages = [
     'demo_arsip_list.png',
     'demo_verifikasi.png',
     'dokumentasi_balai_desa_1.jpg',
-    'dokumentasi_sosialisasi_2.jpg'
+    'dokumentasi_sosialisasi_2.jpg',
 ];
 foreach ($dummyImages as $f) {
-    if (!file_exists($targetDir . $f)) {
+    if (! file_exists($targetDir.$f)) {
         if (file_exists(public_path('images/bsre-logo.png'))) {
-            copy(public_path('images/bsre-logo.png'), $targetDir . $f);
+            copy(public_path('images/bsre-logo.png'), $targetDir.$f);
         } else {
-            file_put_contents($targetDir . $f, 'sample image content');
+            file_put_contents($targetDir.$f, 'sample image content');
         }
     }
 }
-if (!file_exists($targetDir . 'manual_book_kearsipan.pdf')) {
-    file_put_contents($targetDir . 'manual_book_kearsipan.pdf', "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj\nxref\n0 4\n0000000000 65535 f\n0000000010 00000 n\n0000000053 00000 n\n0000000102 00000 n\ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n185\n%%EOF");
+if (! file_exists($targetDir.'manual_book_kearsipan.pdf')) {
+    file_put_contents($targetDir.'manual_book_kearsipan.pdf', "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj\nxref\n0 4\n0000000000 65535 f\n0000000010 00000 n\n0000000053 00000 n\n0000000102 00000 n\ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n185\n%%EOF");
 }
-if (!file_exists($targetDir . 'laporan_luaran_inovasi.pdf')) {
-    file_put_contents($targetDir . 'laporan_luaran_inovasi.pdf', "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj\nxref\n0 4\n0000000000 65535 f\n0000000010 00000 n\n0000000053 00000 n\n0000000102 00000 n\ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n185\n%%EOF");
+if (! file_exists($targetDir.'laporan_luaran_inovasi.pdf')) {
+    file_put_contents($targetDir.'laporan_luaran_inovasi.pdf', "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj\nxref\n0 4\n0000000000 65535 f\n0000000010 00000 n\n0000000053 00000 n\n0000000102 00000 n\ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n185\n%%EOF");
 }
-if (!file_exists($targetDir . 'sim_magang_v1.0_source.zip')) {
-    $zip = new ZipArchive();
-    if ($zip->open($targetDir . 'sim_magang_v1.0_source.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+if (! file_exists($targetDir.'sim_magang_v1.0_source.zip')) {
+    $zip = new ZipArchive;
+    if ($zip->open($targetDir.'sim_magang_v1.0_source.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
         $zip->addFromString('README.md', "# SIM Magang Dispusip Surabaya\n\nSource code arsip proyek inovasi mahasiswa.");
         $zip->close();
     }
@@ -85,6 +86,5 @@ if (!file_exists($targetDir . 'sim_magang_v1.0_source.zip')) {
 echo "Updated project ID: {$project->id} - {$project->title}\n";
 echo "Embed URL: {$project->youtube_embed_url}\n";
 echo "Placement ID: {$project->placement_id}\n";
-echo "Student Email: " . ($project->placement?->application?->user?->email ?? 'none') . "\n";
+echo 'Student Email: '.($project->placement?->application?->user?->email ?? 'none')."\n";
 echo "Dummy files verified in storage.\n";
-

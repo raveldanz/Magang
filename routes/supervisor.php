@@ -3,6 +3,7 @@
 use App\Http\Controllers\Supervisor\ApplicationApprovalController;
 use App\Http\Controllers\Supervisor\CertificateApprovalController;
 use App\Http\Controllers\Supervisor\DashboardController;
+use App\Http\Controllers\Supervisor\StudentReportController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,6 +31,6 @@ Route::middleware(['auth', 'role:supervisor,super_admin'])->prefix('supervisor')
     Route::post('/certificates/{id}/revise', [CertificateApprovalController::class, 'revise'])->name('certificates.revise');
 
     // 4. Laporan Mahasiswa (Pemantauan Kinerja Tanpa Menilai)
-    Route::get('/reports', [\App\Http\Controllers\Supervisor\StudentReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/{placementId}', [\App\Http\Controllers\Supervisor\StudentReportController::class, 'show'])->name('reports.show');
+    Route::get('/reports', [StudentReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/{placementId}', [StudentReportController::class, 'show'])->name('reports.show');
 });

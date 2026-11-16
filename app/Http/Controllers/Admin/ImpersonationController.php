@@ -29,6 +29,10 @@ class ImpersonationController extends Controller
         $impersonatorId = $originalSuperAdminId ?? $currentUser->id;
         $impersonatorUser = User::findOrFail($impersonatorId);
 
+        // Wewenang dari sesi harus dicek ulang ke database: Super Admin asal bisa saja
+        // sudah diturunkan perannya sejak penyamaran dimulai.
+        abort_unless($impersonatorUser->isSuperAdmin(), 403, 'Hanya Super Administrator yang berhak menggunakan fitur penyamaran (Login As).');
+
         $targetUser = User::findOrFail($userId);
 
         // Jika menargetkan akun Super Admin asli sendiri, kembalikan ke akun Super Admin
@@ -57,8 +61,14 @@ class ImpersonationController extends Controller
             ?? $request->headers->get('referer')
             ?? url()->previous();
 
-        if ($returnTo && (str_contains($returnTo, '/login') || str_contains($returnTo, '/impersonate'))) {
-            $returnTo = null;
+        if ($returnTo) {
+            $parsedHost = parse_url($returnTo, PHP_URL_HOST);
+            $isSafeRelative = str_starts_with($returnTo, '/') && ! str_starts_with($returnTo, '//');
+            $isSafeSameHost = $parsedHost !== null && strcasecmp((string) $parsedHost, (string) $request->getHost()) === 0;
+
+            if ((! $isSafeRelative && ! $isSafeSameHost) || str_contains($returnTo, '/login') || str_contains($returnTo, '/impersonate')) {
+                $returnTo = null;
+            }
         }
 
         // Login sebagai target user + buat ID sesi baru (mencegah session fixation)
@@ -78,6 +88,7 @@ class ImpersonationController extends Controller
         $role = $targetUser->role;
         $targetRoute = match ($role) {
             'admin' => route('admin.dashboard'),
+            'supervisor' => route('supervisor.dashboard'),
             'mentor', 'pembimbing' => route('mentor.dashboard'),
             'dosen', 'academic_advisor' => route('lecturer.dashboard'),
             'universitas' => route('university.dashboard'),
@@ -98,8 +109,17 @@ class ImpersonationController extends Controller
         }
 
         $originalId = $request->session()->get('impersonator_id');
-        $originalUser = User::findOrFail($originalId);
+        $originalUser = User::find($originalId);
         $impersonatedUser = Auth::user();
+
+        // Jangan masuk kembali ke akun asal yang sudah tidak berwenang
+        if (! $originalUser || ! $originalUser->isSuperAdmin()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('login');
+        }
 
         // Tentukan URL tujuan kembali sebelum sesi penyamaran dihapus
         $returnUrl = $request->session()->get('impersonator_return_to');

@@ -15,10 +15,20 @@
         </div>
     </x-slot>
 
-    <div class="py-8" x-data="{ selectedRole: '{{ old('role', $user->role) }}' }">
+    <div class="py-8" x-data="{ selectedRole: @js(old('role', $user->role)) }">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-2xl border border-gray-100 shadow-xs p-6 sm:p-8">
 
+                @if ($errors->any())
+                    <div role="alert" class="mb-4 p-3.5 rounded-xl border border-red-200 bg-red-50 text-xs text-red-800">
+                        <p class="font-bold mb-1">Data belum dapat disimpan:</p>
+                        <ul class="list-disc list-inside space-y-0.5">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <form method="POST" action="{{ route('admin.users.update', $user->id) }}" class="space-y-6">
                     @csrf
                     <input type="hidden" name="return_to" value="{{ $returnTo ?? request('return_to') ?? old('return_to') }}">
@@ -54,12 +64,16 @@
                                 Role Pengguna <span class="text-rose-500">*</span>
                             </label>
                             <select name="role" x-model="selectedRole" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-semibold">
-                                <option value="mahasiswa">Mahasiswa Pendaftar</option>
+                                <option value="mahasiswa">Peserta Magang Pendaftar</option>
                                 <option value="admin">Admin Instansi Dinas / Superadmin</option>
-                                <option value="supervisor">Supervisor</option>
+                                @if(auth()->user()->isSuperAdmin())
+                                    <option value="supervisor">Supervisor</option>
+                                @endif
                                 <option value="mentor">Mentor Lapangan Dinas</option>
-                                <option value="dosen">Pembimbing</option>
-                                <option value="universitas">Admin Universitas</option>
+                                @if(auth()->user()->isSuperAdmin())
+                                    <option value="dosen">Pembimbing</option>
+                                    <option value="universitas">Admin Kampus/Sekolah</option>
+                                @endif
                             </select>
                         </div>
 
@@ -92,11 +106,11 @@
                     <!-- Input Universitas jika Role Universitas / Dosen / Mahasiswa -->
                     <div x-show="selectedRole === 'universitas' || selectedRole === 'dosen' || selectedRole === 'mahasiswa'" x-cloak class="p-4 rounded-xl bg-sky-50/60 border border-sky-100 space-y-2">
                         <label class="block text-xs font-bold text-sky-900 uppercase tracking-wider">
-                            Pilih Perguruan Tinggi Terkait
+                            Pilih Kampus/Sekolah Terkait
                         </label>
                         <x-searchable-select
                             name="university_id"
-                            placeholder="-- Pilih Universitas --"
+                            placeholder="-- Pilih Kampus/Sekolah --"
                             :items="$universities->map(fn($un) => ['id' => $un->id, 'name' => $un->name, 'acronym' => $un->acronym ?? $un->code, 'meta' => $un->code])"
                             :selected="old('university_id', $user->university_id)"
                         />

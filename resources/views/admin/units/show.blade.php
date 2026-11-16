@@ -68,7 +68,7 @@
                 {{-- Mahasiswa Aktif --}}
                 <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between">
                     <div>
-                        <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Mahasiswa Aktif</div>
+                        <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Peserta Aktif</div>
                         <div class="text-2xl sm:text-3xl font-black text-slate-900 mt-2">{{ $stats['active_students'] }}</div>
                     </div>
                     <div class="text-[11px] text-slate-500 mt-3 pt-2.5 border-t border-slate-100">
@@ -105,7 +105,7 @@
                 {{-- Mahasiswa Lulus --}}
                 <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-2xs col-span-2 md:col-span-1 flex flex-col justify-between">
                     <div>
-                        <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Mahasiswa Lulus</div>
+                        <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Peserta Magang Lulus</div>
                         <div class="text-2xl sm:text-3xl font-black text-slate-900 mt-2">{{ $stats['completed_students'] }}</div>
                     </div>
                     <div class="text-[11px] text-slate-500 mt-3 pt-2.5 border-t border-slate-100">
@@ -203,7 +203,7 @@
                             <input type="text"
                                    name="search"
                                    value="{{ request('search') }}"
-                                   placeholder="Cari mahasiswa, NIM, kampus..."
+                                   placeholder="Cari peserta magang, NIM/NIS, kampus..."
                                    class="w-full text-xs pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-xl focus:ring-1 focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                             <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -240,8 +240,8 @@
                         <thead>
                             <tr class="border-b border-slate-200 bg-slate-100/50 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
                                 <th class="py-3.5 px-4 text-center w-12">No</th>
-                                <th class="py-3.5 px-6">Nama Peserta & NIM</th>
-                                <th class="py-3.5 px-6">Perguruan Tinggi & Program Studi</th>
+                                <th class="py-3.5 px-6">Nama Peserta & NIM/NIS</th>
+                                <th class="py-3.5 px-6">Kampus/Sekolah & Jurusan</th>
                                 <th class="py-3.5 px-4 text-center">Periode Magang</th>
                                 <th class="py-3.5 px-4">Mentor</th>
                                 <th class="py-3.5 px-4 text-center">Status</th>
@@ -267,7 +267,7 @@
                                             {{ $student?->name ?? 'Nama Tidak Terdata' }}
                                         </div>
                                         <div class="text-[11px] text-slate-500 font-mono mt-0.5">
-                                            NIM: {{ $nim }}
+                                            NIM/NIS: {{ $nim }}
                                         </div>
                                     </td>
                                     <td class="py-4 px-6">
@@ -281,10 +281,10 @@
                                     <td class="py-4 px-4 text-center text-slate-600">
                                         @if($app->start_date && $app->end_date)
                                             <div class="font-medium text-[11px]">
-                                                {{ \Carbon\Carbon::parse($app->start_date)->format('d M Y') }}
+                                                {{ \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M Y') }}
                                             </div>
                                             <div class="text-[10px] text-slate-400">
-                                                s.d. {{ \Carbon\Carbon::parse($app->end_date)->format('d M Y') }}
+                                                s.d. {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}
                                             </div>
                                         @else
                                             <span class="text-slate-400 italic">Belum Dijadwalkan</span>
@@ -339,7 +339,7 @@
                                         {{ $student?->name ?? 'Nama Tidak Terdata' }}
                                     </h4>
                                     <div class="text-[11px] text-slate-500 font-mono mt-0.5">
-                                        NIM: {{ $nim }}
+                                        NIM/NIS: {{ $nim }}
                                     </div>
                                 </div>
                                 <div class="shrink-0">
@@ -349,7 +349,7 @@
 
                             <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1.5">
                                 <div>
-                                    <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Perguruan Tinggi & Prodi</span>
+                                    <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Kampus/Sekolah & Jurusan</span>
                                     <span class="font-semibold text-slate-800 block">{{ $univName }}</span>
                                     <span class="text-slate-500 text-[11px] block">{{ $jurusan }}</span>
                                 </div>
@@ -358,7 +358,7 @@
                                         <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Periode Magang</span>
                                         @if($app->start_date && $app->end_date)
                                             <span class="text-slate-700 font-medium">
-                                                {{ \Carbon\Carbon::parse($app->start_date)->format('d M') }} - {{ \Carbon\Carbon::parse($app->end_date)->format('d M Y') }}
+                                                {{ \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M') }} - {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}
                                             </span>
                                         @else
                                             <span class="text-slate-400 italic">Belum Dijadwalkan</span>
@@ -426,7 +426,7 @@
                                     @endif
                                 </div>
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-100 text-blue-800 shrink-0">
-                                    {{ $mentor->active_students_count ?? 0 }} Mhs Aktif
+                                    {{ $mentor->active_students_count ?? 0 }} Peserta Aktif
                                 </span>
                             </div>
                         @empty
@@ -452,7 +452,7 @@
             const nextVal = current + delta;
             
             if (nextVal < filled) {
-                alert(`Kuota tidak boleh kurang dari jumlah mahasiswa yang sedang aktif (${filled} orang).`);
+                alert(`Kuota tidak boleh kurang dari jumlah peserta magang yang sedang aktif (${filled} orang).`);
                 return;
             }
             if (nextVal > 500) {
@@ -477,7 +477,7 @@
             }
 
             if (val < filled) {
-                alert(`Kuota tidak boleh kurang dari jumlah mahasiswa yang sedang aktif (${filled} orang).`);
+                alert(`Kuota tidak boleh kurang dari jumlah peserta magang yang sedang aktif (${filled} orang).`);
                 input.value = input.dataset.currentVal;
                 return;
             }

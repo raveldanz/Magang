@@ -6,8 +6,8 @@
                 <div class="cc-box bg-white rounded-3xl border border-slate-100 p-6 sm:p-7 shadow-xs space-y-6">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
                         <div>
-                            <h3 class="font-black text-lg text-slate-900">Kebijakan Evaluasi & Skema Penilaian Magang MBKM</h3>
-                            <p class="text-xs text-slate-500 mt-1">Konfigurasi formula bobot penilaian akhir dan keterlibatan Dosen Pembimbing Lapangan</p>
+                            <h3 class="font-black text-lg text-slate-900">Kebijakan Evaluasi & Skema Penilaian Magang</h3>
+                            <p class="text-xs text-slate-500 mt-1">Konfigurasi formula bobot penilaian akhir dan keterlibatan Pembimbing</p>
                         </div>
 
                         @if($isSuperAdmin)
@@ -31,9 +31,9 @@
                             </div>
                             <p class="text-xs text-slate-600 leading-relaxed">
                                 @if($university->evaluation_scheme === 'mentor_only')
-                                    Kampus menyerahkan sepenuhnya nilai evaluasi magang mahasiswa kepada Pembimbing Lapangan Dinas Perpustakaan dan Kearsipan Surabaya. Nilai akhir diambil 100% dari nilai mentor lapangan.
+                                    Kampus menyerahkan sepenuhnya nilai evaluasi magang peserta kepada Pembimbing Lapangan Dinas Perpustakaan dan Kearsipan Surabaya. Nilai akhir diambil 100% dari nilai mentor lapangan.
                                 @else
-                                    Nilai akhir merupakan gabungan berbobot antara penilaian kinerja praktis oleh Pembimbing Lapangan Dispusip Surabaya dan evaluasi akademis oleh Dosen Pembimbing Lapangan.
+                                    Nilai akhir merupakan gabungan berbobot antara penilaian kinerja praktis oleh Pembimbing Lapangan Dispusip Surabaya dan evaluasi akademis oleh Pembimbing.
                                 @endif
                             </p>
                         </div>
@@ -49,7 +49,7 @@
                                 </div>
                             @elseif(($university->weight_mentor ?? 0) === 0)
                                 <div class="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-100">
-                                    <span class="text-xs font-bold text-slate-700">Dosen Pembimbing Kampus</span>
+                                    <span class="text-xs font-bold text-slate-700">Pembimbing Kampus/Sekolah</span>
                                     <span class="text-xs font-black text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-100">100%</span>
                                 </div>
                             @else
@@ -59,14 +59,14 @@
                                         <span class="text-xs font-black text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">{{ $university->weight_mentor ?? 100 }}%</span>
                                     </div>
                                     <div class="flex items-center justify-between p-2.5 rounded-xl bg-white border border-slate-100">
-                                        <span class="text-xs font-bold text-slate-700">Dosen Pembimbing Kampus</span>
+                                        <span class="text-xs font-bold text-slate-700">Pembimbing Kampus/Sekolah</span>
                                         <span class="text-xs font-black text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-100">{{ $university->weight_lecturer ?? 0 }}%</span>
                                     </div>
                                 </div>
                             @endif
 
                             <div class="text-xs text-slate-500 pt-1">
-                                Syarat Penugasan Dosen Pembimbing: <strong class="text-slate-800">{{ $university->requiresAdvisor() ? 'Wajib Ditetapkan' : 'Opsional / Tidak Wajib' }}</strong>
+                                Syarat Penugasan Pembimbing: <strong class="text-slate-800">{{ $university->requiresAdvisor() ? 'Wajib Ditetapkan' : 'Opsional / Tidak Wajib' }}</strong>
                             </div>
                         </div>
                     </div>
@@ -87,7 +87,7 @@
                                 </ul>
                             </div>
                             <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
-                                <span class="font-bold text-purple-900 block text-[11px]">Aspek Penilaian DPL (Akademik Kampus)</span>
+                                <span class="font-bold text-purple-900 block text-xs">Aspek Penilaian Pembimbing (Kampus/Sekolah)</span>
                                 <ul class="space-y-1.5 text-slate-600 text-[11px]">
                                     <li class="flex items-start gap-1.5"><strong class="text-slate-800">1.</strong> <span>{{ $university->getDplComponent(1) }}</span></li>
                                     <li class="flex items-start gap-1.5"><strong class="text-slate-800">2.</strong> <span>{{ $university->getDplComponent(2) }}</span></li>

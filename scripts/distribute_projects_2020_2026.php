@@ -1,19 +1,19 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
-use App\Models\User;
-use App\Models\Placement;
 use App\Models\InternshipProject;
+use App\Models\Placement;
 use Carbon\Carbon;
+use Illuminate\Contracts\Console\Kernel;
 
 echo "--- Mendistribusikan Proyek Inovasi Magang Tahun 2020 - 2026 ---\n";
 
 $placement = Placement::first();
-if (!$placement) {
+if (! $placement) {
     echo "Tidak ada placement ditemukan!\n";
     exit(1);
 }
@@ -128,7 +128,7 @@ foreach ($yearlyProjects as $data) {
     );
 
     // Update timestamp secara langsung jika Eloquent overwrite
-    \DB::table('internship_projects')->where('id', $proj->id)->update([
+    DB::table('internship_projects')->where('id', $proj->id)->update([
         'created_at' => $createdAt->toDateTimeString(),
         'updated_at' => $createdAt->toDateTimeString(),
     ]);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +23,22 @@ class EnsureAccountIsActive
 
         // Super Admin yang sedang "Login As" tetap boleh memeriksa akun nonaktif
         $isImpersonating = $request->hasSession() && $request->session()->has('impersonator_id');
+
+        // Hak "Login As" dicek ulang setiap request: bila Super Admin asli sudah diturunkan
+        // perannya, dihapus, atau dinonaktifkan, sesi penyamaran langsung diputus.
+        if ($user && $isImpersonating) {
+            $impersonator = User::find($request->session()->get('impersonator_id'));
+
+            if (! $impersonator || ! $impersonator->isSuperAdmin()) {
+                Auth::guard('web')->logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return redirect()->route('login')->withErrors([
+                    'email' => 'Sesi penyamaran dihentikan karena akun Super Admin asal tidak lagi berwenang.',
+                ]);
+            }
+        }
 
         if (! $user || ! $user->isInactive() || $isImpersonating) {
             return $next($request);

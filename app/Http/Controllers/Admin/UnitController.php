@@ -85,7 +85,7 @@ class UnitController extends Controller
             $defaultAgencyId = $request->query('agency_id');
         }
 
-        $returnTo = $request->query('return_to', url()->previous());
+        $returnTo = $this->safeReturnTo($request->query('return_to', url()->previous()));
 
         return view('admin.units.create', compact('agencies', 'defaultAgencyId', 'returnTo'));
     }
@@ -116,6 +116,12 @@ class UnitController extends Controller
 
         $agencyId = $userAgencyId ?? ($request->agency_profile_id ?? AgencyProfile::first()?->id);
 
+        // Klik ganda pada tombol simpan (atau salah ketik) tidak boleh menghasilkan dua bidang bernama sama.
+        if ($this->unitNameTaken((string) $request->name, $agencyId)) {
+            return redirect()->back()->withInput()
+                ->withErrors(['name' => 'Bidang / divisi dengan nama ini sudah ada pada instansi yang sama.']);
+        }
+
         $unit = Unit::create([
             'name' => $request->name,
             'description' => $request->description,
@@ -126,8 +132,8 @@ class UnitController extends Controller
         $successMsg = "Divisi '{$unit->name}' berhasil ditambahkan!";
 
         // 1. Prioritas return_to dari pemanggil
-        if ($request->filled('return_to') && ! str_contains($request->return_to, 'units/create')) {
-            return redirect($request->return_to)->with('success', $successMsg);
+        if (($safeReturn = $this->safeReturnTo($request->return_to)) && ! str_contains($safeReturn, 'units/create')) {
+            return redirect($safeReturn)->with('success', $successMsg);
         }
 
         // 2. Balik ke detail instansi jika ada agencyId
@@ -242,7 +248,7 @@ class UnitController extends Controller
         }
 
         $agencies = $agencyId ? AgencyProfile::where('id', $agencyId)->get() : AgencyProfile::all();
-        $returnTo = $request->query('return_to', url()->previous());
+        $returnTo = $this->safeReturnTo($request->query('return_to', url()->previous()));
 
         // Kandidat Kepala / Koordinator Unit: akun mentor resmi di instansi unit ini
         $headCandidates = User::whereIn('role', ['mentor', 'pembimbing'])
@@ -285,8 +291,13 @@ class UnitController extends Controller
             'return_to' => 'nullable|string',
         ], [
             'head_user_id.exists' => 'Kepala Unit harus akun mentor resmi dari instansi yang sama.',
-            'quota.min' => "Kuota tidak boleh kurang dari jumlah mahasiswa yang sedang menempati divisi ini ({$occupied} orang).",
+            'quota.min' => "Kuota tidak boleh kurang dari jumlah peserta magang yang sedang menempati divisi ini ({$occupied} orang).",
         ]);
+
+        if ($this->unitNameTaken((string) $request->name, $unit->agency_profile_id, $unit->id)) {
+            return redirect()->back()->withInput()
+                ->withErrors(['name' => 'Bidang / divisi dengan nama ini sudah ada pada instansi yang sama.']);
+        }
 
         $updateData = [
             'name' => $request->name,
@@ -306,8 +317,8 @@ class UnitController extends Controller
         $successMsg = 'Data divisi / unit magang berhasil diperbarui!';
 
         // 1. Prioritas return_to dari pemanggil
-        if ($request->filled('return_to') && ! str_contains($request->return_to, 'units/'.$id.'/edit')) {
-            return redirect($request->return_to)->with('success', $successMsg);
+        if (($safeReturn = $this->safeReturnTo($request->return_to)) && ! str_contains($safeReturn, 'units/'.$id.'/edit')) {
+            return redirect($safeReturn)->with('success', $successMsg);
         }
 
         // Jika Admin Bidang, langsung kembali ke ruang kerja bidangnya
@@ -348,7 +359,7 @@ class UnitController extends Controller
 
         $action = $request->input('action');
         $occupied = $unit->occupied_count;
-        $belowOccupied = "Kuota tidak boleh kurang dari jumlah mahasiswa yang sedang menempati divisi ini ({$occupied} orang).";
+        $belowOccupied = "Kuota tidak boleh kurang dari jumlah peserta magang yang sedang menempati divisi ini ({$occupied} orang).";
 
         if ($action === 'decrement' && $unit->quota - 1 < $occupied) {
             if ($request->wantsJson() || $request->ajax()) {
@@ -439,10 +450,18 @@ class UnitController extends Controller
         $unit->delete();
         $successMsg = "Divisi / unit magang '{$unit->name}' berhasil dihapus.";
 
-        if ($request->filled('return_to')) {
-            return redirect($request->return_to)->with('success', $successMsg);
+        if ($safeReturn = $this->safeReturnTo($request->return_to)) {
+            return redirect($safeReturn)->with('success', $successMsg);
         }
 
         return redirect()->back()->with('success', $successMsg);
+    }
+
+    private function unitNameTaken(string $name, $agencyId, ?int $exceptId = null): bool
+    {
+        return Unit::where('agency_profile_id', $agencyId)
+            ->whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($name))])
+            ->when($exceptId, fn ($q) => $q->whereKeyNot($exceptId))
+            ->exists();
     }
 }

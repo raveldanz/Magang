@@ -1,99 +1,106 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <a href="{{ route('mentor.dashboard') }}" class="p-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-lg transition" title="Kembali ke Dashboard">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="{{ route('mentor.dashboard') }}" class="min-h-[48px] min-w-[48px] inline-flex items-center justify-center bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 rounded-xl transition" title="Kembali ke Beranda Mentor" aria-label="Kembali ke Beranda Mentor">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
             </a>
             <div>
-                <h2 class="font-bold text-xl sm:text-2xl text-slate-900 leading-tight">
-                    Logbook Mahasiswa Bimbingan
+                <h2 class="font-bold text-2xl text-slate-900 leading-tight">
+                    Periksa Logbook Peserta Magang
                 </h2>
-                <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-                    Tinjau dan verifikasi paket aktivitas mingguan mahasiswa magang di unit kerja Anda
+                <p class="text-base text-slate-700 mt-0.5">
+                    Logbook dikelompokkan per minggu. Buka minggu yang bertanda kuning, putuskan setiap hari, lalu simpan.
                 </p>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    @php
+        $filterQuery = request()->except(['status', 'page']);
+        $statusTabs = [
+            'pending' => ['Perlu Diperiksa', $pendingCount, 'hari'],
+            'all' => ['Semua', $pendingCount + $approvedCount + $rejectedCount, 'hari'],
+            'approved' => [\App\Enums\ReviewStatus::APPROVED->localizedLabel('mentor'), $approvedCount, 'hari'],
+            'rejected' => ['Sedang Diperbaiki Peserta Magang', $rejectedCount, 'hari'],
+        ];
+    @endphp
 
-            <!-- Flash Success Message -->
-            @if (session('success'))
-                <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-lg flex items-center justify-between text-emerald-900 text-sm font-medium">
-                    <span>{{ session('success') }}</span>
-                </div>
-            @endif
+    <div class="py-6 sm:py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
 
-            <!-- 1. Tiga Angka Polos (Menunggu, Disetujui, Perlu Revisi) -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-white p-4 rounded-xl border border-slate-200">
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Menunggu</span>
-                    <div class="text-2xl font-bold text-slate-900 mt-1">{{ $pendingCount }}</div>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200">
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Disetujui</span>{{-- status-guard:ignore --}}
-                    <div class="text-2xl font-bold text-slate-900 mt-1">{{ $approvedCount }}</div>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200">
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Perlu Revisi</span>
-                    <div class="text-2xl font-bold text-slate-900 mt-1">{{ $rejectedCount }}</div>
-                </div>
+            <!-- Ringkasan: berapa yang harus diperiksa -->
+            <div class="p-5 rounded-2xl border {{ $pendingCount > 0 ? 'bg-amber-50 border-amber-300' : 'bg-emerald-50 border-emerald-300' }}">
+                @if ($pendingCount > 0)
+                    <p class="text-lg font-bold text-amber-900">
+                        Ada {{ $pendingCount }} hari kegiatan ({{ $pendingWeeks }} minggu) yang menunggu pemeriksaan Anda.
+                    </p>
+                    <p class="text-base text-amber-900 mt-0.5">Mulai dari minggu paling atas. Minggu pertama sudah dibuka otomatis.</p>
+                @else
+                    <p class="text-lg font-bold text-emerald-900">Semua logbook sudah Anda periksa. Tidak ada yang menunggu.</p>
+                @endif
             </div>
 
-            <!-- 2. Filter Bar: Dropdown Mahasiswa, Dropdown Status, Kolom Cari, Tombol Cari -->
-            <div class="bg-white rounded-xl p-4 border border-slate-200">
-                <form method="GET" action="{{ route('mentor.logbooks.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <!-- Dropdown Mahasiswa -->
+            <!-- Pilihan tampilan berdasarkan keadaan -->
+            <div class="border-b border-slate-200 overflow-x-auto">
+                <nav class="flex gap-6 min-w-max" aria-label="Pilih logbook berdasarkan keadaan">
+                    @foreach ($statusTabs as $key => [$label, $count, $unit])
+                        <a href="{{ route('mentor.logbooks.index', array_merge($filterQuery, ['status' => $key])) }}"
+                           @if ($statusFilter === $key) aria-current="page" @endif
+                           class="py-3 px-1 border-b-4 text-base inline-flex items-center gap-2 transition min-h-[48px] {{ $statusFilter === $key ? 'border-blue-600 text-blue-800 font-bold' : 'border-transparent text-slate-700 hover:text-slate-900 font-semibold' }}">
+                            <span>{{ $label }}</span>
+                            <span class="px-2.5 py-0.5 rounded-full text-sm font-bold {{ $statusFilter === $key ? 'bg-blue-100 text-blue-900' : 'bg-slate-100 text-slate-800' }}">{{ $count }} {{ $unit }}</span>
+                        </a>
+                    @endforeach
+                </nav>
+            </div>
+
+            <!-- Cari mahasiswa -->
+            <div class="bg-white rounded-2xl p-4 border border-slate-200">
+                <form method="GET" action="{{ route('mentor.logbooks.index') }}" class="grid grid-cols-1 lg:grid-cols-3 gap-3 items-end">
+                    <input type="hidden" name="status" value="{{ $statusFilter }}">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Mahasiswa:</label>
-                        <select name="placement_id" onchange="this.form.submit()" class="w-full text-sm border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-2">
-                            <option value="">Semua Mahasiswa</option>
+                        <label for="pilih-mahasiswa" class="block text-base font-semibold text-slate-900 mb-1">Peserta Magang</label>
+                        <select id="pilih-mahasiswa" name="placement_id" onchange="this.form.submit()" class="w-full min-h-[48px] text-base border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2">
+                            <option value="">Semua Peserta Magang</option>
                             @foreach ($supervisedPlacements as $pl)
                                 @php
                                     $st = $pl->application?->user;
                                     $nim = $st?->studentProfile?->nim ?? '-';
                                 @endphp
                                 <option value="{{ $pl->id }}" {{ request('placement_id') == $pl->id ? 'selected' : '' }}>
-                                    {{ $st?->name ?? 'Mahasiswa' }} ({{ $nim }})
+                                    {{ $st?->name ?? 'Peserta Magang' }} ({{ $nim }})
                                 </option>
                             @endforeach
                         </select>
                     </div>
 
-                    <!-- Dropdown Status -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Status:</label>
-                        <select name="status" onchange="this.form.submit()" class="w-full text-sm border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-2">
-                            <option value="">Semua Status</option>
-                            <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Menunggu</option>
-                            <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Disetujui</option>{{-- status-guard:ignore --}}
-                            <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Perlu Revisi</option>
-                        </select>
-                    </div>
-
-                    <!-- Kolom Cari & Tombol Cari -->
                     <div class="lg:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Cari:</label>
+                        <label for="cari-logbook" class="block text-base font-semibold text-slate-900 mb-1">Cari nama, NIM/NIS, atau isi kegiatan</label>
                         <div class="flex items-center gap-2">
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa, NIM, atau kegiatan..."
-                                   class="w-full text-sm border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-2">
-                            <button type="submit" class="inline-flex items-center justify-center px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg transition shrink-0 cursor-pointer">
+                            <input id="cari-logbook" type="text" name="search" value="{{ request('search') }}" placeholder="Contoh: Budi atau katalog"
+                                   class="w-full min-h-[48px] text-base border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2">
+                            <button type="submit" class="min-h-[48px] inline-flex items-center justify-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-base font-bold rounded-xl transition shrink-0 cursor-pointer">
                                 Cari
                             </button>
+                            @if (request()->filled('search') || request()->filled('placement_id'))
+                                <a href="{{ route('mentor.logbooks.index') }}"
+                                   class="min-h-[48px] inline-flex items-center justify-center px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold rounded-xl transition shrink-0">
+                                    Reset
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </form>
             </div>
 
-            <!-- 3. Daftar Paket Mingguan (Komponen Bersama) -->
+            <!-- Daftar Paket Mingguan (Komponen Bersama) -->
             <x-supervision.logbook-weekly
                 :bundles="$weeklyBundles"
                 :reviewRoute="route('mentor.logbooks.bulk_review')"
                 role="mentor"
-                emptyMessage="Tidak ada paket logbook mingguan yang ditemukan sesuai filter yang dipilih."
+                emptyMessage="Tidak ada logbook mingguan yang sesuai dengan pilihan ini."
             />
 
         </div>

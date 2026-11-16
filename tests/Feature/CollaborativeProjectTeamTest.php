@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\InternshipProject;
-use App\Models\InternshipProjectMember;
 use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\User;
@@ -212,4 +211,3 @@ class CollaborativeProjectTeamTest extends TestCase
         $this->assertEquals('media', $detectedVideo);
     }
 }
-

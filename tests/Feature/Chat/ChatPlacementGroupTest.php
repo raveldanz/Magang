@@ -51,7 +51,7 @@ class ChatPlacementGroupTest extends ChatTestCase
         $expectedDplMembers = [$this->dosenA->id, $this->studentA->id];
         sort($expectedDplMembers);
         $this->assertSame($expectedDplMembers, $this->memberIds($dplGroup));
-        $this->assertSame("Bimbingan Dosen {$this->dosenA->name}", $dplGroup->title);
+        $this->assertSame("Bimbingan Pembimbing {$this->dosenA->name}", $dplGroup->title);
 
         // Mentor tidak boleh berada di grup bimbingan DPL
         $this->assertNotContains($this->mentorX->id, $this->memberIds($dplGroup));

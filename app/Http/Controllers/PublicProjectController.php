@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\InternshipProject;
-use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,7 +19,6 @@ class PublicProjectController extends Controller
         $sort = trim((string) $request->input('sort', 'latest'));
 
         $user = Auth::user();
-        $isPrivileged = $user && ($user->isSuperAdmin() || in_array($user->role, ['admin', 'supervisor']));
 
         $query = InternshipProject::with([
             'placement.application.user.studentProfile',
@@ -29,10 +27,8 @@ class PublicProjectController extends Controller
             'placement.academicAdvisor',
         ]);
 
-        // Pengunjung umum hanya melihat proyek bertanda public (is_public = true)
-        if (! $isPrivileged) {
-            $query->where('is_public', true);
-        }
+        // Pengunjung umum hanya melihat proyek publik; staf dinas juga melihat proyek privat dinasnya sendiri
+        $query->visibleTo($user);
 
         $driver = \DB::connection()->getDriverName();
         $like = $driver === 'pgsql' ? 'ilike' : 'like';
@@ -91,14 +87,11 @@ class PublicProjectController extends Controller
         });
 
         // 6. Ambil Daftar Tahun Unik untuk Pilihan Filter
-        $yearExpression = $driver === 'sqlite' 
-            ? "strftime('%Y', created_at) as project_year" 
+        $yearExpression = $driver === 'sqlite'
+            ? "strftime('%Y', created_at) as project_year"
             : 'EXTRACT(YEAR FROM created_at) as project_year';
 
-        $yearQuery = InternshipProject::selectRaw($yearExpression);
-        if (! $isPrivileged) {
-            $yearQuery->where('is_public', true);
-        }
+        $yearQuery = InternshipProject::selectRaw($yearExpression)->visibleTo($user);
 
         $availableYears = $yearQuery->distinct()
             ->orderBy('project_year', 'desc')
@@ -113,9 +106,9 @@ class PublicProjectController extends Controller
 
         // Metrik Statistik Ringkas Galeri
         $stats = [
-            'total_projects' => InternshipProject::when(! $isPrivileged, fn ($q) => $q->where('is_public', true))->count(),
-            'total_likes' => (int) InternshipProject::when(! $isPrivileged, fn ($q) => $q->where('is_public', true))->sum('likes_count'),
-            'total_comments' => (int) InternshipProject::when(! $isPrivileged, fn ($q) => $q->where('is_public', true))->sum('comments_count'),
+            'total_projects' => InternshipProject::visibleTo($user)->count(),
+            'total_likes' => (int) InternshipProject::visibleTo($user)->sum('likes_count'),
+            'total_comments' => (int) InternshipProject::visibleTo($user)->sum('comments_count'),
             'total_categories' => count(InternshipProject::CATEGORIES),
         ];
 
