@@ -215,7 +215,7 @@ class SupervisorDemoSeeder extends Seeder
             ['file_path' => $samplePdf]
         );
         ApplicationDocument::updateOrCreate(
-            ['application_id' => $appAnisa->id, 'document_type' => 'Proposal Magang Mahasiswa'],
+            ['application_id' => $appAnisa->id, 'document_type' => 'Proposal Magang Peserta'],
             ['file_path' => $samplePdf]
         );
         ApplicationDocument::updateOrCreate(
@@ -250,7 +250,7 @@ class SupervisorDemoSeeder extends Seeder
             ['file_path' => $samplePdf]
         );
         ApplicationDocument::updateOrCreate(
-            ['application_id' => $appBagas->id, 'document_type' => 'Proposal Magang Mahasiswa'],
+            ['application_id' => $appBagas->id, 'document_type' => 'Proposal Magang Peserta'],
             ['file_path' => $samplePdf]
         );
 

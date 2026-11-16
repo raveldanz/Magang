@@ -561,7 +561,7 @@ class InternshipGroupDemoSeeder extends Seeder
                 'nilai_kinerja' => 94,
                 'nilai_laporan' => 93,
                 'nilai_akademik' => 90,
-                'catatan' => 'Mahasiswa menunjukkan kepemimpinan tim yang luar biasa dan dedikasi tinggi selama magang.',
+                'catatan' => 'Peserta magang menunjukkan kepemimpinan tim yang luar biasa dan dedikasi tinggi selama magang.',
                 'catatan_dosen' => 'Pencapaian kompetensi sangat baik dan relevan dengan kurikulum program studi.',
             ]
         );

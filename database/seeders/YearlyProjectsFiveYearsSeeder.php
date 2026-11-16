@@ -343,8 +343,8 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'custom_category' => null,
                 'project_type' => 'group',
                 'photo_path' => 'projects/mahasiswi_membaca_koleksi.jpg',
-                'description' => 'Pengembangan platform terpadu untuk efisiensi pendaftaran mahasiswa magang, verifikasi penempatan, pencatatan logbook harian, penilaian pembimbing dinas/dosen, dan etalase terbuka proyek inovasi kedinasan.',
-                'community_benefit' => 'Mengeliminasi penggunaan berkas fisik proposal kertas, memfasilitasi ratusan mahasiswa magang dari perguruan tinggi terkemuka, dan mempublikasikan karya nyata mahasiswa kepada masyarakat.',
+                'description' => 'Pengembangan platform terpadu untuk efisiensi pendaftaran peserta magang, verifikasi penempatan, pencatatan logbook harian, penilaian mentor dinas dan pembimbing, dan etalase terbuka proyek inovasi kedinasan.',
+                'community_benefit' => 'Mengeliminasi penggunaan berkas fisik proposal kertas, memfasilitasi ratusan peserta magang dari kampus dan sekolah mitra, dan mempublikasikan karya nyata peserta magang kepada masyarakat.',
                 'demo_url' => 'https://dispusip.surabaya.go.id',
                 'repository_url' => 'https://github.com/surabaya-dev/sim-magang-dispusip',
                 'video_url' => 'https://youtu.be/jlKU3exv4Oc',
@@ -530,7 +530,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
         if (! File::exists($zipDest)) {
             $zip = new \ZipArchive;
             if ($zip->open($zipDest, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
-                $zip->addFromString('README.md', "# SIM Magang Dispusip Surabaya\n\nBerkas arsip kode & karya luaran inovasi mahasiswa.");
+                $zip->addFromString('README.md', "# SIM Magang Dispusip Surabaya\n\nBerkas arsip kode & karya luaran inovasi peserta magang.");
                 $zip->close();
             }
         }

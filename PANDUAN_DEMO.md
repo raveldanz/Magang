@@ -30,14 +30,27 @@ yang tanggal mulainya sudah tiba, menaikkan batas unggah ke 64 MB, dan menjalank
 | Admin Dinas | `admin.dispusip@surabaya.go.id` |
 | Supervisor (pengesahan) | `supervisor@dispusip.surabaya.go.id` |
 | Mentor lapangan | `mentor.dispusip@surabaya.go.id` |
-| Dosen (DPL) | `dosen.unesa@unesa.ac.id` |
-| Admin Universitas | `admin@unesa.ac.id` |
-| Mahasiswa aktif (logbook) | `mahasiswa.aktif@unesa.ac.id` |
-| Mahasiswa lulus (sertifikat) | `mahasiswa.lulus@unesa.ac.id` |
-| Mahasiswa diterima | `dani.accepted@unesa.ac.id` |
-| Mahasiswa perlu revisi | `fajar.revisi@unesa.ac.id` |
+| Pembimbing (dosen kampus) | `dosen.unesa@unesa.ac.id` |
+| Admin Kampus | `admin@unesa.ac.id` |
+| Peserta magang aktif (logbook) | `mahasiswa.aktif@unesa.ac.id` |
+| Peserta magang lulus (sertifikat) | `mahasiswa.lulus@unesa.ac.id` |
+| Peserta magang diterima | `dani.accepted@unesa.ac.id` |
+| Peserta magang perlu revisi | `fajar.revisi@unesa.ac.id` |
 
-### Akun mahasiswa per skenario
+### Akun peserta dari sekolah (SMK Negeri 7 Surabaya)
+
+| Peran / keadaan | Email | Yang bisa diperagakan |
+|---|---|---|
+| Admin Sekolah | `admin.smkn7@demo.sch.id` | Menyetujui guru yang mendaftar sendiri (menu Pembimbing) |
+| Guru pembimbing (sudah disetujui) | `guru.smkn7@demo.sch.id` | Memeriksa logbook siswa, mengisi nilai pembimbing |
+| Guru menunggu persetujuan | `guru.menunggu@demo.sch.id` | Login berhasil, belum bisa dipilih siswa |
+| Siswa SMK aktif magang | `siswa.smk.aktif@demo.sch.id` | Profil sekolah (NIS, kelas), logbook |
+| Siswa SMK lulus | `siswa.smk.lulus@demo.sch.id` | Sertifikat dan QR berlabel sekolah |
+
+Daftar 283 SMA/SMK/MA Kota Surabaya otomatis terisi (`start_demo.bat` / `migrate:fresh --seed`),
+jadi saat mendaftar baru, peserta atau guru cukup mengetik nama sekolahnya, misalnya `smkn 7`.
+
+### Akun peserta magang per skenario
 
 Urut mengikuti alur magang. Semua kata sandi `password`.
 
@@ -54,8 +67,8 @@ Urut mengikuti alur magang. Semua kata sandi `password`.
 | Laporan akhir menunggu tinjauan | `laporan.menunggu@unesa.ac.id` | Mentor menyetujui atau meminta revisi |
 | Laporan akhir perlu revisi | `laporan.revisi@unesa.ac.id` | Mengunggah ulang laporan |
 | Magang selesai, tinggal dinilai | `siap.dinilai@unesa.ac.id` | Mentor mengisi nilai, status langsung selesai |
-| Penilaian ganda, menunggu nilai dosen | `ganda.aktif@pens.ac.id` | Dosen `dosen.pens@pens.ac.id` mengisi nilai 60% |
-| Penilaian ganda, sudah lulus | `ganda.lulus@pens.ac.id` | Sertifikat dengan nilai mentor dan dosen |
+| Penilaian ganda, menunggu nilai pembimbing | `ganda.aktif@pens.ac.id` | Pembimbing `dosen.pens@pens.ac.id` mengisi nilai 60% |
+| Penilaian ganda, sudah lulus | `ganda.lulus@pens.ac.id` | Sertifikat dengan nilai mentor dan pembimbing |
 | Lulus, sertifikat belum diterbitkan | `haikal.ketua.lulus@unitomo.ac.id` | Admin Dinas menerbitkan sertifikat |
 | Lulus, sertifikat menunggu pengesahan | `hana.sertifikat@unesa.ac.id` | Supervisor mengesahkan |
 | Lulus, sertifikat diminta revisi | `kartika.revisi@unesa.ac.id` | Admin Dinas memperbaiki sertifikat |
@@ -66,7 +79,8 @@ Urut mengikuti alur magang. Semua kata sandi `password`.
 | Akun dinonaktifkan | `akun.nonaktif@unesa.ac.id` | Login ditolak |
 
 Mentor `mentor.dispusip@surabaya.go.id` membimbing akun `logbook.revisi`, `laporan.*`, `siap.dinilai`, dan `ganda.*`.
-Sertifikat baru bisa dibuka mahasiswa setelah diterbitkan Admin Dinas **dan** disahkan Supervisor.
+Mentor yang sama juga membimbing `siswa.smk.aktif` dan `siswa.smk.lulus`.
+Sertifikat baru bisa dibuka peserta setelah diterbitkan Admin Dinas **dan** disahkan Supervisor.
 
 Mengembalikan akun-akun skenario ke keadaan awal (misalnya setelah gladi bersih):
 

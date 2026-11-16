@@ -176,6 +176,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-156** | 2026-11-16 | Keamanan: Pembimbing Daftar Mandiri Wajib Disetujui | Akun dosen/guru daftar mandiri langsung aktif sehingga mahasiswa bisa membuat pembimbing palsu dan menilai dirinya sendiri; nama kampus bebas membuat kampus dobel | RESOLVED |
 | **LRN-157** | 2026-11-16 | Revisi Istilah & Peserta dari Sekolah | "Mahasiswa"/"Dosen"/"DPL" diganti "Peserta Magang"/"Pembimbing" di seluruh tampilan; profil peserta mendapat pilihan Sekolah (NIS, kelas) | RESOLVED |
 | **LRN-158** | 2026-11-16 | Master Sekolah & Surat untuk Peserta Sekolah | Pilihan sekolah di profil kosong tanpa data master; surat penerimaan/pengantar menulis "Universitas Saudara", "Dekan", "MBKM", NIM & semester untuk siswa SMK | RESOLVED |
+| **LRN-159** | 2026-11-16 | Pemeriksaan Siap Demo: Label Peserta Sekolah di Semua Peran | Label kampus ("Universitas / Prodi", "Smt", "Admin Universitas", MBKM) tampil untuk siswa; form feedback menampilkan kode peran mentah; `@php(...)` sebaris membuat form profil galat | RESOLVED |
 ---
 
 ## 3. Catatan Masalah & Solusi (Knowledge Base)
@@ -4567,3 +4568,13 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   1. Setiap template yang menyebut institusi asal peserta wajib bercabang pada `StudentProfile::isSchoolStudent()` / `University::isSchool()` (penerima surat, nama program, label NIM/NIS, Semester/Kelas, Fakultas).
   2. Impor master institusi harus aman dijalankan berulang dan mencocokkan kode resmi (NPSN/kode PT) sebelum nama, tanpa LIKE.
   3. Saat menyusun teks pengganti di PowerShell, jangan menggabung string dengan `+` di dalam array literal `@('a', 'b' + $x)`: koma lebih kuat dari `+` sehingga teks terpotong. Pakai variabel terpisah atau Edit langsung.
+
+### [LRN-159] Pemeriksaan Siap Demo: Label Peserta Sekolah di Semua Peran
+- **Date:** 2026-11-16
+- **Problem / Symptom:** Setelah LRN-157/158 masih ada label khusus kampus yang dibaca siswa dan guru: "Universitas / Prodi", "Asal Perguruan Tinggi", "Smt", "Admin Universitas", "Portal Universitas", kalimat "Magang MBKM", label kontak chat "NIM/Semester", dan nama peran chat "Dosen Pembimbing (DPL)"/"Mahasiswa" di JavaScript. Form feedback menampilkan `Role: mahasiswa` (kode mentah). Data demo tidak punya peserta sekolah, sehingga tampilan siswa tidak pernah teruji. Menambahkan `@php($x = ...)` sebaris di form profil yang juga memakai blok `@php ... @endphp` membuat halaman galat 500 ("unexpected endif").
+- **Root Cause:** Label ditulis langsung per halaman; tidak ada penjelajah otomatis per peran; Blade mengira `@php(` sebaris sebagai awal blok bila berkas juga memakai `@endphp`.
+- **Fix Applied:** Penggantian frasa terpilih menjadi "Kampus/Sekolah" (tabel, filter, label, menu, peran Admin Kampus/Sekolah) dan penghapusan kalimat MBKM di halaman peserta; `periodLabel()`/`identityNumberLabel()` di tab peserta kampus, detail siswa Admin Sekolah, kontak chat; label awal form profil mengikuti jenjang (tanpa menunggu JavaScript). Data demo: SMK Negeri 7 Surabaya dengan Admin Sekolah, guru disetujui, guru menunggu persetujuan, siswa aktif, siswa lulus bersertifikat (`DemoScenarioSeeder::schoolScenarios`). Tes `SchoolParticipantEndToEndTest` (daftar guru → persetujuan → siswa → pengajuan → Double ACC → logbook → laporan → nilai 40/60 → sertifikat → QR).
+- **Prevention Rule:**
+  1. Sebelum demo, jalankan `migrate:fresh --seed` di database salinan lalu jelajahi halaman tiap akun demo (termasuk akun sekolah) dan cari galat 5xx serta istilah lama; data demo wajib memuat contoh setiap jenis peserta.
+  2. Di Blade, jangan pakai `@php(...)` sebaris pada berkas yang juga memakai blok `@php ... @endphp`; selalu pakai bentuk blok.
+  3. Jangan menampilkan kode peran (`$user->role`) ke pengguna; pakai `roleLabel()`.

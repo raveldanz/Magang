@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\AccountStatus;
 use App\Enums\ApplicationStatus;
 use App\Models\AgencyProfile;
 use App\Models\Application;
@@ -15,6 +16,7 @@ use App\Models\StudentProfile;
 use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
+use App\Services\MasterUniversityService;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -233,7 +235,89 @@ class DemoScenarioSeeder extends Seeder
         // ---------------------------------------------------------------------------------------
         $this->backfillApplicationDocuments();
 
-        $this->command?->info('DemoScenarioSeeder: 10 skenario demo tambahan siap dipakai (kata sandi bawaan).');
+        // ---------------------------------------------------------------------------------------
+        // 13. Peserta dari sekolah (SMK): admin sekolah, guru pembimbing (disetujui & menunggu
+        //     persetujuan), siswa aktif magang, dan siswa lulus dengan sertifikat sah.
+        // ---------------------------------------------------------------------------------------
+        $this->schoolScenarios($unit, $mentor, $supervisor);
+
+        $this->command?->info('DemoScenarioSeeder: skenario demo tambahan (termasuk peserta sekolah) siap dipakai (kata sandi bawaan).');
+    }
+
+    private function schoolScenarios(Unit $unit, User $mentor, ?User $supervisor): void
+    {
+        $service = app(MasterUniversityService::class);
+        $item = $service->search('SMK NEGERI 7 SURABAYA', 5)->firstWhere('institution_type', University::TYPE_SCHOOL);
+        $school = $item
+            ? $service->resolveToUniversity($item)
+            : University::updateOrCreate(['name' => 'SMK NEGERI 7 SURABAYA'], ['institution_type' => University::TYPE_SCHOOL, 'is_verified' => true, 'status' => 'active']);
+
+        $account = fn (string $email, string $name, string $role, string $status = 'active') => User::updateOrCreate(
+            ['email' => $email],
+            ['name' => $name, 'password' => $this->password, 'role' => $role, 'university_id' => $school->id, 'university' => $school->name, 'status' => $status, 'email_verified_at' => now()]
+        );
+
+        $account('admin.smkn7@demo.sch.id', 'Admin SMK Negeri 7 Surabaya', 'universitas');
+        $guru = $account('guru.smkn7@demo.sch.id', 'Sri Wahyuni, S.Pd.', 'dosen');
+        // Guru yang mendaftar sendiri: menunggu persetujuan Admin Sekolah (tombol Setujui di menu Pembimbing)
+        $account('guru.menunggu@demo.sch.id', 'Agus Santoso, S.Pd.', 'dosen', AccountStatus::PENDING->value);
+
+        $siswaAktif = $this->schoolStudent('siswa.smk.aktif@demo.sch.id', 'Putri Ayu Lestari', '0071234561', $school, 11);
+        $appAktif = $this->application($siswaAktif, $unit, ApplicationStatus::ACTIVE, Carbon::now()->subDays(15), Carbon::now()->addDays(75));
+        $plAktif = $this->placement($appAktif, $mentor, $guru);
+        Logbook::where('placement_id', $plAktif->id)->delete();
+        $this->logbook($plAktif, 5, 'Membantu penataan arsip surat masuk dan mencatat nomor agenda.', 'approved', 'Rapi.');
+        $this->logbook($plAktif, 3, 'Memindai 60 lembar arsip inaktif dan memberi nama berkas sesuai pedoman.', 'pending');
+        $this->logbook($plAktif, 1, 'Membantu layanan peminjaman buku di ruang baca anak.', 'pending');
+
+        $siswaLulus = $this->schoolStudent('siswa.smk.lulus@demo.sch.id', 'Dimas Ardiansyah', '0071234562', $school, 12);
+        $appLulus = $this->application($siswaLulus, $unit, ApplicationStatus::COMPLETED, Carbon::now()->subDays(110), Carbon::now()->subDays(15));
+        $plLulus = $this->placement($appLulus, $mentor, $guru, 'SERT/301/DISPUSIP-SBY/'.Carbon::now()->subDays(15)->format('Y'));
+        $this->logbook($plLulus, 30, 'Menyusun daftar arsip vital bidang kearsipan.', 'approved', 'Sangat baik.');
+        $this->finalReport($plLulus, 'Laporan PKL: Penataan Arsip Vital Bidang Kearsipan', 'approved', 'Laporan lengkap.');
+        Evaluation::updateOrCreate(
+            ['placement_id' => $plLulus->id],
+            [
+                'nilai_disiplin' => 90, 'nilai_kinerja' => 88, 'nilai_laporan' => 86,
+                'mentor_aspects' => [
+                    ['name' => $school->getDinasComponent(1), 'score' => 90],
+                    ['name' => $school->getDinasComponent(2), 'score' => 88],
+                    ['name' => $school->getDinasComponent(3), 'score' => 86],
+                ],
+                'catatan' => 'Dimas disiplin dan teliti menata arsip.',
+                'score_mastery' => 0, 'score_report' => 0, 'score_attitude' => 0,
+                'nilai_dosen' => 0, 'dosen_aspects' => null, 'feedback_dosen' => null,
+                'final_score' => 88, 'grade' => 'A',
+            ]
+        );
+        Certificate::updateOrCreate(
+            ['placement_id' => $plLulus->id],
+            [
+                'certificate_number' => $plLulus->certificate_number,
+                'file_path' => 'certificates/'.str_replace('/', '_', $plLulus->certificate_number).'.pdf',
+                'issued_at' => Carbon::now()->subDays(10)->toDateString(),
+                'approval_status' => 'approved',
+                'approved_by' => $supervisor?->id,
+                'approved_at' => Carbon::now()->subDays(9),
+                'notes' => null,
+            ]
+        );
+    }
+
+    /** Siswa SMK: jenjang sekolah, NIS, kelas (10-13), tanpa fakultas, berkas lengkap. */
+    private function schoolStudent(string $email, string $name, string $nis, University $school, int $kelas): User
+    {
+        $user = $this->student($email, $name, $nis, $school, 'Otomatisasi Tata Kelola Perkantoran', withDocuments: true);
+        StudentProfile::where('user_id', $user->id)->update([
+            'education_level' => University::TYPE_SCHOOL,
+            'semester' => (string) $kelas,
+            'faculty' => null,
+            'fakultas' => null,
+            'alamat' => 'Jl. Pawiyatan No. 2, Surabaya',
+            'address' => 'Jl. Pawiyatan No. 2, Surabaya',
+        ]);
+
+        return $user;
     }
 
     private function student(string $email, string $name, string $nim, University $univ, string $jurusan, bool $withDocuments = false): User
