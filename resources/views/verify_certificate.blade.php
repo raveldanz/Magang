@@ -90,7 +90,7 @@
                             DOKUMEN TIDAK BERLAKU
                         </span>
                         <h3 class="font-extrabold text-rose-950 text-base leading-tight">PESERTA MENGUNDURKAN DIRI / DROP OUT</h3>
-                        <p class="text-xs text-rose-700 mt-0.5">Mahasiswa telah mengundurkan diri atau dibatalkan dari penempatan magang ini, sehingga tidak ada sertifikat kelulusan yang sah.</p>
+                        <p class="text-xs text-rose-700 mt-0.5">Peserta Magang telah mengundurkan diri atau dibatalkan dari penempatan magang ini, sehingga tidak ada sertifikat kelulusan yang sah.</p>
                     </div>
                 </div>
             @else
@@ -112,7 +112,7 @@
 
             <!-- Detail Informasi Sertifikat -->
             <div class="mt-6">
-                <h4 class="font-bold text-gray-800 text-sm uppercase tracking-wider border-b pb-2 mb-3">Detail Informasi Mahasiswa & Penilaian</h4>
+                <h4 class="font-bold text-gray-800 text-sm uppercase tracking-wider border-b pb-2 mb-3">Detail Informasi Peserta Magang & Penilaian</h4>
                 
                 
                 @php
@@ -130,11 +130,11 @@
                         </div>
                     @endif
                     <div class="vrow">
-                        <dt class="vlabel">Nama Mahasiswa</dt>
+                        <dt class="vlabel">Nama Peserta Magang</dt>
                         <dd class="vvalue">{{ strtoupper($student->name ?? '-') }}</dd>
                     </div>
                     <div class="vrow">
-                        <dt class="vlabel">NIM / NPM</dt>
+                        <dt class="vlabel">NIM/NIS / NPM</dt>
                         <dd class="vvalue is-mono">{{ $profile->nim ?? '-' }}</dd>
                     </div>
                     <div class="vrow">

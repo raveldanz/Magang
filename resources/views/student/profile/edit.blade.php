@@ -1,7 +1,7 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-slot name="header">
         <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
-            {{ __('Profil Mahasiswa') }}
+            {{ __('Profil Peserta Magang') }}
         </h2>
     </x-slot>
 
@@ -10,6 +10,7 @@
              x-data="{
                 photoPreview: '{{ ($profile?->photo ?? $user?->studentProfile?->photo) ? route('student.photo', $user->id) . '?v=' . substr(md5((string) ($profile?->photo ?? $user?->studentProfile?->photo)), 0, 8) : '' }}',
                 photoName: '',
+                educationLevel: @js(old('education_level', $profile?->education_level ?? 'perguruan_tinggi') === 'sekolah' ? 'sekolah' : 'perguruan_tinggi'),
                 showModal: false,
                 cvName: '',
                 transcriptName: '',
@@ -130,7 +131,7 @@
 
                                 <div class="mt-1.5">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
-                                        Mahasiswa MBKM
+                                        {{ $profile?->isSchoolStudent() ? 'Siswa PKL' : 'Mahasiswa MBKM' }}
                                     </span>
                                 </div>
                             </div>
@@ -139,24 +140,24 @@
                         <!-- Ringkasan Akademik -->
                         <div class="pt-4 border-t border-slate-100 space-y-3 text-xs">
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400 font-medium">NIM</span>
+                                <span class="text-slate-400 font-medium">{{ $profile?->identityNumberLabel() ?? 'NIM' }}</span>
                                 <strong class="text-slate-800 font-bold text-right truncate max-w-[170px]">{{ $profile?->nim ?: 'Belum Diisi' }}</strong>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400 font-medium">Universitas</span>
+                                <span class="text-slate-400 font-medium">{{ $profile?->isSchoolStudent() ? 'Sekolah' : 'Kampus' }}</span>
                                 <strong class="text-slate-800 font-bold text-right truncate max-w-[170px]" title="{{ $profile?->universitas ?? $user->university ?? '-' }}">
                                     {{ $profile?->universitas ?? $user->university ?? '-' }}
                                 </strong>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400 font-medium">Program Studi</span>
+                                <span class="text-slate-400 font-medium">{{ $profile?->isSchoolStudent() ? 'Jurusan' : 'Program Studi' }}</span>
                                 <strong class="text-slate-800 font-bold text-right truncate max-w-[170px]" title="{{ $profile?->jurusan ?? $profile?->major ?? '-' }}">
                                     {{ $profile?->jurusan ?? $profile?->major ?? '-' }}
                                 </strong>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400 font-medium">Semester</span>
-                                <strong class="text-slate-800 font-bold">{{ $profile?->semester ? 'Semester ' . $profile->semester : '-' }}</strong>
+                                <span class="text-slate-400 font-medium">{{ $profile?->isSchoolStudent() ? 'Kelas' : 'Semester' }}</span>
+                                <strong class="text-slate-800 font-bold">{{ $profile?->periodLabel() ?? '-' }}</strong>
                             </div>
                         </div>
                     </div>
@@ -171,8 +172,8 @@
                         </div>
                         <ul class="text-[11px] text-blue-800/90 space-y-1.5 list-disc list-inside leading-relaxed">
                             <li>Gunakan foto formal dan jelas berformat JPG/PNG (maks. 2MB).</li>
-                            <li>Pastikan NIM, kampus, dan nomor WhatsApp aktif terisi benar.</li>
-                            <li>Lengkapi CV, Transkrip, dan KTM untuk syarat pendaftaran magang.</li>
+                            <li>Pastikan NIM/NIS, kampus/sekolah, dan nomor WhatsApp aktif terisi benar.</li>
+                            <li>Lengkapi CV, Transkrip/Rapor, dan KTM/Kartu Pelajar untuk syarat pendaftaran magang.</li>
                         </ul>
                     </div>
                 </div>
@@ -192,7 +193,7 @@
                             <!-- Section 1: Identitas Akun, Foto & NIM -->
                             <div class="space-y-4">
                                 <h4 class="text-xs font-black uppercase text-blue-700 tracking-wider flex items-center gap-2">
-                                    <span>Identitas Akun & Mahasiswa</span>
+                                    <span>Identitas Akun & Peserta Magang</span>
                                 </h4>
 
                                 <!-- Input Berkas Foto Profil Mahasiswa (Konsisten dengan Dokumen Lain) -->
@@ -200,11 +201,11 @@
     $hasPhoto = !empty($profile?->photo ?? $user?->studentProfile?->photo);
     $photoRawPath = $profile?->photo ?? $user?->studentProfile?->photo;
     $photoExt = $hasPhoto ? pathinfo($photoRawPath, PATHINFO_EXTENSION) : 'jpg';
-    $photoDisplayName = $hasPhoto ? ('Foto_' . ($profile?->nim ?? 'Mahasiswa') . '.' . $photoExt) : '';
+    $photoDisplayName = $hasPhoto ? ('Foto_' . ($profile?->nim ?? 'Peserta') . '.' . $photoExt) : '';
 @endphp
 
 <div class="space-y-2">
-    <x-input-label for="photo" value="Foto Profil Mahasiswa (Opsional)" class="text-xs font-bold uppercase tracking-wider" />
+    <x-input-label for="photo" value="Foto Profil Peserta (Opsional)" class="text-xs font-bold uppercase tracking-wider" />
 
     <div class="flex items-center gap-2 w-full">
         <!-- Hidden Native Input -->
@@ -263,8 +264,9 @@
                                     </div>
 
                                     <div>
-                                        <x-input-label for="nim" value="Nomor Induk Mahasiswa (NIM)" class="text-xs font-bold uppercase tracking-wider" />
-                                        <x-text-input id="nim" name="nim" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('nim', $profile?->nim ?? '')" placeholder="Contoh: 22081010001" required />
+                                        <label for="nim" class="block font-medium text-xs font-bold uppercase tracking-wider text-gray-700"
+                                               x-text="educationLevel === 'sekolah' ? 'Nomor Induk Siswa (NIS / NISN)' : 'Nomor Induk Mahasiswa (NIM)'">Nomor Induk Mahasiswa (NIM)</label>
+                                        <x-text-input id="nim" name="nim" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('nim', $profile?->nim ?? '')" x-bind:placeholder="educationLevel === 'sekolah' ? 'Contoh: 0061234567' : 'Contoh: 22081010001'" placeholder="Contoh: 22081010001" required />
                                         <x-input-error :messages="$errors->get('nim')" class="mt-1" />
                                     </div>
                                 </div>
@@ -273,8 +275,32 @@
                             <!-- Section 2: Data Perguruan Tinggi & Akademik -->
                             <div class="space-y-4 pt-2 border-t border-slate-100">
                                 <h4 class="text-xs font-black uppercase text-blue-700 tracking-wider flex items-center gap-2">
-                                    <span>Data Perguruan Tinggi & Akademik</span>
+                                    <span>Data Kampus / Sekolah & Akademik</span>
                                 </h4>
+
+                                <!-- Pilihan Jenjang: Perguruan Tinggi atau Sekolah (revisi 16 Nov 2026) -->
+                                <fieldset>
+                                    <legend class="text-xs font-bold uppercase tracking-wider text-gray-700">Saya peserta magang dari</legend>
+                                    <div class="mt-1.5 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        <label class="flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition"
+                                               :class="educationLevel === 'perguruan_tinggi' ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white hover:bg-slate-50'">
+                                            <input type="radio" name="education_level" value="perguruan_tinggi" x-model="educationLevel" class="text-blue-600 focus:ring-blue-500">
+                                            <span class="text-sm">
+                                                <strong class="block text-slate-900">Perguruan Tinggi</strong>
+                                                <span class="text-xs text-slate-600">Mahasiswa D3/D4/S1</span>
+                                            </span>
+                                        </label>
+                                        <label class="flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition"
+                                               :class="educationLevel === 'sekolah' ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white hover:bg-slate-50'">
+                                            <input type="radio" name="education_level" value="sekolah" x-model="educationLevel" class="text-blue-600 focus:ring-blue-500">
+                                            <span class="text-sm">
+                                                <strong class="block text-slate-900">Sekolah</strong>
+                                                <span class="text-xs text-slate-600">Siswa PKL SMK/SMA/MA</span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <x-input-error :messages="$errors->get('education_level')" class="mt-1" />
+                                </fieldset>
 
                                 <!-- Pilihan Universitas -->
                                 @php
@@ -288,8 +314,8 @@
                                         :selected="$selectedUniversity"
                                         :allow-custom="true"
                                         custom-name="custom_university_name"
-                                        label="Asal Perguruan Tinggi / Universitas (Master Kampus Terdaftar)"
-                                        placeholder="-- Cari Nama Kampus atau Singkatan (misal: UNESA, UNAIR, ITS, UB, dll.) --"
+                                        label="Asal Kampus / Sekolah"
+                                        placeholder="-- Cari nama kampus/sekolah atau singkatan (misal: UNESA, ITS, SMKN 1 Surabaya) --"
                                         :required="true"
                                     />
                                     <x-input-error :messages="$errors->get('university_id')" class="mt-1" />
@@ -318,28 +344,30 @@
                                             <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                                             </svg>
-                                            <span>Perguruan tinggi Anda sedang dalam status <strong>{{ \App\Models\University::LABEL_PENDING_VERIFICATION }}</strong> oleh Admin. Anda tetap dapat melanjutkan pengajuan magang.</span>
+                                            <span>Kampus/sekolah Anda sedang dalam status <strong>{{ \App\Models\University::LABEL_PENDING_VERIFICATION }}</strong> oleh Admin. Anda tetap dapat melanjutkan pengajuan magang.</span>
                                         </p>
                                     @endif
                                 </div>
 
-                                <!-- Grid Fakultas, Jurusan, Semester -->
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    <div>
+                                <!-- Grid Fakultas, Jurusan, Semester/Kelas (siswa sekolah tidak punya fakultas) -->
+                                <div class="grid grid-cols-1 gap-4" :class="educationLevel === 'sekolah' ? 'sm:grid-cols-2' : 'sm:grid-cols-3'">
+                                    <div x-show="educationLevel !== 'sekolah'">
                                         <x-input-label for="faculty" value="Fakultas" class="text-xs font-bold uppercase tracking-wider" />
-                                        <x-text-input id="faculty" name="faculty" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('faculty', $profile?->faculty ?? $profile?->fakultas ?? '')" placeholder="Contoh: Ilmu Komputer" required />
+                                        <x-text-input id="faculty" name="faculty" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('faculty', $profile?->faculty ?? $profile?->fakultas ?? '')" placeholder="Contoh: Ilmu Komputer" x-bind:required="educationLevel !== 'sekolah'" x-bind:disabled="educationLevel === 'sekolah'" />
                                         <x-input-error :messages="$errors->get('faculty')" class="mt-1" />
                                     </div>
 
                                     <div>
-                                        <x-input-label for="jurusan" value="Program Studi / Jurusan" class="text-xs font-bold uppercase tracking-wider" />
-                                        <x-text-input id="jurusan" name="jurusan" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('jurusan', $profile?->jurusan ?? $profile?->major ?? '')" placeholder="Contoh: Teknik Informatika" required />
+                                        <label for="jurusan" class="block font-medium text-xs font-bold uppercase tracking-wider text-gray-700"
+                                               x-text="educationLevel === 'sekolah' ? 'Jurusan / Kompetensi Keahlian' : 'Program Studi / Jurusan'">Program Studi / Jurusan</label>
+                                        <x-text-input id="jurusan" name="jurusan" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('jurusan', $profile?->jurusan ?? $profile?->major ?? '')" x-bind:placeholder="educationLevel === 'sekolah' ? 'Contoh: Otomatisasi Tata Kelola Perkantoran' : 'Contoh: Teknik Informatika'" placeholder="Contoh: Teknik Informatika" required />
                                         <x-input-error :messages="$errors->get('jurusan')" class="mt-1" />
                                     </div>
 
                                     <div>
-                                        <x-input-label for="semester" value="Semester Saat Ini" class="text-xs font-bold uppercase tracking-wider" />
-                                        <x-text-input id="semester" name="semester" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('semester', $profile?->semester ?? '5')" placeholder="Contoh: 5 / 6 / 7" required />
+                                        <label for="semester" class="block font-medium text-xs font-bold uppercase tracking-wider text-gray-700"
+                                               x-text="educationLevel === 'sekolah' ? 'Kelas Saat Ini (10-13)' : 'Semester Saat Ini'">Semester Saat Ini</label>
+                                        <x-text-input id="semester" name="semester" type="text" inputmode="numeric" class="mt-1 block w-full text-xs sm:text-sm" :value="old('semester', $profile?->semester ?? '')" x-bind:placeholder="educationLevel === 'sekolah' ? 'Contoh: 11' : 'Contoh: 5 / 6 / 7'" placeholder="Contoh: 5 / 6 / 7" required />
                                         <x-input-error :messages="$errors->get('semester')" class="mt-1" />
                                     </div>
                                 </div>
@@ -407,7 +435,7 @@
         <!-- 1. Curriculum Vitae -->
         @php
             $hasCv = !empty($profile?->cv_path);
-            $cvDisplayName = $hasCv ? ('CV_' . ($profile?->nim ?? 'Mahasiswa') . '.pdf') : '';
+            $cvDisplayName = $hasCv ? ('CV_' . ($profile?->nim ?? 'Peserta') . '.pdf') : '';
         @endphp
         <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2.5 flex flex-col justify-between"
              x-data="{ selectedName: '' }">
@@ -484,13 +512,13 @@
         <!-- 2. Transkrip Nilai Akademik -->
         @php
             $hasTranscript = !empty($profile?->transcript_path);
-            $transcriptDisplayName = $hasTranscript ? ('Transkrip_' . ($profile?->nim ?? 'Mahasiswa') . '.pdf') : '';
+            $transcriptDisplayName = $hasTranscript ? ('Transkrip_' . ($profile?->nim ?? 'Peserta') . '.pdf') : '';
         @endphp
         <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2.5 flex flex-col justify-between"
              x-data="{ selectedName: '' }">
             <div class="space-y-2">
                 <label class="block text-xs font-bold text-slate-800">
-                    2. Transkrip Nilai
+                    2. Transkrip Nilai / Rapor
                 </label>
 
                 <div class="flex items-center gap-2 w-full">
@@ -557,13 +585,13 @@
         @php
             $hasIdCard = !empty($profile?->id_card_path);
             $idCardExt = $hasIdCard ? pathinfo($profile->id_card_path, PATHINFO_EXTENSION) : 'pdf';
-            $idCardDisplayName = $hasIdCard ? ('KTM_' . ($profile?->nim ?? 'Mahasiswa') . '.' . $idCardExt) : '';
+            $idCardDisplayName = $hasIdCard ? ('KTM_' . ($profile?->nim ?? 'Peserta') . '.' . $idCardExt) : '';
         @endphp
         <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2.5 flex flex-col justify-between"
              x-data="{ selectedName: '' }">
             <div class="space-y-2">
                 <label class="block text-xs font-bold text-slate-800">
-                    3. KTM atau Kartu Identitas
+                    3. KTM / Kartu Pelajar
                 </label>
 
                 <div class="flex items-center gap-2 w-full">

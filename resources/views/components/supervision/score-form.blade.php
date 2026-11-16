@@ -156,16 +156,16 @@
     <!-- 1. Info Singkat Mahasiswa (Grid 2x2 Lapang & Terstruktur) -->
     <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-xs space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
-            <h3 class="font-bold text-base text-slate-900">Data Mahasiswa &amp; Penempatan</h3>
+            <h3 class="font-bold text-base text-slate-900">Data Peserta Magang &amp; Penempatan</h3>
             @if ($placement?->application?->status)
                 <x-status-badge :status="$placement->application->status" />
             @endif
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4">
             <div class="p-4 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-1">
-                <span class="text-xs text-slate-600 font-bold uppercase tracking-wider block">Mahasiswa</span>
+                <span class="text-xs text-slate-600 font-bold uppercase tracking-wider block">Peserta Magang</span>
                 <div class="text-sm sm:text-base font-bold text-slate-900 leading-snug">{{ $student->name ?? '-' }}</div>
-                <div class="text-xs sm:text-sm text-slate-700 font-mono">NIM: {{ $profile->nim ?? '-' }}</div>
+                <div class="text-xs sm:text-sm text-slate-700 font-mono">NIM/NIS: {{ $profile->nim ?? '-' }}</div>
             </div>
             <div class="p-4 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-1">
                 <span class="text-xs text-slate-600 font-bold uppercase tracking-wider block">Perguruan Tinggi &amp; Program Studi</span>
@@ -196,7 +196,7 @@
         <div class="bg-blue-50/60 rounded-2xl p-4 sm:p-5 border border-blue-200 text-sm text-blue-900 shadow-2xs">
             <div class="font-bold mb-1">Kebijakan Evaluasi Kampus: 100% Mentor Lapangan</div>
             <p class="text-xs text-blue-800 leading-relaxed">
-                Perguruan tinggi <strong>{{ $profile->universitas ?? ($univ->name ?? 'Mahasiswa') }}</strong> memberlakukan penilaian magang penuh dari Mentor Lapangan. Anda dapat meninjau nilai di bawah dan melengkapi catatan evaluasi akhir bimbingan.
+                Perguruan tinggi <strong>{{ $profile->universitas ?? ($univ->name ?? 'Peserta Magang') }}</strong> memberlakukan penilaian magang penuh dari Mentor Lapangan. Anda dapat meninjau nilai di bawah dan melengkapi catatan evaluasi akhir bimbingan.
             </p>
         </div>
     @endif
@@ -210,7 +210,7 @@
         <div class="bg-amber-50/80 rounded-2xl p-4 sm:p-5 border border-amber-300 text-base text-amber-950">
             <div class="font-bold mb-1">Catatan Jadwal Penilaian</div>
             <p class="text-base leading-relaxed">
-                Masa magang mahasiswa berlangsung hingga <strong>{{ $endDate->translatedFormat('d M Y') }}</strong> ({{ $daysUntilEnd }} hari lagi). Penilaian akhir disarankan diisi menjelang selesai magang agar mencerminkan capaian penuh.
+                Masa magang peserta berlangsung hingga <strong>{{ $endDate->translatedFormat('d M Y') }}</strong> ({{ $daysUntilEnd }} hari lagi). Penilaian akhir disarankan diisi menjelang selesai magang agar mencerminkan capaian penuh.
             </p>
         </div>
     @endif
@@ -251,7 +251,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                             <h3 class="text-base font-bold text-slate-900">
-                                {{ $role === 'mentor' ? 'Aspek & Kriteria Penilaian Mentor Lapangan' : 'Aspek & Kriteria Penilaian Akademik Dosen Pembimbing' }}
+                                {{ $role === 'mentor' ? 'Aspek & Kriteria Penilaian Mentor Lapangan' : 'Aspek & Kriteria Penilaian Akademik Pembimbing' }}
                             </h3>
                             <p class="text-base text-slate-700 mt-0.5">
                                 Ketik nilai 0 sampai 100 pada setiap kriteria (boleh desimal, misalnya 85.5). Rata-rata dan predikat dihitung otomatis.
@@ -401,8 +401,8 @@
                 @if ($role === 'mentor')
                     <p class="mt-2.5 text-sm text-slate-700 font-medium">
                         {{ $isMentorOnly
-                            ? 'Ketentuan kampus mahasiswa ini: 100% nilai akhir berasal dari Mentor Lapangan.'
-                            : "Ketentuan kampus mahasiswa ini: Bobot {$weightMentor}% nilai Mentor Lapangan dan {$weightLecturer}% nilai Dosen Pembimbing." }}
+                            ? 'Ketentuan kampus peserta magang ini: 100% nilai akhir berasal dari Mentor Lapangan.'
+                            : "Ketentuan kampus peserta magang ini: Bobot {$weightMentor}% nilai Mentor Lapangan dan {$weightLecturer}% nilai Pembimbing." }}
                     </p>
                 @endif
             </div>
@@ -410,11 +410,11 @@
             <!-- 4. Textarea Catatan -->
             <div>
                 <label for="catatan-penilaian" class="block text-base font-bold text-slate-900 mb-1.5">
-                    {{ $role === 'mentor' ? 'Catatan Evaluasi Mentor Lapangan' : 'Catatan Evaluasi Dosen Pembimbing' }}
+                    {{ $role === 'mentor' ? 'Catatan Evaluasi Mentor Lapangan' : 'Catatan Evaluasi Pembimbing' }}
                     <span class="font-normal text-slate-600">(boleh dikosongkan)</span>
                 </label>
                 <textarea id="catatan-penilaian" name="{{ $role === 'mentor' ? 'catatan' : 'feedback_dosen' }}" rows="3"
-                          placeholder="Tuliskan catatan evaluasi, rekomendasi karir, atau apresiasi untuk mahasiswa..."
+                          placeholder="Tuliskan catatan evaluasi, rekomendasi karir, atau apresiasi untuk peserta magang..."
                           class="w-full text-base border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 p-3 bg-white shadow-2xs">{{ $oldFeedback }}</textarea>
                 @error($role === 'mentor' ? 'catatan' : 'feedback_dosen')
                     <span class="text-rose-700 text-base block mt-1 font-semibold">{{ $message }}</span>

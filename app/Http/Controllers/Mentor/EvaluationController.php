@@ -33,7 +33,7 @@ class EvaluationController extends Controller
 
         // Multi-Tenant Authorization Check
         if ($mentor->agency_profile_id !== null && optional($placement->application?->unit)->agency_profile_id !== $mentor->agency_profile_id) {
-            abort(403, 'Anda tidak memiliki hak akses untuk menilai mahasiswa instansi lain.');
+            abort(403, 'Anda tidak memiliki hak akses untuk menilai peserta magang instansi lain.');
         }
 
         // Form tetap bisa dibuka untuk melihat nilai, tetapi terkunci bila magang belum berjalan / sudah selesai.
@@ -62,7 +62,7 @@ class EvaluationController extends Controller
         })->findOrFail($placementId);
 
         if ($mentor->agency_profile_id !== null && optional($placement->application?->unit)->agency_profile_id !== $mentor->agency_profile_id) {
-            abort(403, 'Anda tidak memiliki hak akses untuk mencetak nilai mahasiswa instansi lain.');
+            abort(403, 'Anda tidak memiliki hak akses untuk mencetak nilai peserta magang instansi lain.');
         }
 
         $evaluation = $placement->evaluation;
@@ -103,7 +103,7 @@ class EvaluationController extends Controller
 
         // Multi-Tenant Authorization Check
         if ($mentor->agency_profile_id !== null && optional($placement->application?->unit)->agency_profile_id !== $mentor->agency_profile_id) {
-            abort(403, 'Anda tidak memiliki hak akses untuk menilai mahasiswa instansi lain.');
+            abort(403, 'Anda tidak memiliki hak akses untuk menilai peserta magang instansi lain.');
         }
 
         if ($lockReason = $placement->evaluationLockReason()) {
@@ -258,6 +258,6 @@ class EvaluationController extends Controller
         StudentNotifier::evaluationSubmitted($placement->application?->user, 'mentor');
 
         return redirect()->route('mentor.students.show', $placement->id)
-            ->with('success', 'Nilai evaluasi mahasiswa berhasil disimpan.');
+            ->with('success', 'Nilai evaluasi peserta magang berhasil disimpan.');
     }
 }

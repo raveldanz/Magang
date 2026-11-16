@@ -35,7 +35,7 @@
                     @if ($isStudent)
                         Status sertifikat diperbarui otomatis setelah semua syarat di atas lengkap. Bila menurut Anda ada syarat yang sudah terpenuhi, hubungi Mentor Lapangan atau Admin Dinas.
                     @else
-                        Lengkapi penilaian mentor dan persetujuan laporan akhir, lalu tetapkan status kelulusan mahasiswa sebelum mencetak sertifikat.
+                        Lengkapi penilaian mentor dan persetujuan laporan akhir, lalu tetapkan status kelulusan peserta magang sebelum mencetak sertifikat.
                     @endif
                 </div>
 

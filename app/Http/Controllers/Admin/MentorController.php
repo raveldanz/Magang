@@ -237,7 +237,7 @@ class MentorController extends Controller
         })->count();
 
         if ($historyCount > 0) {
-            return redirect()->back()->with('error', "Gagal menghapus: Mentor '{$mentor->name}' tercatat membimbing {$historyCount} mahasiswa (termasuk arsip alumni). Ubah status akun menjadi Nonaktif untuk mencabut aksesnya.");
+            return redirect()->back()->with('error', "Gagal menghapus: Mentor '{$mentor->name}' tercatat membimbing {$historyCount} peserta magang (termasuk arsip alumni). Ubah status akun menjadi Nonaktif untuk mencabut aksesnya.");
         }
 
         $name = $mentor->name;

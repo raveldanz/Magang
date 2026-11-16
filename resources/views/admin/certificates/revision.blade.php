@@ -2,7 +2,7 @@
     <x-slot name="header">
         <x-page-header 
             title="Pusat Perbaikan & Revisi Sertifikat Magang" 
-            description="Lakukan koreksi terpadu pada nilai evaluasi, biodata mahasiswa, dan periode magang sesuai catatan dari Atasan.">
+            description="Lakukan koreksi terpadu pada nilai evaluasi, biodata peserta magang, dan periode magang sesuai catatan dari Atasan.">
             <x-slot name="actions">
                 <a href="{{ route('admin.certificates.index') }}" 
                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200 shadow-xs transition">
@@ -60,7 +60,7 @@
                                 {{ $certificate->notes ?: 'Terdapat aspek nilai atau data kelulusan yang perlu disesuaikan sebelum sertifikat dapat disahkan resmi.' }}
                             </h3>
                             <p class="text-xs text-slate-600 mt-1">
-                                Perbaiki poin-poin di bawah ini. Anda dapat mengoreksi nilai evaluasi, biodata mahasiswa, periode magang, atau berkas pendukung, lalu kirim ulang ke Atasan.
+                                Perbaiki poin-poin di bawah ini. Anda dapat mengoreksi nilai evaluasi, biodata peserta magang, periode magang, atau berkas pendukung, lalu kirim ulang ke Atasan.
                             </p>
                         </div>
                     </div>
@@ -183,7 +183,7 @@
                                         <div class="flex items-center justify-between">
                                             <div>
                                                 <label class="block text-xs font-black text-indigo-900 uppercase tracking-wider">
-                                                    Nilai Dosen Pembimbing
+                                                    Nilai Pembimbing
                                                 </label>
                                                 <p class="text-[11px] text-indigo-700 mt-0.5">Bobot Kampus: {{ $weightLecturer }}% (Bobot Dinas: {{ $weightMentor }}%)</p>
                                             </div>
@@ -199,7 +199,7 @@
                                         Catatan Evaluasi Lapangan (Opsional):
                                     </label>
                                     <textarea name="catatan_evaluasi" rows="2" 
-                                              placeholder="Tuliskan catatan apresiasi atau evaluasi kinerja magang mahasiswa..."
+                                              placeholder="Tuliskan catatan apresiasi atau evaluasi kinerja magang peserta..."
                                               class="w-full text-xs p-3 rounded-xl border-2 border-slate-200 focus:border-blue-600 focus:ring-0">{{ old('catatan_evaluasi', $evaluation->catatan ?? '') }}</textarea>
                                 </div>
                             </div>
@@ -263,7 +263,7 @@
                             <div class="border-b border-slate-200 pb-3">
                                 <span class="text-[11px] font-black uppercase tracking-wider text-purple-600">Aspek 2</span>
                                 <h3 class="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                                    Data Mahasiswa & Magang
+                                    Data Peserta & Magang
                                 </h3>
                                 <p class="text-xs text-slate-500 mt-0.5">
                                     Data ini tercetak langsung pada lembar depan Sertifikat resmi.
@@ -274,7 +274,7 @@
                                 {{-- Nama Mahasiswa --}}
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">
-                                        Nama Lengkap Mahasiswa:
+                                        Nama Lengkap Peserta Magang:
                                     </label>
                                     <input type="text" name="student_name" required
                                            value="{{ old('student_name', $student->name) }}"
@@ -284,7 +284,7 @@
                                 {{-- NIM --}}
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">
-                                        Nomor Induk Mahasiswa (NIM):
+                                        NIM / NIS:
                                     </label>
                                     <input type="text" name="nim" required
                                            value="{{ old('nim', $profile->nim ?? '') }}"
@@ -376,7 +376,7 @@
                             </div>
 
                             <textarea name="resolution_note" rows="3" required
-                                      placeholder="Contoh: Skor kehadiran presensi telah disinkronisasi sesuai lembar absensi (dari 80 menjadi 85). Data mahasiswa telah terverifikasi."
+                                      placeholder="Contoh: Skor kehadiran presensi telah disinkronisasi sesuai lembar absensi (dari 80 menjadi 85). Data peserta magang telah terverifikasi."
                                       class="w-full text-xs p-3 rounded-xl border-2 border-slate-200 focus:border-blue-600 focus:ring-0">{{ old('resolution_note', 'Perbaikan nilai dan data kelulusan telah disesuaikan sesuai arahan catatan atasan.') }}</textarea>
 
                             {{-- Tombol Aksi --}}

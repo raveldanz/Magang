@@ -45,7 +45,7 @@ class EvaluationController extends Controller
         $isSuperAdmin = $lecturer->isSuperAdmin();
 
         if (! $isAssignedAdvisor && ! $isSuperAdmin) {
-            abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing Lapangan yang ditugaskan untuk mahasiswa ini.');
+            abort(403, 'Akses Ditolak: Anda bukan Pembimbing yang ditugaskan untuk peserta magang ini.');
         }
 
         return $placement;
@@ -272,8 +272,8 @@ class EvaluationController extends Controller
         }
 
         $successMsg = $isMentorOnly
-            ? 'Catatan bimbingan Dosen Pembimbing berhasil disimpan!'
-            : 'Nilai bimbingan akademik Dosen Pembimbing dan catatan berhasil disimpan!';
+            ? 'Catatan bimbingan Pembimbing berhasil disimpan!'
+            : 'Nilai bimbingan akademik Pembimbing dan catatan berhasil disimpan!';
 
         return redirect()->route('lecturer.students.show', $placement->id)
             ->with('success', $successMsg);
@@ -301,7 +301,7 @@ class EvaluationController extends Controller
         // membuat laporan kosong berstatus disetujui, sehingga syarat laporan terlewati.
         $finalReport = FinalReport::where('placement_id', $placement->id)->first();
         if (! $finalReport || empty($finalReport->file_path) || basename((string) $finalReport->file_path) === 'default.pdf') {
-            return redirect()->back()->with('error', 'Mahasiswa belum mengunggah naskah laporan akhir, sehingga belum ada yang dapat ditinjau.');
+            return redirect()->back()->with('error', 'Peserta Magang belum mengunggah naskah laporan akhir, sehingga belum ada yang dapat ditinjau.');
         }
 
         $finalReport->update([
@@ -325,7 +325,7 @@ class EvaluationController extends Controller
 
         $statusLabel = $request->status === 'approved' ? 'disetujui (ACC)' : 'diminta perbaikan (Revisi)';
 
-        return redirect()->back()->with('success', "Status laporan akhir mahasiswa berhasil {$statusLabel}!");
+        return redirect()->back()->with('success', "Status laporan akhir peserta magang berhasil {$statusLabel}!");
     }
 
     /**

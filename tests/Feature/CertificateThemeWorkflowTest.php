@@ -201,7 +201,7 @@ class CertificateThemeWorkflowTest extends TestCase
         $response->assertSee('MAGANG');
         $response->assertSee('Nomor : 400.14.5.4/4692/436.7.17/2026');
         $response->assertSee('Achmad Dhafa Sholahudin F');
-        $response->assertSee('Mahasiswa Program Studi Manajemen Fakultas Ekonomi dan Bisnis');
+        $response->assertSee('Peserta Magang Program Studi Manajemen Fakultas Ekonomi dan Bisnis');
         $response->assertSee('Universitas 17 Agustus 1945 Surabaya');
         $response->assertSee('Ditandatangani secara elektronik oleh:');
         $response->assertSee('Dra. NOVELIJA, SH');

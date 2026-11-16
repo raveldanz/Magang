@@ -127,7 +127,7 @@ class ChatPriorityEngineTest extends ChatTestCase
         $this->assertArrayHasKey('stage_badge', $target);
         // Untuk Admin Dinas, mahasiswa BUKAN prioritas tindakan darurat
         $this->assertFalse($target['stage_badge']['is_urgent']);
-        $this->assertSame('Mahasiswa', $target['stage_badge']['label']);
+        $this->assertSame('Peserta Magang', $target['stage_badge']['label']);
     }
 
     public function test_dosen_priority_for_report_review_and_missing_grades(): void

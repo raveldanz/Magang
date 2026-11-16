@@ -222,7 +222,7 @@ class MentorElderlyFriendlyOptimizationTest extends TestCase
         }
 
         $detailText = strip_tags($this->actingAs($data['mentor'])->get(route('mentor.students.show', $data['placementActive']->id))->getContent());
-        $this->assertStringContainsString('Dosen Pembimbing', $detailText);
+        $this->assertStringContainsString('Pembimbing', $detailText);
     }
 
     public function test_profile_and_password_reset_views_are_friendly_and_indonesian(): void
@@ -302,12 +302,12 @@ class MentorElderlyFriendlyOptimizationTest extends TestCase
             ->assertOk()
             ->getContent();
 
-        $this->assertStringContainsString('Data Mahasiswa &amp; Penempatan', $formHtml);
+        $this->assertStringContainsString('Data Peserta Magang &amp; Penempatan', $formHtml);
         $this->assertStringContainsString('Sesuaikan Aspek Penilaian', $formHtml);
         $this->assertStringContainsString('Panduan Nilai &amp; Predikat', $formHtml);
         $this->assertStringContainsString('Catatan Jadwal Penilaian', $formHtml);
         $this->assertStringContainsString('step="0.01"', $formHtml);
-        $this->assertStringContainsString('Bobot 40% nilai Mentor Lapangan dan 60% nilai Dosen Pembimbing', $formHtml);
+        $this->assertStringContainsString('Bobot 40% nilai Mentor Lapangan dan 60% nilai Pembimbing', $formHtml);
 
         // Simpan nilai desimal
         $this->actingAs($data['mentor'])

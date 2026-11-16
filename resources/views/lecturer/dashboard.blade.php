@@ -64,9 +64,9 @@
                                 </div>
                                 <p class="text-xs text-slate-600 mt-2 leading-relaxed">
                                     @if ($actionAlerts['pending_reports']->count() === 1)
-                                        Naskah laporan akhir dari {{ $actionAlerts['pending_reports']->first()->application->user->name ?? 'Mahasiswa' }} menunggu persetujuan Anda.
+                                        Naskah laporan akhir dari {{ $actionAlerts['pending_reports']->first()->application->user->name ?? 'Peserta Magang' }} menunggu persetujuan Anda.
                                     @elseif ($actionAlerts['pending_reports']->count() > 1)
-                                        {{ $actionAlerts['pending_reports']->count() }} naskah laporan akhir mahasiswa menunggu persetujuan Anda.
+                                        {{ $actionAlerts['pending_reports']->count() }} naskah laporan akhir peserta magang menunggu persetujuan Anda.
                                     @else
                                         Semua naskah laporan sudah selesai diperiksa.
                                     @endif
@@ -95,17 +95,17 @@
                                 </div>
                                 <p class="text-xs text-slate-600 mt-2 leading-relaxed">
                                     @if ($actionAlerts['urgent_ending']->count() === 1)
-                                        Mahasiswa mendekati akhir magang ({{ $actionAlerts['urgent_ending']->first()->application->user->name ?? 'Mahasiswa' }}), lembar evaluasi belum lengkap untuk penerbitan sertifikat.
+                                        Peserta Magang mendekati akhir magang ({{ $actionAlerts['urgent_ending']->first()->application->user->name ?? 'Peserta Magang' }}), lembar evaluasi belum lengkap untuk penerbitan sertifikat.
                                     @elseif ($actionAlerts['urgent_ending']->count() > 1)
-                                        {{ $actionAlerts['urgent_ending']->count() }} mahasiswa mendekati akhir magang, lembar evaluasi belum lengkap untuk penerbitan sertifikat.
+                                        {{ $actionAlerts['urgent_ending']->count() }} peserta magang mendekati akhir magang, lembar evaluasi belum lengkap untuk penerbitan sertifikat.
                                     @else
-                                        Semua mahasiswa aktif yang mendekati akhir magang telah dievaluasi.
+                                        Semua peserta magang aktif yang mendekati akhir magang telah dievaluasi.
                                     @endif
                                 </p>
                             </div>
                             @if ($actionAlerts['urgent_ending']->count() > 0)
                                 <a href="{{ $actionAlerts['urgent_ending']->count() === 1 ? route('lecturer.students.show', $actionAlerts['urgent_ending']->first()->id) : route('lecturer.monitoring.index', ['tab' => 'active']) }}" class="mt-4 inline-flex items-center justify-center py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition text-center shadow-xs">
-                                    {{ $actionAlerts['urgent_ending']->count() === 1 ? 'Tinjau Progres' : 'Tinjau ' . $actionAlerts['urgent_ending']->count() . ' Mahasiswa' }}
+                                    {{ $actionAlerts['urgent_ending']->count() === 1 ? 'Tinjau Progres' : 'Tinjau ' . $actionAlerts['urgent_ending']->count() . ' Peserta Magang' }}
                                 </a>
                             @else
                                 <div class="mt-auto pt-4 flex items-center gap-1.5 text-xs text-slate-400 font-medium">
@@ -126,9 +126,9 @@
                                 </div>
                                 <p class="text-xs text-slate-600 mt-2 leading-relaxed">
                                     @if ($actionAlerts['pending_logbooks_count'] > 0)
-                                        Catatan aktivitas harian mahasiswa menunggu verifikasi Anda.
+                                        Catatan aktivitas harian peserta magang menunggu verifikasi Anda.
                                     @else
-                                        Seluruh logbook mahasiswa telah selesai ditinjau.
+                                        Seluruh logbook peserta magang telah selesai ditinjau.
                                     @endif
                                 </p>
                             </div>
@@ -156,7 +156,7 @@
                         <span class="text-xs font-medium text-slate-500 uppercase tracking-wider block">Total Bimbingan</span>
                         <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{{ $stats['total_students'] }}</div>
                     </div>
-                    <span class="text-xs text-slate-400 mt-2 block">Mahasiswa aktif</span>
+                    <span class="text-xs text-slate-400 mt-2 block">Peserta Magang aktif</span>
                 </div>
 
                 <!-- Evaluasi Selesai -->
@@ -197,7 +197,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                         </div>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa, NIM, atau program studi..." 
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama peserta magang, NIM/NIS, atau program studi..." 
                                class="w-full text-xs sm:text-sm bg-white border border-slate-200 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl pl-10 pr-3.5 py-2.5 transition shadow-2xs">
                     </div>
 
@@ -238,9 +238,9 @@
             <div class="bg-white rounded-2xl shadow-xs overflow-hidden">
                 <div class="p-4 sm:p-5 flex items-center justify-between border-b border-slate-100">
                     <div>
-                        <h3 class="font-bold text-sm sm:text-base text-slate-900">Mahasiswa Bimbingan Magang</h3>
+                        <h3 class="font-bold text-sm sm:text-base text-slate-900">Peserta Bimbingan Magang</h3>
                     </div>
-                    <span class="text-xs text-slate-600 font-semibold bg-slate-100 px-3 py-1 rounded-full">{{ $placements->count() }} Mahasiswa</span>
+                    <span class="text-xs text-slate-600 font-semibold bg-slate-100 px-3 py-1 rounded-full">{{ $placements->count() }} Peserta Magang</span>
                 </div>
 
                 <!-- 1. TAMPILAN MOBILE & TABLET (< 1024px) -->
@@ -337,13 +337,13 @@
                             <div>
                                 <a href="{{ route('lecturer.students.show', $p->id) }}" 
                                    class="inline-flex items-center justify-center w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs text-center min-h-[38px]">
-                                    {{ $isMentorOnly ? 'Detail Mahasiswa' : 'Detail & Nilai' }}
+                                    {{ $isMentorOnly ? 'Detail Peserta Magang' : 'Detail & Nilai' }}
                                 </a>
                             </div>
                         </div>
                     @empty
                         <div class="p-6 text-center text-slate-400 text-xs">
-                            Belum ada mahasiswa bimbingan magang yang ditugaskan kepada Anda.
+                            Belum ada peserta bimbingan magang yang ditugaskan kepada Anda.
                         </div>
                     @endforelse
                 </div>
@@ -353,7 +353,7 @@
                     <table class="w-full table-fixed divide-y divide-slate-100 text-left text-xs">
                         <thead class="bg-slate-50/75 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
                             <tr>
-                                <th class="py-3.5 px-4 w-[23%]">Mahasiswa</th>
+                                <th class="py-3.5 px-4 w-[23%]">Peserta Magang</th>
                                 <th class="py-3.5 px-4 w-[21%]">Instansi & Unit Kerja</th>
                                 <th class="py-3.5 px-4 w-[18%]">Pembimbing Dinas</th>
                                 <th class="py-3.5 px-3 w-[9%] text-center">Logbook</th>
@@ -403,7 +403,7 @@
                                                 </span>
                                             </div>
                                         @endif
-                                        <div class="text-[11px] text-slate-500 font-medium truncate">NIM: {{ $profile?->nim ?? '-' }}</div>
+                                        <div class="text-[11px] text-slate-500 font-medium truncate">NIM/NIS: {{ $profile?->nim ?? '-' }}</div>
                                         <div class="text-[11px] text-slate-600 truncate">{{ $profile?->jurusan ?? '-' }}</div>
                                     </td>
 
@@ -504,7 +504,7 @@
                             @empty
                                 <tr>
                                     <td colspan="7" class="py-12 text-center text-slate-400">
-                                        Belum ada mahasiswa bimbingan magang yang ditugaskan kepada Anda.
+                                        Belum ada peserta bimbingan magang yang ditugaskan kepada Anda.
                                     </td>
                                 </tr>
                             @endforelse

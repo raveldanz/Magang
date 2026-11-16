@@ -172,8 +172,8 @@ class InternshipStatusStandardizationTest extends TestCase
 
         $response = $this->actingAs($this->mentor)->get(route('mentor.dashboard'));
         $response->assertOk();
-        $response->assertSeeText('Daftar Mahasiswa Bimbingan Magang');
-        $response->assertSeeText('Mahasiswa');
+        $response->assertSeeText('Daftar Peserta Bimbingan Magang');
+        $response->assertSeeText('Peserta Magang');
         $response->assertSeeText('Perguruan Tinggi & Unit');
         $response->assertSeeText('Status');
         $response->assertDontSee('Dosen Pembimbing');

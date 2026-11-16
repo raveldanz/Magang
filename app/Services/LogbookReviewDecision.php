@@ -64,8 +64,8 @@ class LogbookReviewDecision
     public static function summaryMessage(int $approved, int $rejected): string
     {
         return match (true) {
-            $approved > 0 && $rejected > 0 => "Tersimpan: {$approved} hari disetujui dan {$rejected} hari dikembalikan ke mahasiswa untuk diperbaiki.",
-            $rejected > 0 => "Tersimpan: {$rejected} hari dikembalikan ke mahasiswa untuk diperbaiki.",
+            $approved > 0 && $rejected > 0 => "Tersimpan: {$approved} hari disetujui dan {$rejected} hari dikembalikan ke peserta magang untuk diperbaiki.",
+            $rejected > 0 => "Tersimpan: {$rejected} hari dikembalikan ke peserta magang untuk diperbaiki.",
             default => "Tersimpan: {$approved} hari kegiatan disetujui.",
         };
     }

@@ -134,7 +134,7 @@
                                         <span>Penilaian Penuh Dinas (100%)</span>
                                         <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">Standar</span>
                                     </strong>
-                                    <span class="text-gray-600 text-xs block mt-0.5">100% dinilai Dinas. Logbook cukup di-ACC Mentor. Dosen Pembimbing tidak diwajibkan.</span>
+                                    <span class="text-gray-600 text-xs block mt-0.5">100% dinilai Dinas. Logbook cukup di-ACC Mentor. Pembimbing tidak diwajibkan.</span>
                                 </div>
                             </label>
 
@@ -143,7 +143,7 @@
                                 <input type="radio" name="evaluation_scheme" value="dual_evaluation" x-model="scheme" class="mt-0.5 text-blue-600">
                                 <div>
                                     <strong class="text-gray-900 block">Kemitraan Dua Pihak / Kustom</strong>
-                                    <span class="text-gray-500 text-[11px] block mt-0.5">Dinilai Mentor Dinas & Dosen Pembimbing (atau opsi 100% Kampus).</span>
+                                    <span class="text-gray-500 text-[11px] block mt-0.5">Dinilai Mentor Dinas & Pembimbing (atau opsi 100% Kampus).</span>
                                 </div>
                             </label>
                         </div>
@@ -162,7 +162,7 @@
 
                                 <div class="space-y-1">
                                     <div class="flex justify-between text-xs font-semibold text-gray-700">
-                                        <span>Bobot Dosen Pembimbing Kampus:</span>
+                                        <span>Bobot Pembimbing Kampus:</span>
                                         <span class="font-mono text-purple-600 font-bold" x-text="weightLecturer + '%'"></span>
                                     </div>
                                     <input type="range" min="0" max="100" step="5" x-model="weightLecturer" @input="updateMentor()" class="w-full h-2 bg-gray-200 rounded-lg accent-purple-600">
@@ -173,7 +173,7 @@
                             <div class="pt-1 flex items-center gap-2">
                                 <input type="checkbox" name="require_dpl" value="1" id="admin_require_dpl" {{ old('require_dpl', $university->require_dpl ?? false) ? 'checked' : '' }} class="rounded border-gray-300 text-blue-600">
                                 <label for="admin_require_dpl" class="text-xs text-gray-700 font-medium">
-                                    Kunci pengisian logbook mahasiswa hingga memilih Dosen Pembimbing.
+                                    Kunci pengisian logbook peserta magang hingga memilih Pembimbing.
                                 </label>
                             </div>
                         </div>
@@ -183,7 +183,7 @@
                             <div class="flex items-center justify-between flex-wrap gap-2">
                                 <div>
                                     <h5 class="font-bold text-xs sm:text-sm text-gray-900">Komponen Penilaian Sertifikat (3 Aspek)</h5>
-                                    <p class="text-xs text-gray-600">Sesuaikan nama aspek kompetensi dinas dan Dosen Pembimbing sesuai kurikulum kampus</p>
+                                    <p class="text-xs text-gray-600">Sesuaikan nama aspek kompetensi dinas dan Pembimbing sesuai kurikulum kampus</p>
                                 </div>
                             </div>
 
@@ -211,7 +211,7 @@
                                 <!-- Dosen Pembimbing -->
                                 <div class="p-3.5 rounded-xl bg-white border border-slate-200 space-y-2.5">
                                     <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
-                                        <span class="font-bold text-purple-900 uppercase text-[10px]">Aspek Dosen Pembimbing Kampus</span>
+                                        <span class="font-bold text-purple-900 uppercase text-[10px]">Aspek Pembimbing Kampus</span>
                                         <button type="button" @click="resetDpl()" class="text-[10px] font-semibold text-purple-600 hover:underline">Reset</button>
                                     </div>
                                     <div>

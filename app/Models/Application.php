@@ -250,7 +250,7 @@ class Application extends Model
         }
 
         if ($lecturerRequired && ! $lecturerEvalComplete) {
-            $blockers[] = 'Nilai evaluasi akademik dari Dosen Pembimbing Lapangan (kampus) belum lengkap.';
+            $blockers[] = 'Nilai evaluasi akademik dari Pembimbing (kampus) belum lengkap.';
         }
 
         if (! $this->has_approved_report) {
@@ -417,7 +417,7 @@ class Application extends Model
 
         return match ($this->actionPriority($requireAdvisor)) {
             2 => 'Siap diluluskan',
-            3 => $this->missingSupervisor($requireAdvisor) === 'mentor' ? 'Mentor belum ditetapkan' : 'Dosen pembimbing belum ditetapkan',
+            3 => $this->missingSupervisor($requireAdvisor) === 'mentor' ? 'Mentor belum ditetapkan' : 'Pembimbing belum ditetapkan',
             default => null,
         };
     }

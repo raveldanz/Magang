@@ -233,12 +233,12 @@
         <div class="mb-4 pl-4">
             <table class="text-[12px] w-full border-collapse">
                 <tr class="py-1">
-                    <td class="w-44 py-1 font-semibold">Nama Lengkap Mahasiswa</td>
+                    <td class="w-44 py-1 font-semibold">Nama Lengkap Peserta Magang</td>
                     <td class="w-3 py-1">:</td>
                     <td class="py-1 font-bold text-black uppercase">{{ $student->name }}</td>
                 </tr>
                 <tr class="py-1">
-                    <td class="py-1 font-semibold">Nomor Induk Mahasiswa (NIM)</td>
+                    <td class="py-1 font-semibold">NIM / NIS</td>
                     <td class="py-1">:</td>
                     <td class="py-1 font-mono font-bold">{{ $profile?->nim ?? '-' }}</td>
                 </tr>
@@ -258,7 +258,7 @@
         <!-- 6. DETAIL PENEMPATAN & PEMBIMBING -->
         <div class="text-[12px] text-justify space-y-3 mb-4">
             <p>
-                Mahasiswa yang bersangkutan telah diterima dan ditugaskan untuk menjalankan kegiatan magang dengan rincian sebagai berikut:
+                Peserta Magang yang bersangkutan telah diterima dan ditugaskan untuk menjalankan kegiatan magang dengan rincian sebagai berikut:
             </p>
         </div>
 
@@ -275,9 +275,9 @@
                     <td class="py-1">{{ $unit?->name ?? 'Bidang Terkait' }}</td>
                 </tr>
                 <tr class="py-1">
-                    <td class="py-1 font-semibold">Dosen Pembimbing</td>
+                    <td class="py-1 font-semibold">Pembimbing</td>
                     <td class="py-1">:</td>
-                    <td class="py-1 font-semibold">{{ $dosen?->name ?? 'Dosen Pembimbing Terdaftar' }}</td>
+                    <td class="py-1 font-semibold">{{ $dosen?->name ?? 'Pembimbing Terdaftar' }}</td>
                 </tr>
                 <tr class="py-1">
                     <td class="py-1 font-semibold">Mentor Lapangan</td>
@@ -301,7 +301,7 @@
         <!-- 7. PENUTUP SURAT -->
         <div class="text-[12px] text-justify space-y-2 mb-8">
             <p>
-                Demikian surat tugas ini kami sampaikan. Kami mengucapkan terima kasih yang sebesar-besarnya atas kesempatan, bimbingan, dan kerja sama yang telah diberikan oleh jajaran Pemerintah Kota Surabaya kepada mahasiswa kami.
+                Demikian surat tugas ini kami sampaikan. Kami mengucapkan terima kasih yang sebesar-besarnya atas kesempatan, bimbingan, dan kerja sama yang telah diberikan oleh jajaran Pemerintah Kota Surabaya kepada peserta magang kami.
             </p>
         </div>
 

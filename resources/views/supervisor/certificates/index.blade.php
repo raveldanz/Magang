@@ -2,7 +2,7 @@
     <x-slot name="header">
         <x-page-header 
             title="Pengesahan Sertifikat Kelulusan Magang" 
-            description="Validasi nilai evaluasi akhir peserta magang dan berikan pengesahan resmi agar sertifikat dapat diunduh oleh mahasiswa.">
+            description="Validasi nilai evaluasi akhir peserta magang dan berikan pengesahan resmi agar sertifikat dapat diunduh oleh peserta magang.">
             <x-slot name="actions">
                 <a href="{{ route('supervisor.dashboard') }}" 
                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200 transition">
@@ -60,7 +60,7 @@
 
                 <div class="flex-1">
                     <input type="text" name="search" value="{{ request('search') }}" 
-                           placeholder="Cari nama mahasiswa, NIM, atau universitas..." 
+                           placeholder="Cari nama peserta magang, NIM/NIS, atau universitas..." 
                            class="w-full h-12 px-4 rounded-xl border-2 border-slate-200 focus:border-blue-600 focus:ring-0 text-sm font-medium text-slate-800">
                 </div>
 
@@ -83,7 +83,7 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="border-b-2 border-slate-200 bg-slate-100/70 text-slate-700 text-xs font-bold uppercase tracking-wider">
-                                <th class="py-4 px-6">Mahasiswa & Kampus</th>
+                                <th class="py-4 px-6">Peserta Magang & Kampus</th>
                                 <th class="py-4 px-6">Bidang & No. Sertifikat</th>
                                 <th class="py-4 px-4 text-center">Nilai Akhir</th>
                                 <th class="py-4 px-4 text-center">Status ACC</th>
@@ -104,7 +104,7 @@
                                     <td class="py-4 px-6">
                                         <div class="font-black text-slate-900 text-base">{{ $student?->name }}</div>
                                         <div class="text-xs text-slate-600 mt-0.5">
-                                            NIM: <span class="font-bold text-slate-700">{{ $profile?->nim ?? '-' }}</span>
+                                            NIM/NIS: <span class="font-bold text-slate-700">{{ $profile?->nim ?? '-' }}</span>
                                         </div>
                                         <div class="text-xs font-semibold text-blue-700 mt-0.5">
                                             {{ $profile?->universitas ?? $student?->university ?? '-' }}
@@ -182,12 +182,12 @@
                                                                 </div>
                                                             </div>
                                                             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
-                                                                <div class="text-slate-500">Nama Mahasiswa:</div>
+                                                                <div class="text-slate-500">Nama Peserta Magang:</div>
                                                                 <div class="font-bold text-slate-900 text-sm">{{ $student?->name }}</div>
                                                                 <div class="text-xs text-slate-600">{{ $student?->studentProfile?->universitas ?? '-' }}</div>
                                                             </div>
                                                             <p class="text-xs text-slate-600 leading-relaxed">
-                                                                Setelah disahkan, mahasiswa yang bersangkutan akan dapat mengunduh E-Sertifikat resmi Dispusip beserta transkrip nilai.
+                                                                Setelah disahkan, peserta magang yang bersangkutan akan dapat mengunduh E-Sertifikat resmi Dispusip beserta transkrip nilai.
                                                             </p>
                                                             <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
                                                                 <button type="button" @click="showApproveCertModal = false" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
@@ -264,7 +264,7 @@
                                     {{ $student?->name }}
                                 </h3>
                                 <div class="text-xs text-slate-500 mt-0.5">
-                                    NIM: <span class="font-mono font-bold text-slate-700">{{ $profile?->nim ?? '-' }}</span> &bull; <span class="text-blue-700 font-semibold">{{ $profile?->universitas ?? $student?->university ?? '-' }}</span>
+                                    NIM/NIS: <span class="font-mono font-bold text-slate-700">{{ $profile?->nim ?? '-' }}</span> &bull; <span class="text-blue-700 font-semibold">{{ $profile?->universitas ?? $student?->university ?? '-' }}</span>
                                 </div>
                             </div>
 
@@ -324,18 +324,18 @@
                                                 </div>
                                                 <div>
                                                     <h3 class="text-sm font-extrabold text-slate-900">Pengesahan E-Sertifikat</h3>
-                                                    <p class="text-xs text-slate-500 mt-0.5">Sahkan sertifikat resmi mahasiswa</p>
+                                                    <p class="text-xs text-slate-500 mt-0.5">Sahkan sertifikat resmi peserta magang</p>
                                                 </div>
                                             </div>
                                             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
-                                                <div class="text-slate-500">Nama Mahasiswa:</div>
+                                                <div class="text-slate-500">Nama Peserta Magang:</div>
                                                 <div class="font-bold text-slate-900 text-sm">{{ $student?->name }}</div>
                                                 <div class="text-xs text-slate-600">{{ $student?->studentProfile?->universitas ?? '-' }}</div>
                                             </div>
                                             <form method="POST" action="{{ route('supervisor.certificates.approve', $cert->id) }}" class="space-y-3">
                                                 @csrf
                                                 <p class="text-xs text-slate-600 leading-relaxed">
-                                                    Setelah disahkan, mahasiswa dapat mengunduh E-Sertifikat resmi Dispusip.
+                                                    Setelah disahkan, peserta magang dapat mengunduh E-Sertifikat resmi Dispusip.
                                                 </p>
                                                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
                                                     <button type="button" @click="showApproveCertModalMobile = false" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl">

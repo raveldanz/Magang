@@ -39,7 +39,7 @@
 </head>
 <body>
     <div class="toolbar">
-        <a href="{{ route('mentor.students.show', $placement->id) }}">&larr; Kembali ke Halaman Mahasiswa</a>
+        <a href="{{ route('mentor.students.show', $placement->id) }}">&larr; Kembali ke Halaman Peserta Magang</a>
         <span>Periksa isinya, lalu klik Cetak. Tanda tangani setelah dicetak.</span>
         <button type="button" onclick="window.print()">Cetak Lembar Nilai</button>
     </div>
@@ -56,8 +56,8 @@
         <h1>Lembar Penilaian Mentor Lapangan</h1>
 
         <table class="identitas">
-            <tr><td>Nama Mahasiswa</td><td>:</td><td><strong>{{ $student?->name ?? '-' }}</strong></td></tr>
-            <tr><td>NIM</td><td>:</td><td>{{ $profile?->nim ?? '-' }}</td></tr>
+            <tr><td>Nama Peserta Magang</td><td>:</td><td><strong>{{ $student?->name ?? '-' }}</strong></td></tr>
+            <tr><td>NIM/NIS</td><td>:</td><td>{{ $profile?->nim ?? '-' }}</td></tr>
             <tr><td>Perguruan Tinggi / Program Studi</td><td>:</td><td>{{ $profile?->universitas ?? '-' }} / {{ $profile?->jurusan ?? '-' }}</td></tr>
             <tr><td>Bidang / Unit Penempatan</td><td>:</td><td>{{ $unit?->name ?? '-' }}</td></tr>
             <tr><td>Periode Magang</td><td>:</td><td>
@@ -65,7 +65,7 @@
                 s/d
                 {{ $placement->application?->end_date ? \Carbon\Carbon::parse($placement->application->end_date)->translatedFormat('d F Y') : '-' }}
             </td></tr>
-            <tr><td>Dosen Pembimbing</td><td>:</td><td>{{ $placement->academicAdvisor?->name ?? '-' }}</td></tr>
+            <tr><td>Pembimbing</td><td>:</td><td>{{ $placement->academicAdvisor?->name ?? '-' }}</td></tr>
         </table>
 
         <table class="nilai">

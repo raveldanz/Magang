@@ -14,7 +14,7 @@
                     Tambah Pengguna Sistem Baru
                 </h2>
                 <p class="text-xs text-gray-500">Registrasi akun baru untuk admin, mentor, pembimbing, universitas, atau
-                    mahasiswa</p>
+                    peserta magang</p>
             </div>
         </div>
     </x-slot>
@@ -74,7 +74,7 @@
                             </label>
                             <select name="role" x-model="selectedRole" required
                                 class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-semibold">
-                                <option value="mahasiswa">Mahasiswa Pendaftar</option>
+                                <option value="mahasiswa">Peserta Magang Pendaftar</option>
                                 <option value="admin">Admin Instansi Dinas</option>
                                 @if(auth()->user()->isSuperAdmin())
                                     <option value="supervisor">Supervisor</option>

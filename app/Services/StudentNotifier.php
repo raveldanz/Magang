@@ -88,7 +88,7 @@ class StudentNotifier
 
     private static function sender(string $from, bool $capitalize = false): string
     {
-        $label = $from === 'lecturer' ? 'dosen pembimbing' : 'mentor dinas';
+        $label = $from === 'lecturer' ? 'pembimbing' : 'mentor dinas';
 
         return $capitalize ? ucfirst($label) : $label;
     }

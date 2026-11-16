@@ -230,7 +230,7 @@ class Placement extends Model
             return null;
         }
 
-        return 'Penilaian baru dapat diisi setelah magang mahasiswa berjalan (status Aktif).';
+        return 'Penilaian baru dapat diisi setelah magang peserta berjalan (status Aktif).';
     }
 
     // Relasi ke User (Pembimbing Lapangan Dinas / Mentor)

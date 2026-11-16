@@ -133,7 +133,7 @@ class ChatPresenter
             'subtitle' => $contact
                 ? implode(' · ', array_filter([$contact['role_label'], $contact['org']]))
                 : ($c->isMentorGuidance() || $c->isDplGuidance()
-                    ? max(0, ((int) $c->participants_count) - 1).' mahasiswa bimbingan'
+                    ? max(0, ((int) $c->participants_count) - 1).' peserta bimbingan'
                     : ($c->type === ChatConversation::TYPE_PLACEMENT ? 'Grup Bimbingan' : ((int) $c->participants_count).' anggota')),
             'avatar' => $contact
                 ? ['initials' => $contact['initials'], 'color' => $contact['color'], 'group' => false, 'is_channel' => false, 'squircle' => false, 'logo_url' => null]
@@ -202,18 +202,18 @@ class ChatPresenter
                     'is_urgent' => true,
                     'role_group' => 'group',
                     'priority_rank' => 3,
-                    'hint' => "Ada {$unread} pesan belum dibaca di grup bimbingan dosen",
+                    'hint' => "Ada {$unread} pesan belum dibaca di grup bimbingan pembimbing",
                 ];
             }
 
             return [
                 'code' => 'guidance',
-                'label' => 'Bimbingan Dosen',
+                'label' => 'Bimbingan Pembimbing',
                 'theme' => 'info',
                 'is_urgent' => false,
                 'role_group' => 'group',
                 'priority_rank' => 6,
-                'hint' => 'Grup koordinasi bimbingan mahasiswa',
+                'hint' => 'Grup koordinasi bimbingan peserta magang',
             ];
         }
 
@@ -259,7 +259,7 @@ class ChatPresenter
                             'is_urgent' => true,
                             'role_group' => 'student',
                             'priority_rank' => 1,
-                            'hint' => 'Mahasiswa sedang dalam proses revisi laporan akhir bimbingan',
+                            'hint' => 'Peserta Magang sedang dalam proses revisi laporan akhir bimbingan',
                         ];
                     }
 
@@ -271,7 +271,7 @@ class ChatPresenter
                             'is_urgent' => true,
                             'role_group' => 'student',
                             'priority_rank' => 1,
-                            'hint' => 'Laporan akhir mahasiswa menunggu peninjauan/ACC dosen',
+                            'hint' => 'Laporan akhir peserta magang menunggu peninjauan/ACC pembimbing',
                         ];
                     }
                 }
@@ -289,7 +289,7 @@ class ChatPresenter
                             'is_urgent' => true,
                             'role_group' => 'student',
                             'priority_rank' => 2,
-                            'hint' => 'Nilai evaluasi akademik dosen belum diisi',
+                            'hint' => 'Nilai evaluasi akademik pembimbing belum diisi',
                         ];
                     }
                 }
@@ -304,7 +304,7 @@ class ChatPresenter
                         'is_urgent' => true,
                         'role_group' => 'student',
                         'priority_rank' => 3,
-                        'hint' => "Ada {$pendingDosenLogs} logbook mahasiswa menunggu verifikasi dosen",
+                        'hint' => "Ada {$pendingDosenLogs} logbook peserta magang menunggu verifikasi pembimbing",
                     ];
                 }
 
@@ -317,29 +317,29 @@ class ChatPresenter
                         'is_urgent' => true,
                         'role_group' => 'student',
                         'priority_rank' => 4,
-                        'hint' => 'Pesan belum dibaca dari mahasiswa bimbingan',
+                        'hint' => 'Pesan belum dibaca dari peserta bimbingan',
                     ];
                 }
 
                 return [
                     'code' => 'active_student',
-                    'label' => 'Mahasiswa Bimbingan',
+                    'label' => 'Peserta Bimbingan',
                     'theme' => 'neutral',
                     'is_urgent' => false,
                     'role_group' => 'student',
                     'priority_rank' => 6,
-                    'hint' => 'Mahasiswa bimbingan aktif',
+                    'hint' => 'Peserta bimbingan aktif',
                 ];
             }
 
             return [
                 'code' => 'student',
-                'label' => 'Mahasiswa Kampus',
+                'label' => 'Peserta Magang Kampus',
                 'theme' => 'neutral',
                 'is_urgent' => false,
                 'role_group' => 'student',
                 'priority_rank' => 8,
-                'hint' => 'Mahasiswa dari kampus yang sama',
+                'hint' => 'Peserta Magang dari kampus yang sama',
             ];
         }
 
@@ -375,19 +375,19 @@ class ChatPresenter
         if ($otherUser && $otherUser->role === 'mahasiswa') {
             return [
                 'code' => 'student',
-                'label' => 'Mahasiswa',
+                'label' => 'Peserta Magang',
                 'theme' => 'neutral',
                 'is_urgent' => false,
                 'role_group' => 'student',
                 'priority_rank' => 9,
-                'hint' => 'Kontak mahasiswa (bimbingan ditangani mentor lapangan)',
+                'hint' => 'Kontak peserta magang (bimbingan ditangani mentor lapangan)',
             ];
         }
 
         if ($c->isGuidanceGroup()) {
             return [
                 'code' => 'guidance',
-                'label' => $c->isMentorGuidance() ? 'Bimbingan Mentor' : 'Bimbingan Dosen',
+                'label' => $c->isMentorGuidance() ? 'Bimbingan Mentor' : 'Bimbingan Pembimbing',
                 'theme' => 'neutral',
                 'is_urgent' => false,
                 'role_group' => 'group',
@@ -472,7 +472,7 @@ class ChatPresenter
                     'is_urgent' => true,
                     'role_group' => 'mentor',
                     'priority_rank' => 3,
-                    'hint' => 'Pesan dari Mentor Lapangan dinas terkait mahasiswa/unit',
+                    'hint' => 'Pesan dari Mentor Lapangan dinas terkait peserta magang/unit',
                 ];
             }
 
@@ -579,7 +579,7 @@ class ChatPresenter
                         'is_urgent' => true,
                         'role_group' => 'student',
                         'priority_rank' => 1,
-                        'hint' => "Ada {$pendingLogs} logbook mahasiswa menunggu verifikasi mentor",
+                        'hint' => "Ada {$pendingLogs} logbook peserta magang menunggu verifikasi mentor",
                     ];
                 }
 
@@ -605,12 +605,12 @@ class ChatPresenter
                 if ($unread > 0) {
                     return [
                         'code' => 'urgent',
-                        'label' => 'Pesan Mahasiswa',
+                        'label' => 'Pesan Peserta Magang',
                         'theme' => 'info',
                         'is_urgent' => true,
                         'role_group' => 'student',
                         'priority_rank' => 3,
-                        'hint' => 'Pesan belum dibaca dari mahasiswa bimbingan',
+                        'hint' => 'Pesan belum dibaca dari peserta bimbingan',
                     ];
                 }
 
@@ -621,18 +621,18 @@ class ChatPresenter
                     'is_urgent' => false,
                     'role_group' => 'student',
                     'priority_rank' => 6,
-                    'hint' => 'Mahasiswa bimbingan aktif',
+                    'hint' => 'Peserta bimbingan aktif',
                 ];
             }
 
             return [
                 'code' => 'student',
-                'label' => 'Mahasiswa',
+                'label' => 'Peserta Magang',
                 'theme' => 'neutral',
                 'is_urgent' => false,
                 'role_group' => 'student',
                 'priority_rank' => 8,
-                'hint' => 'Mahasiswa magang',
+                'hint' => 'Peserta Magang',
             ];
         }
 
@@ -689,35 +689,35 @@ class ChatPresenter
             if ($app && in_array($app->statusValue(), ['accepted', 'active'], true) && empty($placement?->academic_advisor_id)) {
                 return [
                     'code' => 'urgent',
-                    'label' => 'Perlu Dosen',
+                    'label' => 'Perlu Pembimbing',
                     'theme' => 'urgent',
                     'is_urgent' => true,
                     'role_group' => 'student',
                     'priority_rank' => 1,
-                    'hint' => 'Mahasiswa telah diterima dinas namun belum di-plot Dosen Pembimbing',
+                    'hint' => 'Peserta Magang telah diterima dinas namun belum di-plot Pembimbing',
                 ];
             }
 
             if ($unread > 0) {
                 return [
                     'code' => 'urgent',
-                    'label' => 'Pesan Mahasiswa',
+                    'label' => 'Pesan Peserta Magang',
                     'theme' => 'info',
                     'is_urgent' => true,
                     'role_group' => 'student',
                     'priority_rank' => 4,
-                    'hint' => 'Pesan dari mahasiswa kampus',
+                    'hint' => 'Pesan dari peserta magang kampus',
                 ];
             }
 
             return [
                 'code' => 'student',
-                'label' => 'Mahasiswa Kampus',
+                'label' => 'Peserta Magang Kampus',
                 'theme' => 'neutral',
                 'is_urgent' => false,
                 'role_group' => 'student',
                 'priority_rank' => 7,
-                'hint' => 'Mahasiswa dari perguruan tinggi',
+                'hint' => 'Peserta Magang dari perguruan tinggi',
             ];
         }
 
@@ -749,23 +749,23 @@ class ChatPresenter
             if ($unread > 0) {
                 return [
                     'code' => 'urgent',
-                    'label' => 'Pesan Dosen',
+                    'label' => 'Pesan Pembimbing',
                     'theme' => 'info',
                     'is_urgent' => true,
                     'role_group' => 'dosen',
                     'priority_rank' => 3,
-                    'hint' => 'Pesan dari Dosen Pembimbing',
+                    'hint' => 'Pesan dari Pembimbing',
                 ];
             }
 
             return [
                 'code' => 'dosen',
-                'label' => 'Dosen Pembimbing',
+                'label' => 'Pembimbing',
                 'theme' => 'neutral',
                 'is_urgent' => false,
                 'role_group' => 'dosen',
                 'priority_rank' => 7,
-                'hint' => 'Dosen Perguruan Tinggi',
+                'hint' => 'Pembimbing Perguruan Tinggi',
             ];
         }
 
@@ -812,7 +812,7 @@ class ChatPresenter
 
             return [
                 'code' => 'guidance',
-                'label' => $c->isMentorGuidance() ? 'Bimbingan Mentor' : 'Bimbingan Dosen',
+                'label' => $c->isMentorGuidance() ? 'Bimbingan Mentor' : 'Bimbingan Pembimbing',
                 'theme' => 'info',
                 'is_urgent' => false,
                 'role_group' => 'group',
@@ -852,30 +852,30 @@ class ChatPresenter
                     'is_urgent' => true,
                     'role_group' => 'dosen',
                     'priority_rank' => 1,
-                    'hint' => 'Laporan akhir Anda diminta revisi oleh Dosen Pembimbing',
+                    'hint' => 'Laporan akhir Anda diminta revisi oleh Pembimbing',
                 ];
             }
 
             if ($unread > 0) {
                 return [
                     'code' => 'urgent',
-                    'label' => 'Pesan Dosen',
+                    'label' => 'Pesan Pembimbing',
                     'theme' => 'urgent',
                     'is_urgent' => true,
                     'role_group' => 'dosen',
                     'priority_rank' => 2,
-                    'hint' => 'Pesan belum dibaca dari Dosen Pembimbing',
+                    'hint' => 'Pesan belum dibaca dari Pembimbing',
                 ];
             }
 
             return [
                 'code' => 'dosen',
-                'label' => 'Dosen Pembimbing',
+                'label' => 'Pembimbing',
                 'theme' => 'neutral',
                 'is_urgent' => false,
                 'role_group' => 'dosen',
                 'priority_rank' => 6,
-                'hint' => 'Dosen Pembimbing Kampus',
+                'hint' => 'Pembimbing Kampus',
             ];
         }
 
@@ -951,7 +951,7 @@ class ChatPresenter
             $label = match ($otherUser->role) {
                 'admin' => 'Admin Dinas',
                 'universitas' => 'Admin Kampus',
-                'dosen', 'academic_advisor' => 'Dosen',
+                'dosen', 'academic_advisor' => 'Pembimbing',
                 'mentor', 'pembimbing' => 'Mentor',
                 default => 'Pesan Baru',
             };
@@ -998,7 +998,7 @@ class ChatPresenter
                 'is_urgent' => $unread > 0,
                 'role_group' => 'student',
                 'priority_rank' => $unread > 0 ? 2 : 6,
-                'hint' => 'Grup koordinasi bimbingan magang mahasiswa',
+                'hint' => 'Grup koordinasi bimbingan magang peserta',
             ];
         }
 
@@ -1029,12 +1029,12 @@ class ChatPresenter
 
             return [
                 'code' => 'new_student',
-                'label' => 'Mahasiswa',
+                'label' => 'Peserta Magang',
                 'theme' => 'neutral',
                 'is_urgent' => false,
                 'role_group' => 'student',
                 'priority_rank' => 7,
-                'hint' => 'Akun mahasiswa terdaftar',
+                'hint' => 'Akun peserta magang terdaftar',
             ];
         }
 
@@ -1106,7 +1106,7 @@ class ChatPresenter
                 'is_urgent' => true,
                 'role_group' => $roleGroup,
                 'priority_rank' => 3,
-                'hint' => 'Mentor atau Dosen belum ditetapkan',
+                'hint' => 'Mentor atau Pembimbing belum ditetapkan',
             ];
         }
 
@@ -1410,9 +1410,9 @@ class ChatPresenter
             'admin' => 'Admin Dispusip',
             'supervisor' => 'Tim Kerja Umum dan Kepegawaian',
             'mentor', 'pembimbing' => 'Pembimbing Lapangan',
-            'dosen', 'academic_advisor' => 'Dosen Pembimbing',
+            'dosen', 'academic_advisor' => 'Pembimbing',
             'universitas', 'university' => 'Admin Universitas',
-            'mahasiswa', 'student' => 'Mahasiswa Magang',
+            'mahasiswa', 'student' => 'Peserta Magang',
             default => $user->roleLabel(),
         };
     }

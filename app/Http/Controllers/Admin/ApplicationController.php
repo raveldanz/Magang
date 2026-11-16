@@ -371,7 +371,7 @@ class ApplicationController extends Controller
                     $missing[] = 'Laporan Akhir belum disetujui';
                 }
                 if (! $application->has_complete_evaluation) {
-                    $missing[] = 'Penilaian (Mentor & Dosen Pembimbing) belum tuntas diisi';
+                    $missing[] = 'Penilaian (Mentor & Pembimbing) belum tuntas diisi';
                 }
                 $missingStr = implode(' dan ', $missing);
 

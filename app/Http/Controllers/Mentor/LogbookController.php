@@ -124,7 +124,7 @@ class LogbookController extends Controller
         abort_unless(
             $logbook->placement?->canFieldReviewLogbook(Auth::user()),
             403,
-            'Anda tidak memiliki hak akses ke logbook mahasiswa ini.'
+            'Anda tidak memiliki hak akses ke logbook peserta magang ini.'
         );
 
         return view('admin.logbooks.show', compact('logbook'));
@@ -142,7 +142,7 @@ class LogbookController extends Controller
         $placement = $logbook->placement;
 
         if (! $placement || ! $placement->canFieldReviewLogbook($mentor)) {
-            abort(403, 'Anda tidak memiliki hak akses untuk memverifikasi logbook mahasiswa ini.');
+            abort(403, 'Anda tidak memiliki hak akses untuk memverifikasi logbook peserta magang ini.');
         }
 
         $request->validate([
@@ -170,7 +170,7 @@ class LogbookController extends Controller
 
         return redirect()->back()->with('success', $isFallback
             ? 'Status logbook diperbarui sebagai Kepala Unit (validasi sementara sebelum mentor ditugaskan).'
-            : 'Status logbook mahasiswa berhasil diperbarui!');
+            : 'Status logbook peserta magang berhasil diperbarui!');
     }
 
     /**

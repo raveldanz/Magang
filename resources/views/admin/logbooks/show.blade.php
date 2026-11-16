@@ -61,9 +61,9 @@
                 <h3 class="font-bold text-base text-slate-900 pb-3 border-b border-slate-100">Data Magang</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div>
-                        <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Mahasiswa</span>
+                        <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Peserta Magang</span>
                         <span class="font-bold text-slate-900 block mt-0.5">{{ $student->name ?? '-' }}</span>
-                        <span class="text-xs text-slate-600">NIM: {{ $profile->nim ?? '-' }} &bull; {{ $profile->universitas ?? '-' }}</span>
+                        <span class="text-xs text-slate-600">NIM/NIS: {{ $profile->nim ?? '-' }} &bull; {{ $profile->universitas ?? '-' }}</span>
                     </div>
                     <div>
                         <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Instansi & Unit Kerja</span>
@@ -75,7 +75,7 @@
                         <span class="font-medium text-slate-800 block mt-0.5">{{ $mentor->name ?? 'Belum Ditugaskan' }}</span>
                     </div>
                     <div>
-                        <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Dosen Pembimbing</span>
+                        <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Pembimbing</span>
                         <span class="font-medium text-slate-800 block mt-0.5">{{ $dosen->name ?? 'Belum Ditugaskan' }}</span>
                     </div>
                 </div>
@@ -125,7 +125,7 @@
                             </a>
                         @endif
                     @else
-                        <p class="text-sm text-slate-400">Mahasiswa tidak melampirkan bukti untuk kegiatan ini.</p>
+                        <p class="text-sm text-slate-400">Peserta Magang tidak melampirkan bukti untuk kegiatan ini.</p>
                     @endif
                 </div>
             </div>
@@ -145,11 +145,11 @@
                     </div>
                     <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
                         <div class="flex items-center justify-between gap-2">
-                            <span class="text-sm font-bold text-slate-800">Dosen Pembimbing</span>
+                            <span class="text-sm font-bold text-slate-800">Pembimbing</span>
                             <x-status-badge type="review" :status="$logbook->lecturer_status ?? 'pending'" />
                         </div>
                         <p class="text-sm {{ $logbook->lecturer_feedback ? 'text-slate-700' : 'text-slate-400' }}">
-                            {{ $logbook->lecturer_feedback ?: 'Belum ada catatan dari dosen.' }}
+                            {{ $logbook->lecturer_feedback ?: 'Belum ada catatan dari pembimbing.' }}
                         </p>
                     </div>
                 </div>
@@ -161,7 +161,7 @@
                 if ($isMentor) {
                     $reviewForm = ['route' => route('mentor.logbooks.updateStatus', $logbook->id), 'feedback' => $logbook->feedback, 'title' => 'Verifikasi Mentor Lapangan'];
                 } elseif ($isLecturer) {
-                    $reviewForm = ['route' => route('lecturer.logbooks.updateStatus', $logbook->id), 'feedback' => $logbook->lecturer_feedback, 'title' => 'Verifikasi Dosen Pembimbing'];
+                    $reviewForm = ['route' => route('lecturer.logbooks.updateStatus', $logbook->id), 'feedback' => $logbook->lecturer_feedback, 'title' => 'Verifikasi Pembimbing'];
                 } elseif ($isAdminFallback) {
                     $reviewForm = ['route' => route('admin.logbooks.review', $logbook->id), 'feedback' => $logbook->feedback, 'title' => Auth::user()->isBidangAdmin() ? 'Validasi Sementara oleh Admin Bidang' : 'Validasi Sementara oleh Admin Dinas'];
                 }
@@ -172,7 +172,7 @@
                     <div class="pb-3 border-b border-slate-100">
                         <h3 class="font-bold text-base text-slate-900">{{ $reviewForm['title'] }}</h3>
                         @if ($isAdminFallback)
-                            <p class="text-sm text-slate-500 mt-1">Mahasiswa ini belum memiliki Mentor Dinas. Anda dapat memvalidasi logbook sementara sampai mentor ditugaskan. Riwayat validasi tetap tersimpan.</p>
+                            <p class="text-sm text-slate-500 mt-1">Peserta Magang ini belum memiliki Mentor Dinas. Anda dapat memvalidasi logbook sementara sampai mentor ditugaskan. Riwayat validasi tetap tersimpan.</p>
                         @elseif ($isUnitHeadFallback)
                             <p class="text-sm text-slate-500 mt-1">Anda memvalidasi sebagai Kepala Unit (sementara, karena mentor belum ditunjuk).</p>
                         @endif
@@ -184,7 +184,7 @@
 
                         <div>
                             <label for="feedback" class="block text-base font-bold text-slate-900 mb-1.5">
-                                Catatan untuk mahasiswa <span class="font-normal text-slate-600">(wajib bila meminta revisi)</span>
+                                Catatan untuk peserta magang <span class="font-normal text-slate-600">(wajib bila meminta revisi)</span>
                             </label>
                             {{-- Selalu mulai kosong: catatan lama sudah tampil di atas dan tidak boleh ikut terkirim tanpa sengaja --}}
                             <textarea id="feedback" name="feedback" rows="3" maxlength="1000"
@@ -202,14 +202,14 @@
                                         const fb = (fbField?.value || '').trim();
                                         if (fb === '') {
                                             fbField?.focus();
-                                            $dispatch('toast', { type: 'error', message: 'Tulis dulu catatan perbaikan agar mahasiswa tahu apa yang harus diperbaiki.' });
+                                            $dispatch('toast', { type: 'error', message: 'Tulis dulu catatan perbaikan agar peserta magang tahu apa yang harus diperbaiki.' });
                                             return;
                                         }
                                         $dispatch('open-confirm-modal', {
                                             form: $el.closest('form'),
                                             submitter: $el,
                                             title: 'Konfirmasi Permintaan Revisi Logbook',
-                                            message: 'Logbook akan dikembalikan kepada mahasiswa untuk diperbaiki sesuai catatan Anda.',
+                                            message: 'Logbook akan dikembalikan kepada peserta magang untuk diperbaiki sesuai catatan Anda.',
                                             label: 'Status Tujuan',
                                             name: @js(\App\Enums\ReviewStatus::REJECTED->localizedLabel(auth()->user()?->role)),
                                             desc: fb !== '' ? 'Catatan: ' + fb : 'Belum ada catatan tertulis.',
@@ -234,7 +234,7 @@
                                                 form: $el.closest('form'),
                                                 submitter: $el,
                                                 title: 'Konfirmasi Persetujuan Logbook',
-                                                message: 'Apakah Anda yakin ingin menyetujui catatan logbook mahasiswa ini?',
+                                                message: 'Apakah Anda yakin ingin menyetujui catatan logbook peserta magang ini?',
                                                 label: 'Status Tujuan',
                                                 name: @js(\App\Enums\ReviewStatus::APPROVED->localizedLabel(auth()->user()?->role)),
                                                 desc: fb !== '' ? 'Catatan: ' + fb : '',

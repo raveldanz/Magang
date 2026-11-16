@@ -141,7 +141,7 @@
             $backLabel = 'Kembali ke Pengesahan Sertifikat';
         } elseif (in_array(Auth::user()?->role, ['dosen', 'academic_advisor'], true)) {
             $backUrl = route('lecturer.dashboard');
-            $backLabel = 'Kembali ke Dashboard Dosen';
+            $backLabel = 'Kembali ke Dashboard Pembimbing';
         } elseif (in_array(Auth::user()?->role, ['pembimbing', 'mentor'], true)) {
             $backUrl = route('mentor.dashboard');
             $backLabel = 'Kembali ke Dashboard Mentor';

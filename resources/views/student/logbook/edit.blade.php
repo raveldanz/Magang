@@ -34,7 +34,7 @@
 
                     @if($lecturerFeedback)
                         <div class="rounded-2xl bg-white p-4 border border-rose-100 shadow-2xs space-y-1">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-rose-700 block">Masukan Dosen Pembimbing Lapangan:</span>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-rose-700 block">Masukan Pembimbing:</span>
                             <p class="text-xs sm:text-sm text-slate-700 leading-relaxed italic whitespace-pre-line">"{{ $lecturerFeedback }}"</p>
                         </div>
                     @endif

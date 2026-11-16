@@ -57,7 +57,7 @@
                         :class="activeTab === 'students' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'"
                         class="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    <span>Daftar Mahasiswa & Cetak</span>
+                    <span>Daftar Peserta Magang & Cetak</span>
                     <span class="ml-1.5 px-2 py-0.5 text-[10px] rounded-full" :class="activeTab === 'students' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'">
                         {{ $applications->total() ?? 0 }}
                     </span>
@@ -84,7 +84,7 @@
                         <input type="hidden" name="tab" value="students">
                         <div class="relative flex-1 max-w-md">
                             <input type="text" name="search" value="{{ request('search') }}" 
-                                   placeholder="Cari nama mahasiswa, NIM, atau universitas..."
+                                   placeholder="Cari nama peserta magang, NIM/NIS, atau universitas..."
                                    class="w-full text-xs rounded-xl border-gray-200 pl-9 pr-4 py-2 focus:border-blue-600 focus:ring-blue-600">
                             <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         </div>
@@ -99,7 +99,7 @@
                     </form>
 
                     <div class="text-xs text-gray-500 font-medium">
-                        Menampilkan <strong>{{ $applications->count() }}</strong> dari total <strong>{{ $applications->total() }}</strong> mahasiswa siap cetak
+                        Menampilkan <strong>{{ $applications->count() }}</strong> dari total <strong>{{ $applications->total() }}</strong> peserta magang siap cetak
                     </div>
                 </div>
 
@@ -107,7 +107,7 @@
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
                     <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-                            <h3 class="text-base font-bold text-gray-900">Mahasiswa Memenuhi Kriteria Kelulusan</h3>
+                            <h3 class="text-base font-bold text-gray-900">Peserta Magang Memenuhi Kriteria Kelulusan</h3>
                             <p class="text-xs text-gray-500 mt-0.5">Seluruh laporan akhir telah disetujui dan nilai evaluasi lengkap</p>
                         </div>
                         <div class="flex items-center gap-2">
@@ -203,8 +203,8 @@
                             </div>
                         @empty
                             <div class="mempty">
-                                <p style="font-weight:700;color:#475569">Belum ada mahasiswa yang memenuhi syarat kelulusan.</p>
-                                <p style="margin-top:4px">Pastikan mahasiswa telah mengumpulkan laporan dan dinilai oleh pembimbing.</p>
+                                <p style="font-weight:700;color:#475569">Belum ada peserta magang yang memenuhi syarat kelulusan.</p>
+                                <p style="margin-top:4px">Pastikan peserta magang telah mengumpulkan laporan dan dinilai oleh pembimbing.</p>
                             </div>
                         @endforelse
                     </div>
@@ -214,8 +214,8 @@
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
                                 <tr class="border-b border-gray-100 bg-gray-50/75 text-gray-500 font-bold uppercase tracking-wider text-[11px]">
-                                    <th class="py-3.5 px-4">Nama Mahasiswa</th>
-                                    <th class="py-3.5 px-4">Universitas / NIM</th>
+                                    <th class="py-3.5 px-4">Nama Peserta Magang</th>
+                                    <th class="py-3.5 px-4">Universitas / NIM/NIS</th>
                                     <th class="py-3.5 px-4">Unit Tempat Magang</th>
                                     <th class="py-3.5 px-4 text-center">Nilai Akhir</th>
                                     <th class="py-3.5 px-4 text-center">Status ACC Atasan</th>
@@ -235,7 +235,7 @@
                                         </td>
                                         <td class="py-4 px-4">
                                             <div class="text-gray-800 font-semibold">{{ $app->user->studentProfile->universitas ?? '-' }}</div>
-                                            <div class="text-[11px] text-blue-600 font-mono">NIM: {{ $app->user->studentProfile->nim ?? '-' }}</div>
+                                            <div class="text-[11px] text-blue-600 font-mono">NIM/NIS: {{ $app->user->studentProfile->nim ?? '-' }}</div>
                                         </td>
                                         <td class="py-4 px-4 text-gray-700 font-medium">
                                             {{ $app->unit->name ?? '-' }}
@@ -296,8 +296,8 @@
                                 @empty
                                     <tr>
                                         <td colspan="6" class="py-12 text-center text-gray-400">
-                                            <p class="font-bold text-gray-600 text-sm">Belum ada mahasiswa yang memenuhi syarat kelulusan.</p>
-                                            <p class="text-xs text-gray-400 mt-1">Pastikan mahasiswa telah mengumpulkan laporan dan dinilai oleh pembimbing.</p>
+                                            <p class="font-bold text-gray-600 text-sm">Belum ada peserta magang yang memenuhi syarat kelulusan.</p>
+                                            <p class="text-xs text-gray-400 mt-1">Pastikan peserta magang telah mengumpulkan laporan dan dinilai oleh pembimbing.</p>
                                         </td>
                                     </tr>
                                 @endforelse
@@ -600,7 +600,7 @@
                                         <div class="pt-1">
                                             <span class="inline-block border-b border-black pb-0.5 font-bold text-[10px] text-black">Achmad Dhafa Sholahudin F</span>
                                         </div>
-                                        <div class="text-[6px] text-black">Mahasiswa Program Studi Manajemen Fakultas Ekonomi dan Bisnis</div>
+                                        <div class="text-[6px] text-black">Peserta Magang Program Studi Manajemen Fakultas Ekonomi dan Bisnis</div>
                                         <div class="text-[6px] text-black">Universitas 17 Agustus 1945 Surabaya</div>
                                         <div class="text-[6px] text-black italic pt-0.5">10 Agustus {{ $activeTheme->year ?? date('Y') }} s.d. 10 Oktober {{ $activeTheme->year ?? date('Y') }}</div>
                                     </div>
@@ -625,7 +625,7 @@
                                 <!-- Pratinjau hasil generate nyata (2 halaman) dengan isian form yang belum disimpan -->
                                 <div class="border-t border-slate-100 pt-3 space-y-2.5">
                                     <div>
-                                        <label for="sample_placement_id" class="text-[11px] font-bold text-slate-600 uppercase tracking-wider block mb-1">Contoh mahasiswa untuk pratinjau:</label>
+                                        <label for="sample_placement_id" class="text-[11px] font-bold text-slate-600 uppercase tracking-wider block mb-1">Contoh peserta magang untuk pratinjau:</label>
                                         <select id="sample_placement_id" name="sample_placement_id" class="w-full rounded-xl border-slate-200 text-xs focus:border-blue-600 focus:ring-blue-600">
                                             <option value="">Otomatis</option>
                                             @foreach (($eligibleApps ?? collect())->take(40) as $sampleApp)

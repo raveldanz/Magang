@@ -101,7 +101,7 @@ class CertificateApprovalController extends Controller
         ]);
 
         return redirect()->route('supervisor.certificates.index')
-            ->with('success', "Sertifikat kelulusan atas nama {$certificate->placement?->application?->user?->name} berhasil disahkan dan siap diunduh oleh mahasiswa.");
+            ->with('success', "Sertifikat kelulusan atas nama {$certificate->placement?->application?->user?->name} berhasil disahkan dan siap diunduh oleh peserta magang.");
     }
 
     /**
@@ -198,7 +198,7 @@ class CertificateApprovalController extends Controller
 
         $aspectLabels = [
             'nilai' => 'Nilai Evaluasi & Transkrip',
-            'identitas' => 'Data Mahasiswa & Magang',
+            'identitas' => 'Data Peserta & Magang',
             'laporan' => 'Validasi Logbook & Laporan Akhir',
             'lainnya' => 'Aspek Lainnya',
         ];

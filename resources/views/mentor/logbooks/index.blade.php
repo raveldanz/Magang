@@ -8,7 +8,7 @@
             </a>
             <div>
                 <h2 class="font-bold text-2xl text-slate-900 leading-tight">
-                    Periksa Logbook Mahasiswa
+                    Periksa Logbook Peserta Magang
                 </h2>
                 <p class="text-base text-slate-700 mt-0.5">
                     Logbook dikelompokkan per minggu. Buka minggu yang bertanda kuning, putuskan setiap hari, lalu simpan.
@@ -23,7 +23,7 @@
             'pending' => ['Perlu Diperiksa', $pendingCount, 'hari'],
             'all' => ['Semua', $pendingCount + $approvedCount + $rejectedCount, 'hari'],
             'approved' => [\App\Enums\ReviewStatus::APPROVED->localizedLabel('mentor'), $approvedCount, 'hari'],
-            'rejected' => ['Sedang Diperbaiki Mahasiswa', $rejectedCount, 'hari'],
+            'rejected' => ['Sedang Diperbaiki Peserta Magang', $rejectedCount, 'hari'],
         ];
     @endphp
 
@@ -61,23 +61,23 @@
                 <form method="GET" action="{{ route('mentor.logbooks.index') }}" class="grid grid-cols-1 lg:grid-cols-3 gap-3 items-end">
                     <input type="hidden" name="status" value="{{ $statusFilter }}">
                     <div>
-                        <label for="pilih-mahasiswa" class="block text-base font-semibold text-slate-900 mb-1">Mahasiswa</label>
+                        <label for="pilih-mahasiswa" class="block text-base font-semibold text-slate-900 mb-1">Peserta Magang</label>
                         <select id="pilih-mahasiswa" name="placement_id" onchange="this.form.submit()" class="w-full min-h-[48px] text-base border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2">
-                            <option value="">Semua Mahasiswa</option>
+                            <option value="">Semua Peserta Magang</option>
                             @foreach ($supervisedPlacements as $pl)
                                 @php
                                     $st = $pl->application?->user;
                                     $nim = $st?->studentProfile?->nim ?? '-';
                                 @endphp
                                 <option value="{{ $pl->id }}" {{ request('placement_id') == $pl->id ? 'selected' : '' }}>
-                                    {{ $st?->name ?? 'Mahasiswa' }} ({{ $nim }})
+                                    {{ $st?->name ?? 'Peserta Magang' }} ({{ $nim }})
                                 </option>
                             @endforeach
                         </select>
                     </div>
 
                     <div class="lg:col-span-2">
-                        <label for="cari-logbook" class="block text-base font-semibold text-slate-900 mb-1">Cari nama, NIM, atau isi kegiatan</label>
+                        <label for="cari-logbook" class="block text-base font-semibold text-slate-900 mb-1">Cari nama, NIM/NIS, atau isi kegiatan</label>
                         <div class="flex items-center gap-2">
                             <input id="cari-logbook" type="text" name="search" value="{{ request('search') }}" placeholder="Contoh: Budi atau katalog"
                                    class="w-full min-h-[48px] text-base border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2">

@@ -68,11 +68,11 @@
                     </template>
                     <template x-if="!active.description && (active.scope_type === 'mentor_guidance' || active.scope_type === 'dpl_guidance' || active.type === 'placement')">
                         <p class="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl p-2.5 text-left leading-relaxed">
-                            Grup bimbingan ini dibuat dan dikelola secara otomatis oleh sistem untuk mempermudah koordinasi mahasiswa bimbingan aktif dengan pembimbing.
+                            Grup bimbingan ini dibuat dan dikelola secara otomatis oleh sistem untuk mempermudah koordinasi peserta bimbingan aktif dengan pembimbing.
                         </p>
                     </template>
                     <a x-show="active.placement_url" :href="active.placement_url" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800">
-                        Buka detail magang mahasiswa →
+                        Buka detail magang peserta →
                     </a>
                 </div>
 

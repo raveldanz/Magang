@@ -143,7 +143,7 @@ class DashboardController extends Controller
         ]);
 
         // Mentor yang ditugaskan, atau Kepala Unit selama mentor belum ditunjuk (validasi sementara).
-        abort_unless($placement->canFieldReviewLogbook($mentor), 403, 'Anda tidak memiliki hak akses ke data bimbingan mahasiswa ini.');
+        abort_unless($placement->canFieldReviewLogbook($mentor), 403, 'Anda tidak memiliki hak akses ke data bimbingan peserta magang ini.');
 
         // Multi-Tenant Authorization Check
         if ($mentor->agency_profile_id !== null && optional($placement->application?->unit)->agency_profile_id !== $mentor->agency_profile_id) {
@@ -219,7 +219,7 @@ class DashboardController extends Controller
         StudentNotifier::finalReportReviewed($placement->application?->user, 'mentor', $request->status, $request->feedback);
 
         return redirect()->back()->with('success', $request->status === 'approved'
-            ? 'Laporan akhir disetujui. Langkah berikutnya: isi nilai akhir mahasiswa.'
-            : 'Laporan akhir dikembalikan ke mahasiswa untuk diperbaiki beserta catatan Anda.');
+            ? 'Laporan akhir disetujui. Langkah berikutnya: isi nilai akhir peserta magang.'
+            : 'Laporan akhir dikembalikan ke peserta magang untuk diperbaiki beserta catatan Anda.');
     }
 }

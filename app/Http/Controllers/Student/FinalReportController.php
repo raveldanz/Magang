@@ -51,7 +51,7 @@ class FinalReportController extends Controller
         if ($placement) {
             // Syarat Wajib: DPL Harus Sudah Dipilih sebelum mengisi/mengakses Laporan Akhir
             if (empty($placement->academic_advisor_id) && empty($placement->pembimbing_id)) {
-                return redirect()->route('dashboard')->with('error', 'Silakan pilih Dosen Pembimbing terlebih dahulu sebelum mengakses pengunggahan Laporan Akhir.');
+                return redirect()->route('dashboard')->with('error', 'Silakan pilih Pembimbing terlebih dahulu sebelum mengakses pengunggahan Laporan Akhir.');
             }
 
             $finalReport = $placement->finalreport;
@@ -97,7 +97,7 @@ class FinalReportController extends Controller
 
         // Syarat Wajib: DPL Harus Sudah Dipilih / Terdaftar
         if (empty($placement->academic_advisor_id) && empty($placement->pembimbing_id)) {
-            return redirect()->route('dashboard')->with('error', 'Akses ditolak: Silakan pilih Dosen Pembimbing terlebih dahulu.');
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak: Silakan pilih Pembimbing terlebih dahulu.');
         }
 
         $placementId = $application->placement->id;
@@ -145,7 +145,7 @@ class FinalReportController extends Controller
             $ext = SafeUpload::extension($file, ['pdf'], 'pdf');
             $nim = $user->studentProfile?->nim ?? 'NIM';
             $cleanNim = preg_replace('/[^A-Za-z0-9]/', '', $nim) ?: 'NIM';
-            $cleanName = Str::slug($user->name, '_') ?: 'Mahasiswa';
+            $cleanName = Str::slug($user->name, '_') ?: 'Peserta Magang';
             $timestamp = time();
             $customFilename = "Laporan_Akhir_{$cleanNim}_{$cleanName}_{$timestamp}.{$ext}";
 
@@ -268,14 +268,14 @@ class FinalReportController extends Controller
         }
 
         if (! $realPath || ! file_exists($realPath)) {
-            return redirect()->back()->with('error', 'Berkas naskah laporan akhir belum tersedia atau sedang disiapkan oleh mahasiswa.');
+            return redirect()->back()->with('error', 'Berkas naskah laporan akhir belum tersedia atau sedang disiapkan oleh peserta magang.');
         }
 
         // Susun Nama Berkas Bersih untuk Browser / Download: Laporan_Akhir_[NIM]_[Nama_Mahasiswa].[ext]
-        $studentName = $student?->name ?? 'Mahasiswa';
+        $studentName = $student?->name ?? 'Peserta Magang';
         $nim = $student?->studentProfile?->nim ?? 'NIM';
         $cleanNim = preg_replace('/[^A-Za-z0-9]/', '', $nim) ?: 'NIM';
-        $cleanName = Str::slug($studentName, '_') ?: 'Mahasiswa';
+        $cleanName = Str::slug($studentName, '_') ?: 'Peserta Magang';
         $ext = pathinfo($realPath, PATHINFO_EXTENSION) ?: 'pdf';
         $downloadFilename = "Laporan_Akhir_{$cleanNim}_{$cleanName}.{$ext}";
 

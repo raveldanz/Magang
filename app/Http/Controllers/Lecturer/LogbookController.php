@@ -132,7 +132,7 @@ class LogbookController extends Controller
         }
 
         if (! $isAssignedAdvisor && ! $isSameUniv) {
-            abort(403, 'Anda tidak memiliki hak akses untuk memonitor logbook mahasiswa ini.');
+            abort(403, 'Anda tidak memiliki hak akses untuk memonitor logbook peserta magang ini.');
         }
 
         return view('admin.logbooks.show', compact('logbook'));
@@ -159,7 +159,7 @@ class LogbookController extends Controller
         $isAssignedAdvisor = ($placement && ((int) $placement->academic_advisor_id === (int) $user->id || (int) $placement->mentor_id === (int) $user->id));
 
         if (! $isAssignedAdvisor) {
-            abort(403, 'Anda tidak memiliki hak akses untuk memverifikasi logbook mahasiswa ini.');
+            abort(403, 'Anda tidak memiliki hak akses untuk memverifikasi logbook peserta magang ini.');
         }
 
         $logbook->update([
@@ -174,7 +174,7 @@ class LogbookController extends Controller
 
         $statusText = $request->status === 'approved' ? 'disetujui (ACC)' : ($request->status === 'rejected' ? 'ditolak / diminta revisi' : 'diperbarui');
 
-        return redirect()->back()->with('success', "Logbook berhasil {$statusText} dan catatan feedback Dosen telah tersimpan!");
+        return redirect()->back()->with('success', "Logbook berhasil {$statusText} dan catatan feedback Pembimbing telah tersimpan!");
     }
 
     /**
@@ -202,8 +202,8 @@ class LogbookController extends Controller
             'revise_ids.*' => ['integer', Rule::in(array_map('intval', (array) $request->input('logbook_ids', [])))],
             'bulk_feedback' => 'nullable|required_if:action,rejected|required_with:revise_ids|string|max:1000',
         ], [
-            'bulk_feedback.required_if' => 'Catatan wajib diisi saat menolak atau meminta revisi, agar mahasiswa tahu apa yang perlu diperbaiki.',
-            'bulk_feedback.required_with' => 'Catatan wajib diisi saat menolak atau meminta revisi, agar mahasiswa tahu apa yang perlu diperbaiki.',
+            'bulk_feedback.required_if' => 'Catatan wajib diisi saat menolak atau meminta revisi, agar peserta magang tahu apa yang perlu diperbaiki.',
+            'bulk_feedback.required_with' => 'Catatan wajib diisi saat menolak atau meminta revisi, agar peserta magang tahu apa yang perlu diperbaiki.',
         ]);
 
         // Ambil ID placement yang dibimbing langsung oleh Dosen ini
@@ -262,7 +262,7 @@ class LogbookController extends Controller
         $isSuperAdmin = $user->isSuperAdmin();
 
         if (! $isAssignedAdvisor && ! $isSuperAdmin) {
-            abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing Lapangan yang ditugaskan untuk mahasiswa ini.');
+            abort(403, 'Akses Ditolak: Anda bukan Pembimbing yang ditugaskan untuk peserta magang ini.');
         }
 
         $now = Carbon::now();
@@ -311,7 +311,7 @@ class LogbookController extends Controller
         ]);
 
         if ($count > 0) {
-            return redirect()->back()->with('success', "Sebanyak {$count} logbook mahasiswa yang telah disetujui mentor berhasil di-ACC sekaligus!");
+            return redirect()->back()->with('success', "Sebanyak {$count} logbook peserta magang yang telah disetujui mentor berhasil di-ACC sekaligus!");
         }
 
         return redirect()->back()->with('info', 'Tidak ada logbook menunggu yang telah di-ACC oleh mentor.');

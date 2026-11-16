@@ -55,7 +55,7 @@
                                 </span>
                             </div>
                             <p class="text-xs text-slate-500 mt-1">
-                                NIM: <span class="font-bold text-slate-800">{{ $profile?->nim ?? '-' }}</span> &bull; 
+                                NIM/NIS: <span class="font-bold text-slate-800">{{ $profile?->nim ?? '-' }}</span> &bull; 
                                 <span class="text-blue-700 font-semibold">{{ $profile?->universitas ?? $student?->university ?? '-' }}</span> &bull; 
                                 <span class="text-slate-600">{{ $profile?->jurusan ?? '-' }}</span>
                             </p>
@@ -199,7 +199,7 @@
                                        :class="selectedAspects.includes('identitas') ? 'border-amber-500' : 'border-slate-300'">
                                 <div>
                                     <span class="text-[10px] font-black uppercase tracking-wider text-amber-700 block">Aspek 2</span>
-                                    <h4 class="text-base font-black text-slate-900">Data Mahasiswa & Magang</h4>
+                                    <h4 class="text-base font-black text-slate-900">Data Peserta & Magang</h4>
                                 </div>
                             </label>
                             <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold"
@@ -212,11 +212,11 @@
                         {{-- Ringkasan Biodata & Periode Magang --}}
                         <div class="p-3.5 bg-white/90 rounded-2xl border border-slate-200/80 space-y-2 text-xs">
                             <div class="flex justify-between items-center py-1 border-b border-slate-100">
-                                <span class="text-slate-500">Nama Mahasiswa:</span>
+                                <span class="text-slate-500">Nama Peserta Magang:</span>
                                 <span class="font-bold text-slate-900 text-right">{{ $student?->name }}</span>
                             </div>
                             <div class="flex justify-between items-center py-1 border-b border-slate-100">
-                                <span class="text-slate-500">Nomor Induk Mahasiswa:</span>
+                                <span class="text-slate-500">NIM / NIS:</span>
                                 <span class="font-mono font-bold text-slate-800">{{ $profile?->nim ?? '-' }}</span>
                             </div>
                             <div class="flex justify-between items-center py-1 border-b border-slate-100">
@@ -241,7 +241,7 @@
                                 Catatan Khusus Aspek Identitas:
                             </label>
                             <textarea name="aspect_notes[identitas]" rows="2" 
-                                      placeholder="Contoh: Ejaan nama mahasiswa mohon disesuaikan dengan KTP atau format penulisan NIM..."
+                                      placeholder="Contoh: Ejaan nama peserta magang mohon disesuaikan dengan KTP atau format penulisan NIM/NIS..."
                                       class="w-full text-xs p-3 rounded-xl border border-amber-300 focus:border-amber-600 focus:ring-0 bg-white shadow-2xs">{{ old('aspect_notes.identitas') }}</textarea>
                         </div>
                     </div>
@@ -359,7 +359,7 @@
                     <div>
                         <span class="text-xs font-bold text-slate-600 block mb-2">Rekomendasi Template Catatan Cepat:</span>
                         <div class="flex flex-wrap gap-2">
-                            <button type="button" @click="appendNote('Mohon sesuaikan ejaan nama lengkap mahasiswa dengan KTP resmi.')"
+                            <button type="button" @click="appendNote('Mohon sesuaikan ejaan nama lengkap peserta magang dengan KTP resmi.')"
                                     class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
                                 + Ejaan nama sesuai KTP
                             </button>
@@ -375,9 +375,9 @@
                                     class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
                                 + Pengesahan naskah laporan
                             </button>
-                            <button type="button" @click="appendNote('Format penulisan NIM dan Program Studi perlu disesuaikan.')"
+                            <button type="button" @click="appendNote('Format penulisan NIM/NIS dan Program Studi perlu disesuaikan.')"
                                     class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
-                                + Format NIM dan Prodi
+                                + Format NIM/NIS dan Prodi
                             </button>
                         </div>
                     </div>

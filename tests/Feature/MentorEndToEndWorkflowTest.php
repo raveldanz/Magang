@@ -189,7 +189,7 @@ class MentorEndToEndWorkflowTest extends TestCase
             'status' => 'per_day',
             'revise_ids' => [$wednesday->id],
             'feedback' => 'Uraikan judul buku yang dikatalogkan.',
-        ])->assertRedirect()->assertSessionHas('success', 'Tersimpan: 2 hari disetujui dan 1 hari dikembalikan ke mahasiswa untuk diperbaiki.');
+        ])->assertRedirect()->assertSessionHas('success', 'Tersimpan: 2 hari disetujui dan 1 hari dikembalikan ke peserta magang untuk diperbaiki.');
 
         $this->assertSame('approved', $monday->fresh()->status);
         $this->assertNull($monday->fresh()->feedback, 'Catatan revisi tidak boleh menempel di hari yang disetujui.');
@@ -239,7 +239,7 @@ class MentorEndToEndWorkflowTest extends TestCase
 
         // Halaman detail tidak menampilkan tombol pemeriksaan selama mahasiswa memperbaiki
         $this->actingAs($this->mentor)->get(route('mentor.students.show', $this->placement->id))
-            ->assertSeeText('Laporan sedang diperbaiki mahasiswa.')
+            ->assertSeeText('Laporan sedang diperbaiki peserta magang.')
             ->assertSeeText('Lengkapi daftar pustaka.');
 
         // Mahasiswa unggah ulang, mentor setujui tanpa catatan → catatan revisi lama dihapus

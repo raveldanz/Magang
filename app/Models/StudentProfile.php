@@ -46,6 +46,28 @@ class StudentProfile extends Model
         return $this->belongsTo(University::class);
     }
 
+    /** Peserta dari sekolah (SMK/SMA/MA), bukan perguruan tinggi. */
+    public function isSchoolStudent(): bool
+    {
+        return ($this->attributes['education_level'] ?? null) === University::TYPE_SCHOOL;
+    }
+
+    /** "NIS" untuk siswa, "NIM" untuk mahasiswa. */
+    public function identityNumberLabel(): string
+    {
+        return $this->isSchoolStudent() ? 'NIS' : 'NIM';
+    }
+
+    /** "Kelas 11" untuk siswa, "Semester 5" untuk mahasiswa, null bila kosong. */
+    public function periodLabel(): ?string
+    {
+        if (empty($this->semester)) {
+            return null;
+        }
+
+        return ($this->isSchoolStudent() ? 'Kelas ' : 'Semester ').$this->semester;
+    }
+
     // Accessor & Mutator Helper untuk fleksibilitas nama atribut
     public function getFacultyAttribute($value)
     {

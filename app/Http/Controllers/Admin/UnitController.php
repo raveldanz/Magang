@@ -291,7 +291,7 @@ class UnitController extends Controller
             'return_to' => 'nullable|string',
         ], [
             'head_user_id.exists' => 'Kepala Unit harus akun mentor resmi dari instansi yang sama.',
-            'quota.min' => "Kuota tidak boleh kurang dari jumlah mahasiswa yang sedang menempati divisi ini ({$occupied} orang).",
+            'quota.min' => "Kuota tidak boleh kurang dari jumlah peserta magang yang sedang menempati divisi ini ({$occupied} orang).",
         ]);
 
         if ($this->unitNameTaken((string) $request->name, $unit->agency_profile_id, $unit->id)) {
@@ -359,7 +359,7 @@ class UnitController extends Controller
 
         $action = $request->input('action');
         $occupied = $unit->occupied_count;
-        $belowOccupied = "Kuota tidak boleh kurang dari jumlah mahasiswa yang sedang menempati divisi ini ({$occupied} orang).";
+        $belowOccupied = "Kuota tidak boleh kurang dari jumlah peserta magang yang sedang menempati divisi ini ({$occupied} orang).";
 
         if ($action === 'decrement' && $unit->quota - 1 < $occupied) {
             if ($request->wantsJson() || $request->ajax()) {

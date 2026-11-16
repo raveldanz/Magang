@@ -346,7 +346,7 @@ class AgencyController extends Controller
             })->count();
 
         if ($activeMentorsCount > 0) {
-            return redirect()->back()->with('error', "Gagal menghapus: Terdapat {$activeMentorsCount} mahasiswa aktif yang sedang dibimbing oleh mentor dinas ini.");
+            return redirect()->back()->with('error', "Gagal menghapus: Terdapat {$activeMentorsCount} peserta magang aktif yang sedang dibimbing oleh mentor dinas ini.");
         }
 
         $name = $agency->agency_name;

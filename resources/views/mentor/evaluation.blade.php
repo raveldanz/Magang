@@ -3,7 +3,7 @@
         <div class="flex items-center gap-3">
             <a href="{{ route('mentor.students.show', $placement->id) }}" 
                class="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition shadow-2xs" 
-               title="Kembali ke Detail Mahasiswa">
+               title="Kembali ke Detail Peserta Magang">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             </a>
             <div>
@@ -11,7 +11,7 @@
                     Penilaian Evaluasi Akhir
                 </h2>
                 <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
-                    Mahasiswa: <strong class="text-slate-800">{{ $placement->application?->user?->name ?? '-' }}</strong> (NIM: {{ $placement->application?->user?->studentProfile?->nim ?? '-' }})
+                    Peserta Magang: <strong class="text-slate-800">{{ $placement->application?->user?->name ?? '-' }}</strong> (NIM/NIS: {{ $placement->application?->user?->studentProfile?->nim ?? '-' }})
                 </p>
             </div>
         </div>

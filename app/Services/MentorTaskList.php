@@ -98,7 +98,7 @@ class MentorTaskList
         }
 
         $pendingLogbook ??= $this->pendingLogbookStats(collect([$placement->id]))->get($placement->id);
-        $studentName = $application->user?->name ?? 'Mahasiswa';
+        $studentName = $application->user?->name ?? 'Peserta Magang';
         $today = now()->startOfDay();
         $endDate = $application->end_date ? Carbon::parse($application->end_date)->startOfDay() : null;
         $tasks = [];
@@ -155,7 +155,7 @@ class MentorTaskList
                 $description = match (true) {
                     $overdue => 'Masa magang sudah berakhir '.$endDate->translatedFormat('d F Y').'. Nilai Anda ditunggu agar sertifikat dapat diproses.',
                     $endDate !== null => 'Masa magang berakhir '.$endDate->translatedFormat('d F Y').'. Isi nilai sebelum tanggal tersebut.',
-                    default => 'Laporan akhir sudah disetujui. Silakan isi nilai akhir mahasiswa.',
+                    default => 'Laporan akhir sudah disetujui. Silakan isi nilai akhir peserta magang.',
                 };
 
                 $tasks[] = $this->task(
@@ -184,7 +184,7 @@ class MentorTaskList
                 studentName: $studentName,
                 title: "Ingatkan {$studentName} mengunggah laporan akhir",
                 description: 'Masa magang berakhir '.$endDate->translatedFormat('d F Y').', tetapi naskah laporan akhir belum diunggah. Kirim pesan pengingat lewat Chat.',
-                buttonLabel: 'Buka Halaman Mahasiswa',
+                buttonLabel: 'Buka Halaman Peserta Magang',
                 url: route('mentor.students.show', $placement->id).'#bagian-laporan',
                 urgent: false,
                 badge: null,
@@ -217,13 +217,13 @@ class MentorTaskList
         if ($pending > 0) {
             $logbookStep = ['state' => 'todo', 'text' => "{$pending} hari kegiatan menunggu pemeriksaan Anda."];
         } elseif ($waitingStudent > 0) {
-            $logbookStep = ['state' => 'waiting', 'text' => "{$waitingStudent} hari sedang diperbaiki mahasiswa. Tidak ada yang perlu Anda periksa saat ini."];
+            $logbookStep = ['state' => 'waiting', 'text' => "{$waitingStudent} hari sedang diperbaiki peserta magang. Tidak ada yang perlu Anda periksa saat ini."];
         } elseif ($approved > 0) {
             $logbookStep = ['state' => 'done', 'text' => "Semua logbook sudah Anda periksa ({$approved} hari disetujui)."];
         } else {
             $logbookStep = ['state' => 'waiting', 'text' => $status === ApplicationStatus::ACTIVE->value
-                ? 'Mahasiswa belum mengisi logbook.'
-                : 'Logbook mulai diisi mahasiswa saat masa magang berjalan.'];
+                ? 'Peserta Magang belum mengisi logbook.'
+                : 'Logbook mulai diisi peserta magang saat masa magang berjalan.'];
         }
 
         // 2. Laporan akhir
@@ -231,9 +231,9 @@ class MentorTaskList
             'pending' => $isAssigned
                 ? ['state' => 'todo', 'text' => 'Naskah laporan menunggu persetujuan Anda.']
                 : ['state' => 'waiting', 'text' => 'Naskah laporan menunggu persetujuan mentor yang ditugaskan.'],
-            'revision', 'rejected' => ['state' => 'waiting', 'text' => 'Mahasiswa sedang memperbaiki laporan sesuai catatan.'],
+            'revision', 'rejected' => ['state' => 'waiting', 'text' => 'Peserta Magang sedang memperbaiki laporan sesuai catatan.'],
             'approved' => ['state' => 'done', 'text' => 'Laporan akhir sudah disetujui.'],
-            default => ['state' => 'waiting', 'text' => 'Mahasiswa belum mengunggah naskah laporan akhir.'],
+            default => ['state' => 'waiting', 'text' => 'Peserta Magang belum mengunggah naskah laporan akhir.'],
         };
 
         // 3. Nilai akhir
@@ -250,7 +250,7 @@ class MentorTaskList
             $endDate = $application?->end_date ? Carbon::parse($application->end_date) : null;
             $evalStep = ['state' => 'todo', 'text' => $endDate
                 ? 'Isi nilai akhir paling lambat '.$endDate->translatedFormat('d F Y').'.'
-                : 'Isi nilai akhir mahasiswa.'];
+                : 'Isi nilai akhir peserta magang.'];
         } else {
             // Formulir sudah terbuka, tetapi belum jatuh tempo: sama dengan Daftar Tugas di dasbor.
             $endDate = Carbon::parse($application->end_date)->startOfDay();

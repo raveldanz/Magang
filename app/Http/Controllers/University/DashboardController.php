@@ -216,7 +216,7 @@ class DashboardController extends Controller
         $request->validate([
             'academic_advisor_id' => 'required|exists:users,id',
         ], [
-            'academic_advisor_id.required' => 'Silakan pilih Dosen Pembimbing Lapangan.',
+            'academic_advisor_id.required' => 'Silakan pilih Pembimbing.',
         ]);
 
         $application = Application::with('user.studentProfile')->findOrFail($applicationId);
@@ -226,7 +226,7 @@ class DashboardController extends Controller
         $isSameUniv = app(UniversityResolver::class)->belongsTo($student, $university);
 
         if (! $isSameUniv) {
-            abort(403, 'Anda tidak memiliki hak akses untuk memplot dosen mahasiswa kampus lain.');
+            abort(403, 'Anda tidak memiliki hak akses untuk memplot pembimbing peserta magang kampus lain.');
         }
 
         // Pastikan dosen yang dipilih berasal dari universitas yang sama
@@ -234,7 +234,7 @@ class DashboardController extends Controller
         $isAdvisorSameUniv = app(UniversityResolver::class)->belongsTo($advisor, $university);
 
         if (! $isAdvisorSameUniv) {
-            return redirect()->back()->with('error', 'Dosen yang dipilih harus terdaftar di perguruan tinggi Anda.');
+            return redirect()->back()->with('error', 'Pembimbing yang dipilih harus terdaftar di perguruan tinggi Anda.');
         }
 
         if ($advisor->isPendingApproval()) {
@@ -251,7 +251,7 @@ class DashboardController extends Controller
             ->where('id', '!=', $placement->id)
             ->delete();
 
-        return redirect()->back()->with('success', "Dosen Pembimbing Lapangan ({$advisor->name}) berhasil ditugaskan untuk mahasiswa {$student->name}!");
+        return redirect()->back()->with('success', "Pembimbing ({$advisor->name}) berhasil ditugaskan untuk peserta magang {$student->name}!");
     }
 
     /**
@@ -304,18 +304,18 @@ class DashboardController extends Controller
             fputcsv($handle, [
                 'No',
                 'NIM',
-                'Nama Mahasiswa',
+                'Nama Peserta Magang',
                 'Tipe Pendaftaran',
                 'Kelompok Magang',
                 'Program Studi',
                 'Instansi Magang',
                 'Unit / Bidang Kerja',
-                'Dosen Pembimbing',
+                'Pembimbing',
                 'Mentor Dinas',
                 'Periode Magang',
                 'Status Magang',
                 'Nilai Mentor',
-                'Nilai Dosen',
+                'Nilai Pembimbing',
                 'Nilai Akhir',
             ]);
 
@@ -425,12 +425,12 @@ class DashboardController extends Controller
                 $placement = $application->placement;
             } elseif ($placement) {
                 // Ada placement tapi tidak sesuai kampus yang login
-                abort(403, 'Anda tidak memiliki hak akses untuk melihat data mahasiswa kampus lain.');
+                abort(403, 'Anda tidak memiliki hak akses untuk melihat data peserta magang kampus lain.');
             } elseif ($appCandidate) {
                 // Ada application tapi tidak sesuai kampus yang login
-                abort(403, 'Anda tidak memiliki hak akses untuk melihat data mahasiswa kampus lain.');
+                abort(403, 'Anda tidak memiliki hak akses untuk melihat data peserta magang kampus lain.');
             } else {
-                abort(404, 'Data mahasiswa magang tidak ditemukan.');
+                abort(404, 'Data peserta magang tidak ditemukan.');
             }
         }
 

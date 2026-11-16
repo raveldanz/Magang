@@ -2,7 +2,7 @@
     <x-slot name="header">
         <x-page-header 
             title="Detail Berkas & Usulan Penempatan Magang" 
-            description="Tinjau kesesuaian berkas mahasiswa, kuota bidang, dan mentor pembimbing untuk pengajuan #{{ $application->id }}.">
+            description="Tinjau kesesuaian berkas peserta magang, kuota bidang, dan mentor pembimbing untuk pengajuan #{{ $application->id }}.">
             <x-slot name="actions">
                 <a href="{{ route('supervisor.applications.index') }}" 
                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200 transition">
@@ -41,7 +41,7 @@
                                 </div>
                                 <div class="min-w-0">
                                     <h2 class="text-lg sm:text-xl font-black text-slate-900 truncate">{{ $application->user?->name }}</h2>
-                                    <p class="text-xs text-slate-500">NIM: <strong class="text-slate-800">{{ $application->user?->studentProfile?->nim ?? '-' }}</strong></p>
+                                    <p class="text-xs text-slate-500">NIM/NIS: <strong class="text-slate-800">{{ $application->user?->studentProfile?->nim ?? '-' }}</strong></p>
                                 </div>
                             </div>
                             <div class="self-start sm:self-auto shrink-0">
@@ -112,7 +112,7 @@
                             </div>
 
                             <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-                                <span class="text-xs text-slate-500 font-bold uppercase block">Alamat Email Mahasiswa</span>
+                                <span class="text-xs text-slate-500 font-bold uppercase block">Alamat Email Peserta Magang</span>
                                 <span class="font-bold text-slate-800 text-sm mt-0.5 block truncate">
                                     {{ $application->user?->email }}
                                 </span>
@@ -267,7 +267,7 @@
                                                        class="w-4 h-4 mt-0.5 rounded border-rose-300 text-rose-600 focus:ring-rose-500 cursor-pointer">
                                                 <label for="sup_sync_group" class="text-xs text-slate-700 leading-snug cursor-pointer select-none">
                                                     <span class="font-bold text-slate-900 block">Terapkan ke seluruh anggota kelompok</span>
-                                                    Lepas centang jika hanya untuk mahasiswa ini saja.
+                                                    Lepas centang jika hanya untuk peserta magang ini saja.
                                                 </label>
                                             </div>
                                         @endif

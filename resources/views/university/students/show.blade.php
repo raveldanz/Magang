@@ -4,7 +4,7 @@
             <!-- Baris 1: Judul Halaman -->
             <div>
                 <h2 class="font-bold text-lg sm:text-2xl text-slate-800 leading-tight">
-                    {{ __('Detail Monitoring Mahasiswa') }}
+                    {{ __('Detail Monitoring Peserta Magang') }}
                 </h2>
                 <p class="text-xs text-slate-500 mt-0.5 truncate">
                     {{ $student->name }} &bull; <span class="font-mono">{{ $profile?->nim ?? '-' }}</span>
@@ -27,7 +27,7 @@
                     </a>
                 @endif
 
-                <x-chat-button :user="$student" label="Chat Mahasiswa" />
+                <x-chat-button :user="$student" label="Chat Peserta Magang" />
 
                 <a href="{{ route('university.dashboard') }}"
                    class="inline-flex items-center justify-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition text-center">
@@ -63,7 +63,7 @@
                         </div>
                         <div class="min-w-0">
                             <h3 class="font-bold text-sm text-slate-900 truncate leading-tight">{{ $student->name }}</h3>
-                            <p class="text-[11px] font-mono text-slate-400 mt-0.5">NIM: {{ $profile?->nim ?? '-' }}</p>
+                            <p class="text-[11px] font-mono text-slate-400 mt-0.5">NIM/NIS: {{ $profile?->nim ?? '-' }}</p>
                         </div>
                     </div>
 
@@ -119,18 +119,18 @@
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <div>
                             <h3 class="font-bold text-sm text-slate-900 leading-tight">Pembimbing</h3>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Dosen Pembimbing & Mentor Dinas</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Pembimbing & Mentor Dinas</p>
                         </div>
                         <button type="button" 
                                 @click="showAssignModal = true" 
                                 class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-lg transition shrink-0">
-                            {{ $dosen ? 'Ganti' : '+ Dosen' }}
+                            {{ $dosen ? 'Ganti' : '+ Pembimbing' }}
                         </button>
                     </div>
 
                     <div class="space-y-2 text-xs">
                         <div>
-                            <span class="text-slate-400 block text-[10px]">Dosen Pembimbing:</span>
+                            <span class="text-slate-400 block text-[10px]">Pembimbing:</span>
                             @if ($dosen)
                                 <div class="font-bold text-slate-800 truncate mt-0.5">{{ $dosen->name }}</div>
                             @else
@@ -151,7 +151,7 @@
             <div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-slate-100 shadow-xs space-y-4">
                 <div class="border-b border-slate-100 pb-3">
                     <h4 class="font-bold text-slate-900 text-sm sm:text-base">Rekapitulasi Nilai Magang</h4>
-                    <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Evaluasi dari mentor dinas dan dosen pembimbing lapangan</p>
+                    <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Evaluasi dari mentor dinas dan pembimbing</p>
                 </div>
 
                 @php
@@ -169,7 +169,7 @@
                     </div>
 
                     <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Nilai Dosen</p>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Nilai Pembimbing</p>
                         <p class="text-xl sm:text-2xl font-black text-blue-600 mt-1">{{ $dosenVal ? number_format($dosenVal, 2) : '-' }}</p>
                     </div>
 
@@ -191,7 +191,7 @@
                     <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                         <div>
                             <h4 class="font-bold text-slate-900 text-sm sm:text-base">Proyek Inovasi Magang</h4>
-                            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Karya inovasi dan manfaat bagi masyarakat yang dihasilkan mahasiswa</p>
+                            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Karya inovasi dan manfaat bagi masyarakat yang dihasilkan peserta magang</p>
                         </div>
                         <span class="px-2.5 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">
                             {{ $placement->internshipProjects->count() }} Proyek
@@ -228,7 +228,7 @@
             <div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-slate-100 shadow-xs space-y-3">
                 <div class="border-b border-slate-100 pb-3">
                     <h4 class="font-bold text-slate-900 text-sm sm:text-base">Laporan Akhir Magang</h4>
-                    <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Dokumen laporan tugas magang mahasiswa</p>
+                    <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Dokumen laporan tugas magang peserta</p>
                 </div>
 
                 @if ($finalReport && $finalReport->file_path)
@@ -243,7 +243,7 @@
                     </div>
                 @else
                     <div class="p-4 text-center text-slate-400 bg-slate-50 rounded-xl text-xs">
-                        Mahasiswa belum mengunggah laporan akhir magang.
+                        Peserta Magang belum mengunggah laporan akhir magang.
                     </div>
                 @endif
             </div>
@@ -255,7 +255,7 @@
                         Riwayat Logbook Aktivitas Harian ({{ $logbooks->count() }})
                     </h4>
                     <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">
-                        Catatan kegiatan harian beserta review mentor dan dosen
+                        Catatan kegiatan harian beserta review mentor dan pembimbing
                     </p>
                 </div>
 
@@ -293,7 +293,7 @@
 
                             @if ($log->lecturer_feedback)
                                 <div class="text-[11px] bg-blue-50/80 border border-blue-200/70 p-2.5 rounded-xl text-blue-900 space-y-0.5">
-                                    <strong class="block text-[10px] uppercase tracking-wider text-blue-700">Catatan Dosen:</strong>
+                                    <strong class="block text-[10px] uppercase tracking-wider text-blue-700">Catatan Pembimbing:</strong>
                                     <p class="italic">"{{ $log->lecturer_feedback }}"</p>
                                 </div>
                             @endif
@@ -306,14 +306,14 @@
                                 </div>
 
                                 <div class="p-2 rounded-lg bg-slate-50 border border-slate-100 text-center">
-                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Dosen Pembimbing</span>
+                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Pembimbing</span>
                                     <x-status-badge type="review" :status="$log->lecturer_status ?? 'pending'" class="mt-1" />
                                 </div>
                             </div>
                         </div>
                     @empty
                         <div class="p-8 text-center text-slate-400 text-xs">
-                            Belum ada catatan logbook yang diisi oleh mahasiswa ini.
+                            Belum ada catatan logbook yang diisi oleh peserta magang ini.
                         </div>
                     @endforelse
                 </div>
@@ -327,7 +327,7 @@
                                 <th class="px-6 py-3.5 w-32">Tanggal</th>
                                 <th class="px-6 py-3.5">Deskripsi Aktivitas</th>
                                 <th class="px-6 py-3.5 text-center w-36">Status Mentor</th>
-                                <th class="px-6 py-3.5 text-center w-36">Status Dosen</th>
+                                <th class="px-6 py-3.5 text-center w-36">Status Pembimbing</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -349,7 +349,7 @@
                                         @endif
                                         @if ($log->lecturer_feedback)
                                             <div class="mt-1 text-xs bg-blue-50 border border-blue-200 rounded-lg p-2 text-blue-900">
-                                                <span class="font-bold">Feedback Dosen:</span> {{ $log->lecturer_feedback }}
+                                                <span class="font-bold">Feedback Pembimbing:</span> {{ $log->lecturer_feedback }}
                                             </div>
                                         @endif
                                     </td>
@@ -363,7 +363,7 @@
                             @empty
                                 <tr>
                                     <td colspan="5" class="px-6 py-8 text-center text-slate-400 text-xs">
-                                        Belum ada catatan logbook yang diisi oleh mahasiswa ini.
+                                        Belum ada catatan logbook yang diisi oleh peserta magang ini.
                                     </td>
                                 </tr>
                             @endforelse
@@ -391,8 +391,8 @@
                 
                 <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
                     <div>
-                        <h3 class="font-bold text-base text-slate-900">Penugasan Dosen Pembimbing</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Untuk Mahasiswa: <strong class="text-slate-700">{{ $student->name }}</strong></p>
+                        <h3 class="font-bold text-base text-slate-900">Penugasan Pembimbing</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Untuk Peserta Magang: <strong class="text-slate-700">{{ $student->name }}</strong></p>
                     </div>
                     <button type="button" @click="showAssignModal = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
                 </div>
@@ -401,17 +401,17 @@
                     @csrf
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                            Pilih Dosen Pembimbing <span class="text-rose-500">*</span>
+                            Pilih Pembimbing <span class="text-rose-500">*</span>
                         </label>
                         <select name="academic_advisor_id" required class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                            <option value="">-- Pilih Dosen Pembimbing Kampus --</option>
+                            <option value="">-- Pilih Pembimbing Kampus --</option>
                             @foreach ($availableDosens as $d)
                                 <option value="{{ $d->id }}" {{ $dosen?->id == $d->id ? 'selected' : '' }}>
                                     {{ $d->name }} ({{ $d->email }})
                                 </option>
                             @endforeach
                         </select>
-                        <p class="text-[11px] text-slate-400 mt-1">Daftar memuat seluruh dosen yang terdaftar di kampus Anda.</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Daftar memuat seluruh pembimbing yang terdaftar di kampus Anda.</p>
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
@@ -419,7 +419,7 @@
                             Batal
                         </button>
                         <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
-                            Simpan Penugasan Dosen
+                            Simpan Penugasan Pembimbing
                         </button>
                     </div>
                 </form>

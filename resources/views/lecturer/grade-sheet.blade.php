@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Berita Acara Penilaian Dosen Pembimbing - {{ $student->name }} ({{ $profile->nim ?? 'NIM' }})</title>
+    <title>Berita Acara Penilaian Pembimbing - {{ $student->name }} ({{ $profile->nim ?? 'NIM' }})</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -86,7 +86,7 @@
             </a>
             <div class="hidden sm:block border-l border-slate-700 pl-3">
                 <span class="text-xs text-slate-400 block">Dokumen Resmi Akademik</span>
-                <span class="text-xs font-bold text-white">Berita Acara &amp; Lembar Penilaian Dosen Pembimbing</span>
+                <span class="text-xs font-bold text-white">Berita Acara &amp; Lembar Penilaian Pembimbing</span>
             </div>
         </div>
 
@@ -134,7 +134,7 @@
         <!-- JUDUL DAN NOMOR BERITA ACARA -->
         <div class="text-center my-3">
             <h2 class="text-base font-bold uppercase tracking-wider underline text-slate-950">
-                BERITA ACARA &amp; LEMBAR PENILAIAN DOSEN PEMBIMBING
+                BERITA ACARA &amp; LEMBAR PENILAIAN PEMBIMBING
             </h2>
             <p class="text-xs text-slate-600 font-sans mt-1">
                 Nomor Dokumen: <span class="font-mono font-semibold">BAP-DP/{{ date('Y') }}/{{ str_pad($placement->id, 4, '0', STR_PAD_LEFT) }}/{{ $profile->nim ?? 'MHS' }}</span>
@@ -143,7 +143,7 @@
 
         <!-- KATA PENGANTAR RESMI -->
         <p class="text-xs text-justify mt-3 leading-relaxed">
-            Pada hari ini telah dilakukan rekapitulasi, telaah karya naskah laporan, dan evaluasi hasil kegiatan program Praktik Kerja Lapangan / Magang Mandiri Berdampak bagi mahasiswa berikut:
+            Pada hari ini telah dilakukan rekapitulasi, telaah karya naskah laporan, dan evaluasi hasil kegiatan program Praktik Kerja Lapangan / Magang Mandiri Berdampak bagi peserta magang berikut:
         </p>
 
         <!-- 1. IDENTITAS MAHASISWA & PENEMPATAN -->
@@ -151,12 +151,12 @@
             <table class="w-full text-left border-collapse">
                 <tbody>
                     <tr>
-                        <td class="w-40 py-1 font-semibold text-slate-700">Nama Lengkap Mahasiswa</td>
+                        <td class="w-40 py-1 font-semibold text-slate-700">Nama Lengkap Peserta Magang</td>
                         <td class="w-3 py-1">:</td>
                         <td class="py-1 font-bold text-slate-900 uppercase">{{ $student->name }}</td>
                     </tr>
                     <tr>
-                        <td class="py-1 font-semibold text-slate-700">Nomor Induk Mahasiswa (NIM)</td>
+                        <td class="py-1 font-semibold text-slate-700">NIM / NIS</td>
                         <td class="py-1">:</td>
                         <td class="py-1 font-mono font-semibold text-slate-900">{{ $profile->nim ?? '-' }}</td>
                     </tr>
@@ -190,7 +190,7 @@
                         <td class="py-1 text-slate-900">{{ $mentor->name ?? '-' }} (Instansi Kedinasan)</td>
                     </tr>
                     <tr>
-                        <td class="py-1 font-semibold text-slate-700">Dosen Pembimbing</td>
+                        <td class="py-1 font-semibold text-slate-700">Pembimbing</td>
                         <td class="py-1">:</td>
                         <td class="py-1 font-semibold text-slate-900">{{ $dosen->name ?? '-' }} (Perguruan Tinggi)</td>
                     </tr>
@@ -267,7 +267,7 @@
                             <span class="font-semibold text-slate-800">{{ $letterIndex }}. {{ $aspect['name'] }}</span>
                         </td>
                         @if ($idx === 0)
-                            <td class="border border-slate-300 py-1.5 text-center text-slate-700" rowspan="{{ $totalDosenAspects }}">Dosen Pembimbing</td>
+                            <td class="border border-slate-300 py-1.5 text-center text-slate-700" rowspan="{{ $totalDosenAspects }}">Pembimbing</td>
                             <td class="border border-slate-300 py-1.5 text-center font-semibold" rowspan="{{ $totalDosenAspects }}">{{ $weightLecturer }}%</td>
                         @endif
                         <td class="border border-slate-300 py-1.5 text-center text-slate-800">{{ number_format((float)($aspect['score'] ?? 0), 1) }}</td>
@@ -281,14 +281,14 @@
 
                 <!-- Rata-rata Dosen Pembimbing -->
                 <tr class="bg-slate-50/75 font-semibold text-slate-800">
-                    <td colspan="4" class="border border-slate-300 py-1.5 px-3 text-right">Rata-Rata Penilaian Akademik Dosen Pembimbing:</td>
+                    <td colspan="4" class="border border-slate-300 py-1.5 px-3 text-right">Rata-Rata Penilaian Akademik Pembimbing:</td>
                     <td class="border border-slate-300 py-1.5 text-center font-bold text-blue-900">{{ number_format($nilaiDosen, 2) }}</td>
                     <td class="border border-slate-300 py-1.5 text-center">-</td>
                 </tr>
 
                 <!-- NILAI TOTAL AKHIR -->
                 <tr class="bg-slate-200/80 font-bold text-slate-950 text-sm">
-                    <td colspan="4" class="border border-slate-400 py-2 px-3 text-right uppercase">Nilai Akhir Kumulatif Mahasiswa:</td>
+                    <td colspan="4" class="border border-slate-400 py-2 px-3 text-right uppercase">Nilai Akhir Kumulatif Peserta Magang:</td>
                     <td colspan="2" class="border border-slate-400 py-2 text-center text-base font-black text-blue-900">
                         {{ number_format($finalScore, 2) }} &nbsp;
                         <span class="text-sm font-extrabold text-slate-800">({{ $grade }})</span>
@@ -305,7 +305,7 @@
                     &bull; Status Naskah Laporan: <strong class="{{ optional($finalReport)->status === 'approved' ? 'text-emerald-700' : 'text-amber-700' }} uppercase">{{ \App\Enums\ReviewStatus::resolve(optional($finalReport)->status)?->localizedLabel() ?? 'Belum Lengkap' }}</strong>
                 </p>
                 <p class="text-slate-700">
-                    &bull; Riwayat Sesi Konsultasi Dosen Pembimbing: <strong>{{ $consultations->count() }} Sesi Bimbingan Tercatat</strong>
+                    &bull; Riwayat Sesi Konsultasi Pembimbing: <strong>{{ $consultations->count() }} Sesi Bimbingan Tercatat</strong>
                 </p>
                 <p class="text-slate-700">
                     &bull; Predikat Kelulusan: <strong class="text-blue-800">{{ $predikat }}</strong>
@@ -313,9 +313,9 @@
             </div>
 
             <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-                <span class="font-bold text-slate-800 block uppercase tracking-wider text-[11px]">Catatan / Rekomendasi Dosen Pembimbing:</span>
+                <span class="font-bold text-slate-800 block uppercase tracking-wider text-[11px]">Catatan / Rekomendasi Pembimbing:</span>
                 <p class="text-slate-700 italic mt-0.5 leading-relaxed">
-                    "{{ $evaluation?->catatan_dosen ?? ($evaluation?->catatan ?? 'Mahasiswa telah menyelesaikan program magang mandiri dengan dedikasi dan kinerja akademik yang sangat baik.') }}"
+                    "{{ $evaluation?->catatan_dosen ?? ($evaluation?->catatan ?? 'Peserta Magang telah menyelesaikan program magang mandiri dengan dedikasi dan kinerja akademik yang sangat baik.') }}"
                 </p>
             </div>
         </div>
@@ -381,7 +381,7 @@
                 {{-- Kolom 3 (kanan): Dosen Pembimbing --}}
                 <div>
                     <p class="text-slate-500 font-medium text-[10.5px]">Surabaya, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
-                    <p class="font-bold text-slate-800 text-xs mt-0.5">Dosen Pembimbing</p>
+                    <p class="font-bold text-slate-800 text-xs mt-0.5">Pembimbing</p>
                     <p class="text-[10px] text-slate-500 truncate">{{ $univ->name ?? ($profile->universitas ?? 'Perguruan Tinggi') }}</p>
 
                     <div class="h-12 flex items-center justify-center my-0.5">

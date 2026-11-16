@@ -160,7 +160,7 @@ class SupervisorCertificateRevisionFlowTest extends TestCase
 
         // Verifikasi pilihan aspek-aspek revisi
         $response->assertSee('Koreksi Nilai Evaluasi');
-        $response->assertSee('Data Mahasiswa');
+        $response->assertSee('Data Peserta');
         $response->assertSee('Validasi Logbook');
         $response->assertSee('Aspek Lainnya');
 
@@ -212,7 +212,7 @@ class SupervisorCertificateRevisionFlowTest extends TestCase
         $this->assertNull($this->certificate->approved_at);
 
         // Verifikasi catatan memuat aspek yang dipilih
-        $this->assertStringContainsString('Aspek Revisi: Data Mahasiswa & Magang, Nilai Evaluasi & Transkrip', $this->certificate->notes);
+        $this->assertStringContainsString('Aspek Revisi: Data Peserta & Magang, Nilai Evaluasi & Transkrip', $this->certificate->notes);
         $this->assertStringContainsString('Terdapat koreksi pada ejaan nama mahasiswa', $this->certificate->notes);
         $this->assertStringContainsString('Ejaan nama mohon dicek kembali', $this->certificate->notes);
 
@@ -220,7 +220,7 @@ class SupervisorCertificateRevisionFlowTest extends TestCase
         $adminResp = $this->actingAs($this->adminDinas)->get(route('admin.certificates.revision', $this->placement->id));
         $adminResp->assertOk();
         $adminResp->assertSee('Catatan Revisi dari Atasan Kepegawaian');
-        $adminResp->assertSee('Data Mahasiswa');
+        $adminResp->assertSee('Data Peserta');
         $adminResp->assertSee('Nilai Evaluasi');
     }
 

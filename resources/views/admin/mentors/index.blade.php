@@ -6,7 +6,7 @@
                     <span>Kelola Mentor {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? '• ' . (auth()->user()->unit->name ?? 'Bidang') : ($currentAgency->agency_name ?? 'Dinas') }}</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Kelola akun mentor {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? (auth()->user()->unit->name ?? 'bidang') : 'dinas' }} yang bertugas membimbing dan mengevaluasi mahasiswa magang
+                    Kelola akun mentor {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? (auth()->user()->unit->name ?? 'bidang') : 'dinas' }} yang bertugas membimbing dan mengevaluasi peserta magang
                 </p>
             </div>
 

@@ -204,7 +204,7 @@ class LecturerFeaturesUpdateTest extends TestCase
             ->assertDontSeeText('Cetak Lembar Nilai / Berita Acara')
             ->assertDontSee('<iframe', false)
             ->assertSeeText('Melakukan testing REST API layanan e-Gov')
-            ->assertSeeText('Verifikasi Dosen Pembimbing');
+            ->assertSeeText('Verifikasi Pembimbing');
     }
 
     public function test_lecturer_can_verify_logbook_inline_with_feedback()

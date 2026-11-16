@@ -728,7 +728,7 @@ class InternshipGroupWorkflowTest extends TestCase
         $response->assertSee('Jalur Kelompok');
         $response->assertSee('Tim Kolaborasi Surabaya');
         $response->assertSee($group->code);
-        $response->assertSee('Daftar Mahasiswa Anggota: Tim Kolaborasi Surabaya');
+        $response->assertSee('Daftar Peserta Magang Anggota: Tim Kolaborasi Surabaya');
         $response->assertSee($this->leader->name);
         $response->assertSee($this->member->name);
 

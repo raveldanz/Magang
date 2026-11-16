@@ -21,7 +21,7 @@
                     Proyek Inovasi Magang
                 </h3>
                 <p class="text-xs text-slate-500 mt-0.5">
-                    Hasil karya inovasi dan dampak nyata bagi masyarakat yang dibuat oleh mahasiswa
+                    Hasil karya inovasi dan dampak nyata bagi masyarakat yang dibuat oleh peserta magang
                 </p>
             </div>
             <div>
@@ -120,7 +120,7 @@
             </div>
         @else
             <div class="p-6 bg-slate-50 rounded-2xl text-center text-slate-500 text-xs">
-                Mahasiswa belum mengunggah dokumentasi proyek inovasi.
+                Peserta Magang belum mengunggah dokumentasi proyek inovasi.
             </div>
         @endif
     </div>
@@ -195,7 +195,7 @@
                 <p class="text-base text-slate-700">Magang sudah dinyatakan selesai, sehingga laporan akhir tidak dapat diubah lagi.</p>
             @elseif (in_array($reportStatusValue, ['revision', 'rejected'], true))
                 <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl text-base text-amber-900">
-                    Laporan sedang diperbaiki mahasiswa. Tombol pemeriksaan akan muncul lagi setelah mahasiswa mengunggah naskah perbaikan.
+                    Laporan sedang diperbaiki peserta magang. Tombol pemeriksaan akan muncul lagi setelah peserta magang mengunggah naskah perbaikan.
                 </div>
             @else
             <form action="{{ $submitRoute }}" method="POST" class="space-y-4 pt-1"
@@ -212,7 +212,7 @@
                               form: button.closest('form'),
                               submitter: button,
                               title: 'Kembalikan Laporan untuk Diperbaiki',
-                              message: 'Naskah laporan akhir akan dikembalikan ke mahasiswa beserta catatan Anda.',
+                              message: 'Naskah laporan akhir akan dikembalikan ke peserta magang beserta catatan Anda.',
                               label: 'Dokumen:',
                               name: @js($finalReport->title ?? 'Laporan Akhir Magang'),
                               confirmText: 'Ya, Kembalikan',
@@ -233,7 +233,7 @@
 
                 <div>
                     <label for="catatan-laporan-{{ $finalReport->id }}" class="block text-base font-bold text-slate-900 mb-1">
-                        Catatan untuk mahasiswa <span class="font-normal text-slate-600">(wajib bila dikembalikan)</span>
+                        Catatan untuk peserta magang <span class="font-normal text-slate-600">(wajib bila dikembalikan)</span>
                     </label>
 
                     <!-- Contoh catatan siap pakai -->
@@ -255,7 +255,7 @@
 
                     <textarea id="catatan-laporan-{{ $finalReport->id }}" name="feedback" x-ref="reportNote" x-model="feedbackText" rows="3"
                               @input="if (feedbackText.trim() !== '') showNoteError = false"
-                              placeholder="Tulis catatan untuk mahasiswa di sini..."
+                              placeholder="Tulis catatan untuk peserta magang di sini..."
                               class="w-full text-base bg-white border focus:ring-2 focus:ring-blue-600 focus:border-blue-600 rounded-xl p-3 shadow-2xs"
                               :class="showNoteError ? 'border-rose-500' : 'border-slate-300'"></textarea>
                     <p x-show="showNoteError" x-cloak class="mt-1 text-base font-semibold text-rose-700" role="alert">
@@ -274,7 +274,7 @@
                                 form: $el.closest('form'),
                                 submitter: $el,
                                 title: 'Setujui Laporan Akhir',
-                                message: 'Naskah laporan akhir dan proyek inovasi mahasiswa akan disetujui sebagai syarat kelulusan magang.',
+                                message: 'Naskah laporan akhir dan proyek inovasi peserta magang akan disetujui sebagai syarat kelulusan magang.',
                                 label: 'Dokumen:',
                                 name: @js($finalReport->title ?? 'Laporan Akhir Magang'),
                                 confirmText: 'Ya, Setujui Laporan',
@@ -288,7 +288,7 @@
             @endif
         @else
             <div class="p-8 bg-slate-50 rounded-2xl text-center text-slate-600 text-sm">
-                Mahasiswa belum mengunggah naskah laporan akhir.
+                Peserta Magang belum mengunggah naskah laporan akhir.
             </div>
         @endif
     </div>

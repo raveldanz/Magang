@@ -9,7 +9,7 @@
                     Pusat Kendali Instansi: {{ $agency->agency_name }}
                 </h2>
                 <p class="text-xs text-slate-500 mt-0.5">
-                    Manajemen terpadu Unit Bidang Magang, Personel Kedinasan, Pengajuan, dan Penempatan Mahasiswa
+                    Manajemen terpadu Unit Bidang Magang, Personel Kedinasan, Pengajuan, dan Penempatan Peserta Magang
                 </p>
             </div>
 
@@ -251,7 +251,7 @@
                     <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</div>
                     <div class="mt-1.5 flex items-baseline gap-1.5">
                         <span class="text-2xl font-bold text-slate-900">{{ $stats['active_students'] }}</span>
-                        <span class="text-sm text-slate-500">mahasiswa</span>
+                        <span class="text-sm text-slate-500">peserta magang</span>
                     </div>
                 </div>
                 <div class="bg-white p-4 sm:p-5 col-span-2 sm:col-span-1">
@@ -299,7 +299,7 @@
                             :class="activeTab === 'students' ? 'cc-active border-blue-600 text-blue-600 font-black' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold'"
                             class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>
-                        <span>Mahasiswa Aktif</span>
+                        <span>Peserta Aktif</span>
                     </button>
 
                     <!-- Tab 5: Kelulusan & Sertifikat -->
@@ -625,7 +625,7 @@
                         <table class="rtable min-w-full divide-y divide-slate-100 text-left text-[13px]">
                             <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-xs whitespace-nowrap">
                                 <tr>
-                                    <th class="py-3 px-4">Mahasiswa</th>
+                                    <th class="py-3 px-4">Peserta Magang</th>
                                     <th class="py-3 px-4">Universitas / Prodi</th>
                                     <th class="py-3 px-4">Bidang Dituju</th>
                                     <th class="py-3 px-4">Tanggal Daftar</th>
@@ -636,7 +636,7 @@
                             <tbody class="divide-y divide-slate-100">
                                 @forelse($applications as $app)
                                     <tr class="hover:bg-slate-50/70 transition" x-show="unitFilter === 'all' || unitFilter === '{{ $app->unit_id }}'">
-                                        <td class="rt-title py-3.5 px-4 font-bold text-slate-900" data-label="Mahasiswa">
+                                        <td class="rt-title py-3.5 px-4 font-bold text-slate-900" data-label="Peserta Magang">
                                             {{ $app->user->name ?? '-' }}
                                             <span class="block text-xs font-mono text-slate-400">{{ $app->user->studentProfile->nim ?? '-' }}</span>
                                         </td>
@@ -736,14 +736,14 @@
             <!-- ============================================================== -->
             <div x-show="activeTab === 'students'" class="cc-card bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden" style="display: none;">
                 <div class="cc-panel-head px-4 sm:px-6 pt-4 sm:pt-5 pb-6 sm:pb-7 border-b border-slate-100">
-                    <h3 class="text-sm font-black text-slate-900">Mahasiswa Aktif Magang & Mentor Pembimbing</h3>
+                    <h3 class="text-sm font-black text-slate-900">Peserta Aktif Magang & Mentor Pembimbing</h3>
                 </div>
 
                     <div class="d-only overflow-x-auto rounded-2xl border border-slate-100">
                         <table class="rtable min-w-full divide-y divide-slate-100 text-left text-[13px]">
                             <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-xs whitespace-nowrap">
                                 <tr>
-                                    <th class="py-3 px-4">Mahasiswa Magang</th>
+                                    <th class="py-3 px-4">Peserta Magang</th>
                                     <th class="py-3 px-4">Bidang Penempatan</th>
                                     <th class="py-3 px-4">Mentor Pembimbing Lapangan</th>
                                     <th class="py-3 px-4 text-center">Aktivitas Logbook</th>
@@ -753,7 +753,7 @@
                             <tbody class="divide-y divide-slate-100">
                                 @forelse($activePlacements as $placement)
                                     <tr class="hover:bg-slate-50/70 transition">
-                                        <td class="rt-title py-3.5 px-4 font-bold text-slate-900" data-label="Mahasiswa Magang">
+                                        <td class="rt-title py-3.5 px-4 font-bold text-slate-900" data-label="Peserta Magang">
                                             {{ $placement->application->user->name ?? '-' }}
                                             <span class="block text-xs font-mono text-slate-400">{{ $placement->application->user->studentProfile->universitas ?? '-' }}</span>
                                         </td>
@@ -782,7 +782,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="5" class="py-8 text-center text-slate-400 font-medium">
-                                            Belum ada mahasiswa yang aktif magang di dinas ini.
+                                            Belum ada peserta magang yang aktif magang di dinas ini.
                                         </td>
                                     </tr>
                                 @endforelse
@@ -825,7 +825,7 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="mempty">Belum ada mahasiswa yang aktif magang di dinas ini.</div>
+                            <div class="mempty">Belum ada peserta magang yang aktif magang di dinas ini.</div>
                         @endforelse
                     </div>
                 </div>
@@ -836,7 +836,7 @@
             <div x-show="activeTab === 'certificates'" class="cc-card bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden" style="display: none;">
                 <div class="cc-panel-head flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 pt-4 sm:pt-5 pb-6 sm:pb-7 border-b border-slate-100">
                     <div>
-                        <h3 class="text-sm font-black text-slate-900">Daftar Mahasiswa Lulus & Status E-Sertifikat</h3>
+                        <h3 class="text-sm font-black text-slate-900">Daftar Peserta Magang Lulus & Status E-Sertifikat</h3>
                         <p class="text-xs text-slate-500 mt-0.5">Alumni yang telah menyelesaikan magang dan status pengesahan sertifikat oleh atasan</p>
                     </div>
                     <div class="cc-head-actions flex items-center gap-2">
@@ -852,8 +852,8 @@
                         <table class="rtable min-w-full divide-y divide-slate-100 text-left text-[13px]">
                             <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-xs whitespace-nowrap">
                                 <tr>
-                                    <th class="py-3 px-4">Nama Mahasiswa</th>
-                                    <th class="py-3 px-4">Universitas / NIM</th>
+                                    <th class="py-3 px-4">Nama Peserta Magang</th>
+                                    <th class="py-3 px-4">Universitas / NIM/NIS</th>
                                     <th class="py-3 px-4">Bidang Penempatan</th>
                                     <th class="py-3 px-4 text-center">Nilai Akhir</th>
                                     <th class="py-3 px-4 text-center">Status ACC Sertifikat</th>
@@ -868,12 +868,12 @@
                                         $cCert = $cp->certificate;
                                     @endphp
                                     <tr class="hover:bg-slate-50/70 transition">
-                                        <td class="rt-title py-3.5 px-4 font-bold text-slate-900" data-label="Nama Mahasiswa">
+                                        <td class="rt-title py-3.5 px-4 font-bold text-slate-900" data-label="Nama Peserta Magang">
                                             {{ $cp->application->user->name ?? '-' }}
                                         </td>
                                         <td class="py-3.5 px-4" data-label="Universitas / NIM">
                                             <span class="block font-semibold text-slate-800">{{ $cp->application->user->studentProfile->universitas ?? '-' }}</span>
-                                            <span class="block text-xs font-mono text-slate-400">NIM: {{ $cp->application->user->studentProfile->nim ?? '-' }}</span>
+                                            <span class="block text-xs font-mono text-slate-400">NIM/NIS: {{ $cp->application->user->studentProfile->nim ?? '-' }}</span>
                                         </td>
                                         <td class="py-3.5 px-4 font-semibold text-slate-800" data-label="Bidang Penempatan">
                                             {{ $cp->application->unit->name ?? '-' }}
@@ -919,7 +919,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="6" class="py-8 text-center text-slate-400 font-medium">
-                                            Belum ada mahasiswa yang berstatus lulus (completed) di dinas ini.
+                                            Belum ada peserta magang yang berstatus lulus (completed) di dinas ini.
                                         </td>
                                     </tr>
                                 @endforelse
@@ -974,7 +974,7 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="mempty">Belum ada mahasiswa yang berstatus lulus (completed) di dinas ini.</div>
+                            <div class="mempty">Belum ada peserta magang yang berstatus lulus (completed) di dinas ini.</div>
                         @endforelse
                     </div>
                 </div>

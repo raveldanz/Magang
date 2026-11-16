@@ -16,10 +16,10 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-                    <span>Rekapitulasi Logbook Mahasiswa {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? '• ' . (auth()->user()->unit->name ?? 'Bidang') : '' }}</span>
+                    <span>Rekapitulasi Logbook Peserta Magang {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? '• ' . (auth()->user()->unit->name ?? 'Bidang') : '' }}</span>
                 </h2>
                 <p class="text-xs text-gray-500 mt-1">
-                    Pantau progres pengisian logbook harian mahasiswa magang {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? 'di ' . (auth()->user()->unit->name ?? 'bidang kerja') : 'per unit kerja' }} secara agregat
+                    Pantau progres pengisian logbook harian peserta magang {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? 'di ' . (auth()->user()->unit->name ?? 'bidang kerja') : 'per unit kerja' }} secara agregat
                 </p>
             </div>
         </div>
@@ -44,7 +44,7 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-slate-600 uppercase">Mahasiswa Aktif</span>
+                        <span class="text-xs font-bold text-slate-600 uppercase">Peserta Aktif</span>
                         <span class="p-2 bg-blue-50 text-blue-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -52,7 +52,7 @@
                         </span>
                     </div>
                     <div class="text-2xl font-black text-gray-900 mt-2">{{ $placements->total() }}</div>
-                    <div class="text-xs text-slate-600 mt-0.5">Total mahasiswa terdaftar</div>
+                    <div class="text-xs text-slate-600 mt-0.5">Total peserta magang terdaftar</div>
                 </div>
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
@@ -169,7 +169,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </div>
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa / NIM..." 
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama peserta magang / NIM/NIS..." 
                                    class="w-full min-h-[44px] text-xs border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
                                    style="padding-left: 2.5rem !important; padding-right: 0.75rem !important; padding-top: 0.55rem !important; padding-bottom: 0.55rem !important;">
                         </div>
@@ -207,7 +207,7 @@
                                 <h3 class="font-bold text-gray-900 text-base flex items-center gap-2">
                                     Riwayat Logbook: {{ $selStudent->name }}
                                     <span class="text-xs font-mono font-normal bg-blue-100 text-blue-800 px-2 py-0.5 rounded-md">
-                                        NIM: {{ $selProfile->nim ?? '-' }}
+                                        NIM/NIS: {{ $selProfile->nim ?? '-' }}
                                     </span>
                                 </h3>
                                 <p class="text-xs text-gray-600 mt-0.5">
@@ -261,7 +261,7 @@
                             </div>
                         @empty
                             <div class="p-6 bg-white rounded-xl text-center text-slate-600 text-xs">
-                                Mahasiswa belum mengunggah entri logbook kegiatan.
+                                Peserta Magang belum mengunggah entri logbook kegiatan.
                             </div>
                         @endforelse
                     </div>
@@ -275,7 +275,7 @@
                         <thead>
                             <tr class="bg-gray-50/75 border-b border-gray-200 text-xs font-bold text-slate-600 uppercase tracking-wider">
                                 <th class="py-3.5 px-4 text-center w-12">No</th>
-                                <th class="py-3.5 px-4">Mahasiswa</th>
+                                <th class="py-3.5 px-4">Peserta Magang</th>
                                 <th class="py-3.5 px-4">Unit & Pembimbing</th>
                                 <th class="py-3.5 px-4 text-center">Pending Logbook</th>
                                 <th class="py-3.5 px-4 text-center">Progres Disetujui</th>
@@ -303,10 +303,10 @@
                                         {{ $placements->firstItem() + $index }}
                                     </td>
 
-                                    <td class="rt-title py-4 px-4" data-label="Mahasiswa">
+                                    <td class="rt-title py-4 px-4" data-label="Peserta Magang">
                                         <div class="font-bold text-gray-900 leading-snug">{{ $student->name }}</div>
                                         <div class="text-xs text-slate-600 mt-0.5 font-mono">
-                                            NIM: {{ $profile->nim ?? '-' }}
+                                            NIM/NIS: {{ $profile->nim ?? '-' }}
                                         </div>
                                         <div class="text-xs text-blue-700 mt-0.5">
                                             {{ $profile->universitas ?? '-' }} ({{ $profile->jurusan ?? '-' }})
@@ -363,7 +363,7 @@
                             @empty
                                 <tr>
                                     <td colspan="7" class="py-12 text-center text-slate-600 text-xs">
-                                        Tidak ada data mahasiswa magang yang sesuai dengan kriteria pencarian.
+                                        Tidak ada data peserta magang yang sesuai dengan kriteria pencarian.
                                     </td>
                                 </tr>
                             @endforelse

@@ -13,7 +13,7 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                         </div>
                         <div>
-                            <h3 class="font-black text-base text-slate-900">Tambah Dosen Pembimbing Baru</h3>
+                            <h3 class="font-black text-base text-slate-900">Tambah Pembimbing Baru</h3>
                             <p class="text-xs text-slate-500">{{ $university->name }}</p>
                         </div>
                     </div>
@@ -23,14 +23,14 @@
                 <form method="POST" action="{{ route('admin.universities.dosens.store', $university->id) }}" class="space-y-4">
                     @csrf
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap & Gelar Dosen <span class="text-rose-500">*</span></label>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap & Gelar Pembimbing <span class="text-rose-500">*</span></label>
                         <input type="text" name="name" required placeholder="Contoh: Dr. Budi Santoso, M.Kom." class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2.5">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Email Resmi Dosen <span class="text-rose-500">*</span></label>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Email Resmi Pembimbing <span class="text-rose-500">*</span></label>
                         <input type="email" name="email" required placeholder="budi@kampus.ac.id" class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2.5">
-                        <p class="text-xs text-slate-400 mt-1">Digunakan untuk login ke Portal Dosen dengan password default: 'password'</p>
+                        <p class="text-xs text-slate-400 mt-1">Digunakan untuk login ke Portal Pembimbing dengan password default: 'password'</p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
@@ -49,7 +49,7 @@
                             Batal
                         </button>
                         <button type="submit" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs">
-                            Simpan Dosen
+                            Simpan Pembimbing
                         </button>
                     </div>
                 </form>
@@ -70,8 +70,8 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                         </div>
                         <div>
-                            <h3 class="font-black text-base text-slate-900">Penugasan Dosen Pembimbing</h3>
-                            <p class="text-xs text-slate-500" x-text="'Mahasiswa: ' + selectedStudentName"></p>
+                            <h3 class="font-black text-base text-slate-900">Penugasan Pembimbing</h3>
+                            <p class="text-xs text-slate-500" x-text="'Peserta Magang: ' + selectedStudentName"></p>
                         </div>
                     </div>
                     <button type="button" @click="showAssignAdvisorModal = false" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
@@ -82,14 +82,14 @@
                     <input type="hidden" name="application_id" :value="selectedApplicationId">
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Dosen Pembimbing <span class="text-rose-500">*</span></label>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Pembimbing <span class="text-rose-500">*</span></label>
                         <select name="academic_advisor_id" required class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2.5">
-                            <option value="">-- Pilih Dosen Pembimbing dari {{ $university->name }} --</option>
+                            <option value="">-- Pilih Pembimbing dari {{ $university->name }} --</option>
                             @foreach($dosens as $dsn)
                                 <option value="{{ $dsn->id }}">{{ $dsn->name }} ({{ $dsn->email }})</option>
                             @endforeach
                         </select>
-                        <p class="text-xs text-slate-400 mt-1">Dosen yang dipilih akan menerima hak akses untuk memantau logbook dan menilai laporan mahasiswa ini.</p>
+                        <p class="text-xs text-slate-400 mt-1">Pembimbing yang dipilih akan menerima hak akses untuk memantau logbook dan menilai laporan peserta magang ini.</p>
                     </div>
 
                     <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
@@ -97,7 +97,7 @@
                             Batal
                         </button>
                         <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-xs">
-                            Tugaskan Dosen
+                            Tugaskan Pembimbing
                         </button>
                     </div>
                 </form>

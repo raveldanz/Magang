@@ -43,7 +43,7 @@ class NotificationService
                     'type' => 'urgent',
                     'category' => 'university',
                     'title' => "Perguruan Tinggi Baru: {$u->name}",
-                    'message' => "Terdaftar otomatis dari pendaftaran {$u->students_count} mahasiswa. Belum memiliki akun Admin Kampus / PIC.",
+                    'message' => "Terdaftar otomatis dari pendaftaran {$u->students_count} peserta magang. Belum memiliki akun Admin Kampus / PIC.",
                     'time' => $u->created_at ? $u->created_at->diffForHumans() : 'Baru saja',
                     'action_url' => route('admin.universities.index'),
                     'action_label' => 'Buat Akun Kampus',
@@ -94,7 +94,7 @@ class NotificationService
                     'type' => 'warning',
                     'category' => 'application',
                     'title' => "{$pendingAppsCount} Pengajuan Magang Menunggu Verifikasi",
-                    'message' => 'Terdapat permohonan magang mahasiswa yang menunggu pemeriksaan berkas oleh instansi dinas.',
+                    'message' => 'Terdapat permohonan magang peserta yang menunggu pemeriksaan berkas oleh instansi dinas.',
                     'time' => 'Memerlukan tindakan',
                     'action_url' => route('admin.applications.index'),
                     'action_label' => 'Tinjau Pengajuan',
@@ -160,8 +160,8 @@ class NotificationService
                     'id' => 'unassigned_dpl',
                     'type' => 'info',
                     'category' => 'academic',
-                    'title' => "{$unassignedDpl} Mahasiswa Belum Memiliki Dosen Pembimbing",
-                    'message' => 'Mahasiswa telah diterima di instansi dinas namun data Dosen Pembimbing belum ditentukan.',
+                    'title' => "{$unassignedDpl} Peserta Magang Belum Memiliki Pembimbing",
+                    'message' => 'Peserta Magang telah diterima di instansi dinas namun data Pembimbing belum ditentukan.',
                     'time' => 'Perlu penetapan',
                     'action_url' => route('admin.applications.index'),
                     'action_label' => 'Lihat Penempatan',
@@ -179,7 +179,7 @@ class NotificationService
                     'type' => 'urgent',
                     'category' => 'application',
                     'title' => "Terdapat {$waitingApps} Pengajuan Magang Menunggu ACC Atasan",
-                    'message' => 'Admin telah memverifikasi berkas mahasiswa dan menentukan pembimbing lapangan. Silakan periksa dan berikan pengesahan (Double ACC).',
+                    'message' => 'Admin telah memverifikasi berkas peserta magang dan menentukan pembimbing lapangan. Silakan periksa dan berikan pengesahan (Double ACC).',
                     'time' => 'Menunggu ACC',
                     'action_url' => route('supervisor.applications.index'),
                     'action_label' => 'Periksa & Sahkan',
@@ -243,8 +243,8 @@ class NotificationService
                     'id' => 'agency_logbooks_pending',
                     'type' => 'info',
                     'category' => 'logbook',
-                    'title' => "{$pendingLogbooks} Logbook Mahasiswa Perlu Review",
-                    'message' => 'Mahasiswa magang telah mengunggah logbook harian aktivitas kerja.',
+                    'title' => "{$pendingLogbooks} Logbook Peserta Magang Perlu Review",
+                    'message' => 'Peserta Magang telah mengunggah logbook harian aktivitas kerja.',
                     'time' => 'Monitoring dinas',
                     'action_url' => route('admin.logbooks.index'),
                     'action_label' => 'Cek Logbook',
@@ -273,7 +273,7 @@ class NotificationService
                     'type' => 'warning',
                     'category' => 'logbook',
                     'title' => "{$pendingLogbooksCount} Logbook Bimbingan Menunggu Evaluasi",
-                    'message' => 'Mahasiswa bimbingan Anda telah mengisi logbook aktivitas harian yang perlu diberi catatan/tinjauan.',
+                    'message' => 'Peserta bimbingan Anda telah mengisi logbook aktivitas harian yang perlu diberi catatan/tinjauan.',
                     'time' => 'Menunggu review',
                     'action_url' => route('lecturer.logbooks.index'),
                     'action_label' => 'Review Logbook',
@@ -291,8 +291,8 @@ class NotificationService
                     'id' => 'dosen_report_pending',
                     'type' => 'urgent',
                     'category' => 'evaluation',
-                    'title' => "{$pendingReportsCount} Laporan Akhir Mahasiswa Siap Dinilai",
-                    'message' => 'Mahasiswa telah menyelesaikan masa magang dan mengunggah laporan akhir magang.',
+                    'title' => "{$pendingReportsCount} Laporan Akhir Peserta Magang Siap Dinilai",
+                    'message' => 'Peserta Magang telah menyelesaikan masa magang dan mengunggah laporan akhir magang.',
                     'time' => 'Perlu penilaian',
                     'action_url' => route('lecturer.monitoring.index'),
                     'action_label' => 'Beri Nilai Akhir',
@@ -305,9 +305,9 @@ class NotificationService
                     'id' => 'dosen_students_active',
                     'type' => 'info',
                     'category' => 'academic',
-                    'title' => "Total {$placements->count()} Mahasiswa dalam Bimbingan Anda",
-                    'message' => 'Pantau kemajuan kegiatan magang mahasiswa bimbingan di instansi Pemkot Surabaya.',
-                    'time' => 'Portal Dosen Pembimbing',
+                    'title' => "Total {$placements->count()} Peserta Magang dalam Bimbingan Anda",
+                    'message' => 'Pantau kemajuan kegiatan magang peserta bimbingan di instansi Pemkot Surabaya.',
+                    'time' => 'Portal Pembimbing',
                     'action_url' => route('lecturer.monitoring.index'),
                     'is_action_required' => false,
                 ];
@@ -326,7 +326,7 @@ class NotificationService
                     'type' => 'warning',
                     'category' => 'logbook',
                     'title' => "{$mentorSummary['pending_logbook_days']} Logbook Harian Menunggu Pemeriksaan Anda",
-                    'message' => "Dari {$mentorSummary['pending_logbook_students']} mahasiswa bimbingan. Buka untuk memeriksa per minggu.",
+                    'message' => "Dari {$mentorSummary['pending_logbook_students']} peserta bimbingan. Buka untuk memeriksa per minggu.",
                     'time' => 'Menunggu pemeriksaan',
                     'action_url' => route('mentor.logbooks.index'),
                     'action_label' => 'Periksa Logbook',
@@ -400,11 +400,11 @@ class NotificationService
                             'id' => 'student_need_dpl',
                             'type' => 'urgent',
                             'category' => 'academic',
-                            'title' => 'Selamat! Pengajuan Diterima - Silakan Pilih Dosen Pembimbing',
-                            'message' => 'Permohonan magang Anda telah disetujui. Lengkapi data Dosen Pembimbing pada dashboard.',
+                            'title' => 'Selamat! Pengajuan Diterima - Silakan Pilih Pembimbing',
+                            'message' => 'Permohonan magang Anda telah disetujui. Lengkapi data Pembimbing pada dashboard.',
                             'time' => 'Tindakan diperlukan',
                             'action_url' => route('dashboard'),
-                            'action_label' => 'Pilih Dosen',
+                            'action_label' => 'Pilih Pembimbing',
                             'is_action_required' => true,
                         ];
                     } else {
@@ -414,7 +414,7 @@ class NotificationService
                             'category' => 'academic',
                             'title' => 'Data Pembimbing Lengkap & Magang Siap Dilaksanakan',
                             'message' => $requiresAdvisor
-                                ? 'Mentor Dinas & Dosen Pembimbing telah terhubung. Jangan lupa untuk mengisi logbook harian secara berkala.'
+                                ? 'Mentor Dinas & Pembimbing telah terhubung. Jangan lupa untuk mengisi logbook harian secara berkala.'
                                 : 'Mentor Dinas telah terhubung. Jangan lupa untuk mengisi logbook harian secara berkala.',
                             'time' => 'Aktif',
                             'action_url' => route('student.logbook.index'),
@@ -499,11 +499,11 @@ class NotificationService
                         'id' => 'univ_no_dosen',
                         'type' => 'warning',
                         'category' => 'university',
-                        'title' => 'Belum Ada Dosen Pembimbing Terdaftar',
-                        'message' => 'Daftarkan akun Dosen Pembimbing resmi kampus agar mahasiswa dapat memilih Dosen Pembimbing dengan mudah.',
+                        'title' => 'Belum Ada Pembimbing Terdaftar',
+                        'message' => 'Daftarkan akun Pembimbing resmi kampus agar peserta magang dapat memilih Pembimbing dengan mudah.',
                         'time' => 'Perlu kelengkapan',
                         'action_url' => route('university.lecturers.index'),
-                        'action_label' => 'Tambah Dosen Pembimbing',
+                        'action_label' => 'Tambah Pembimbing',
                         'is_action_required' => true,
                     ];
                 }
@@ -514,7 +514,7 @@ class NotificationService
                         'type' => 'info',
                         'category' => 'university',
                         'title' => 'Lengkapi Data Profil & Kop Surat Kampus',
-                        'message' => 'Lengkapi data PIC Rektorat/Dekanat dan format kop surat resmi untuk penerbitan surat pengantar mahasiswa.',
+                        'message' => 'Lengkapi data PIC Rektorat/Dekanat dan format kop surat resmi untuk penerbitan surat pengantar peserta magang.',
                         'time' => 'Profil instansi',
                         'action_url' => route('university.profile.index'),
                         'action_label' => 'Lengkapi Profil',
@@ -527,7 +527,7 @@ class NotificationService
                     'type' => 'info',
                     'category' => 'university',
                     'title' => "Portal Mitra MBKM: {$univ->name}",
-                    'message' => "Tercatat {$studentCount} Mahasiswa dan {$dosenCount} Dosen Pembimbing aktif pada program magang Pemkot Surabaya.",
+                    'message' => "Tercatat {$studentCount} Peserta Magang dan {$dosenCount} Pembimbing aktif pada program magang Pemkot Surabaya.",
                     'time' => 'Terhubung',
                     'action_url' => route('university.profile.index'),
                     'action_label' => 'Buka Profil Kampus',
@@ -619,7 +619,7 @@ class NotificationService
      */
     public static function notifySupervisorForApplication(Application $application): void
     {
-        $studentName = $application->user?->name ?? 'Mahasiswa';
+        $studentName = $application->user?->name ?? 'Peserta Magang';
         SystemNotification::send(
             title: 'Pengajuan Magang Menunggu Persetujuan Atasan',
             message: "Pengajuan magang atas nama {$studentName} telah diverifikasi oleh Admin Dispusip dan menunggu persetujuan Anda.",
@@ -637,7 +637,7 @@ class NotificationService
      */
     public static function notifySupervisorForCertificate(Certificate $certificate): void
     {
-        $studentName = $certificate->placement?->application?->user?->name ?? 'Mahasiswa';
+        $studentName = $certificate->placement?->application?->user?->name ?? 'Peserta Magang';
         SystemNotification::send(
             title: 'Sertifikat Kelulusan Menunggu Pengesahan Atasan',
             message: "Sertifikat magang untuk peserta {$studentName} telah diterbitkan dan menunggu pengesahan resmi Anda.",

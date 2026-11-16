@@ -12,7 +12,7 @@
     $bundleItems = collect($bundles instanceof \Illuminate\Pagination\AbstractPaginator ? $bundles->items() : $bundles);
     $selectableValues = $bundleItems->filter(fn ($b) => ! empty($b['pending_ids']))->map(fn ($b) => implode(',', $b['pending_ids']))->values();
     $firstPendingKey = $openFirstPending ? optional($bundleItems->first(fn ($b) => ! empty($b['pending_ids'])))['bundle_key'] : null;
-    $otherPartyLabel = $role === 'lecturer' ? 'Mentor Lapangan' : 'Dosen Pembimbing';
+    $otherPartyLabel = $role === 'lecturer' ? 'Mentor Lapangan' : 'Pembimbing';
     $statusText = fn ($s) => (\App\Enums\ReviewStatus::tryFrom((string) $s) ?? \App\Enums\ReviewStatus::PENDING)->localizedLabel('mentor');
     $errorBundleKey = old('bundle_key');
 @endphp
@@ -120,10 +120,10 @@
                     <!-- Mahasiswa -->
                     <div>
                         <div class="font-bold text-slate-900 text-base">
-                            {{ $student->name ?? 'Mahasiswa' }}
+                            {{ $student->name ?? 'Peserta Magang' }}
                         </div>
                         <div class="text-sm text-slate-600 mt-0.5">
-                            NIM: {{ $profile->nim ?? '-' }}
+                            NIM/NIS: {{ $profile->nim ?? '-' }}
                         </div>
                         @if ($role === 'mentor' && !empty($bundle['is_fallback_unit_head']))
                             <span class="mt-1 inline-flex px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 text-sm font-bold">
@@ -132,7 +132,7 @@
                         @endif
                         @if ($role === 'lecturer')
                             <span class="mt-1 inline-flex px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-sm font-medium">
-                                Verifikasi Dosen Pembimbing
+                                Verifikasi Pembimbing
                             </span>
                         @endif
                     </div>
@@ -165,7 +165,7 @@
                             </span>
                         @elseif ($waitingStudentCount > 0)
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-rose-50 text-rose-800 border border-rose-200">
-                                {{ $waitingStudentCount }} hari sedang diperbaiki mahasiswa
+                                {{ $waitingStudentCount }} hari sedang diperbaiki peserta magang
                             </span>
                         @else
                             <x-status-badge type="review" :status="$bundle['status']" />
@@ -208,7 +208,7 @@
                          }
                          const parts = [];
                          if (this.approveCount > 0) parts.push(this.approveCount + ' hari disetujui');
-                         if (this.revise.length > 0) parts.push(this.revise.length + ' hari dikembalikan ke mahasiswa untuk diperbaiki');
+                         if (this.revise.length > 0) parts.push(this.revise.length + ' hari dikembalikan ke peserta magang untuk diperbaiki');
                          this.$dispatch('open-confirm-modal', {
                              form: form,
                              title: 'Simpan Pemeriksaan Logbook',
@@ -291,12 +291,12 @@
                                 </div>
                             @elseif (!empty($entry['feedback']))
                                 <div class="text-sm text-slate-700 bg-slate-50 p-3 rounded-xl">
-                                    <strong>Catatan Anda sebelumnya (sudah diperbaiki mahasiswa):</strong> {{ $entry['feedback'] }}
+                                    <strong>Catatan Anda sebelumnya (sudah diperbaiki peserta magang):</strong> {{ $entry['feedback'] }}
                                 </div>
                             @endif
 
                             @if (in_array($entryStatus, ['rejected', 'revision'], true))
-                                <p class="text-sm text-rose-800 font-semibold">Menunggu mahasiswa memperbaiki kegiatan ini.</p>
+                                <p class="text-sm text-rose-800 font-semibold">Menunggu peserta magang memperbaiki kegiatan ini.</p>
                             @endif
 
                             @if ($isPendingEntry)
@@ -335,8 +335,8 @@
 
                         <div>
                             <label for="catatan-{{ $bundle['bundle_key'] }}" class="block text-base font-bold text-slate-900 mb-1">
-                                <span x-show="revise.length > 0">Tulis apa yang harus diperbaiki mahasiswa <span class="text-rose-700">(wajib)</span></span>
-                                <span x-show="revise.length === 0">Catatan atau pujian untuk mahasiswa <span class="font-normal text-slate-600">(boleh dikosongkan)</span></span>
+                                <span x-show="revise.length > 0">Tulis apa yang harus diperbaiki peserta magang <span class="text-rose-700">(wajib)</span></span>
+                                <span x-show="revise.length === 0">Catatan atau pujian untuk peserta magang <span class="font-normal text-slate-600">(boleh dikosongkan)</span></span>
                             </label>
 
                             <!-- Contoh catatan siap pakai -->
@@ -369,7 +369,7 @@
                                       class="w-full text-base bg-white border focus:ring-2 focus:ring-blue-600 focus:border-blue-600 rounded-xl p-3 shadow-2xs"
                                       :class="showNoteError ? 'border-rose-500' : 'border-slate-300'"></textarea>
                             <p x-show="showNoteError" x-cloak class="mt-1 text-base font-semibold text-rose-700" role="alert">
-                                Catatan wajib diisi karena ada hari yang dikembalikan. Tulis apa yang harus diperbaiki agar mahasiswa paham.
+                                Catatan wajib diisi karena ada hari yang dikembalikan. Tulis apa yang harus diperbaiki agar peserta magang paham.
                             </p>
                         </div>
 
@@ -389,7 +389,7 @@
                         </div>
                     </form>
                 @elseif ($waitingStudentCount > 0)
-                    <p class="mt-4 text-base text-slate-700">Tidak ada yang perlu Anda putuskan pada minggu ini. Hari yang dikembalikan akan muncul lagi di sini setelah diperbaiki mahasiswa.</p>
+                    <p class="mt-4 text-base text-slate-700">Tidak ada yang perlu Anda putuskan pada minggu ini. Hari yang dikembalikan akan muncul lagi di sini setelah diperbaiki peserta magang.</p>
                 @else
                     <p class="mt-4 text-base text-emerald-800 font-semibold">Semua hari pada minggu ini sudah disetujui.</p>
                 @endif

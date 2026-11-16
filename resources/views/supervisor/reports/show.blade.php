@@ -7,10 +7,10 @@
                 </a>
                 <div>
                     <h2 class="font-bold text-xl sm:text-2xl text-slate-900 leading-tight">
-                        {{ $student?->name ?? 'Mahasiswa' }}
+                        {{ $student?->name ?? 'Peserta Magang' }}
                     </h2>
                     <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-                        NIM: {{ $profile?->nim ?? '-' }} &bull; {{ $profile?->universitas ?? '-' }} &bull; {{ $profile?->jurusan ?? '-' }}
+                        NIM/NIS: {{ $profile?->nim ?? '-' }} &bull; {{ $profile?->universitas ?? '-' }} &bull; {{ $profile?->jurusan ?? '-' }}
                     </p>
                 </div>
             </div>
@@ -34,7 +34,7 @@
                         <span class="font-bold text-slate-800 mt-0.5 block">{{ $mentor?->name ?? 'Belum Ditugaskan' }}</span>
                     </div>
                     <div>
-                        <span class="text-slate-600 text-xs font-semibold uppercase tracking-wider block">Dosen Pembimbing</span>
+                        <span class="text-slate-600 text-xs font-semibold uppercase tracking-wider block">Pembimbing</span>
                         <span class="font-bold text-slate-800 mt-0.5 block">{{ $academicAdvisor?->name ?? 'Belum Ditugaskan' }}</span>
                     </div>
                     <div>
@@ -57,7 +57,7 @@
                 <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                     <div>
                         <h3 class="font-bold text-base text-slate-900">
-                            Proyek Inovasi Mahasiswa
+                            Proyek Inovasi Peserta Magang
                         </h3>
                         <p class="text-xs text-slate-500 mt-0.5">
                             Dokumentasi karya dan manfaat nyata kegiatan bagi masyarakat
@@ -103,7 +103,7 @@
                     </div>
                 @else
                     <div class="p-8 bg-slate-50 rounded-2xl text-center text-slate-500 text-xs">
-                        Mahasiswa belum menambahkan proyek inovasi.
+                        Peserta Magang belum menambahkan proyek inovasi.
                     </div>
                 @endif
             </div>
@@ -116,7 +116,7 @@
                             Naskah Laporan Akhir
                         </h3>
                         <p class="text-xs text-slate-500 mt-0.5">
-                            Dokumen naskah ilmiah PKL / Magang yang diunggah mahasiswa
+                            Dokumen naskah ilmiah PKL / Magang yang diunggah peserta magang
                         </p>
                     </div>
                     <div>
@@ -151,7 +151,7 @@
                     @endif
                 @else
                     <div class="p-8 bg-slate-50 rounded-2xl text-center text-slate-600 text-xs">
-                        Mahasiswa belum mengunggah naskah laporan akhir.
+                        Peserta Magang belum mengunggah naskah laporan akhir.
                     </div>
                 @endif
             </div>
@@ -164,7 +164,7 @@
                             Evaluasi & Nilai Akhir
                         </h3>
                         <p class="text-xs text-slate-600 mt-0.5">
-                            Rekapitulasi penilaian kinerja magang dari pembimbing lapangan dan dosen
+                            Rekapitulasi penilaian kinerja magang dari pembimbing lapangan dan pembimbing
                         </p>
                     </div>
 

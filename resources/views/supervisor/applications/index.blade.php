@@ -2,7 +2,7 @@
     <x-slot name="header">
         <x-page-header
             title="Persetujuan Pengajuan Magang"
-            description="Tinjau berkas mahasiswa yang telah diverifikasi oleh Admin Dispusip untuk disetujui dan diterbitkan Surat Balasan resminya.">
+            description="Tinjau berkas peserta magang yang telah diverifikasi oleh Admin Dispusip untuk disetujui dan diterbitkan Surat Balasan resminya.">
             <x-slot name="actions">
                 <a href="{{ route('supervisor.dashboard') }}"
                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200 transition">
@@ -57,7 +57,7 @@
 
                 <div class="flex-1">
                     <input type="text" name="search" value="{{ request('search') }}"
-                           placeholder="Cari nama mahasiswa atau universitas..."
+                           placeholder="Cari nama peserta magang atau universitas..."
                            class="w-full h-12 px-4 rounded-xl border-2 border-slate-200 focus:border-blue-600 focus:ring-0 text-sm font-medium text-slate-800">
                 </div>
 
@@ -91,7 +91,7 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="border-b-2 border-slate-200 bg-slate-100/70 text-slate-700 text-xs font-bold uppercase tracking-wider">
-                                <th class="py-4 px-6">Mahasiswa & Kampus</th>
+                                <th class="py-4 px-6">Peserta Magang & Kampus</th>
                                 <th class="py-4 px-6">Bidang & Mentor Dispusip</th>
                                 <th class="py-4 px-4">Periode Magang</th>
                                 <th class="py-4 px-4 text-center">Status</th>

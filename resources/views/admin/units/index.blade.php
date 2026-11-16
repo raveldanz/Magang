@@ -91,7 +91,7 @@
                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Sisa Kuota Tersedia</p>
                     <h3 class="text-2xl font-black text-gray-900 mt-1" id="stat-total-remaining">{{ $stats['total_remaining'] }}</h3>
-                    <p class="text-xs text-gray-500 mt-1">Slot mahasiswa baru</p>
+                    <p class="text-xs text-gray-500 mt-1">Slot peserta magang baru</p>
                 </div>
             </div>
 
@@ -373,7 +373,7 @@
             }
 
             if (val < filled) {
-                notify(`Kuota tidak boleh kurang dari jumlah mahasiswa yang sudah diterima (${filled} orang).`);
+                notify(`Kuota tidak boleh kurang dari jumlah peserta magang yang sudah diterima (${filled} orang).`);
                 input.value = input.dataset.currentVal;
                 return;
             }

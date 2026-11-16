@@ -116,7 +116,7 @@ class ProfileController extends Controller
 
             if (($weightMentor + $weightLecturer) !== 100) {
                 throw ValidationException::withMessages([
-                    'weight_mentor' => 'Total bobot penilaian Mentor Dinas ('.$weightMentor.'%) dan Dosen Pembimbing Kampus ('.$weightLecturer.'%) harus berjumlah tepat 100%.',
+                    'weight_mentor' => 'Total bobot penilaian Mentor Dinas ('.$weightMentor.'%) dan Pembimbing Kampus ('.$weightLecturer.'%) harus berjumlah tepat 100%.',
                 ]);
             }
 

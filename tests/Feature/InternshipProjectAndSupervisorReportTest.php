@@ -253,7 +253,7 @@ class InternshipProjectAndSupervisorReportTest extends TestCase
         // 1. Supervisor access index
         $response = $this->actingAs($supervisor)->get(route('supervisor.reports.index'));
         $response->assertStatus(200);
-        $response->assertSee('Laporan Mahasiswa');
+        $response->assertSee('Laporan Peserta Magang');
         $response->assertSee('Aditya Pratama');
         $response->assertSee($unit->name);
         $response->assertSee('1 Proyek');

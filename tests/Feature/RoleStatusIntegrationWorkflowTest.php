@@ -110,7 +110,7 @@ class RoleStatusIntegrationWorkflowTest extends TestCase
         $responseMhs = $this->actingAs($eco['student'])->get(route('dashboard'));
         $responseMhs->assertOk();
         $responseMhs->assertSee('Diterima');
-        $responseMhs->assertSee('Pilih Dosen');
+        $responseMhs->assertSee('Pilih Pembimbing');
 
         // 3. Mahasiswa dapat memilih DPL kampus
         $responseDosen = $this->actingAs($eco['student'])->post(route('student.select_advisor'), [

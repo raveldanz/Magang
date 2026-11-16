@@ -279,7 +279,7 @@ class CertificateController extends Controller
 
         // Bidang tujuan harus milik dinas yang sama; mentor harus akun mentor resmi dinas penempatan
         if ($request->filled('unit_id') && ! Unit::where('id', $request->unit_id)->where('agency_profile_id', $application->unit?->agency_profile_id)->exists()) {
-            return redirect()->back()->withInput()->with('error', 'Bidang yang dipilih bukan bagian dari instansi penempatan mahasiswa ini.');
+            return redirect()->back()->withInput()->with('error', 'Bidang yang dipilih bukan bagian dari instansi penempatan peserta magang ini.');
         }
         if ($request->filled('mentor_id')) {
             app(PlacementAssignmentService::class)->resolveMentor($application, (int) $request->mentor_id);
@@ -567,7 +567,7 @@ class CertificateController extends Controller
 
         if (! $placement) {
             return redirect()->route('admin.certificates.index', ['tab' => 'settings'])
-                ->with('error', 'Belum ada mahasiswa yang lulus untuk dijadikan contoh pratinjau sertifikat.');
+                ->with('error', 'Belum ada peserta magang yang lulus untuk dijadikan contoh pratinjau sertifikat.');
         }
 
         // getCertificateData dapat menerbitkan nomor/hash bila kosong — di-rollback agar pratinjau tidak mengubah data

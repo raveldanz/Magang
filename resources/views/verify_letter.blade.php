@@ -68,7 +68,7 @@
                         @endphp
                         <div class="vrow">
                             <dt class="vlabel">Tipe Pengajuan</dt>
-                            <dd class="vvalue"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">Kelompok Magang ({{ $verifiedGroupMembers->count() }} Mahasiswa)</span></dd>
+                            <dd class="vvalue"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">Kelompok Magang ({{ $verifiedGroupMembers->count() }} Peserta Magang)</span></dd>
                         </div>
                         <div class="vrow">
                             <dt class="vlabel">Daftar Anggota Kelompok</dt>
@@ -91,11 +91,11 @@
                         </div>
                     @else
                         <div class="vrow">
-                            <dt class="vlabel">Nama Mahasiswa</dt>
+                            <dt class="vlabel">Nama Peserta Magang</dt>
                             <dd class="vvalue">{{ $application->user->name }}</dd>
                         </div>
                         <div class="vrow">
-                            <dt class="vlabel">NIM / NPM</dt>
+                            <dt class="vlabel">NIM/NIS / NPM</dt>
                             <dd class="vvalue is-mono">{{ $sp?->nim ?? '-' }}</dd>
                         </div>
                         <div class="vrow">

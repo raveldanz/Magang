@@ -150,7 +150,7 @@
                             <h4 class="font-bold text-amber-900 text-xs sm:text-sm">Terdapat {{ $unregisteredCount }}
                                 Instansi yang Belum Memiliki Akun Admin</h4>
                             <p class="text-[11px] text-amber-700 mt-0.5">Buatkan akun agar perwakilan dinas dapat
-                                memverifikasi mahasiswa dan memonitor kuota.</p>
+                                memverifikasi peserta magang dan memonitor kuota.</p>
                         </div>
                     </div>
                 </div>

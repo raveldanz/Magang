@@ -137,7 +137,7 @@ class LecturerInnovationsTest extends TestCase
         $response = $this->actingAs($this->dosen)->get(route('lecturer.students.grade_sheet', $this->placement->id));
         $response->assertStatus(200);
         $response->assertSee('BERITA ACARA', false);
-        $response->assertSee('DOSEN PEMBIMBING', false);
+        $response->assertSee('PEMBIMBING', false);
         $response->assertSee('Ahmad Fajar');
         $response->assertSee('22081010199');
         $response->assertSee('Dr. Budi Santoso, M.Kom.');
@@ -203,7 +203,7 @@ class LecturerInnovationsTest extends TestCase
         $response->sendContent();
         $content = ob_get_clean();
 
-        $this->assertStringContainsString('Nama Mahasiswa', $content);
+        $this->assertStringContainsString('Nama Peserta Magang', $content);
         $this->assertStringContainsString('NIM', $content);
         $this->assertStringContainsString('Ahmad Fajar', $content);
         $this->assertStringContainsString('22081010199', $content);

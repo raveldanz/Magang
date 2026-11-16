@@ -149,7 +149,7 @@ class AdminCertificateRevisionWorkflowTest extends TestCase
         $response->assertSee('Kartika Sari');
         $response->assertSee('22081010021');
         $response->assertSee('Koreksi Nilai Evaluasi');
-        $response->assertSee('Data Mahasiswa');
+        $response->assertSee('Data Peserta');
         $response->assertSee('Ajukan Ulang ke Atasan');
     }
 

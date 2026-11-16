@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
-            {{ __('Dashboard Mahasiswa') }}
+            {{ __('Dashboard Peserta Magang') }}
         </h2>
     </x-slot>
 
@@ -107,7 +107,7 @@
                             <!-- Executive Info Chips (Desktop Only: Sharp Rectangular Badges, Zero Circles) -->
                             <div class="hidden md:flex flex-wrap items-center gap-2 text-xs">
                                 <div class="px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 bg-white/10 border border-white/20 text-white">
-                                    <span class="text-blue-200">NIM:</span>
+                                    <span class="text-blue-200">NIM/NIS:</span>
                                     <strong class="font-mono text-white">{{ $profile->nim ?? 'Belum Diisi' }}</strong>
                                 </div>
                                 <div class="px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 bg-white/10 border border-white/20 text-white">
@@ -205,7 +205,7 @@
                                             </span>
                                             <p class="text-slate-700 leading-relaxed font-medium">
                                                 @if(empty($profile?->nim))
-                                                    Lengkapi biodata dan Nomor Induk Mahasiswa (NIM) terlebih dahulu.
+                                                    Lengkapi biodata dan NIM / NIS terlebih dahulu.
                                                 @elseif(!$application)
                                                     Anda belum mengajukan magang. Silakan buat permohonan magang untuk memulai program magang.
                                                 @elseif(in_array($rawSt, ['resigned', 'rejected'], true))
@@ -264,7 +264,7 @@
                                             @elseif(!$academicAdvisor)
                                                 <a href="#change-advisor-box" @click="showDetailModal = false"
                                                     class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition inline-block">
-                                                    Pilih Dosen
+                                                    Pilih Pembimbing
                                                 </a>
                                             @elseif($logbooksCount < 30)
                                                 <a href="{{ route('student.logbook.create') }}"
@@ -289,7 +289,7 @@
                                 <!-- 1. Profil -->
                                 <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                     <div>
-                                        <div class="font-bold text-slate-800">1. Biodata & NIM Mahasiswa</div>
+                                        <div class="font-bold text-slate-800">1. Biodata & NIM/NIS Peserta Magang</div>
                                     </div>
                                     <div class="shrink-0">
                                         @if(!empty($profile?->nim))
@@ -696,7 +696,7 @@
                                 <div>
                                     <label for="academic_advisor_id"
                                         class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                        Pilih Pembimbing Terdaftar: {{ $univName ?? $profile->universitas ?? 'Kampus Mahasiswa' }}
+                                        Pilih Pembimbing Terdaftar: {{ $univName ?? $profile->universitas ?? 'Kampus Peserta Magang' }}
                                     </label>
                                     <select id="academic_advisor_id" name="academic_advisor_id" required
                                         class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs p-2.5">
@@ -705,7 +705,7 @@
                                             @foreach ($availableDosens as $dosen)
                                                 <option value="{{ $dosen->id }}" {{ optional($placement)->academic_advisor_id == $dosen->id ? 'selected' : '' }}>
                                                     {{ $dosen->name }} —
-                                                    {{ is_string($dosen->university) ? $dosen->university : ($dosen->universityRelation?->name ?? $dosen->university?->name ?? 'Dosen') }}
+                                                    {{ is_string($dosen->university) ? $dosen->university : ($dosen->universityRelation?->name ?? $dosen->university?->name ?? 'Pembimbing') }}
                                                     ({{ $dosen->email }})
                                                 </option>
                                             @endforeach
@@ -730,7 +730,7 @@
                                     </div>
                                     <button type="button" @click="openNewDosenModal = true"
                                         class="text-xs text-blue-600 hover:text-blue-800 font-semibold underline cursor-pointer text-left sm:text-right">
-                                        Dosen tidak ditemukan? Input Dosen Baru
+                                        Pembimbing tidak ditemukan? Input Pembimbing Baru
                                     </button>
                                 </div>
                             </form>

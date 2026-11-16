@@ -258,7 +258,7 @@
                         </a>
                         <a href="{{ route('lecturer.monitoring.index') }}" 
                            class="transition py-1 {{ request()->routeIs('lecturer.monitoring.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Mahasiswa Bimbingan
+                            Peserta Bimbingan
                         </a>
                         <a href="{{ route('lecturer.logbooks.index') }}" 
                            class="transition py-1 {{ request()->routeIs('lecturer.logbooks.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
@@ -516,7 +516,7 @@
                                 Portal Pembimbing
                             </a>
                             <a href="{{ route('lecturer.monitoring.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Mahasiswa Bimbingan
+                                Peserta Bimbingan
                             </a>
                             <a href="{{ route('profile.edit') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Pengaturan Akun
@@ -789,7 +789,7 @@
                     </a>
                     <a href="{{ route('lecturer.monitoring.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('lecturer.monitoring.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         
-                        <span>Mahasiswa Bimbingan</span>
+                        <span>Peserta Bimbingan</span>
                     </a>
                     <a href="{{ route('lecturer.logbooks.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('lecturer.logbooks.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         

@@ -185,7 +185,7 @@
                                 </p>
                                 @if ($requiresDpl && (!$placement || empty($placement->academic_advisor_id)))
                                     <p class="text-xs text-amber-700 mt-1 leading-relaxed">
-                                        Dosen Pembimbing belum ditugaskan. Hal ini <strong>tidak menghambat</strong> pengisian logbook — validasi dosen akan menyusul setelah dosen pembimbing ditetapkan kampus.
+                                        Pembimbing belum ditugaskan. Hal ini <strong>tidak menghambat</strong> pengisian logbook — validasi pembimbing akan menyusul setelah pembimbing ditetapkan kampus.
                                     </p>
                                 @endif
                             </div>
@@ -193,7 +193,7 @@
                         
                         @if ($requiresDpl && (!$placement || empty($placement->academic_advisor_id)))
                             <a href="{{ route('dashboard') }}#change-advisor-box" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0 flex items-center gap-2 cursor-pointer">
-                                <span>Pilih Dosen di Dashboard </span>
+                                <span>Pilih Pembimbing di Dashboard </span>
                             </a>
                         @endif
                     </div>
@@ -264,8 +264,8 @@
                             <p>&bull; Mentor Dinas belum ditunjuk: logbook Anda divalidasi sementara oleh <strong>Admin Dinas</strong> instansi penempatan.</p>
                         @endunless
                         @if ($requiresDpl && !$placement->hasAcademicAdvisor())
-                            <p>&bull; Dosen Pembimbing belum ditugaskan kampus: validasi dosen akan dilakukan setelah dosen pembimbing ditetapkan.
-                                <a href="{{ route('dashboard') }}#change-advisor-box" class="underline font-semibold">Pilih Dosen di Dashboard</a> bila sudah mengetahui dosen Anda.</p>
+                            <p>&bull; Pembimbing belum ditugaskan kampus: validasi pembimbing akan dilakukan setelah pembimbing ditetapkan.
+                                <a href="{{ route('dashboard') }}#change-advisor-box" class="underline font-semibold">Pilih Pembimbing di Dashboard</a> bila sudah mengetahui pembimbing Anda.</p>
                         @endif
                     </div>
                 @endif
@@ -292,7 +292,7 @@
                             <p class="font-bold text-sm text-white">{{ $placement?->mentor?->name ?? $placement?->pembimbing?->name ?? 'Belum Ditugaskan (divalidasi Admin Dinas)' }}</p>
                         </div>
                         <div class="p-3 bg-white/10 rounded-xl">
-                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Dosen Pembimbing</p>
+                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Pembimbing</p>
                             <p class="font-bold text-sm text-white">{{ $placement?->academicAdvisor?->name ?? 'Belum Ditugaskan' }}</p>
                         </div>
                         <div class="p-3 bg-white/10 rounded-xl">
@@ -332,7 +332,7 @@
                             <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">
                                 Daftar Logbook Harian
                             </h3>
-                            <p class="text-xs text-gray-400 mt-0.5">Catatan aktivitas dan verifikasi dua arah (Mentor Dinas & Dosen Kampus)</p>
+                            <p class="text-xs text-gray-400 mt-0.5">Catatan aktivitas dan verifikasi dua arah (Mentor Dinas & Pembimbing Kampus)</p>
                         </div>
 
                         {{-- Tombol Tambah Logbook (Hanya Tampil Jika Status ACTIVE) --}}
@@ -377,7 +377,7 @@
                                     <th class="p-4">Kegiatan</th>
                                     <th class="p-4">Lampiran</th>
                                     <th class="p-4 text-center">Status Mentor Dinas</th>
-                                    <th class="p-4 text-center">Status Dosen Kampus</th>
+                                    <th class="p-4 text-center">Status Pembimbing Kampus</th>
                                     <th class="p-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -398,7 +398,7 @@
                                             @endif
                                             @if($requiresDpl && !empty($log->lecturer_feedback))
                                                 <div class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800 flex items-start gap-1">
-                                                    <span class="font-bold shrink-0">Catatan Dosen:</span>
+                                                    <span class="font-bold shrink-0">Catatan Pembimbing:</span>
                                                     <span>{{ $log->lecturer_feedback }}</span>
                                                 </div>
                                             @endif
@@ -518,7 +518,7 @@
                                 @endif
                                 @if($requiresDpl && !empty($log->lecturer_feedback))
                                     <div class="p-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800 flex items-start gap-1">
-                                        <span class="font-bold shrink-0">Catatan Dosen:</span>
+                                        <span class="font-bold shrink-0">Catatan Pembimbing:</span>
                                         <span>{{ $log->lecturer_feedback }}</span>
                                     </div>
                                 @endif
@@ -529,7 +529,7 @@
                                         <x-status-badge type="review" :status="$log->status" class="mt-1" />
                                     </div>
                                     <div class="p-2 rounded-xl bg-slate-50 border border-slate-100">
-                                        <span class="text-slate-400 block text-[10px] font-semibold uppercase">Dosen Pembimbing:</span>
+                                        <span class="text-slate-400 block text-[10px] font-semibold uppercase">Pembimbing:</span>
                                         @if (!$requiresDpl)
                                             <span class="font-bold text-slate-500 mt-0.5 inline-block">Dilewati</span>
                                         @else

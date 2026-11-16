@@ -412,7 +412,7 @@ class ApplicationController extends Controller
         $leaderUnivId = $group->leader?->university_id;
         $userUnivId = $user->university_id;
         if ($leaderUnivId && $userUnivId && $leaderUnivId !== $userUnivId) {
-            return redirect()->back()->with('error', 'Anda tidak dapat bergabung karena kelompok ini dikhususkan untuk mahasiswa dari '.($group->leader->university ?? 'kampus lain').'.');
+            return redirect()->back()->with('error', 'Anda tidak dapat bergabung karena kelompok ini dikhususkan untuk peserta magang dari '.($group->leader->university ?? 'kampus lain').'.');
         }
 
         // Validasi batas maksimal aman anggota kelompok standar 100 orang

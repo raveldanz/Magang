@@ -66,7 +66,7 @@ class CertificateTranscriptDensityTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('data-density="normal"', false);
         $response->assertSee('data-row="final"', false);
-        $response->assertDontSee('Subtotal Nilai Dosen Pembimbing');
+        $response->assertDontSee('Subtotal Nilai Pembimbing');
     }
 
     public function test_two_party_transcript_starts_denser_and_renders_both_sections(): void
@@ -77,7 +77,7 @@ class CertificateTranscriptDensityTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Subtotal Nilai Dinas');
-        $response->assertSee('Subtotal Nilai Dosen Pembimbing');
+        $response->assertSee('Subtotal Nilai Pembimbing');
         $response->assertDontSee('data-density="normal"', false);
     }
 

@@ -168,7 +168,7 @@ class MonitoringController extends Controller
             // CSV Header
             fputcsv($handle, [
                 'No',
-                'Nama Mahasiswa',
+                'Nama Peserta Magang',
                 'NIM',
                 'Tipe Pendaftaran',
                 'Kelompok Magang',
@@ -182,10 +182,10 @@ class MonitoringController extends Controller
                 'Logbook Disetujui',
                 'Status Laporan Akhir',
                 'Nilai Mentor Lapangan',
-                'Nilai Dosen Pembimbing',
+                'Nilai Pembimbing',
                 'Nilai Akhir Kumulatif',
                 'Nilai Huruf',
-                'Jumlah Sesi Bimbingan Dosen Pembimbing',
+                'Jumlah Sesi Bimbingan Pembimbing',
             ]);
 
             $no = 1;

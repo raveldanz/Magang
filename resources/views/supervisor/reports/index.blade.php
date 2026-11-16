@@ -3,10 +3,10 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h2 class="font-bold text-xl sm:text-2xl text-slate-900 leading-tight">
-                    Laporan Mahasiswa
+                    Laporan Peserta Magang
                 </h2>
                 <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-                    Pemantauan luaran naskah laporan dan proyek inovasi mahasiswa magang
+                    Pemantauan luaran naskah laporan dan proyek inovasi peserta magang
                 </p>
             </div>
         </div>
@@ -19,7 +19,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-1">
                     <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider block">
-                        Total Mahasiswa Magang
+                        Total Peserta Magang
                     </span>
                     <div class="text-2xl font-bold text-slate-900">
                         {{ $totalPlacements }}
@@ -57,7 +57,7 @@
             <!-- 2. Filter Bar Rapi & Kondusif -->
             <form method="GET" action="{{ route('supervisor.reports.index') }}" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col md:flex-row gap-3">
                 <div class="flex-1">
-                    <input type="text" name="search" value="{{ $searchQuery }}" placeholder="Cari nama mahasiswa, NIM, atau universitas..." class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
+                    <input type="text" name="search" value="{{ $searchQuery }}" placeholder="Cari nama peserta magang, NIM/NIS, atau universitas..." class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
                 </div>
 
                 <div class="w-full md:w-56">
@@ -99,7 +99,7 @@
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 text-xs uppercase tracking-wider font-bold select-none">
-                                <th class="py-3.5 px-5 min-w-[220px]">Mahasiswa</th>
+                                <th class="py-3.5 px-5 min-w-[220px]">Peserta Magang</th>
                                 <th class="py-3.5 px-5 min-w-[200px]">Unit Bidang</th>
                                 <th class="py-3.5 px-5 min-w-[180px]">Proyek Inovasi</th>
                                 <th class="py-3.5 px-5 whitespace-nowrap min-w-[150px]">Status Laporan</th>
@@ -127,7 +127,7 @@
                                                     {{ $student?->name ?? '-' }}
                                                 </div>
                                                 <div class="text-xs text-slate-600 font-mono mt-0.5 truncate" title="NIM: {{ $profile?->nim ?? '-' }} &bull; {{ $profile?->universitas ?? '-' }}">
-                                                    NIM: {{ $profile?->nim ?? '-' }} &bull; {{ $profile?->universitas ?? '-' }}
+                                                    NIM/NIS: {{ $profile?->nim ?? '-' }} &bull; {{ $profile?->universitas ?? '-' }}
                                                 </div>
                                             </div>
                                         </div>
@@ -171,7 +171,7 @@
                             @empty
                                 <tr>
                                     <td colspan="5" class="py-10 text-center text-slate-500 text-xs">
-                                        Tidak ada data mahasiswa yang sesuai dengan filter pencarian.
+                                        Tidak ada data peserta magang yang sesuai dengan filter pencarian.
                                     </td>
                                 </tr>
                             @endforelse
@@ -219,7 +219,7 @@
                         </div>
                     @empty
                         <div class="p-8 text-center text-slate-500 text-xs">
-                            Tidak ada data mahasiswa ditemukan.
+                            Tidak ada data peserta magang ditemukan.
                         </div>
                     @endforelse
                 </div>

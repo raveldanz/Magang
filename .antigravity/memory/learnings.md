@@ -174,6 +174,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-154** | 2026-11-12 | Database Migration: Eksekusi Migrasi Pending certificate_themes & Robust Model Fallback (semula LRN-133 di main) | Error 500 relation "certificate_themes" does not exist saat membuka sertifikat mahasiswa | RESOLVED |
 | **LRN-155** | 2026-11-16 | Standardisasi Nomenklatur Role: Penyeragaman 'Dosen Pembimbing' Menjadi 'Pembimbing' (semula LRN-134 di main) | Penyeragaman sebutan role Dosen Pembimbing menjadi Pembimbing pada Master Pengguna Sistem | RESOLVED |
 | **LRN-156** | 2026-11-16 | Keamanan: Pembimbing Daftar Mandiri Wajib Disetujui | Akun dosen/guru daftar mandiri langsung aktif sehingga mahasiswa bisa membuat pembimbing palsu dan menilai dirinya sendiri; nama kampus bebas membuat kampus dobel | RESOLVED |
+| **LRN-157** | 2026-11-16 | Revisi Istilah & Peserta dari Sekolah | "Mahasiswa"/"Dosen"/"DPL" diganti "Peserta Magang"/"Pembimbing" di seluruh tampilan; profil peserta mendapat pilihan Sekolah (NIS, kelas) | RESOLVED |
 ---
 
 ## 3. Catatan Masalah & Solusi (Knowledge Base)
@@ -4335,6 +4336,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   2. **Dilarang Keras Menampilkan Kata `DPL` ke Pengguna -> Selalu Gunakan `Dosen Pembimbing`:**
      - Dilarang keras menuliskan singkatan **`DPL`** di seluruh tampilan UI (`.blade.php`), pesan flash/validasi controller, notifikasi, PDF/sertifikat/transkrip nilai. Wajib memakai **`Dosen Pembimbing`**.
      - Nama kolom/method legacy di skema DB atau kode internal (`universities.require_dpl`, `getDplComponent()`) dipertahankan demi kompatibilitas migrasi/API internal, tetapi seluruh label tampilan user-facing wajib `Dosen Pembimbing`.
+     - **Diperbarui 16 Nov 2026 (revisi tim, LRN-157):** istilah tampilan sekarang `Pembimbing` (dosen/guru) dan `Peserta Magang` (mahasiswa/siswa). Larangan `DPL` tetap berlaku.
   3. **Bebas Emoji & Bebas AI Slop (Kejernihan Visual Senior-Friendly):**
      - **Dilarang keras** menyelipkan emoji atau teks/hiasan dekoratif berlebihan ("AI slop") yang memecah konsentrasi dan membuat mata cepat lelah. Fokus antarmuka harus langsung mengarahkan pengguna berusia pada prioritas aksi yang paling penting.
   4. **Aksesibilitas, Zoom, Kontras, Autentikasi & Profil:**
@@ -4544,3 +4546,13 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   2. Pakai `User::assignableAdvisors()` untuk daftar pembimbing yang bisa dipilih, dan `isPendingApproval()` di setiap aksi yang menetapkan `academic_advisor_id`.
   3. Nama institusi dari input bebas wajib lewat `University::findOrCreateUnverified()` / `UniversityResolver`, jangan `firstOrCreate` langsung.
   4. Saat menggabungkan branch lain, jalankan tes di folder salinan dengan `vendor` hasil salinan (bukan junction/symlink): PHP memuat kelas dari lokasi asli junction sehingga yang teruji adalah kode lama.
+
+### [LRN-157] Revisi Istilah Universal (Peserta Magang & Pembimbing) dan Peserta dari Sekolah
+- **Date:** 2026-11-16
+- **Problem / Symptom:** Revisi tim: peserta bukan hanya mahasiswa (ada siswa PKL SMK/SMA), dan dosen/guru disebut "Pembimbing". Penggantian di main baru menyentuh 16 berkas; ratusan teks "Mahasiswa", "Dosen Pembimbing", dan "DPL" masih tampil. Profil peserta hanya mengenal NIM, fakultas, dan semester.
+- **Root Cause:** Istilah ditulis langsung di ratusan Blade dan pesan controller; tabel `universities` tidak membedakan kampus dan sekolah.
+- **Fix Applied:** (1) Migrasi `universities.institution_type` (perguruan_tinggi/sekolah, ditebak dari nama SMK/SMA/MA) dan `student_profiles.education_level`. Form profil: pilihan "Perguruan Tinggi / Sekolah"; untuk sekolah label NIS/NISN, Jurusan/Kompetensi Keahlian, Kelas 10-13, tanpa fakultas; jenjang wajib cocok dengan jenis institusi. Helper `StudentProfile::identityNumberLabel()`/`periodLabel()` dipakai profil dan surat penerimaan. (2) Penggantian istilah berbasis aturan di `resources/views` dan string literal `app/` (token PHP): Mahasiswa -> Peserta Magang, Mahasiswa Bimbingan -> Peserta Bimbingan, Dosen/DPL -> Pembimbing, NIM -> NIM/NIS. Nilai kode (`'mahasiswa'`, `'dosen'`), variabel, rute, dan nama kolom tidak diubah. Tes yang mengunci teks lama disesuaikan; `SchoolParticipantProfileTest` ditambahkan.
+- **Prevention Rule:**
+  1. Teks baru untuk peserta memakai "Peserta Magang" (atau "Peserta" bila sudah jelas), untuk dosen/guru memakai "Pembimbing"; di halaman yang juga menampilkan mentor, pakai "Pembimbing Kampus/Sekolah" agar tidak tertukar dengan Mentor Lapangan.
+  2. Label identitas/periode peserta wajib lewat `identityNumberLabel()` dan `periodLabel()`, jangan menulis "NIM"/"Semester" langsung.
+  3. Penggantian istilah massal hanya untuk teks tampilan: lindungi kata kode yang dikutip, `->relasi`, `$variabel`, `route.name`, `role:x`; lalu cari hasil ganda ("Pembimbing Pembimbing", "Peserta Magang magang") dan label yang menempel titik dua. Jangan menghasilkan "Magang Aktif" (nama status lama yang dilarang).

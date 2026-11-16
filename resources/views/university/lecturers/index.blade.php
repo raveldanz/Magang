@@ -206,7 +206,7 @@
                     <table class="w-full divide-y divide-slate-100 text-left text-xs">
                         <thead class="bg-slate-50/80 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
                             <tr>
-                                <th class="py-3.5 px-4">Nama Dosen & Gelar</th>
+                                <th class="py-3.5 px-4">Nama Pembimbing & Gelar</th>
                                 <th class="py-3.5 px-4">NIDN / NIP</th>
                                 <th class="py-3.5 px-4">Email Resmi (Login)</th>
                                 <th class="py-3.5 px-4 text-center">Beban Bimbingan</th>
@@ -313,7 +313,7 @@
                     @csrf
                     <div>
                         <label class="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                            Nama Lengkap & Gelar Dosen <span class="text-rose-500">*</span>
+                            Nama Lengkap & Gelar Pembimbing <span class="text-rose-500">*</span>
                         </label>
                         <input type="text" name="name" value="{{ old('name') }}" required placeholder="Contoh: Dr. Ir. Ahmad Sudrajat, M.Kom." class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                     </div>
@@ -374,7 +374,7 @@
                     
                     <div>
                         <label class="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                            Nama Lengkap & Gelar Dosen <span class="text-rose-500">*</span>
+                            Nama Lengkap & Gelar Pembimbing <span class="text-rose-500">*</span>
                         </label>
                         <input type="text" name="name" x-model="editLecturer.name" required class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                     </div>

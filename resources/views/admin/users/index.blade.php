@@ -6,7 +6,7 @@
                     <span>Master Pengguna Sistem</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-600 mt-1">
-                    Kelola akun seluruh role: Mahasiswa, Admin Bidang, Mentor Lapangan, Pembimbing, &amp; Universitas
+                    Kelola akun seluruh role: Peserta Magang, Admin Bidang, Mentor Lapangan, Pembimbing, &amp; Universitas
                 </p>
             </div>
 
@@ -96,7 +96,7 @@
                             Pusat Kendali Kampus
                         </a>
                         <a href="{{ route('admin.applications.index', ['university_id' => $selectedUniversity->id]) }}" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold rounded-xl transition">
-                            Pengajuan Mahasiswa
+                            Pengajuan Peserta Magang
                         </a>
                         <a href="{{ route('admin.users.index') }}" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-xl transition">
                             Reset Filter
@@ -138,7 +138,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                         </div>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, email, NIM..." 
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, email, NIM/NIS..." 
                                class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
                                style="padding-left: 2.75rem !important; padding-right: 1rem !important; padding-top: 0.65rem !important; padding-bottom: 0.65rem !important;">
                     </div>
@@ -146,7 +146,7 @@
                     <!-- Filter Role -->
                     <select name="role" x-model="role" class="w-full py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                         <option value="">Semua Role Pengguna</option>
-                        <option value="mahasiswa" {{ request('role') === 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
+                        <option value="mahasiswa" {{ request('role') === 'mahasiswa' ? 'selected' : '' }}>Peserta Magang</option>
                         <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin Bidang / Dispusip</option>
                         <option value="supervisor" {{ request('role') === 'supervisor' ? 'selected' : '' }}>Supervisor</option>
                         <option value="mentor" {{ request('role') === 'mentor' ? 'selected' : '' }}>Mentor Lapangan</option>
@@ -247,7 +247,7 @@
                                             <div class="font-bold text-gray-900 text-xs sm:text-sm leading-snug break-words">{{ $u->name }}</div>
                                             <div class="text-[11px] text-gray-500 font-mono mt-0.5 truncate" title="{{ $u->email }}">{{ $u->email }}</div>
                                             @if($u->studentProfile?->nim)
-                                                <div class="text-[10px] text-blue-600 font-mono mt-0.5">NIM: {{ $u->studentProfile?->nim }}</div>
+                                                <div class="text-[10px] text-blue-600 font-mono mt-0.5">NIM/NIS: {{ $u->studentProfile?->nim }}</div>
                                             @endif
                                         </div>
                                     </td>
@@ -302,7 +302,7 @@
                                             </span>
                                         @else
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 whitespace-nowrap">
-                                                Mahasiswa
+                                                Peserta Magang
                                             </span>
                                         @endif
                                     </td>
@@ -455,7 +455,7 @@
                                             <div class="text-[11px] text-slate-500 font-mono mt-0.5 break-all">{{ $u->email }}</div>
                                             @if($u->studentProfile?->nim)
                                                 <div class="inline-flex items-center mt-1 text-[10px] font-mono font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
-                                                    NIM: {{ $u->studentProfile?->nim }}
+                                                    NIM/NIS: {{ $u->studentProfile?->nim }}
                                                 </div>
                                             @endif
                                         </div>
@@ -515,7 +515,7 @@
                                             </span>
                                         @else
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                Mahasiswa
+                                                Peserta Magang
                                             </span>
                                         @endif
                                     </div>

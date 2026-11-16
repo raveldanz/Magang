@@ -153,14 +153,14 @@ class UniversityController extends Controller
 
     public function create()
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
 
         return view('admin.universities.create');
     }
 
     public function store(Request $request)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
         $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:universities,code',
@@ -209,7 +209,7 @@ class UniversityController extends Controller
 
     public function edit($id)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
         $university = University::findOrFail($id);
 
         return view('admin.universities.edit', compact('university'));
@@ -217,7 +217,7 @@ class UniversityController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
         $univ = University::findOrFail($id);
 
         $request->validate([
@@ -251,7 +251,7 @@ class UniversityController extends Controller
 
             if (($weightMentor + $weightLecturer) !== 100) {
                 throw ValidationException::withMessages([
-                    'weight_mentor' => 'Total bobot penilaian Mentor Dinas ('.$weightMentor.'%) dan Dosen Pembimbing Kampus ('.$weightLecturer.'%) harus berjumlah tepat 100%.',
+                    'weight_mentor' => 'Total bobot penilaian Mentor Dinas ('.$weightMentor.'%) dan Pembimbing Kampus ('.$weightLecturer.'%) harus berjumlah tepat 100%.',
                 ]);
             }
 
@@ -323,7 +323,7 @@ class UniversityController extends Controller
      */
     public function createAccount(Request $request, $id)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
         $univ = University::findOrFail($id);
 
         $existingAccount = User::where('role', 'universitas')
@@ -376,12 +376,12 @@ class UniversityController extends Controller
 
     public function destroy($id)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
         $univ = University::withCount(['students', 'dosens'])->findOrFail($id);
 
         // 1. Proteksi Mahasiswa: Jika ada mahasiswa terdaftar, jangan hapus
         if ($univ->students_count > 0) {
-            return redirect()->back()->with('error', "Gagal menghapus: Masih ada {$univ->students_count} mahasiswa terdaftar di {$univ->name}. Pindahkan atau hapus data mahasiswa terlebih dahulu.");
+            return redirect()->back()->with('error', "Gagal menghapus: Masih ada {$univ->students_count} peserta magang terdaftar di {$univ->name}. Pindahkan atau hapus data peserta magang terlebih dahulu.");
         }
 
         // 2. Proteksi Dosen dengan Bimbingan Aktif
@@ -393,7 +393,7 @@ class UniversityController extends Controller
             })->count();
 
         if ($activeDosenCount > 0) {
-            return redirect()->back()->with('error', "Gagal menghapus: Terdapat {$activeDosenCount} dosen pembimbing dari {$univ->name} yang sedang membimbing mahasiswa aktif.");
+            return redirect()->back()->with('error', "Gagal menghapus: Terdapat {$activeDosenCount} pembimbing dari {$univ->name} yang sedang membimbing peserta magang aktif.");
         }
 
         $name = $univ->name;
@@ -449,7 +449,7 @@ class UniversityController extends Controller
      */
     public function storeDosen(Request $request, $id)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
         $university = University::findOrFail($id);
 
         $request->validate([
@@ -458,8 +458,8 @@ class UniversityController extends Controller
             'nidn' => 'nullable|string|max:50',
             'phone' => 'nullable|string|max:30',
         ], [
-            'name.required' => 'Nama lengkap dan gelar dosen wajib diisi.',
-            'email.required' => 'Email resmi dosen wajib diisi.',
+            'name.required' => 'Nama lengkap dan gelar pembimbing wajib diisi.',
+            'email.required' => 'Email resmi pembimbing wajib diisi.',
             'email.unique' => 'Email ini sudah terdaftar di dalam sistem.',
         ]);
 
@@ -488,7 +488,7 @@ class UniversityController extends Controller
         ]);
 
         return redirect()->route('admin.universities.show', ['university' => $university->id, 'tab' => 'dosen'])
-            ->with('success', "Dosen Pembimbing '{$dosen->name}' berhasil ditambahkan ke {$university->name}! Password sementara ditampilkan sekali di layar ini.");
+            ->with('success', "Pembimbing '{$dosen->name}' berhasil ditambahkan ke {$university->name}! Password sementara ditampilkan sekali di layar ini.");
     }
 
     /**
@@ -496,7 +496,7 @@ class UniversityController extends Controller
      */
     public function resetDosenPassword(Request $request, $univId, $dosenId)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
         $university = University::findOrFail($univId);
         $dosen = User::whereIn('role', ['dosen', 'academic_advisor'])
             ->where(function ($q) use ($university) {
@@ -513,7 +513,7 @@ class UniversityController extends Controller
         ]);
 
         return redirect()->route('admin.universities.show', ['university' => $university->id, 'tab' => 'dosen'])
-            ->with('success', "Password untuk Dosen '{$dosen->name}' ({$dosen->email}) berhasil direset. Password sementara ditampilkan sekali di layar ini.");
+            ->with('success', "Password untuk Pembimbing '{$dosen->name}' ({$dosen->email}) berhasil direset. Password sementara ditampilkan sekali di layar ini.");
     }
 
     /**
@@ -521,7 +521,7 @@ class UniversityController extends Controller
      */
     public function destroyDosen(Request $request, $univId, $dosenId)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
         $university = University::findOrFail($univId);
         $dosen = User::whereIn('role', ['dosen', 'academic_advisor'])
             ->where(function ($q) use ($university) {
@@ -536,7 +536,7 @@ class UniversityController extends Controller
 
         if ($historyCount > 0) {
             return redirect()->route('admin.universities.show', ['university' => $university->id, 'tab' => 'dosen'])
-                ->with('error', "Dosen '{$dosen->name}' tidak dapat dihapus karena tercatat membimbing {$historyCount} mahasiswa (termasuk arsip alumni). Ubah status akun menjadi Nonaktif untuk mencabut aksesnya.");
+                ->with('error', "Pembimbing '{$dosen->name}' tidak dapat dihapus karena tercatat membimbing {$historyCount} peserta magang (termasuk arsip alumni). Ubah status akun menjadi Nonaktif untuk mencabut aksesnya.");
         }
 
         $name = $dosen->name;
@@ -548,7 +548,7 @@ class UniversityController extends Controller
         ]);
 
         return redirect()->route('admin.universities.show', ['university' => $university->id, 'tab' => 'dosen'])
-            ->with('success', "Dosen Pembimbing '{$name}' berhasil dihapus dari daftar kampus.");
+            ->with('success', "Pembimbing '{$name}' berhasil dihapus dari daftar kampus.");
     }
 
     /**
@@ -556,15 +556,15 @@ class UniversityController extends Controller
      */
     public function assignAdvisor(Request $request, $id)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
         $university = University::findOrFail($id);
 
         $request->validate([
             'application_id' => 'required|exists:applications,id',
             'academic_advisor_id' => 'required|exists:users,id',
         ], [
-            'application_id.required' => 'Pengajuan mahasiswa wajib dipilih.',
-            'academic_advisor_id.required' => 'Dosen Pembimbing Lapangan wajib dipilih.',
+            'application_id.required' => 'Pengajuan peserta magang wajib dipilih.',
+            'academic_advisor_id.required' => 'Pembimbing wajib dipilih.',
         ]);
 
         $application = Application::with('user.studentProfile')->findOrFail($request->application_id);
@@ -592,7 +592,7 @@ class UniversityController extends Controller
         ]);
 
         return redirect()->route('admin.universities.show', ['university' => $university->id, 'tab' => 'mahasiswa'])
-            ->with('success', "Dosen Pembimbing Lapangan ({$advisor->name}) berhasil ditugaskan untuk {$application->user->name}!");
+            ->with('success', "Pembimbing ({$advisor->name}) berhasil ditugaskan untuk {$application->user->name}!");
     }
 
     /**
@@ -645,16 +645,16 @@ class UniversityController extends Controller
             fputcsv($handle, [
                 'No',
                 'NIM',
-                'Nama Mahasiswa',
+                'Nama Peserta Magang',
                 'Program Studi',
                 'Instansi Magang',
                 'Unit / Bidang Kerja',
-                'Dosen Pembimbing',
+                'Pembimbing',
                 'Mentor Dinas',
                 'Periode Magang',
                 'Status Magang',
                 'Nilai Mentor',
-                'Nilai Dosen',
+                'Nilai Pembimbing',
                 'Nilai Akhir',
             ]);
 

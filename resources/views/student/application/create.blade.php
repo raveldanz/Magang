@@ -91,7 +91,7 @@
                     <!-- Ringkasan Status Anggota Kelompok Saat Ini -->
                     <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2.5">
                         <div class="text-xs font-bold text-slate-700 flex items-center justify-between">
-                            <span>Status Anggota Kelompok ({{ $rejMembers->count() }} Mahasiswa):</span>
+                            <span>Status Anggota Kelompok ({{ $rejMembers->count() }} Peserta Magang):</span>
                             <span class="text-[11px] font-normal text-slate-500">
                                 Periode: {{ \Carbon\Carbon::parse($rejectedGroupApplication->start_date)->translatedFormat('d M Y') }} - {{ \Carbon\Carbon::parse($rejectedGroupApplication->end_date)->translatedFormat('d M Y') }}
                             </span>
@@ -105,7 +105,7 @@
                                             {{ $mApp->user?->name }} {{ $mApp->id === $rejectedGroupApplication->id ? '(Anda)' : '' }}
                                         </div>
                                         <div class="text-[10px] text-slate-500 font-mono">
-                                            {{ $mApp->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }} &bull; NIM: {{ $mApp->user?->studentProfile?->nim ?? '-' }}
+                                            {{ $mApp->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }} &bull; NIM/NIS: {{ $mApp->user?->studentProfile?->nim ?? '-' }}
                                         </div>
                                     </div>
                                     <x-status-badge :status="$mApp->status" />
@@ -348,7 +348,7 @@
                             <div class="flex items-center justify-between">
                                 <h4 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
                                     <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                                    <span>Daftar Anggota Kelompok: {{ $memberCount }} Mahasiswa</span>
+                                    <span>Daftar Anggota Kelompok: {{ $memberCount }} Peserta Magang</span>
                                 </h4>
                                 @if($memberCount < 2)
                                     <span class="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
@@ -362,8 +362,8 @@
                                     <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
                                         <tr>
                                             <th class="py-3 px-4 w-12 text-center">No</th>
-                                            <th class="py-3 px-4">Nama Mahasiswa</th>
-                                            <th class="py-3 px-4">NIM</th>
+                                            <th class="py-3 px-4">Nama Peserta Magang</th>
+                                            <th class="py-3 px-4">NIM/NIS</th>
                                             <th class="py-3 px-4">Program Studi</th>
                                             <th class="py-3 px-4 text-center">Peran</th>
                                             <th class="py-3 px-4 text-right">Aksi</th>
@@ -525,7 +525,7 @@
                                                 Pendaftaran Individu
                                             </h4>
                                             <p class="text-xs sm:text-sm text-slate-500 mt-1">
-                                                Pengajuan magang perorangan bagi mahasiswa yang mendaftar secara mandiri.
+                                                Pengajuan magang perorangan bagi peserta magang yang mendaftar secara mandiri.
                                             </p>
                                         </div>
 
@@ -535,7 +535,7 @@
                                                 <div class="w-4 h-4 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
                                                     <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
                                                 </div>
-                                                <span>Pendaftaran mandiri satu mahasiswa perorangan.</span>
+                                                <span>Pendaftaran mandiri satu peserta magang perorangan.</span>
                                             </div>
                                             <div class="flex items-start gap-2.5 text-xs text-slate-600">
                                                 <div class="w-4 h-4 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
@@ -839,10 +839,10 @@
     $hasIdCard = !empty($studentProfile?->id_card_path);
     $allComplete = $hasCv && $hasTranscript && $hasIdCard;
 
-    $cvDisplayName = $hasCv ? ('CV_' . ($studentProfile?->nim ?? 'Mahasiswa') . '.pdf') : '';
-    $transcriptDisplayName = $hasTranscript ? ('Transkrip_' . ($studentProfile?->nim ?? 'Mahasiswa') . '.pdf') : '';
+    $cvDisplayName = $hasCv ? ('CV_' . ($studentProfile?->nim ?? 'Peserta Magang') . '.pdf') : '';
+    $transcriptDisplayName = $hasTranscript ? ('Transkrip_' . ($studentProfile?->nim ?? 'Peserta Magang') . '.pdf') : '';
     $idCardExt = $hasIdCard ? pathinfo($studentProfile->id_card_path, PATHINFO_EXTENSION) : 'pdf';
-    $idCardDisplayName = $hasIdCard ? ('KTM_' . ($studentProfile?->nim ?? 'Mahasiswa') . '.' . $idCardExt) : '';
+    $idCardDisplayName = $hasIdCard ? ('KTM_' . ($studentProfile?->nim ?? 'Peserta Magang') . '.' . $idCardExt) : '';
 @endphp
 
 <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-3">
@@ -867,7 +867,7 @@
     </div>
 
     <p class="text-[11px] text-slate-500">
-        Anda tidak perlu mengunggah ulang berkas identitas pribadi. Dokumen di bawah ini ditarik langsung dari profil mahasiswa Anda:
+        Anda tidak perlu mengunggah ulang berkas identitas pribadi. Dokumen di bawah ini ditarik langsung dari profil peserta magang Anda:
     </p>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">

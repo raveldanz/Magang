@@ -3,7 +3,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-bold text-xl sm:text-2xl text-slate-900 leading-tight">
-                Logbook Mahasiswa Bimbingan
+                Logbook Peserta Bimbingan
             </h2>
         </div>
     </x-slot>
@@ -68,14 +68,14 @@
                         <div class="w-full sm:w-64 sm:max-w-xs shrink-0">
                             <select name="placement_id" onchange="this.form.submit()" 
                                     class="w-full min-h-[44px] text-xs sm:text-sm bg-white border border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl py-2.5 pl-3.5 pr-9 font-medium transition shadow-2xs truncate">
-                                <option value="">Semua Mahasiswa</option>
+                                <option value="">Semua Peserta Magang</option>
                                 @foreach ($supervisedPlacements as $pl)
                                     @php
                                         $st = $pl->application?->user;
                                         $nim = $st?->studentProfile?->nim ?? '-';
                                     @endphp
                                     <option value="{{ $pl->id }}" {{ request('placement_id') == $pl->id ? 'selected' : '' }}>
-                                        {{ $st?->name ?? 'Mahasiswa' }} ({{ $nim }})
+                                        {{ $st?->name ?? 'Peserta Magang' }} ({{ $nim }})
                                     </option>
                                 @endforeach
                             </select>

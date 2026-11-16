@@ -487,7 +487,7 @@
                                     <div class="p-2 sm:p-2.5 bg-white border border-slate-200 rounded-xl space-y-1">
                                         <div class="flex items-center gap-1.5 font-mono text-[11px] sm:text-xs font-bold text-blue-700">
                                             <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                            <span class="truncate">Format: Laporan_Akhir_[NIM]_[Nama].[ext]</span>
+                                            <span class="truncate">Format: Laporan_Akhir_[NIM/NIS]_[Nama].[ext]</span>
                                         </div>
                                         <div class="text-[10px] sm:text-[11px] text-slate-500 break-all leading-normal">
                                             Contoh: <strong class="text-slate-800 font-mono">Laporan_Akhir_{{ preg_replace('/[^A-Za-z0-9]/', '', Auth::user()->studentProfile->nim ?? '22051204001') }}_{{ \Illuminate\Support\Str::slug(Auth::user()->name, '_') }}.pdf</strong>

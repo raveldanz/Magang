@@ -46,7 +46,7 @@
                             @if ($tasks->isNotEmpty())
                                 Perlu Tindakan Segera: kerjakan dari atas ke bawah. Klik tombol biru di setiap baris.
                             @else
-                                Tugas akan muncul di sini saat mahasiswa mengirim logbook, laporan, atau saat waktunya memberi nilai.
+                                Tugas akan muncul di sini saat peserta magang mengirim logbook, laporan, atau saat waktunya memberi nilai.
                             @endif
                         </p>
                     </div>
@@ -111,18 +111,18 @@
                 <div class="px-5 sm:px-6 pb-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-base text-slate-800">
                     <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
                         <p class="font-bold text-slate-900">1. Periksa logbook harian</p>
-                        <p>Selama magang berjalan, mahasiswa mengisi kegiatan setiap hari. Baca per minggu, pilih <strong>Sesuai</strong> atau <strong>Perlu Diperbaiki</strong> untuk tiap hari, lalu simpan.</p>
+                        <p>Selama magang berjalan, peserta magang mengisi kegiatan setiap hari. Baca per minggu, pilih <strong>Sesuai</strong> atau <strong>Perlu Diperbaiki</strong> untuk tiap hari, lalu simpan.</p>
                     </div>
                     <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
                         <p class="font-bold text-slate-900">2. Periksa laporan akhir</p>
-                        <p>Menjelang akhir magang, mahasiswa mengunggah naskah laporan. Buka naskahnya, lalu <strong>Setujui</strong> atau <strong>Kembalikan untuk Diperbaiki</strong> dengan catatan.</p>
+                        <p>Menjelang akhir magang, peserta magang mengunggah naskah laporan. Buka naskahnya, lalu <strong>Setujui</strong> atau <strong>Kembalikan untuk Diperbaiki</strong> dengan catatan.</p>
                     </div>
                     <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
                         <p class="font-bold text-slate-900">3. Beri nilai akhir</p>
-                        <p>Isi nilai setiap aspek (0–100) paling lambat pada tanggal akhir magang. Sertifikat mahasiswa baru diproses setelah laporan disetujui dan nilai lengkap.</p>
+                        <p>Isi nilai setiap aspek (0–100) paling lambat pada tanggal akhir magang. Sertifikat peserta magang baru diproses setelah laporan disetujui dan nilai lengkap.</p>
                     </div>
                     <p class="md:col-span-3 text-slate-700">
-                        Persetujuan penerimaan mahasiswa tetap dilakukan Admin Dinas dan Atasan. Anda cukup mengerjakan tugas yang muncul di <strong>Daftar Tugas Anda</strong>; bila daftar kosong, berarti tidak ada yang tertinggal.
+                        Persetujuan penerimaan peserta magang tetap dilakukan Admin Dinas dan Atasan. Anda cukup mengerjakan tugas yang muncul di <strong>Daftar Tugas Anda</strong>; bila daftar kosong, berarti tidak ada yang tertinggal.
                     </p>
                 </div>
             </details>
@@ -130,7 +130,7 @@
             {{-- 3. RINGKASAN ANGKA (dihitung dari sumber yang sama dengan Daftar Tugas) --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-                    <span class="text-base font-semibold text-slate-700 block">Mahasiswa Bimbingan</span>
+                    <span class="text-base font-semibold text-slate-700 block">Peserta Bimbingan</span>
                     <div class="text-3xl font-black text-slate-900 mt-1">{{ $stats['total_students'] }}</div>
                     <span class="text-sm text-slate-700 mt-2 block">
                         {{ $stats['active_students'] }} aktif &middot; {{ $stats['upcoming_students'] }} belum mulai &middot; {{ $stats['completed_students'] }} selesai
@@ -144,7 +144,7 @@
                     </div>
                     <span class="text-sm text-blue-800 font-semibold mt-2 block">
                         @if ($stats['pending_logbooks'] > 0)
-                            dari {{ $stats['pending_logbook_students'] }} mahasiswa &middot; Buka halaman logbook &rarr;
+                            dari {{ $stats['pending_logbook_students'] }} peserta magang &middot; Buka halaman logbook &rarr;
                         @else
                             Semua logbook sudah diperiksa
                         @endif
@@ -168,7 +168,7 @@
                         @elseif ($stats['total_pending_eval'] > 0)
                             Nilai diisi menjelang akhir magang ({{ $stats['total_evaluated'] }} sudah dinilai)
                         @else
-                            {{ $stats['total_evaluated'] }} mahasiswa sudah dinilai
+                            {{ $stats['total_evaluated'] }} peserta magang sudah dinilai
                         @endif
                     </span>
                 </div>
@@ -186,9 +186,9 @@
                         'completed' => [\App\Enums\ApplicationStatus::COMPLETED->localizedLabel('mentor'), $stats['completed_students']],
                     ];
                 @endphp
-                <h3 class="text-xl font-bold text-slate-900">Daftar Mahasiswa Bimbingan Magang</h3>
+                <h3 class="text-xl font-bold text-slate-900">Daftar Peserta Bimbingan Magang</h3>
                 <div class="border-b border-slate-200 overflow-x-auto">
-                    <nav class="flex gap-6 min-w-max" aria-label="Filter Status Mahasiswa">
+                    <nav class="flex gap-6 min-w-max" aria-label="Filter Status Peserta Magang">
                         @foreach ($tabs as $tabKey => [$tabLabel, $tabCount])
                             <a href="{{ route('mentor.dashboard', array_merge($tabBaseQuery, ['tab' => $tabKey])) }}"
                                @if ($activeTab === $tabKey) aria-current="page" @endif
@@ -206,14 +206,14 @@
                             <input type="hidden" name="tab" value="{{ request('tab') }}">
                         @endif
                         <div class="relative flex-1">
-                            <label for="cari-mahasiswa" class="sr-only">Cari mahasiswa</label>
+                            <label for="cari-mahasiswa" class="sr-only">Cari peserta magang</label>
                             <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-3.5 text-slate-500">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                 </svg>
                             </div>
                             <input id="cari-mahasiswa" type="text" name="search" value="{{ request('search', request('q')) }}"
-                                   placeholder="Cari nama mahasiswa atau NIM..."
+                                   placeholder="Cari nama peserta magang atau NIM/NIS..."
                                    class="w-full min-h-[48px] text-base border-slate-300 rounded-xl pl-11 pr-4 py-2.5 focus:ring-blue-600 focus:border-blue-600 shadow-2xs">
                         </div>
 
@@ -262,9 +262,9 @@
             {{-- 5. DAFTAR MAHASISWA BIMBINGAN MENTOR --}}
             <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
                 <div class="p-5 border-b border-slate-100 flex items-center justify-between gap-2">
-                    <p class="text-base text-slate-700">Klik <strong>Buka</strong> untuk melihat logbook, laporan, dan nilai seorang mahasiswa.</p>
+                    <p class="text-base text-slate-700">Klik <strong>Buka</strong> untuk melihat logbook, laporan, dan nilai seorang peserta magang.</p>
                     <span class="text-sm text-slate-800 font-bold bg-slate-100 px-3 py-1 rounded-full shrink-0">
-                        {{ $placements->total() }} Mahasiswa
+                        {{ $placements->total() }} Peserta Magang
                     </span>
                 </div>
 
@@ -300,7 +300,7 @@
                             <div class="flex items-start justify-between gap-3">
                                 <div class="min-w-0">
                                     <p class="font-bold text-lg text-slate-900 leading-snug">{{ $row['student']->name ?? '-' }}</p>
-                                    <p class="text-sm text-slate-700 mt-0.5">NIM: {{ $row['profile']?->nim ?? '-' }}</p>
+                                    <p class="text-sm text-slate-700 mt-0.5">NIM/NIS: {{ $row['profile']?->nim ?? '-' }}</p>
                                 </div>
                                 <x-status-badge :status="$row['status']" />
                             </div>
@@ -339,7 +339,7 @@
                         </div>
                     @empty
                         <div class="p-8 text-center text-slate-700 text-base">
-                            Belum ada mahasiswa bimbingan magang yang sesuai dengan filter ini.
+                            Belum ada peserta bimbingan magang yang sesuai dengan filter ini.
                         </div>
                     @endforelse
                 </div>
@@ -349,7 +349,7 @@
                     <table class="w-full divide-y divide-slate-200 text-left text-base">
                         <thead class="bg-slate-50 text-slate-800 font-bold text-sm">
                             <tr>
-                                <th scope="col" class="py-3.5 px-5">Mahasiswa</th>
+                                <th scope="col" class="py-3.5 px-5">Peserta Magang</th>
                                 <th scope="col" class="py-3.5 px-4">Perguruan Tinggi &amp; Unit</th>
                                 <th scope="col" class="py-3.5 px-4">Status</th>
                                 <th scope="col" class="py-3.5 px-4">Logbook</th>
@@ -363,7 +363,7 @@
                                 <tr class="hover:bg-slate-50/80 transition">
                                     <td class="py-4 px-5 align-middle">
                                         <div class="font-bold text-slate-900 leading-snug">{{ $row['student']->name ?? '-' }}</div>
-                                        <div class="text-sm text-slate-700 mt-0.5">NIM: {{ $row['profile']?->nim ?? '-' }}</div>
+                                        <div class="text-sm text-slate-700 mt-0.5">NIM/NIS: {{ $row['profile']?->nim ?? '-' }}</div>
                                     </td>
                                     <td class="py-4 px-4 align-middle">
                                         <div class="font-semibold text-slate-900">{{ $row['univ'] }}</div>
@@ -405,7 +405,7 @@
                             @empty
                                 <tr>
                                     <td colspan="7" class="py-12 text-center text-slate-700">
-                                        Belum ada mahasiswa bimbingan magang yang sesuai dengan filter ini.
+                                        Belum ada peserta bimbingan magang yang sesuai dengan filter ini.
                                     </td>
                                 </tr>
                             @endforelse

@@ -217,7 +217,7 @@ class DashboardController extends Controller
         $isSuperAdmin = $lecturer->isSuperAdmin();
 
         if (! $isAssignedAdvisor && ! $isSuperAdmin) {
-            abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing Lapangan yang ditugaskan untuk mahasiswa ini.');
+            abort(403, 'Akses Ditolak: Anda bukan Pembimbing yang ditugaskan untuk peserta magang ini.');
         }
 
         $student = $placement->application->user;
@@ -271,7 +271,7 @@ class DashboardController extends Controller
         $isSuperAdmin = ($lecturer->role === 'super_admin' || ($lecturer->role === 'admin' && is_null($lecturer->agency_profile_id)));
 
         if (! $isAssignedAdvisor && ! $isSuperAdmin) {
-            abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing yang ditugaskan untuk mahasiswa ini.');
+            abort(403, 'Akses Ditolak: Anda bukan Pembimbing yang ditugaskan untuk peserta magang ini.');
         }
 
         $request->validate([
@@ -297,7 +297,7 @@ class DashboardController extends Controller
             'consultation_date' => $request->consultation_date,
         ]);
 
-        return redirect()->back()->with('success', 'Catatan sesi bimbingan Dosen Pembimbing berhasil ditambahkan ke riwayat!');
+        return redirect()->back()->with('success', 'Catatan sesi bimbingan Pembimbing berhasil ditambahkan ke riwayat!');
     }
 
     /**
@@ -333,7 +333,7 @@ class DashboardController extends Controller
         $isSuperAdmin = $lecturer->isSuperAdmin();
 
         if (! $isAssignedAdvisor && ! $isSuperAdmin) {
-            abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing Lapangan yang ditugaskan untuk mahasiswa ini.');
+            abort(403, 'Akses Ditolak: Anda bukan Pembimbing yang ditugaskan untuk peserta magang ini.');
         }
 
         $validated = $request->validate([

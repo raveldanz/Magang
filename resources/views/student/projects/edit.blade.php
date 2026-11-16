@@ -334,9 +334,9 @@
                                             
                                             <div class="flex-1">
                                                 <label for="peer_check_edit_{{ $peer->id }}" class="cursor-pointer block">
-                                                    <div class="font-bold text-xs sm:text-sm text-slate-900">{{ $peerUser?->name ?? 'Mahasiswa' }}</div>
+                                                    <div class="font-bold text-xs sm:text-sm text-slate-900">{{ $peerUser?->name ?? 'Peserta Magang' }}</div>
                                                     <div class="text-[11px] text-slate-500 mt-0.5">
-                                                        NIM: {{ $peerProfile?->nim ?? '-' }} &bull; {{ $peerProfile?->universitas ?? $peerUser?->university ?? '-' }} ({{ $peerProfile?->jurusan ?? '-' }})
+                                                        NIM/NIS: {{ $peerProfile?->nim ?? '-' }} &bull; {{ $peerProfile?->universitas ?? $peerUser?->university ?? '-' }} ({{ $peerProfile?->jurusan ?? '-' }})
                                                     </div>
                                                 </label>
 
@@ -387,7 +387,7 @@
                             <h3 class="font-bold text-base text-slate-900">Pusat Akses Proyek</h3>
                         </div>
                         <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                            Sediakan akses langsung ke karya inovasi Anda agar mentor dinas, dosen pembimbing, dan atasan dapat menguji atau meninjau karya Anda. Mahasiswa dapat mengisi salah satu atau seluruh opsi di bawah ini sesuai karakteristik proyek (aplikasi, buku, desain fisik, dll):
+                            Sediakan akses langsung ke karya inovasi Anda agar mentor dinas, pembimbing, dan atasan dapat menguji atau meninjau karya Anda. Peserta Magang dapat mengisi salah satu atau seluruh opsi di bawah ini sesuai karakteristik proyek (aplikasi, buku, desain fisik, dll):
                         </p>
                     </div>
 

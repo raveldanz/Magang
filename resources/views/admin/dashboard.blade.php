@@ -264,7 +264,7 @@
                         {{ $unverifiedUniversities->count() }} Perguruan Tinggi Menunggu Verifikasi
                     </h4>
                     <p class="text-xs text-slate-600 mt-0.5">
-                        Didaftarkan mandiri oleh mahasiswa melalui opsi "Perguruan Tinggi Lainnya":
+                        Didaftarkan mandiri oleh peserta magang melalui opsi "Perguruan Tinggi Lainnya":
                         <strong>{{ $unverifiedUniversities->pluck('name')->implode(', ') }}</strong>.
                     </p>
                 </div>
@@ -288,7 +288,7 @@
                     <div class="text-2xl font-black text-slate-800">{{ $stats['total_students'] ?? 0 }}</div>
                 </div>
                 <div class="text-[10px] text-slate-500 mt-2 leading-tight truncate">
-                    {{ $isSuperAdmin ? 'Mahasiswa kota' : 'Pendaftar dinas' }}
+                    {{ $isSuperAdmin ? 'Peserta Magang kota' : 'Pendaftar dinas' }}
                 </div>
             </div>
 
@@ -372,7 +372,7 @@
                             {{ $myUnit->name ?? 'Bidang Kerja Magang' }}
                         </h2>
                         <p class="text-xs text-slate-500 mt-0.5">
-                            Tata kelola kuota, tim pembimbing lapangan, dan supervisi langsung mahasiswa magang di bidang ini.
+                            Tata kelola kuota, tim pembimbing lapangan, dan supervisi langsung peserta magang di bidang ini.
                         </p>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
@@ -390,7 +390,7 @@
                         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
                             <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Lingkup Kerja Bidang</span>
                             <p class="text-xs text-slate-700 leading-relaxed">
-                                {{ $myUnit->description ?? 'Unit kerja resmi di lingkungan Dinas Perpustakaan dan Kearsipan Kota Surabaya yang menyelenggarakan penerimaan dan bimbingan teknis magang mahasiswa.' }}
+                                {{ $myUnit->description ?? 'Unit kerja resmi di lingkungan Dinas Perpustakaan dan Kearsipan Kota Surabaya yang menyelenggarakan penerimaan dan bimbingan teknis magang peserta.' }}
                             </p>
                         </div>
 
@@ -440,7 +440,7 @@
                                         </span>
                                     @endif
                                 </div>
-                                <p class="text-[11px] text-slate-500 mt-0.5">Pegawai pendamping teknis mahasiswa magang di bidang ini</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Pegawai pendamping teknis peserta magang di bidang ini</p>
                             </div>
                             <a href="{{ route('admin.mentors.create') }}"
                                class="self-start sm:self-auto inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl border border-blue-200 transition">
@@ -615,7 +615,7 @@
                     <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                         <div>
                             <h3 class="text-sm font-bold text-slate-800 leading-snug">Pendaftar Terbaru Bidang</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">Pengajuan berkas mahasiswa terkini yang masuk ke bidang ini</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Pengajuan berkas peserta magang terkini yang masuk ke bidang ini</p>
                         </div>
                         <a href="{{ route('admin.applications.index') }}"
                             class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 shadow-2xs">
@@ -629,7 +629,7 @@
                                 <div class="min-w-0 flex-1">
                                     <div class="flex items-center justify-between gap-2">
                                         <span class="font-bold text-xs sm:text-sm text-slate-900 truncate">
-                                            {{ $recentApp->user?->name ?? 'Mahasiswa' }}
+                                            {{ $recentApp->user?->name ?? 'Peserta Magang' }}
                                         </span>
                                         <div class="sm:hidden shrink-0">
                                             <x-status-badge :status="$recentApp->status" />
@@ -651,7 +651,7 @@
                             </div>
                         @empty
                             <div class="text-center py-8 text-xs text-slate-400">
-                                Belum ada pengajuan mahasiswa yang masuk pada bidang ini.
+                                Belum ada pengajuan peserta magang yang masuk pada bidang ini.
                             </div>
                         @endforelse
                     </div>
@@ -664,7 +664,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 pb-3 border-b border-slate-100">
                         <div class="min-w-0 flex-1">
                             <h3 class="text-sm font-bold text-slate-800 leading-snug">Distribusi Penempatan Unit Kerja</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">Sebaran mahasiswa magang di unit/bidang {{ $currentAgency->agency_name ?? 'Dispusip Surabaya' }}</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Sebaran peserta magang di unit/bidang {{ $currentAgency->agency_name ?? 'Dispusip Surabaya' }}</p>
                         </div>
                         <a href="{{ route('admin.units.index') }}"
                             class="self-start sm:self-auto shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 shadow-2xs">
@@ -691,7 +691,7 @@
                                         {{ $itemName }}
                                     </span>
                                     <span class="text-blue-700 font-bold shrink-0">
-                                        {{ $itemCount }} Mahasiswa
+                                        {{ $itemCount }} Peserta Magang
                                         @if($itemQuota > 0)
                                             <span class="text-slate-400 font-normal">/ Kuota {{ $itemQuota }}</span>
                                         @endif
@@ -728,7 +728,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 pb-3 border-b border-slate-100">
                     <div class="min-w-0 flex-1">
                         <h3 class="text-sm font-bold text-slate-800 leading-snug">
-                            {{ $isSuperAdmin ? 'Distribusi Asal Kampus Surabaya' : (Auth::user()->isBidangAdmin() ? 'Distribusi Kampus Mahasiswa Bidang' : 'Distribusi Asal Kampus Mahasiswa Dinas') }}
+                            {{ $isSuperAdmin ? 'Distribusi Asal Kampus Surabaya' : (Auth::user()->isBidangAdmin() ? 'Distribusi Kampus Peserta Magang Bidang' : 'Distribusi Asal Kampus Peserta Magang Dinas') }}
                         </h3>
                         <p class="text-xs text-slate-400 mt-0.5">
                             {{ $isSuperAdmin ? 'Sebaran perguruan tinggi mitra resmi program magang' : (Auth::user()->isBidangAdmin() ? 'Sebaran perguruan tinggi pendaftar magang di bidang ini' : 'Sebaran kampus pendaftar di ' . ($currentAgency->agency_name ?? 'dinas ini')) }}
@@ -756,7 +756,7 @@
                         <div @if($loop->index >= 10) x-show="expanded" x-cloak @endif>
                             <div class="flex items-center justify-between text-xs font-semibold mb-1.5">
                                 <span class="text-slate-700 font-medium truncate max-w-[240px]">{{ $campName }}</span>
-                                <span class="text-sky-700 font-bold shrink-0">{{ $campCount }} Mahasiswa <span
+                                <span class="text-sky-700 font-bold shrink-0">{{ $campCount }} Peserta Magang <span
                                         class="text-slate-400 font-normal">({{ $campPercentage }}%)</span></span>
                             </div>
                             <div class="w-full rounded-full overflow-hidden mt-1.5"

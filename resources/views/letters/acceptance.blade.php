@@ -354,11 +354,11 @@
 
         // Data mahasiswa & permohonan
         $student = $application->user?->studentProfile;
-        $fakultas = $student?->fakultas ?? $student?->faculty ?? 'Fakultas Mahasiswa';
+        $fakultas = $student?->fakultas ?? $student?->faculty ?? 'Fakultas Peserta Magang';
         $universitas = $student?->universitas ?? $application->user?->university ?? 'Perguruan Tinggi';
         $nim = $student?->nim ?? '-';
         $jurusan = $student?->jurusan ?? $student?->major ?? '-';
-        $semester = $student?->semester ? 'Semester ' . $student->semester : '-';
+        $semester = $student?->periodLabel() ?? '-';
 
         // Format tanggal
         \Carbon\Carbon::setLocale('id');
@@ -492,7 +492,7 @@
         <!-- 4. PARAGRAF PENGANTAR & TABEL IDENTITAS MAHASISWA -->
         <div class="content-body">
             <p>
-                Menindaklanjuti surat permohonan izin Praktik Kerja Magang dari Universitas Saudara, bersama ini disampaikan bahwa Pemerintah Kota Surabaya melalui {{ $agencyName }} menyetujui / menerima {{ $application->group_id ? 'kelompok mahasiswa' : 'mahasiswa' }} berikut:
+                Menindaklanjuti surat permohonan izin Praktik Kerja Magang dari Universitas Saudara, bersama ini disampaikan bahwa Pemerintah Kota Surabaya melalui {{ $agencyName }} menyetujui / menerima {{ $application->group_id ? 'kelompok peserta magang' : 'mahasiswa' }} berikut:
             </p>
 
             <table class="student-table">
@@ -500,7 +500,7 @@
                     <tr>
                         <th style="width: 32px;">No</th>
                         <th>Nama</th>
-                        <th style="width: 120px;">NIM</th>
+                        <th style="width: 120px;">NIM/NIS</th>
                         <th>Program Studi</th>
                         <th>Fakultas</th>
                         <th style="width: 80px;">Semester</th>
@@ -518,7 +518,7 @@
                                 $mNim = $mStudent?->nim ?? '-';
                                 $mJurusan = $mStudent?->jurusan ?? $mStudent?->major ?? '-';
                                 $mFakultas = $mStudent?->fakultas ?? $mStudent?->faculty ?? '-';
-                                $mSemester = $mStudent?->semester ? 'Semester ' . $mStudent->semester : '-';
+                                $mSemester = $mStudent?->periodLabel() ?? '-';
                                 $mRole = $grpApp->role_in_group === 'leader' ? 'Ketua' : 'Anggota';
                             @endphp
                             <tr>

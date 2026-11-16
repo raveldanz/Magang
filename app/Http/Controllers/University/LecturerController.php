@@ -114,8 +114,8 @@ class LecturerController extends Controller
             'email' => 'required|email|max:255|unique:users,email',
             'nidn' => 'nullable|string|max:50',
         ], [
-            'name.required' => 'Nama lengkap beserta gelar dosen wajib diisi.',
-            'email.required' => 'Email resmi dosen wajib diisi.',
+            'name.required' => 'Nama lengkap beserta gelar pembimbing wajib diisi.',
+            'email.required' => 'Email resmi pembimbing wajib diisi.',
             'email.unique' => 'Email ini sudah terdaftar di dalam sistem.',
         ]);
 
@@ -136,7 +136,7 @@ class LecturerController extends Controller
         $this->issueTemporaryPasswordFor($lecturer);
 
         return redirect()->route('university.lecturers.index')
-            ->with('success', "Dosen Pembimbing Baru '{$lecturer->name}' berhasil ditambahkan ke daftar dosen kampus!");
+            ->with('success', "Pembimbing Baru '{$lecturer->name}' berhasil ditambahkan ke daftar pembimbing kampus!");
     }
 
     /**
@@ -157,7 +157,7 @@ class LecturerController extends Controller
         $isSameUniv = app(UniversityResolver::class)->belongsTo($lecturer, $university);
 
         if (! $isSameUniv) {
-            abort(403, 'Anda tidak memiliki hak akses untuk mengedit data dosen kampus lain.');
+            abort(403, 'Anda tidak memiliki hak akses untuk mengedit data pembimbing kampus lain.');
         }
 
         $request->validate([
@@ -166,8 +166,8 @@ class LecturerController extends Controller
             'nidn' => 'nullable|string|max:50',
             'status' => ['nullable', 'string', Rule::in(AccountStatus::values())],
         ], [
-            'name.required' => 'Nama lengkap dosen wajib diisi.',
-            'email.required' => 'Email resmi dosen wajib diisi.',
+            'name.required' => 'Nama lengkap pembimbing wajib diisi.',
+            'email.required' => 'Email resmi pembimbing wajib diisi.',
             'email.unique' => 'Email ini sudah digunakan oleh akun lain.',
         ]);
 
@@ -183,7 +183,7 @@ class LecturerController extends Controller
         ]);
 
         return redirect()->route('university.lecturers.index')
-            ->with('success', "Data & Status Dosen Pembimbing '{$dosenName}' berhasil diperbarui!");
+            ->with('success', "Data & Status Pembimbing '{$dosenName}' berhasil diperbarui!");
     }
 
     /**
@@ -204,13 +204,13 @@ class LecturerController extends Controller
         $isSameUniv = app(UniversityResolver::class)->belongsTo($lecturer, $university);
 
         if (! $isSameUniv) {
-            abort(403, 'Anda tidak memiliki hak akses untuk mereset password dosen kampus lain.');
+            abort(403, 'Anda tidak memiliki hak akses untuk mereset password pembimbing kampus lain.');
         }
 
         $this->issueTemporaryPasswordFor($lecturer);
 
         return redirect()->route('university.lecturers.index')
-            ->with('success', "Password untuk Dosen '{$lecturer->name}' ({$lecturer->email}) berhasil direset. Password sementara ditampilkan sekali di layar ini.");
+            ->with('success', "Password untuk Pembimbing '{$lecturer->name}' ({$lecturer->email}) berhasil direset. Password sementara ditampilkan sekali di layar ini.");
     }
 
     /**
@@ -251,7 +251,7 @@ class LecturerController extends Controller
         $isSameUniv = app(UniversityResolver::class)->belongsTo($lecturer, $university);
 
         if (! $isSameUniv) {
-            abort(403, 'Anda tidak memiliki hak akses untuk menghapus dosen kampus lain.');
+            abort(403, 'Anda tidak memiliki hak akses untuk menghapus pembimbing kampus lain.');
         }
 
         // Periksa riwayat bimbingan (aktif maupun alumni): placements.academic_advisor_id ON DELETE SET NULL
@@ -260,13 +260,13 @@ class LecturerController extends Controller
 
         if ($historyCount > 0) {
             return redirect()->route('university.lecturers.index')
-                ->with('error', "Dosen '{$lecturer->name}' tidak dapat dihapus karena tercatat membimbing {$historyCount} mahasiswa (termasuk arsip alumni). Ubah status dosen menjadi Nonaktif untuk mencabut aksesnya.");
+                ->with('error', "Pembimbing '{$lecturer->name}' tidak dapat dihapus karena tercatat membimbing {$historyCount} peserta magang (termasuk arsip alumni). Ubah status pembimbing menjadi Nonaktif untuk mencabut aksesnya.");
         }
 
         $lecturerName = $lecturer->name;
         $lecturer->delete();
 
         return redirect()->route('university.lecturers.index')
-            ->with('success', "Dosen Pembimbing '{$lecturerName}' berhasil dihapus dari daftar kampus.");
+            ->with('success', "Pembimbing '{$lecturerName}' berhasil dihapus dari daftar kampus.");
     }
 }

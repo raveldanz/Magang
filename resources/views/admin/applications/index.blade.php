@@ -66,7 +66,7 @@
                                 </svg>
                             </div>
                             <input type="text" name="search" value="{{ request('search') }}" 
-                                placeholder="Cari nama mahasiswa, NIM, atau universitas..." 
+                                placeholder="Cari nama peserta magang, NIM/NIS, atau universitas..." 
                                 class="w-full text-xs sm:text-sm bg-white border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs font-medium placeholder:text-gray-400 h-10"
                                 style="padding-left: 2.75rem !important; padding-right: 1rem !important;" />
                         </div>
@@ -528,8 +528,8 @@
 
                                                     <!-- Baris 2: Ketua: [Nama Ketua] • [Nama Universitas] -->
                                                     <div class="text-[11px] text-slate-500 mt-0.5 leading-tight truncate font-normal" 
-                                                         title="Ketua: {{ $app->group->leader?->name ?? $app->user?->name ?? 'Mahasiswa' }} • {{ $app->user?->studentProfile?->universitas ?? '-' }}">
-                                                        <span class="text-slate-600">Ketua: <span class="font-medium text-slate-700">{{ $app->group->leader?->name ?? $app->user?->name ?? 'Mahasiswa' }}</span></span>
+                                                         title="Ketua: {{ $app->group->leader?->name ?? $app->user?->name ?? 'Peserta Magang' }} • {{ $app->user?->studentProfile?->universitas ?? '-' }}">
+                                                        <span class="text-slate-600">Ketua: <span class="font-medium text-slate-700">{{ $app->group->leader?->name ?? $app->user?->name ?? 'Peserta Magang' }}</span></span>
                                                         <span class="text-slate-300 mx-1">•</span>
                                                         <span class="text-slate-500">{{ $app->user?->studentProfile?->universitas ?? '-' }}</span>
                                                     </div>
@@ -610,12 +610,12 @@
                                                     <div class="flex items-center gap-2">
                                                         <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 shrink-0"></span>
                                                         <h5 class="font-extrabold text-xs text-slate-800 uppercase tracking-wider">
-                                                            Daftar Mahasiswa Anggota: {{ $app->group->name }}
+                                                            Daftar Peserta Magang Anggota: {{ $app->group->name }}
                                                         </h5>
-                                                        <span class="text-xs text-slate-400 font-medium">Total {{ $groupMemberCount }} Mahasiswa</span>
+                                                        <span class="text-xs text-slate-400 font-medium">Total {{ $groupMemberCount }} Peserta Magang</span>
                                                     </div>
                                                     <div class="text-[11px] text-slate-500">
-                                                        Buka Detail untuk melihat berkas dan mengelola keputusan per mahasiswa
+                                                        Buka Detail untuk melihat berkas dan mengelola keputusan per peserta magang
                                                     </div>
                                                 </div>
 
@@ -624,9 +624,9 @@
                                                         <thead>
                                                             <tr class="text-[10px] uppercase font-bold text-slate-400 border-b border-slate-100 bg-slate-50/60">
                                                                 <th class="py-2 px-3">Peran</th>
-                                                                <th class="py-2 px-3">Nama Mahasiswa &amp; NIM</th>
+                                                                <th class="py-2 px-3">Nama Peserta Magang &amp; NIM/NIS</th>
                                                                 <th class="py-2 px-3">Jurusan &amp; Kampus</th>
-                                                                <th class="py-2 px-3 text-center">Status Mahasiswa</th>
+                                                                <th class="py-2 px-3 text-center">Status Peserta Magang</th>
                                                                 <th class="py-2 px-3 text-center">Aksi</th>
                                                             </tr>
                                                         </thead>
@@ -646,10 +646,10 @@
                                                                     </td>
                                                                     <td class="py-2.5 px-3">
                                                                         <div class="font-bold text-slate-900 text-xs">
-                                                                            {{ $memberApp->user?->name ?? 'Mahasiswa' }}
+                                                                            {{ $memberApp->user?->name ?? 'Peserta Magang' }}
                                                                         </div>
                                                                         <div class="text-[11px] text-slate-400 font-mono">
-                                                                            NIM: {{ $memberApp->user?->studentProfile?->nim ?? '-' }}
+                                                                            NIM/NIS: {{ $memberApp->user?->studentProfile?->nim ?? '-' }}
                                                                         </div>
                                                                     </td>
                                                                     <td class="py-2.5 px-3">
@@ -694,8 +694,8 @@
                                                     {{ strtoupper(substr($app->user?->name ?? 'M', 0, 1)) }}
                                                 </div>
                                                 <div class="min-w-0 max-w-[240px] sm:max-w-[280px]">
-                                                    <a href="{{ route('admin.applications.show', $app->id) }}" class="font-bold text-slate-900 text-xs sm:text-sm hover:text-blue-600 transition leading-tight truncate block" title="{{ $app->user?->name ?? 'Mahasiswa' }}">
-                                                        {{ $app->user?->name ?? 'Mahasiswa' }}
+                                                    <a href="{{ route('admin.applications.show', $app->id) }}" class="font-bold text-slate-900 text-xs sm:text-sm hover:text-blue-600 transition leading-tight truncate block" title="{{ $app->user?->name ?? 'Peserta Magang' }}">
+                                                        {{ $app->user?->name ?? 'Peserta Magang' }}
                                                     </a>
                                                     <div class="text-[11px] text-slate-500 mt-0.5 leading-tight truncate" title="{{ $app->user?->studentProfile?->universitas ?? '-' }}{{ $app->user?->studentProfile?->jurusan ? ' • ' . $app->user?->studentProfile?->jurusan : '' }}">
                                                         <span class="font-medium text-slate-700">{{ $app->user?->studentProfile?->universitas ?? '-' }}</span>
@@ -814,7 +814,7 @@
                                 </div>
                                 <div class="min-w-0">
                                     <h4 class="font-bold text-sm text-slate-900 leading-snug">{{ $app->group->name }}</h4>
-                                    <p class="text-xs text-slate-600 mt-0.5 font-normal">Ketua: {{ $app->group->leader?->name ?? $app->user?->name ?? 'Mahasiswa' }}</p>
+                                    <p class="text-xs text-slate-600 mt-0.5 font-normal">Ketua: {{ $app->group->leader?->name ?? $app->user?->name ?? 'Peserta Magang' }}</p>
                                     <p class="text-xs text-slate-500 mt-0.5">{{ $app->user?->studentProfile?->universitas ?? '-' }}</p>
                                 </div>
 
@@ -852,9 +852,9 @@
                                                         <span class="px-1.5 py-0.5 rounded text-[9px] font-black {{ $memberApp->role_in_group === 'leader' ? 'bg-purple-100 text-purple-800 border border-purple-200' : 'bg-slate-200 text-slate-700' }}">
                                                             {{ $memberApp->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }}
                                                         </span>
-                                                        <span class="font-bold text-xs text-slate-900">{{ $memberApp->user?->name ?? 'Mahasiswa' }}</span>
+                                                        <span class="font-bold text-xs text-slate-900">{{ $memberApp->user?->name ?? 'Peserta Magang' }}</span>
                                                     </div>
-                                                    <p class="text-[11px] text-slate-500 mt-0.5">NIM: {{ $memberApp->user?->studentProfile?->nim ?? '-' }} · {{ $memberApp->user?->studentProfile?->jurusan ?? '-' }}</p>
+                                                    <p class="text-[11px] text-slate-500 mt-0.5">NIM/NIS: {{ $memberApp->user?->studentProfile?->nim ?? '-' }} · {{ $memberApp->user?->studentProfile?->jurusan ?? '-' }}</p>
                                                 </div>
                                                 <x-status-badge :status="$memberApp->status" />
                                             </div>
@@ -890,7 +890,7 @@
                                     @endif
                                 </div>
                                 <div class="min-w-0">
-                                    <h4 class="font-bold text-sm text-slate-900 leading-snug">{{ $app->user?->name ?? 'Mahasiswa' }}</h4>
+                                    <h4 class="font-bold text-sm text-slate-900 leading-snug">{{ $app->user?->name ?? 'Peserta Magang' }}</h4>
                                     <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">{{ $app->user?->studentProfile?->universitas ?? '-' }} <span class="text-slate-400">· {{ $app->user?->studentProfile?->jurusan ?? '-' }}</span></p>
                                 </div>
 

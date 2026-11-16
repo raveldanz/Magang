@@ -30,7 +30,7 @@ class ChatGroupService
     public function create(User $creator, string $title, ?string $description, array $memberIds): ChatConversation
     {
         if (! $this->contacts->canCreateGroups($creator)) {
-            throw new AuthorizationException('Mahasiswa tidak dapat membuat grup. Minta mentor, dosen, atau admin untuk membuatkan grup.');
+            throw new AuthorizationException('Peserta Magang tidak dapat membuat grup. Minta mentor, pembimbing, atau admin untuk membuatkan grup.');
         }
 
         $members = $this->resolveContacts($creator, $memberIds);
@@ -205,7 +205,7 @@ class ChatGroupService
                 'created_by' => $mentor->id,
                 'agency_profile_id' => $mentor->agency_profile_id,
                 'title' => "Bimbingan Mentor {$mentor->name}",
-                'description' => "Grup Koordinasi Bimbingan Magang Mahasiswa bersama Mentor {$mentor->name}",
+                'description' => "Grup Koordinasi Bimbingan Magang Peserta bersama Mentor {$mentor->name}",
             ]);
             $created = true;
         }
@@ -226,7 +226,7 @@ class ChatGroupService
         $removed = array_values(array_diff($removed, [(int) $mentor->id]));
 
         if ($created) {
-            $this->system($conversation, "Grup Bimbingan Mentor {$mentor->name} dibuat otomatis untuk koordinasi mahasiswa bimbingan.", 'guidance_group_created');
+            $this->system($conversation, "Grup Bimbingan Mentor {$mentor->name} dibuat otomatis untuk koordinasi peserta bimbingan.", 'guidance_group_created');
         }
 
         $usersById = User::whereIn('id', array_merge($added, $removed))->get()->keyBy('id');
@@ -301,8 +301,8 @@ class ChatGroupService
                 'scope_type' => ChatConversation::SCOPE_DPL_GUIDANCE,
                 'created_by' => $dpl->id,
                 'university_id' => $dpl->university_id,
-                'title' => "Bimbingan Dosen {$dpl->name}",
-                'description' => "Grup Koordinasi Bimbingan Magang Mahasiswa bersama Dosen {$dpl->name}",
+                'title' => "Bimbingan Pembimbing {$dpl->name}",
+                'description' => "Grup Koordinasi Bimbingan Magang Peserta bersama Pembimbing {$dpl->name}",
             ]);
             $created = true;
         }
@@ -323,7 +323,7 @@ class ChatGroupService
         $removed = array_values(array_diff($removed, [(int) $dpl->id]));
 
         if ($created) {
-            $this->system($conversation, "Grup Bimbingan Dosen {$dpl->name} dibuat otomatis untuk koordinasi mahasiswa bimbingan.", 'guidance_group_created');
+            $this->system($conversation, "Grup Bimbingan Pembimbing {$dpl->name} dibuat otomatis untuk koordinasi peserta bimbingan.", 'guidance_group_created');
         }
 
         $usersById = User::whereIn('id', array_merge($added, $removed))->get()->keyBy('id');
@@ -339,7 +339,7 @@ class ChatGroupService
             ]);
             $addedUser = $usersById[$userId] ?? null;
             if ($addedUser) {
-                $this->system($conversation, "{$addedUser->name} bergabung ke grup bimbingan dosen.", 'member_added');
+                $this->system($conversation, "{$addedUser->name} bergabung ke grup bimbingan pembimbing.", 'member_added');
             }
         }
 
@@ -350,7 +350,7 @@ class ChatGroupService
                 $isResigned = Application::where('user_id', $userId)->where('status', 'resigned')->exists();
                 $msg = $isResigned
                     ? "{$removedUser->name} dikeluarkan dari grup bimbingan karena telah mengundurkan diri (resigned)."
-                    : "{$removedUser->name} tidak lagi berada dalam bimbingan dosen ini.";
+                    : "{$removedUser->name} tidak lagi berada dalam bimbingan pembimbing ini.";
                 $this->system($conversation, $msg, 'member_removed');
             }
         }

@@ -216,7 +216,7 @@ class ActionPriorityDisplayTest extends TestCase
 
         $this->assertSame([3, 'Mentor belum ditetapkan'], [$noMentor->actionPriority(), $noMentor->actionHint()]);
         // Default: mengikuti kebijakan kampus mahasiswa (require_dpl = true)
-        $this->assertSame([3, 'Dosen pembimbing belum ditetapkan'], [$noDosen->actionPriority(), $noDosen->actionHint()]);
+        $this->assertSame([3, 'Pembimbing belum ditetapkan'], [$noDosen->actionPriority(), $noDosen->actionHint()]);
         $this->assertSame([4, null], [$noDosen->actionPriority(false), $noDosen->actionHint(false)]);
         // Kampus yang tidak mewajibkan DPL: mahasiswa aktif tanpa DPL tidak dianggap perlu tindakan
         $this->univ->update(['require_dpl' => false]);

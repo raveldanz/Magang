@@ -159,10 +159,10 @@ class DashboardController extends Controller
         // DPL wajib berasal dari perguruan tinggi mahasiswa sendiri
         $studentUnivId = $this->studentUniversityId($user);
         if (! $studentUnivId) {
-            return redirect()->route('student.profile.edit')->with('error', 'Lengkapi asal perguruan tinggi di profil Anda sebelum memilih Dosen Pembimbing.');
+            return redirect()->route('student.profile.edit')->with('error', 'Lengkapi asal perguruan tinggi di profil Anda sebelum memilih Pembimbing.');
         }
         if ((int) $advisor->university_id !== $studentUnivId) {
-            return redirect()->route('dashboard')->with('error', 'Dosen Pembimbing yang dipilih harus berasal dari perguruan tinggi Anda.');
+            return redirect()->route('dashboard')->with('error', 'Pembimbing yang dipilih harus berasal dari perguruan tinggi Anda.');
         }
 
         // Update row placement yang sudah ada (bukan membuat baris baru)
@@ -176,7 +176,7 @@ class DashboardController extends Controller
             ->where('id', '!=', $placement->id)
             ->delete();
 
-        return redirect()->route('dashboard')->with('success', 'Dosen Pembimbing Kampus ('.$advisor->name.') berhasil dipilih!');
+        return redirect()->route('dashboard')->with('success', 'Pembimbing Kampus ('.$advisor->name.') berhasil dipilih!');
     }
 
     /**
@@ -195,7 +195,7 @@ class DashboardController extends Controller
     private function advisorChangeBlocker(Application $application): ?string
     {
         if ($application->statusValue() === 'completed') {
-            return 'Magang Anda sudah selesai. Dosen Pembimbing tidak dapat diganti lagi.';
+            return 'Magang Anda sudah selesai. Pembimbing tidak dapat diganti lagi.';
         }
 
         $placement = $application->placement;
@@ -209,7 +209,7 @@ class DashboardController extends Controller
         );
 
         if ($placement?->academic_advisor_id && $dplHasGraded) {
-            return 'Dosen Pembimbing sudah memberikan nilai, sehingga tidak dapat diganti oleh mahasiswa. Hubungi Admin Kampus bila perlu perubahan.';
+            return 'Pembimbing sudah memberikan nilai, sehingga tidak dapat diganti oleh peserta magang. Hubungi Admin Kampus bila perlu perubahan.';
         }
 
         return null;
@@ -241,7 +241,7 @@ class DashboardController extends Controller
         // DPL baru selalu dicatat pada perguruan tinggi mahasiswa (input university_id dari form diabaikan)
         $targetUnivId = $this->studentUniversityId($user);
         if (! $targetUnivId) {
-            return redirect()->route('student.profile.edit')->with('error', 'Lengkapi asal perguruan tinggi di profil Anda sebelum mendaftarkan Dosen Pembimbing.');
+            return redirect()->route('student.profile.edit')->with('error', 'Lengkapi asal perguruan tinggi di profil Anda sebelum mendaftarkan Pembimbing.');
         }
         $targetUniv = University::find($targetUnivId);
         $univName = $targetUniv?->name ?? $user->university ?? 'Perguruan Tinggi';
@@ -267,7 +267,7 @@ class DashboardController extends Controller
 
         // Kasus 1: Dosen sudah terdaftar di database
         if ($existingLecturer && $existingLecturer->university_id && (int) $existingLecturer->university_id !== (int) $targetUnivId) {
-            return redirect()->route('dashboard')->with('error', 'Email dosen tersebut terdaftar di perguruan tinggi lain. Hubungi Admin Kampus Anda untuk penugasan Dosen Pembimbing.');
+            return redirect()->route('dashboard')->with('error', 'Email pembimbing tersebut terdaftar di perguruan tinggi lain. Hubungi Admin Kampus Anda untuk penugasan Pembimbing.');
         }
 
         // Akun pembimbing daftar mandiri yang belum disetujui tidak boleh dipakai (cegah akun palsu menilai mahasiswa)
@@ -293,7 +293,7 @@ class DashboardController extends Controller
                 ->where('id', '!=', $placement->id)
                 ->delete();
 
-            return redirect()->route('dashboard')->with('success', "Dosen Pembimbing {$existingLecturer->name} sudah terdaftar sebelumnya di sistem dan berhasil dipilih sebagai Dosen Pembimbing Anda.");
+            return redirect()->route('dashboard')->with('success', "Pembimbing {$existingLecturer->name} sudah terdaftar sebelumnya di sistem dan berhasil dipilih sebagai Pembimbing Anda.");
         }
 
         // Kasus 2: Dosen Baru (Belum Terdaftar)
@@ -333,6 +333,6 @@ class DashboardController extends Controller
             'univ_name' => $univName,
         ]);
 
-        return redirect()->route('dashboard')->with('success', "Akun Dosen Pembimbing Baru ({$newDosen->name}) berhasil didaftarkan dan menunggu aktivasi Admin Kampus.");
+        return redirect()->route('dashboard')->with('success', "Akun Pembimbing Baru ({$newDosen->name}) berhasil didaftarkan dan menunggu aktivasi Admin Kampus.");
     }
 }

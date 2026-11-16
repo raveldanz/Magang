@@ -42,7 +42,7 @@ class LetterController extends Controller
         $isSameUniv = app(UniversityResolver::class)->belongsTo($student, $university);
 
         if (! $isSameUniv) {
-            abort(403, 'Anda tidak memiliki hak akses untuk mencetak surat tugas mahasiswa kampus lain.');
+            abort(403, 'Anda tidak memiliki hak akses untuk mencetak surat tugas peserta magang kampus lain.');
         }
 
         return view('university.letters.internship_letter', compact(

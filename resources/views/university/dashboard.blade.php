@@ -44,7 +44,7 @@
                     </div>
                     <h3 class="text-xl sm:text-2xl font-black">{{ $university->name ?? $user->name }}</h3>
                     <p class="text-blue-100 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
-                        Pemantauan partisipasi, distribusi penempatan, dan evaluasi mahasiswa magang di Dinas Perpustakaan dan Kearsipan Kota Surabaya.
+                        Pemantauan partisipasi, distribusi penempatan, dan evaluasi peserta magang di Dinas Perpustakaan dan Kearsipan Kota Surabaya.
                     </p>
                 </div>
                 <div class="hidden sm:block text-right shrink-0">
@@ -59,7 +59,7 @@
                      style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
                     <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Total Pendaftar</span>
                     <div class="text-2xl font-black text-slate-800">{{ $stats['total_students'] ?? 0 }}</div>
-                    <div class="text-[11px] text-slate-500 mt-1">Mahasiswa terdaftar</div>
+                    <div class="text-[11px] text-slate-500 mt-1">Peserta Magang terdaftar</div>
                 </div>
                 <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between"
                      style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
@@ -87,8 +87,8 @@
                  x-data="{ showAll: {{ ($activeUnitsCount ?? 0) > 0 ? 'false' : 'true' }} }">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
                     <div class="min-w-0 flex-1">
-                        <h3 class="text-sm font-bold text-slate-800 leading-snug">Sebaran Bidang Penempatan Mahasiswa</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Distribusi mahasiswa magang pada 4 bidang resmi Dinas Perpustakaan dan Kearsipan Surabaya</p>
+                        <h3 class="text-sm font-bold text-slate-800 leading-snug">Sebaran Bidang Penempatan Peserta Magang</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Distribusi peserta magang pada 4 bidang resmi Dinas Perpustakaan dan Kearsipan Surabaya</p>
                     </div>
                     @if(($totalUnitsCount ?? 0) > ($activeUnitsCount ?? 0))
                         <button type="button" @click="showAll = !showAll"
@@ -100,7 +100,7 @@
 
                 <div class="space-y-4 pt-1">
                     @if(($activeUnitsCount ?? 0) === 0)
-                        <div x-show="!showAll" class="text-center py-6 text-xs text-slate-400">Belum ada mahasiswa yang aktif ditempatkan pada bidang Dispusip.</div>
+                        <div x-show="!showAll" class="text-center py-6 text-xs text-slate-400">Belum ada peserta magang yang aktif ditempatkan pada bidang Dispusip.</div>
                     @endif
                     @foreach ($unitDistribution ?? [] as $dist)
                         @php $hasStudents = $dist['count'] > 0; @endphp
@@ -108,7 +108,7 @@
                             <div class="flex items-center justify-between text-xs font-semibold mb-1.5 gap-2">
                                 <span class="text-slate-700 font-medium truncate flex-1 min-w-0">{{ $dist['name'] }}</span>
                                 <span class="text-blue-700 font-bold shrink-0">
-                                    {{ $dist['count'] }} Mahasiswa
+                                    {{ $dist['count'] }} Peserta Magang
                                     <span class="text-slate-400 font-normal">({{ $dist['percentage'] }}%)</span>
                                 </span>
                             </div>
@@ -127,7 +127,7 @@
                 <form method="GET" action="{{ route('university.dashboard') }}" class="flex flex-col sm:flex-row gap-3">
                     <div class="flex-1">
                         <input type="text" name="search" value="{{ request('search') }}" 
-                            placeholder="Cari nama mahasiswa, NIM, atau jurusan..." 
+                            placeholder="Cari nama peserta magang, NIM/NIS, atau jurusan..." 
                             class="w-full text-xs sm:text-sm border-slate-200 bg-slate-50 focus:bg-white rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-xs">
                     </div>
                     <div class="w-full sm:w-64">
@@ -158,10 +158,10 @@
     <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
             <h4 class="font-bold text-slate-900 text-sm sm:text-base">
-                Daftar Mahasiswa Magang
+                Daftar Peserta Magang
             </h4>
             <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">
-                Seluruh mahasiswa terdaftar asal {{ $university->name ?? $user->name }}
+                Seluruh peserta magang terdaftar asal {{ $university->name ?? $user->name }}
             </p>
         </div>
 
@@ -194,7 +194,7 @@
                         </div>
                     @endif
                     <p class="text-[11px] text-slate-400 font-mono mt-0.5">
-                        NIM: {{ $student->studentProfile->nim ?? '-' }}
+                        NIM/NIS: {{ $student->studentProfile->nim ?? '-' }}
                     </p>
                 </div>
 
@@ -218,8 +218,8 @@
         <table class="min-w-full divide-y divide-slate-100 text-left text-xs sm:text-sm">
             <thead class="bg-slate-50/80 border-b border-slate-200 text-slate-600 uppercase text-[11px] font-bold tracking-wider">
                 <tr>
-                    <th class="px-4 py-3.5 whitespace-nowrap">Mahasiswa</th>
-                    <th class="px-4 py-3.5 whitespace-nowrap">Jurusan / NIM</th>
+                    <th class="px-4 py-3.5 whitespace-nowrap">Peserta Magang</th>
+                    <th class="px-4 py-3.5 whitespace-nowrap">Jurusan / NIM/NIS</th>
                     <th class="px-4 py-3.5 whitespace-nowrap">Instansi & Unit Kerja</th>
                     <th class="px-4 py-3.5 whitespace-nowrap text-center">Status Magang</th>
                     <th class="px-4 py-3.5 whitespace-nowrap">Pembimbing</th>
@@ -252,7 +252,7 @@
                         </td>
                         <td class="px-4 py-4">
                             <div class="font-medium text-slate-800">{{ $student->studentProfile->jurusan ?? '-' }}</div>
-                            <div class="text-xs text-slate-400 font-mono">NIM: {{ $student->studentProfile->nim ?? '-' }}</div>
+                            <div class="text-xs text-slate-400 font-mono">NIM/NIS: {{ $student->studentProfile->nim ?? '-' }}</div>
                         </td>
                         <td class="px-4 py-4">
                             <div class="font-bold text-blue-900">{{ $app->unit->agencyProfile->agency_name ?? '-' }}</div>
@@ -268,7 +268,7 @@
                                 <button type="button" 
                                         @click="assignModal = { show: true, appId: '{{ $app->id }}', studentName: @js((string) ($student->name)), currentAdvisorId: '{{ $dosen->id }}' }"
                                         class="mt-1 text-[11px] text-blue-600 hover:text-blue-800 font-bold underline cursor-pointer">
-                                    Ganti Dosen
+                                    Ganti Pembimbing
                                 </button>
                             @else
                                 <div>
@@ -279,7 +279,7 @@
                                 <button type="button" 
                                         @click="assignModal = { show: true, appId: '{{ $app->id }}', studentName: @js((string) ($student->name)), currentAdvisorId: '' }"
                                         class="mt-1 text-[11px] text-blue-600 hover:text-blue-800 font-bold bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 py-0.5 rounded-md inline-block cursor-pointer">
-                                    + Pilih Dosen
+                                    + Pilih Pembimbing
                                 </button>
                             @endif
                         </td>
@@ -301,7 +301,7 @@
                 @empty
                     <tr>
                         <td colspan="7" class="px-6 py-8 text-center text-slate-400 text-xs">
-                            Belum ada data pengajuan magang dari mahasiswa kampus ini.
+                            Belum ada data pengajuan magang dari peserta magang kampus ini.
                         </td>
                     </tr>
                 @endforelse
@@ -336,7 +336,7 @@
                 <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
                     <div>
                         <h3 class="font-bold text-base text-slate-900">Penugasan Pembimbing</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Mahasiswa: <strong class="text-slate-700" x-text="assignModal.studentName"></strong></p>
+                        <p class="text-xs text-slate-400 mt-0.5">Peserta Magang: <strong class="text-slate-700" x-text="assignModal.studentName"></strong></p>
                     </div>
                     <button type="button" @click="assignModal.show = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
                 </div>
@@ -364,7 +364,7 @@
                             Batal
                         </button>
                         <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
-                            Simpan Penugasan Dosen
+                            Simpan Penugasan Pembimbing
                         </button>
                     </div>
                 </form>

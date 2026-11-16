@@ -6,7 +6,7 @@
         <div class="flex items-center justify-between gap-2">
             <div class="min-w-0">
                 <h1 class="text-lg font-extrabold text-slate-900 leading-tight">Pesan</h1>
-                <p class="text-xs text-slate-500 truncate">Chat dengan mentor, dosen, dinas & kampus</p>
+                <p class="text-xs text-slate-500 truncate">Chat dengan mentor, pembimbing, dinas & kampus</p>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
                 {{-- Pengaturan notifikasi --}}
@@ -106,7 +106,7 @@
             <button type="button" @click="listFilter = 'students'" role="tab" :aria-selected="listFilter === 'students'"
                     class="h-8 px-3 rounded-full text-xs font-bold whitespace-nowrap transition shrink-0"
                     :class="listFilter === 'students' ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
-                Mahasiswa
+                Peserta Magang
             </button>
 
             <button type="button" @click="listFilter = 'staff'" role="tab" :aria-selected="listFilter === 'staff'"
@@ -148,7 +148,7 @@
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
                 </div>
                 <p class="text-sm font-bold text-slate-800">Belum ada percakapan</p>
-                <p class="text-xs text-slate-500 mt-1">Mulai chat dengan mentor, dosen, admin dinas, atau admin kampus Anda.</p>
+                <p class="text-xs text-slate-500 mt-1">Mulai chat dengan mentor, pembimbing, admin dinas, atau admin kampus Anda.</p>
             </div>
         </template>
 
@@ -157,7 +157,7 @@
                 <p class="text-xs font-semibold text-slate-600"
                    x-text="listFilter === 'priority' ? 'Tidak ada percakapan butuh tindakan segera' : 'Tidak ada percakapan yang cocok'"></p>
                 <p class="text-[11px] text-slate-400"
-                   x-text="listFilter === 'priority' ? 'Semua mahasiswa dan grup bimbingan dalam alur status normal.' : 'Coba ubah kata kunci pencarian atau tab filter di atas.'"></p>
+                   x-text="listFilter === 'priority' ? 'Semua peserta magang dan grup bimbingan dalam alur status normal.' : 'Coba ubah kata kunci pencarian atau tab filter di atas.'"></p>
             </div>
         </template>
 

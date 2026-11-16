@@ -67,7 +67,7 @@
 
                     <!-- Kuota Penerimaan -->
                     <div>
-                        <x-input-label for="quota" value="Kapasitas Kuota Mahasiswa Magang" />
+                        <x-input-label for="quota" value="Kapasitas Kuota Peserta Magang" />
                         <input 
                             type="number" 
                             id="quota" 
@@ -78,7 +78,7 @@
                             class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
                             required
                         >
-                        <p class="text-xs text-gray-500 mt-1">Saat ini: <strong>{{ $unit->occupied_count }}</strong> mahasiswa diterima/aktif menempati kuota ini.</p>
+                        <p class="text-xs text-gray-500 mt-1">Saat ini: <strong>{{ $unit->occupied_count }}</strong> peserta magang diterima/aktif menempati kuota ini.</p>
                         @error('quota')
                             <span class="text-rose-600 text-xs font-medium block mt-1">{{ $message }}</span>
                         @enderror
@@ -93,7 +93,7 @@
                                 <option value="{{ $candidate->id }}" @selected((int) old('head_user_id', $unit->head_user_id) === (int) $candidate->id)>{{ $candidate->name }} ({{ $candidate->email }})</option>
                             @endforeach
                         </select>
-                        <p class="text-xs text-gray-500 mt-1">Kepala Unit dapat memvalidasi logbook mahasiswa di unit ini selama mentor teknis belum ditunjuk.</p>
+                        <p class="text-xs text-gray-500 mt-1">Kepala Unit dapat memvalidasi logbook peserta magang di unit ini selama mentor teknis belum ditunjuk.</p>
                         @error('head_user_id')
                             <span class="text-rose-600 text-xs font-medium block mt-1">{{ $message }}</span>
                         @enderror

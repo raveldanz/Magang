@@ -3,7 +3,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-bold text-xl sm:text-2xl text-slate-900 leading-tight">
-                Monitoring Mahasiswa Bimbingan
+                Monitoring Peserta Bimbingan
             </h2>
         </div>
     </x-slot>
@@ -17,7 +17,7 @@
                     <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'active'])) }}" 
                         class="flex-1 sm:flex-initial min-h-[44px] py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ ($tab ?? 'active') === 'active' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300 font-semibold' }}">
                         <span class="sm:hidden">Aktif</span> {{-- status-guard:ignore --}}
-                        <span class="hidden sm:inline">Mahasiswa Aktif</span> {{-- status-guard:ignore --}}
+                        <span class="hidden sm:inline">Peserta Aktif</span> {{-- status-guard:ignore --}}
                         <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ ($tab ?? 'active') === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $stats['active'] }}</span>
                     </a>
                     <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'completed'])) }}" 
@@ -51,7 +51,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa atau NIM..."
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama peserta magang atau NIM/NIS..."
                                class="w-full min-h-[44px] text-xs sm:text-sm bg-white border border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl pl-10 pr-3.5 py-2.5 transition shadow-2xs">
                     </div>
 
@@ -198,7 +198,7 @@
                         </div>
                     @empty
                         <div class="py-12 text-center text-slate-600 text-xs">
-                            Tidak ditemukan data mahasiswa bimbingan pada tab ini.
+                            Tidak ditemukan data peserta bimbingan pada tab ini.
                         </div>
                     @endforelse
                 </div>
@@ -208,7 +208,7 @@
                     <table class="w-full text-left border-collapse table-fixed">
                         <thead>
                             <tr class="bg-slate-50/75 text-xs font-bold text-slate-600 uppercase tracking-wider">
-                                <th class="py-3.5 px-4 w-[24%]">Mahasiswa</th>
+                                <th class="py-3.5 px-4 w-[24%]">Peserta Magang</th>
                                 <th class="py-3.5 px-4 w-[22%]">Instansi & Unit</th>
                                 <th class="py-3.5 px-3 w-[10%] text-center">Status</th>
                                 <th class="py-3.5 px-3 w-[11%] text-center">Logbook</th>
@@ -261,7 +261,7 @@
                                                 </span>
                                             </div>
                                         @endif
-                                        <div class="text-xs text-slate-500 mt-0.5 truncate">NIM: {{ $profile->nim ?? '-' }} &bull; {{ $profile->major ?? $profile->jurusan ?? '-' }}</div>
+                                        <div class="text-xs text-slate-500 mt-0.5 truncate">NIM/NIS: {{ $profile->nim ?? '-' }} &bull; {{ $profile->major ?? $profile->jurusan ?? '-' }}</div>
                                     </td>
 
                                     <td class="py-4 px-4">
@@ -349,7 +349,7 @@
                             @empty
                                 <tr>
                                     <td colspan="7" class="py-12 text-center text-slate-600 text-xs">
-                                        Tidak ditemukan data mahasiswa bimbingan pada tab ini.
+                                        Tidak ditemukan data peserta bimbingan pada tab ini.
                                     </td>
                                 </tr>
                             @endforelse

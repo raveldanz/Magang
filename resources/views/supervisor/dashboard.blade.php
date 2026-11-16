@@ -2,7 +2,7 @@
     <x-slot name="header">
         <x-page-header 
             title="Pemantauan Bidang & Kepegawaian Magang" 
-            description="Pantau kuota penempatan, sebaran mahasiswa magang aktif di 4 Bidang Resmi Dispusip, serta progres persetujuan." 
+            description="Pantau kuota penempatan, sebaran peserta magang aktif di 4 Bidang Resmi Dispusip, serta progres persetujuan." 
         />
     </x-slot>
 
@@ -44,7 +44,7 @@
                 <!-- Card 3: Mahasiswa Aktif -->
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs flex flex-col justify-between">
                     <div>
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Mahasiswa Aktif</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Peserta Aktif</span>
                         <div class="text-3xl sm:text-4xl font-black text-slate-900 mt-2">{{ $totalActiveInterns }}</div>
                         <p class="text-xs text-slate-500 mt-1">Sedang bertugas di unit kerja</p>
                     </div>
@@ -58,7 +58,7 @@
                     <div>
                         <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Alumni Selesai Magang</span>
                         <div class="text-3xl sm:text-4xl font-black text-slate-900 mt-2">{{ $totalCompletedInterns }}</div>
-                        <p class="text-xs text-slate-500 mt-1">Total mahasiswa telah tuntas magang</p>
+                        <p class="text-xs text-slate-500 mt-1">Total peserta magang telah tuntas magang</p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100">
                         <span class="text-xs text-slate-500 font-medium">Telah menyelesaikan program magang</span>
