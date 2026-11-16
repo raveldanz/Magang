@@ -219,7 +219,7 @@ class Placement extends Model
         $status = $app->status instanceof ApplicationStatus ? $app->status : ApplicationStatus::tryFrom(strtolower((string) $app->status));
 
         if ($status === ApplicationStatus::COMPLETED) {
-            return 'Nilai sudah dikunci karena magang telah dinyatakan selesai dan sertifikat sudah dapat diunduh mahasiswa. Hubungi Admin Dinas bila perlu koreksi nilai.';
+            return 'Nilai sudah dikunci karena magang telah dinyatakan selesai dan sertifikat sedang atau sudah diproses. Hubungi Admin Dinas bila perlu koreksi nilai.';
         }
 
         if ($status === ApplicationStatus::ACTIVE) {

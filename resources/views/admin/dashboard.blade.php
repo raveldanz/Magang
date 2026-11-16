@@ -504,7 +504,7 @@
                         <tbody class="divide-y divide-slate-100">
                             @forelse($dispusipUnits ?? [] as $dUnit)
                                 @php
-                                    $uActive = $dUnit->applications->whereIn('status', ['accepted', 'active'])->count();
+                                    $uActive = $dUnit->applications->filter(fn ($a) => in_array($a->statusValue(), ['accepted', 'active'], true))->count();
                                     $uWaiting = $dUnit->applications->where('status', \App\Enums\ApplicationStatus::WAITING_APPROVAL->value)->count();
                                     $uCompleted = $dUnit->applications->where('status', \App\Enums\ApplicationStatus::COMPLETED->value)->count();
                                     $uRemaining = max(0, $dUnit->quota - $uActive);
@@ -555,7 +555,7 @@
                 <div class="md:hidden p-4 space-y-3 bg-slate-50/50">
                     @forelse($dispusipUnits ?? [] as $dUnit)
                         @php
-                            $uActive = $dUnit->applications->whereIn('status', ['accepted', 'active'])->count();
+                            $uActive = $dUnit->applications->filter(fn ($a) => in_array($a->statusValue(), ['accepted', 'active'], true))->count();
                             $uWaiting = $dUnit->applications->where('status', \App\Enums\ApplicationStatus::WAITING_APPROVAL->value)->count();
                             $uCompleted = $dUnit->applications->where('status', \App\Enums\ApplicationStatus::COMPLETED->value)->count();
                             $uRemaining = max(0, $dUnit->quota - $uActive);

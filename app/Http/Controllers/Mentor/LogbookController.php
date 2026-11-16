@@ -118,17 +118,19 @@ class LogbookController extends Controller
     {
         $mentor = Auth::user();
 
-        $request->validate([
-            'status' => 'required|in:approved,rejected,pending',
-            'feedback' => 'nullable|string|max:1000',
-        ]);
-
+        // Hak akses diperiksa lebih dulu, supaya pihak yang tidak berwenang selalu mendapat 403.
         $logbook = Logbook::with(['placement.application.unit', 'placement.application.user'])->findOrFail($logbookId);
         $placement = $logbook->placement;
 
         if (! $placement || ! $placement->canFieldReviewLogbook($mentor)) {
             abort(403, 'Anda tidak memiliki hak akses untuk memverifikasi logbook mahasiswa ini.');
         }
+
+        $request->validate([
+            'status' => 'required|in:approved,rejected,pending',
+            // Penolakan tanpa catatan membuat mahasiswa tidak tahu apa yang harus diperbaiki.
+            'feedback' => 'nullable|required_if:status,rejected|string|max:1000',
+        ]);
 
         $isFallback = ! $placement->isAssignedFieldMentor($mentor);
 
@@ -163,7 +165,8 @@ class LogbookController extends Controller
             'logbook_ids' => 'required|array|min:1',
             'logbook_ids.*' => 'integer|exists:logbooks,id',
             'status' => 'required|in:approved,rejected',
-            'feedback' => 'nullable|string|max:1000',
+            // Penolakan tanpa catatan membuat mahasiswa tidak tahu apa yang harus diperbaiki.
+            'feedback' => 'nullable|required_if:status,rejected|string|max:1000',
         ]);
 
         $logbooks = Logbook::with(['placement.application.unit', 'placement.application.user'])

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <x-page-header 
-            title="Monitoring Bidang & Kepegawaian Magang" 
+            title="Pemantauan Bidang & Kepegawaian Magang" 
             description="Pantau kuota penempatan, sebaran mahasiswa magang aktif di 4 Bidang Resmi Dispusip, serta progres persetujuan." 
         />
     </x-slot>
@@ -90,7 +90,7 @@
                         <tbody class="divide-y divide-slate-200 text-sm">
                             @forelse($units as $unit)
                                 @php
-                                    $unitActiveCount = $unit->applications->whereIn('status', ['accepted', 'active'])->count();
+                                    $unitActiveCount = $unit->applications->filter(fn ($a) => in_array($a->statusValue(), ['accepted', 'active'], true))->count();
                                     $unitWaitingCount = $unit->applications->where('status', \App\Enums\ApplicationStatus::WAITING_APPROVAL->value)->count();
                                     $unitCompletedCount = $unit->applications->where('status', \App\Enums\ApplicationStatus::COMPLETED->value)->count();
                                     $remainingQuota = max(0, $unit->quota - $unitActiveCount);
@@ -154,7 +154,7 @@
                 <div class="md:hidden p-4 space-y-3 bg-slate-50/50">
                     @foreach($units as $unit)
                         @php
-                            $unitActiveCount = $unit->applications->whereIn('status', ['accepted', 'active'])->count();
+                            $unitActiveCount = $unit->applications->filter(fn ($a) => in_array($a->statusValue(), ['accepted', 'active'], true))->count();
                             $unitWaitingCount = $unit->applications->where('status', \App\Enums\ApplicationStatus::WAITING_APPROVAL->value)->count();
                             $unitCompletedCount = $unit->applications->where('status', \App\Enums\ApplicationStatus::COMPLETED->value)->count();
                             $remainingQuota = max(0, $unit->quota - $unitActiveCount);

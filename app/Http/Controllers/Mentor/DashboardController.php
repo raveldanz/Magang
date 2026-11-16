@@ -229,7 +229,7 @@ class DashboardController extends Controller
 
         $request->validate([
             'status' => 'required|in:approved,revision',
-            'feedback' => 'nullable|string|max:1000',
+            'feedback' => 'nullable|required_if:status,revision|string|max:1000',
         ]);
 
         $report = FinalReport::with('placement.application.unit')->findOrFail($reportId);

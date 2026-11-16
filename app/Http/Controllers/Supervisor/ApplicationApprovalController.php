@@ -305,6 +305,12 @@ class ApplicationApprovalController extends Controller
 
         $oldStatus = $application->status instanceof ApplicationStatus ? $application->status->value : (string) $application->status;
 
+        // Penolakan Atasan hanya berlaku untuk pengajuan yang sedang menunggu pengesahannya. Tanpa penjaga ini,
+        // permintaan langsung ke alamat ini bisa mengembalikan magang yang sudah aktif/selesai menjadi 'pending'.
+        if ($oldStatus !== ApplicationStatus::WAITING_APPROVAL->value) {
+            return redirect()->back()->with('error', 'Pengajuan ini tidak sedang menunggu pengesahan Atasan, sehingga tidak dapat ditolak dari halaman ini.');
+        }
+
         $rejectionText = 'Catatan Penolakan Atasan: '.$request->notes;
 
         $application->update([

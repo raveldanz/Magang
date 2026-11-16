@@ -185,7 +185,7 @@
                             <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider block">Nilai Akhir</span>
                             <span class="text-lg font-bold text-slate-900 mt-1 block">
                                 {{ number_format((float) $evaluation->nilai_akhir, 1) }}
-                                <span class="text-xs font-semibold text-slate-500 font-mono">&bull; Grade {{ $evaluation->grade_calculated ?? '-' }}</span>
+                                <span class="text-xs font-semibold text-slate-500 font-mono">&bull; Predikat {{ $evaluation->grade_calculated ?? '-' }}</span>
                             </span>
                         </div>
                     </div>

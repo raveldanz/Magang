@@ -161,7 +161,12 @@ return [
     'ulid' => ':attribute harus berupa ULID yang valid.',
     'uuid' => ':attribute harus berupa UUID yang valid.',
 
-    'custom' => [],
+    'custom' => [
+        'feedback' => [
+            'required_if' => 'Catatan wajib diisi saat menolak atau meminta revisi, agar mahasiswa tahu apa yang perlu diperbaiki.',
+            'min' => 'Catatan minimal :min karakter agar jelas bagi mahasiswa.',
+        ],
+    ],
 
     'attributes' => [
         'name' => 'nama',
