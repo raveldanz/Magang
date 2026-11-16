@@ -108,7 +108,7 @@
                                 <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 text-xs font-bold flex items-center justify-center">3</span>
                                 <h4 class="font-bold text-xs text-slate-700">Penugasan Pembimbing</h4>
                             </div>
-                            <p class="text-[11px] text-slate-500">Penetapan Mentor Dinas & Dosen Pembimbing Lapangan.</p>
+                            <p class="text-[11px] text-slate-500">Penetapan Mentor Dinas & Pembimbing.</p>
                         </div>
 
                         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 opacity-60 space-y-1">
@@ -150,7 +150,7 @@
                         <div class="text-xs text-blue-900 space-y-1">
                             <p class="font-bold">Informasi Akses Laporan Akhir:</p>
                             <p class="text-blue-800 leading-relaxed">
-                                Formulir pengunggahan naskah laporan ilmiah dan tautan luaran proyek magang akan otomatis aktif dan terbuka untuk diisi setelah pengajuan magang Anda <strong>diterima (disetujui)</strong> oleh pihak instansi kedinasan dan data Dosen Pembimbing telah dilengkapi. Anda dapat mengecek pembaruan status secara berkala di portal ini.
+                                Formulir pengunggahan naskah laporan ilmiah dan tautan luaran proyek magang akan otomatis aktif dan terbuka untuk diisi setelah pengajuan magang Anda <strong>diterima (disetujui)</strong> oleh pihak instansi kedinasan dan data Pembimbing telah dilengkapi. Anda dapat mengecek pembaruan status secara berkala di portal ini.
                             </p>
                         </div>
                     </div>

@@ -112,7 +112,7 @@
                                 </div>
                                 @if($academicAdvisor)
                                     <div class="px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 bg-white/10 border border-white/20 text-white">
-                                        <span class="text-blue-200">Dosen Pembimbing:</span>
+                                        <span class="text-blue-200">Pembimbing:</span>
                                         <strong class="text-white truncate max-w-[200px]">{{ $academicAdvisor->name }}</strong>
                                     </div>
                                 @endif
@@ -214,7 +214,7 @@
                                                 @elseif($isPassed)
                                                     Selamat! Seluruh kewajiban telah terpenuhi. E-Sertifikat resmi siap diunduh.
                                                 @elseif(!$academicAdvisor)
-                                                    Pengajuan diterima! Silakan <strong>pilih Dosen Pembimbing</strong> dari perguruan tinggi Anda.
+                                                    Pengajuan diterima! Silakan <strong>pilih Pembimbing</strong> dari perguruan tinggi Anda.
                                                 @elseif($logbooksCount < 30)
                                                     Terus catat aktivitas kerja harian Anda (sudah terisi <strong>{{ $logbooksCount }} hari</strong>, tersisa <strong>{{ max(0, 30 - $logbooksCount) }} hari kerja</strong>).
                                                 @elseif(!$finalReport || $rawFinalSt !== 'approved')
@@ -329,10 +329,10 @@
                                     </div>
                                 </div>
 
-                                <!-- 3. Dosen Pembimbing -->
+                                <!-- 3. Pembimbing -->
                                 <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                     <div>
-                                        <div class="font-bold text-slate-800">3. Dosen Pembimbing</div>
+                                        <div class="font-bold text-slate-800">3. Pembimbing</div>
                                     </div>
                                     <div class="shrink-0">
                                         @if($academicAdvisor)
@@ -343,13 +343,13 @@
                                         @elseif($isAccepted)
                                             <a href="#change-advisor-box" @click="showDetailModal = false; const box = document.getElementById('change-advisor-box'); if (box) { box.classList.remove('hidden'); box.scrollIntoView({behavior: 'smooth'}); }"
                                                 class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-block">
-                                                Pilih Dosen
+                                                Pilih Pembimbing
                                             </a>
                                         @else
                                             <button type="button" disabled
                                                 class="px-3 py-1.5 rounded-md font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none inline-flex items-center gap-1 shadow-none"
-                                                title="Lengkapi verifikasi pengajuan dan pilih dosen pembimbing terlebih dahulu">
-                                                <span>Pilih Dosen</span>
+                                                title="Lengkapi verifikasi pengajuan dan pilih pembimbing terlebih dahulu">
+                                                <span>Pilih Pembimbing</span>
                                             </button>
                                         @endif
                                     </div>
@@ -360,7 +360,7 @@
                                     <div>
                                         <div class="font-bold text-slate-800">4. Logbook Kegiatan Harian</div>
                                         <div class="text-slate-500 mt-0.5">
-                                            Status: <strong>{{ $logbooksCount }} hari terisi</strong>
+                                             Status: <strong>{{ $logbooksCount }} hari terisi</strong>
                                         </div>
                                     </div>
                                     <div class="shrink-0 flex items-center gap-2">
@@ -376,12 +376,12 @@
                                         @else
                                             <button type="button" disabled
                                                 class="px-3 py-1.5 rounded-md font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none inline-flex items-center gap-1 shadow-none"
-                                                title="Lengkapi verifikasi pengajuan dan pilih dosen pembimbing terlebih dahulu">
+                                                title="Lengkapi verifikasi pengajuan dan pilih pembimbing terlebih dahulu">
                                                 <span>+ Isi Logbook</span>
                                             </button>
                                             <button type="button" disabled
                                                 class="px-3 py-1.5 rounded-md font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none inline-block shadow-none"
-                                                title="Lengkapi verifikasi pengajuan dan pilih dosen pembimbing terlebih dahulu">
+                                                title="Lengkapi verifikasi pengajuan dan pilih pembimbing terlebih dahulu">
                                                 Lihat Riwayat
                                             </button>
                                         @endif
@@ -393,13 +393,13 @@
                                     <div>
                                         <div class="font-bold text-slate-800">5. Laporan Akhir Ilmiah Magang</div>
                                         <div class="text-slate-500 mt-0.5">Dokumen pertanggungjawaban kegiatan magang
-                                            yang disahkan Dosen Pembimbing dan Mentor</div>
+                                            yang disahkan Pembimbing dan Mentor</div>
                                     </div>
                                     <div class="shrink-0">
                                         @if (!$canProceed)
                                             <button type="button" disabled
                                                 class="px-3 py-1.5 rounded-md font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none inline-flex items-center gap-1 shadow-none"
-                                                title="Lengkapi verifikasi pengajuan dan pilih dosen pembimbing terlebih dahulu">
+                                                title="Lengkapi verifikasi pengajuan dan pilih pembimbing terlebih dahulu">
                                                 <span>Unggah Laporan</span>
                                             </button>
                                         @elseif ($finalReport && $rawFinalSt === 'approved')
@@ -470,7 +470,7 @@
                                     <p class="text-xs sm:text-sm max-w-2xl leading-relaxed"
                                         style="color: #d1fae5 !important;">
                                         Seluruh kewajiban logbook harian, laporan akhir ilmiah, dan evaluasi instansi dinas
-                                        serta bimbingan akademik dosen pembimbing telah lengkap. E-Sertifikat resmi kelulusan
+                                        serta bimbingan akademik pembimbing telah lengkap. E-Sertifikat resmi kelulusan
                                         telah
                                         diterbitkan.
                                     </p>
@@ -507,7 +507,7 @@
                                 <div class="p-3.5 rounded-2xl"
                                     style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important;">
                                     <span class="text-[10px] font-bold uppercase tracking-wider block"
-                                        style="color: #a7f3d0 !important;">Nilai Dosen Pembimbing</span>
+                                        style="color: #a7f3d0 !important;">Nilai Pembimbing</span>
                                     <p class="text-xl sm:text-2xl font-black mt-1" style="color: #ffffff !important;">
                                         {{ $nilaiDosen }}/100
                                     </p>
@@ -591,11 +591,11 @@
                             </div>
                         </div>
 
-                        <!-- Card 2: Dosen Pembimbing (Desktop) -->
+                        <!-- Card 2: Pembimbing (Desktop) -->
                         <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-between">
                             <div>
                                 <div class="flex items-center justify-between">
-                                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Dosen Pembimbing</p>
+                                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pembimbing</p>
                                     @if ($academicAdvisor)
                                         <span class="px-2.5 py-0.5 text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
                                             Terpilih
@@ -616,8 +616,8 @@
                                             <p class="truncate"><span class="text-slate-400">Kampus:</span> <strong>{{ is_string($academicAdvisor->university) ? $academicAdvisor->university : ($academicAdvisor->universityRelation?->name ?? $academicAdvisor->university?->name ?? $univName ?? $profile->universitas) }}</strong></p>
                                         </div>
                                     @elseif ($application && in_array($rawAppSt, ['accepted', 'active', 'completed'], true))
-                                        <p class="text-sm font-semibold text-slate-700">Belum memilih dosen pembimbing</p>
-                                        <p class="text-xs text-slate-400 mt-1">Dosen akademik dari perguruan tinggi Anda.</p>
+                                        <p class="text-sm font-semibold text-slate-700">Belum memilih pembimbing</p>
+                                        <p class="text-xs text-slate-400 mt-1">Pembimbing akademik dari perguruan tinggi Anda.</p>
                                     @else
                                         <p class="text-sm font-semibold text-slate-400">Belum Tersedia</p>
                                         <p class="text-xs text-slate-400 mt-1">Tersedia setelah diterima magang.</p>
@@ -629,7 +629,7 @@
                                     <button type="button"
                                         onclick="const el = document.getElementById('change-advisor-box'); el.classList.toggle('hidden'); if(!el.classList.contains('hidden')) el.scrollIntoView({behavior: 'smooth'});"
                                         class="text-xs font-bold text-blue-600 hover:text-blue-800 cursor-pointer">
-                                        {{ $academicAdvisor ? 'Ganti Dosen Pembimbing' : 'Pilih Dosen Pembimbing' }}
+                                        {{ $academicAdvisor ? 'Ganti Pembimbing' : 'Pilih Pembimbing' }}
                                     </button>
                                 @else
                                     <span class="text-[11px] text-slate-400">-</span>
@@ -667,11 +667,11 @@
                         </div>
                     </div>
 
-                    <!-- FORM PILIH DOSEN PEMBIMBING (DESKTOP - MUNCUL TEPAT DI BAWAH 3 KARTU, DETAIL PENEMPATAN TURUN KE BAWAH) -->
+                    <!-- FORM PILIH PEMBIMBING (DESKTOP - MUNCUL TEPAT DI BAWAH 3 KARTU, DETAIL PENEMPATAN TURUN KE BAWAH) -->
                     @if ($application && in_array($rawAppSt, ['accepted', 'active', 'completed'], true))
                         <div id="change-advisor-box" class="{{ $academicAdvisor ? 'hidden' : '' }} bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4 scroll-mt-6">
                             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                                <h4 class="font-bold text-slate-800 text-base">Pilih Dosen Pembimbing</h4>
+                                <h4 class="font-bold text-slate-800 text-base">Pilih Pembimbing</h4>
                                 @if ($academicAdvisor)
                                     <button type="button"
                                         onclick="document.getElementById('change-advisor-box').classList.add('hidden')"
@@ -685,11 +685,11 @@
                                 <div>
                                     <label for="academic_advisor_id"
                                         class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                        Pilih Dosen Terdaftar: {{ $univName ?? $profile->universitas ?? 'Kampus Mahasiswa' }}
+                                        Pilih Pembimbing Terdaftar: {{ $univName ?? $profile->universitas ?? 'Kampus Mahasiswa' }}
                                     </label>
                                     <select id="academic_advisor_id" name="academic_advisor_id" required
                                         class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs p-2.5">
-                                        <option value="">-- Pilih Dosen Pembimbing --</option>
+                                        <option value="">-- Pilih Pembimbing --</option>
                                         @if(isset($availableDosens))
                                             @foreach ($availableDosens as $dosen)
                                                 <option value="{{ $dosen->id }}" {{ optional($placement)->academic_advisor_id == $dosen->id ? 'selected' : '' }}>
@@ -707,7 +707,7 @@
                                     <div class="flex items-center gap-2">
                                         <button type="submit"
                                             class="w-full sm:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
-                                            {{ __('Simpan Dosen Pembimbing') }}
+                                            {{ __('Simpan Pembimbing') }}
                                         </button>
                                         @if ($academicAdvisor)
                                             <button type="button"

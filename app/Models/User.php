@@ -114,10 +114,10 @@ class User extends Authenticatable
         return match ($this->role) {
             'super_admin' => 'Super Admin',
             'supervisor' => 'Supervisor',
-            'mentor', 'pembimbing' => 'Mentor Lapangan',
-            'lecturer', 'dosen', 'academic_advisor' => 'Dosen / Guru Pembimbing',
-            'university', 'universitas' => 'Admin Instansi Pendidikan',
-            'student', 'mahasiswa' => 'Peserta Magang',
+            'mentor' => 'Mentor Lapangan',
+            'pembimbing', 'lecturer', 'dosen', 'academic_advisor' => 'Pembimbing',
+            'university', 'universitas' => 'Admin Universitas',
+            'student', 'mahasiswa' => 'Mahasiswa Magang',
             default => ucwords(str_replace('_', ' ', (string) $this->role)),
         };
     }

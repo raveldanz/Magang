@@ -13,7 +13,7 @@
                 <h2 class="font-black text-xl text-gray-900 tracking-tight">
                     Tambah Pengguna Sistem Baru
                 </h2>
-                <p class="text-xs text-gray-500">Registrasi akun baru untuk admin, mentor, dosen, universitas, atau
+                <p class="text-xs text-gray-500">Registrasi akun baru untuk admin, mentor, pembimbing, universitas, atau
                     mahasiswa</p>
             </div>
         </div>
@@ -68,7 +68,7 @@
                                 <option value="admin">Admin Instansi Dinas</option>
                                 <option value="supervisor">Supervisor</option>
                                 <option value="mentor">Mentor Lapangan Dinas</option>
-                                <option value="dosen">Dosen Pembimbing</option>
+                                <option value="dosen">Pembimbing</option>
                                 <option value="universitas">Admin Universitas</option>
                             </select>
                         </div>
