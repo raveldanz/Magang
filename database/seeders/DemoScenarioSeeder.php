@@ -220,6 +220,12 @@ class DemoScenarioSeeder extends Seeder
         $nonaktif = $this->student('akun.nonaktif@unesa.ac.id', 'Bayu Setiawan', '22081010107', $unesa, 'S1 Teknik Informatika');
         $nonaktif->forceFill(['status' => 'inactive'])->save();
 
+        // ---------------------------------------------------------------------------------------
+        // 11. Akun demo yang sudah lulus tetapi belum punya logbook sama sekali (mis. kelompok
+        //     haikal.ketua.lulus): tanpa logbook, sertifikatnya tidak bisa diterbitkan saat demo.
+        // ---------------------------------------------------------------------------------------
+        $this->backfillLogbooksForCompletedPlacements();
+
         $this->command?->info('DemoScenarioSeeder: 10 skenario demo tambahan siap dipakai (kata sandi bawaan).');
     }
 
@@ -280,6 +286,35 @@ class DemoScenarioSeeder extends Seeder
         ])->save();
 
         return $placement;
+    }
+
+    private function backfillLogbooksForCompletedPlacements(): void
+    {
+        $activities = [
+            'Orientasi unit kerja dan pengenalan alur layanan.',
+            'Membantu pengolahan data dan administrasi harian unit kerja.',
+            'Menyusun rangkuman pekerjaan dan serah terima tugas magang.',
+        ];
+
+        $placements = Placement::whereHas('application', fn ($q) => $q->where('status', ApplicationStatus::COMPLETED->value))
+            ->whereDoesntHave('logbooks')
+            ->with('application')
+            ->get();
+
+        foreach ($placements as $placement) {
+            $start = Carbon::parse($placement->application->start_date ?? Carbon::now()->subDays(30));
+
+            foreach ($activities as $offset => $activity) {
+                Logbook::create([
+                    'placement_id' => $placement->id,
+                    'date' => $start->copy()->addDays($offset + 1)->toDateString(),
+                    'activity' => $activity,
+                    'status' => 'approved',
+                    'lecturer_status' => 'approved',
+                    'lecturer_verified_at' => Carbon::now(),
+                ]);
+            }
+        }
     }
 
     private function logbook(Placement $placement, int $daysAgo, string $activity, string $status, ?string $feedback = null): void

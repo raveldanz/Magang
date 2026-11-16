@@ -152,26 +152,28 @@ class ProfileController extends Controller
         $idCardPath = $currentProfile?->id_card_path;
 
         $storage = app(PrivateDocumentStorage::class);
+        // Berkas lama baru dihapus di akhir, setelah dipastikan tidak ada data lain yang masih merujuknya.
+        $replacedPaths = [];
 
         // Upload Foto Profil
         if ($request->hasFile('photo')) {
-            $storage->delete($photoPath);
+            $replacedPaths[] = $photoPath;
             $photoPath = $storage->store($request->file('photo'), PrivateDocumentStorage::PROFILE_PHOTO_DIR);
         }
 
         // Upload Dokumen Personal Mahasiswa
         if ($request->hasFile('cv')) {
-            $storage->delete($cvPath);
+            $replacedPaths[] = $cvPath;
             $cvPath = $storage->store($request->file('cv'), 'documents/student-profiles');
         }
 
         if ($request->hasFile('transkrip')) {
-            $storage->delete($transcriptPath);
+            $replacedPaths[] = $transcriptPath;
             $transcriptPath = $storage->store($request->file('transkrip'), 'documents/student-profiles');
         }
 
         if ($request->hasFile('id_card')) {
-            $storage->delete($idCardPath);
+            $replacedPaths[] = $idCardPath;
             $idCardPath = $storage->store($request->file('id_card'), 'documents/student-profiles');
         }
 
@@ -232,6 +234,8 @@ class ProfileController extends Controller
             }
         }
 
+        $this->deleteUnreferencedFiles($storage, $replacedPaths);
+
         $message = $university->is_verified
             ? (session('university_auto_matched')
                 ? "Profil berhasil disimpan. Kampus yang Anda ketik ternyata sudah terdaftar sebagai '{$university->name}', jadi kami pilihkan otomatis."
@@ -239,5 +243,32 @@ class ProfileController extends Controller
             : "Profil berhasil disimpan! Perguruan tinggi '{$university->name}' tercatat sebagai kampus baru dan sedang menunggu verifikasi Admin. Anda tetap dapat melanjutkan pengajuan magang.";
 
         return redirect()->back()->with('success', $message);
+    }
+
+    /**
+     * Hapus berkas lama hanya bila tidak ada lagi yang merujuknya. Pengajuan yang sudah
+     * diterima/aktif/selesai tetap menunjuk berkas saat dikirim, jadi berkas itu tidak boleh
+     * ikut terhapus ketika mahasiswa mengganti dokumen di profil.
+     *
+     * @param  array<int, string|null>  $paths
+     */
+    private function deleteUnreferencedFiles(PrivateDocumentStorage $storage, array $paths): void
+    {
+        foreach (array_unique(array_filter($paths)) as $path) {
+            $stillUsed = Application::where('cv_path', $path)
+                ->orWhere('transcript_path', $path)
+                ->orWhere('id_card_path', $path)
+                ->exists()
+                || ApplicationDocument::where('file_path', $path)->exists()
+                || StudentProfile::where('photo', $path)
+                    ->orWhere('cv_path', $path)
+                    ->orWhere('transcript_path', $path)
+                    ->orWhere('id_card_path', $path)
+                    ->exists();
+
+            if (! $stillUsed) {
+                $storage->delete($path);
+            }
+        }
     }
 }

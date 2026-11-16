@@ -12,6 +12,7 @@ use App\Services\PrivateDocumentStorage;
 use App\Services\UniversityResolver;
 use App\Support\UploadRules;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class LogbookController extends Controller
@@ -154,11 +155,13 @@ class LogbookController extends Controller
         }
 
         $request->validate([
-            'date' => 'required|date',
+            'date' => $this->logbookDateRules($application),
             'activity' => 'required|string|min:10',
             'attachment' => 'nullable|'.UploadRules::LOGBOOK_ATTACHMENT,
         ], [
             'date.required' => 'Tanggal kegiatan logbook wajib diisi.',
+            'date.before_or_equal' => 'Tanggal kegiatan tidak boleh melewati hari ini.',
+            'date.after_or_equal' => 'Tanggal kegiatan tidak boleh sebelum periode magang Anda dimulai.',
             'activity.required' => 'Uraian aktivitas harian magang wajib diisi.',
             'activity.min' => 'Uraian aktivitas harian minimal 10 karakter agar informatif.',
             'attachment.mimes' => 'Lampiran logbook harus berformat PDF, JPG, JPEG, atau PNG.',
@@ -210,6 +213,28 @@ class LogbookController extends Controller
     }
 
     /**
+     * Tanggal logbook harus masuk akal: tidak di masa depan dan tidak sebelum magang dimulai.
+     * Batas bawah memakai tanggal yang lebih awal antara tanggal mulai dan tanggal pengajuan dibuat,
+     * karena mahasiswa berstatus Diterima boleh mulai mencatat sebelum tanggal mulai resmi.
+     *
+     * @return array<int, string>
+     */
+    protected function logbookDateRules(Application $application): array
+    {
+        $rules = ['required', 'date', 'before_or_equal:today'];
+
+        $candidates = array_filter([
+            $application->start_date ? Carbon::parse($application->start_date)->startOfDay() : null,
+            $application->created_at?->copy()->startOfDay(),
+        ]);
+        if ($candidates !== []) {
+            $rules[] = 'after_or_equal:'.min($candidates)->toDateString();
+        }
+
+        return $rules;
+    }
+
+    /**
      * Periksa apakah kampus mahasiswa mewajibkan DPL
      */
     protected function isDplRequiredForStudent($user): bool
@@ -254,11 +279,13 @@ class LogbookController extends Controller
         }
 
         $request->validate([
-            'date' => 'required|date',
+            'date' => $this->logbookDateRules($application),
             'activity' => 'required|string|min:10',
             'attachment' => 'nullable|'.UploadRules::LOGBOOK_ATTACHMENT,
         ], [
             'date.required' => 'Tanggal kegiatan logbook wajib diisi.',
+            'date.before_or_equal' => 'Tanggal kegiatan tidak boleh melewati hari ini.',
+            'date.after_or_equal' => 'Tanggal kegiatan tidak boleh sebelum periode magang Anda dimulai.',
             'activity.required' => 'Uraian aktivitas harian magang wajib diisi.',
             'activity.min' => 'Uraian aktivitas harian minimal 10 karakter agar informatif.',
             'attachment.mimes' => 'Lampiran logbook harus berformat PDF, JPG, JPEG, atau PNG.',

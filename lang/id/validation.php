@@ -208,5 +208,10 @@ return [
         'file_laporan' => 'berkas laporan akhir',
         'mentor_id' => 'mentor',
         'academic_advisor_id' => 'dosen pembimbing',
+        'category' => 'kategori',
+        'subject' => 'judul laporan',
+        'message' => 'isi pesan',
+        'target_role' => 'tujuan laporan',
+        'priority' => 'prioritas',
     ],
 ];

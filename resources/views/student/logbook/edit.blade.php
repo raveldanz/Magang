@@ -72,7 +72,7 @@
                         <label for="date" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                             Tanggal Kegiatan <span class="text-rose-500">*</span>
                         </label>
-                        <input type="date" id="date" name="date" value="{{ old('date', $logbook->date) }}" 
+                        <input type="date" id="date" name="date" value="{{ old('date', $logbook->date) }}" max="{{ date('Y-m-d') }}" 
                                class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs" required>
                         <x-input-error :messages="$errors->get('date')" class="mt-1" />
                     </div>

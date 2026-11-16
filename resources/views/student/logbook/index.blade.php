@@ -390,16 +390,16 @@
                                         </td>
                                         <td class="p-4 text-gray-700 max-w-xs">
                                             <p class="font-medium text-slate-800">{{ Str::limit($log->activity, 120) }}</p>
-                                            @if(!empty($log->mentor_note))
+                                            @if(!empty($log->feedback))
                                                 <div class="mt-2 p-2 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-start gap-1">
                                                     <span class="font-bold shrink-0">Catatan Mentor:</span>
-                                                    <span>{{ $log->mentor_note }}</span>
+                                                    <span>{{ $log->feedback }}</span>
                                                 </div>
                                             @endif
-                                            @if(!empty($log->lecturer_note))
+                                            @if($requiresDpl && !empty($log->lecturer_feedback))
                                                 <div class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800 flex items-start gap-1">
                                                     <span class="font-bold shrink-0">Catatan Dosen:</span>
-                                                    <span>{{ $log->lecturer_note }}</span>
+                                                    <span>{{ $log->lecturer_feedback }}</span>
                                                 </div>
                                             @endif
                                         </td>
@@ -510,6 +510,18 @@
                                 <p class="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
                                     {{ $log->activity }}
                                 </p>
+                                @if(!empty($log->feedback))
+                                    <div class="p-2 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-start gap-1">
+                                        <span class="font-bold shrink-0">Catatan Mentor:</span>
+                                        <span>{{ $log->feedback }}</span>
+                                    </div>
+                                @endif
+                                @if($requiresDpl && !empty($log->lecturer_feedback))
+                                    <div class="p-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800 flex items-start gap-1">
+                                        <span class="font-bold shrink-0">Catatan Dosen:</span>
+                                        <span>{{ $log->lecturer_feedback }}</span>
+                                    </div>
+                                @endif
 
                                 <div class="grid grid-cols-2 gap-2 text-[11px]">
                                     <div class="p-2 rounded-xl bg-slate-50 border border-slate-100">

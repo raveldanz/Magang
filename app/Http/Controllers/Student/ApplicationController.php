@@ -12,7 +12,9 @@ use App\Models\Unit;
 use App\Models\User;
 use App\Services\PrivateDocumentStorage;
 use App\Support\UploadRules;
+use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -113,8 +115,8 @@ class ApplicationController extends Controller
 
         $request->validate([
             'unit_id' => 'required|exists:units,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date' => ['required', 'date', 'after_or_equal:start_date', $this->maxInternshipEndRule($request)],
             'surat_pengantar' => 'required|'.UploadRules::APPLICATION_DOCUMENT,
             'cv' => 'nullable|'.UploadRules::APPLICATION_DOCUMENT,
             'transkrip' => 'nullable|'.UploadRules::APPLICATION_DOCUMENT,
@@ -122,6 +124,7 @@ class ApplicationController extends Controller
         ], [
             'start_date.required' => 'Tanggal mulai magang wajib diisi.',
             'start_date.date' => 'Tanggal mulai magang tidak valid.',
+            'start_date.after_or_equal' => 'Tanggal mulai magang tidak boleh sebelum hari ini.',
             'end_date.required' => 'Tanggal selesai magang wajib diisi.',
             'end_date.after_or_equal' => 'Tanggal selesai magang harus setelah atau sama dengan tanggal mulai.',
             'surat_pengantar.required' => 'Surat Pengantar dari perguruan tinggi wajib diunggah.',
@@ -223,6 +226,26 @@ class ApplicationController extends Controller
     /**
      * Buat record pengajuan + dokumen persyaratan (dipanggil di dalam transaksi).
      */
+    /**
+     * Periode magang paling lama satu tahun sejak tanggal mulai, supaya salah ketik tahun
+     * (misalnya 2062) tidak lolos menjadi pengajuan.
+     */
+    private function maxInternshipEndRule(Request $request): \Closure
+    {
+        return function (string $attribute, mixed $value, \Closure $fail) use ($request) {
+            try {
+                $start = Carbon::parse((string) $request->input('start_date'));
+                $end = Carbon::parse((string) $value);
+            } catch (InvalidFormatException) {
+                return;
+            }
+
+            if ($end->gt($start->copy()->addYear())) {
+                $fail('Periode magang paling lama 1 tahun sejak tanggal mulai.');
+            }
+        };
+    }
+
     private function createApplicationRecords(Request $request, ?string $proposalPath, ?string $cvPath, ?string $transcriptPath, ?string $idCardPath): Application
     {
         $application = Application::create([
@@ -296,9 +319,12 @@ class ApplicationController extends Controller
 
         $request->validate([
             'unit_id' => 'required|exists:units,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date' => ['required', 'date', 'after_or_equal:start_date', $this->maxInternshipEndRule($request)],
             'name' => 'nullable|string|max:100',
+        ], [
+            'start_date.after_or_equal' => 'Tanggal mulai magang tidak boleh sebelum hari ini.',
+            'end_date.after_or_equal' => 'Tanggal selesai magang harus setelah atau sama dengan tanggal mulai.',
         ]);
 
         $unit = Unit::findOrFail($request->unit_id);

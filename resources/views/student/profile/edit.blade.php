@@ -308,7 +308,7 @@
                                             </div>
                                             <label class="flex items-start gap-2 text-[11px] text-slate-700">
                                                 <input type="checkbox" name="confirm_new_university" value="1" class="mt-0.5 rounded border-slate-300 text-amber-600 focus:ring-amber-500">
-                                                <span>Bukan, kampus saya <strong>berbeda</strong> â€” tetap daftarkan "{{ old('custom_university_name') }}" sebagai kampus baru (akan diverifikasi Admin).</span>
+                                                <span>Bukan, kampus saya <strong>berbeda</strong> - tetap daftarkan "{{ old('custom_university_name') }}" sebagai kampus baru (akan diverifikasi Admin).</span>
                                             </label>
                                         </div>
                                     @endif

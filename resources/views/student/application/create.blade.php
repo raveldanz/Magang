@@ -93,7 +93,7 @@
                         <div class="text-xs font-bold text-slate-700 flex items-center justify-between">
                             <span>Status Anggota Kelompok ({{ $rejMembers->count() }} Mahasiswa):</span>
                             <span class="text-[11px] font-normal text-slate-500">
-                                Periode: {{ \Carbon\Carbon::parse($rejectedGroupApplication->start_date)->translatedFormat('d M Y') }} â€“ {{ \Carbon\Carbon::parse($rejectedGroupApplication->end_date)->translatedFormat('d M Y') }}
+                                Periode: {{ \Carbon\Carbon::parse($rejectedGroupApplication->start_date)->translatedFormat('d M Y') }} - {{ \Carbon\Carbon::parse($rejectedGroupApplication->end_date)->translatedFormat('d M Y') }}
                             </span>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
@@ -330,7 +330,7 @@
                             <div class="flex flex-wrap items-center gap-4 pt-3 border-t border-indigo-100 text-xs text-slate-600">
                                 <div>
                                     <span class="text-slate-400">Periode:</span>
-                                    <strong class="text-slate-700 ml-1">{{ \Carbon\Carbon::parse($draftGroup->start_date)->translatedFormat('d M Y') }} â€“ {{ \Carbon\Carbon::parse($draftGroup->end_date)->translatedFormat('d M Y') }}</strong>
+                                    <strong class="text-slate-700 ml-1">{{ \Carbon\Carbon::parse($draftGroup->start_date)->translatedFormat('d M Y') }} - {{ \Carbon\Carbon::parse($draftGroup->end_date)->translatedFormat('d M Y') }}</strong>
                                 </div>
                                 <div>
                                     <span class="text-slate-400">Ketua:</span>
@@ -671,7 +671,7 @@
                                             'agency_profile_id' => $u->agency_profile_id,
                                             'name' => $u->name,
                                             'acronym' => $u->agencyProfile?->acronym,
-                                            'meta' => ($rem > 0 ? "Sisa Kuota: {$rem} orang" : "Kuota Penuh") . " â€¢ {$agencyName}",
+                                            'meta' => ($rem > 0 ? "Sisa Kuota: {$rem} orang" : "Kuota Penuh") . " • {$agencyName}",
                                             'remaining_quota' => $rem,
                                             'disabled' => $rem <= 0,
                                         ];
@@ -740,6 +740,7 @@
                                                       name="start_date"
                                                       type="date"
                                                       x-model="startDate"
+                                                      min="{{ date('Y-m-d') }}"
                                                       class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-500 p-2.5"
                                                       :value="old('start_date')"
                                                       required />
@@ -1023,11 +1024,11 @@
                                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                 <div>
                                                     <x-input-label for="group_start_date" value="Tanggal Mulai" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
-                                                    <x-text-input id="group_start_date" name="start_date" type="date" :value="old('start_date')" required class="block w-full text-xs rounded-xl border-slate-200 bg-white mt-1 p-2" />
+                                                    <x-text-input id="group_start_date" name="start_date" type="date" min="{{ date('Y-m-d') }}" :value="old('start_date')" required class="block w-full text-xs rounded-xl border-slate-200 bg-white mt-1 p-2" />
                                                 </div>
                                                 <div>
                                                     <x-input-label for="group_end_date" value="Tanggal Selesai" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
-                                                    <x-text-input id="group_end_date" name="end_date" type="date" :value="old('end_date')" required class="block w-full text-xs rounded-xl border-slate-200 bg-white mt-1 p-2" />
+                                                    <x-text-input id="group_end_date" name="end_date" type="date" min="{{ date('Y-m-d') }}" :value="old('end_date')" required class="block w-full text-xs rounded-xl border-slate-200 bg-white mt-1 p-2" />
                                                 </div>
                                             </div>
 
@@ -1186,7 +1187,7 @@
                             <!-- Body: Periode Magang -->
                             <div class="text-xs text-slate-600 bg-slate-50/80 px-3 py-2 rounded-xl border border-slate-100 flex items-center justify-between">
                                 <span class="text-slate-400 text-[11px] font-semibold uppercase tracking-wider">Periode</span>
-                                <span class="font-medium text-slate-700">{{ \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M Y') }} â€“ {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}</span>
+                                <span class="font-medium text-slate-700">{{ \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M Y') }} - {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}</span>
                             </div>
 
                             <!-- Footer: Catatan & Surat -->

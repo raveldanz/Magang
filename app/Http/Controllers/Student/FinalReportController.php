@@ -51,7 +51,7 @@ class FinalReportController extends Controller
         if ($placement) {
             // Syarat Wajib: DPL Harus Sudah Dipilih sebelum mengisi/mengakses Laporan Akhir
             if (empty($placement->academic_advisor_id) && empty($placement->pembimbing_id)) {
-                return redirect()->route('dashboard')->with('error', 'Silakan pilih Dosen Pembimbing Lapangan terlebih dahulu sebelum mengakses pengunggahan Laporan Akhir.');
+                return redirect()->route('dashboard')->with('error', 'Silakan pilih Dosen Pembimbing terlebih dahulu sebelum mengakses pengunggahan Laporan Akhir.');
             }
 
             $finalReport = $placement->finalreport;
@@ -97,7 +97,7 @@ class FinalReportController extends Controller
 
         // Syarat Wajib: DPL Harus Sudah Dipilih / Terdaftar
         if (empty($placement->academic_advisor_id) && empty($placement->pembimbing_id)) {
-            return redirect()->route('dashboard')->with('error', 'Akses ditolak: Silakan pilih Dosen Pembimbing Lapangan terlebih dahulu.');
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak: Silakan pilih Dosen Pembimbing terlebih dahulu.');
         }
 
         $placementId = $application->placement->id;
@@ -108,12 +108,17 @@ class FinalReportController extends Controller
             return redirect()->route('student.final_report.index')->with('error', 'Laporan akhir yang sudah disetujui tidak dapat diubah atau diunggah ulang.');
         }
 
+        $needsRevisedFile = $finalReport?->status === 'revision';
+
         $request->validate([
             'title' => 'nullable|string|max:255',
             'repository_url' => 'nullable|url|max:255',
-            'file_laporan' => ($hasExistingFile ? 'nullable' : 'required').'|'.UploadRules::FINAL_REPORT, // PDF maks 5MB
+            // Saat diminta revisi, naskah baru wajib diunggah: mengirim ulang berkas lama bukan perbaikan.
+            'file_laporan' => ($hasExistingFile && ! $needsRevisedFile ? 'nullable' : 'required').'|'.UploadRules::FINAL_REPORT, // PDF maks 5MB
         ], [
-            'file_laporan.required' => 'File naskah laporan akhir wajib diunggah.',
+            'file_laporan.required' => $needsRevisedFile
+                ? 'Laporan Anda diminta untuk direvisi. Unggah berkas naskah hasil perbaikan sebelum mengirim ulang.'
+                : 'File naskah laporan akhir wajib diunggah.',
             'file_laporan.mimes' => 'Format file naskah laporan akhir harus berupa PDF.',
             'file_laporan.max' => 'Ukuran file naskah laporan akhir maksimal 5 MB (5120 KB).',
             'repository_url.url' => 'Format tautan repositori proyek harus berupa URL valid.',
@@ -149,12 +154,12 @@ class FinalReportController extends Controller
             $filePath = $file->storeAs('final_reports', $customFilename, 'local');
         }
 
-        $newStatus = ($request->hasFile('file_laporan') || $finalReport?->status === 'revision') ? 'pending' : ($finalReport?->status ?? 'pending');
+        $newStatus = $request->hasFile('file_laporan') ? 'pending' : ($finalReport?->status ?? 'pending');
 
         $report = FinalReport::updateOrCreate(
             ['placement_id' => $placementId],
             [
-                'title' => $request->title ?? 'Laporan Akhir Praktik Kerja Lapangan (PKL) / Magang MBKM',
+                'title' => $request->title ?? $finalReport?->title ?? 'Laporan Akhir Praktik Kerja Lapangan (PKL) / Magang MBKM',
                 'repository_url' => $request->repository_url,
                 'file_path' => $filePath,
                 'final_report_path' => $filePath,

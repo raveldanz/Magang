@@ -251,7 +251,7 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
         // Status COMPLETED saja tidak cukup
         $this->actingAs($this->student)->get(route('student.certificate.show', $appId))
             ->assertForbidden()
-            ->assertSee('Sertifikat belum dapat diunduh karena nilai evaluasi dinas atau laporan akhir belum disetujui')
+            ->assertSee('Sertifikat resmi baru dapat dibuka setelah seluruh syarat di bawah ini terpenuhi')
             ->assertSee('Mentor Lapangan')
             ->assertSee('Laporan akhir magang belum disetujui');
         $this->actingAs($this->adminA)->get(route('admin.certificates.generate', $placement->id))->assertForbidden();

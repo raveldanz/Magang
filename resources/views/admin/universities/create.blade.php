@@ -87,7 +87,7 @@
                                         class="w-full text-left px-4 py-2.5 hover:bg-blue-50 transition flex items-center justify-between gap-3 text-xs cursor-pointer">
                                     <div class="min-w-0">
                                         <div class="font-bold text-slate-800" x-text="item.name"></div>
-                                        <div class="text-[11px] text-slate-500" x-text="`${item.city || '-'} â€¢ ${item.province || '-'}`"></div>
+                                        <div class="text-[11px] text-slate-500" x-text="`${item.city || '-'} • ${item.province || '-'}`"></div>
                                     </div>
                                     <span class="px-2 py-0.5 rounded text-[10px] font-black bg-blue-100 text-blue-800 shrink-0 uppercase" x-text="item.acronym || item.code"></span>
                                 </button>

@@ -62,6 +62,10 @@
                 if ($certRecord && $certRecord->approval_status !== 'approved') {
                     $certificateBlockers[] = 'Sertifikat magang telah diajukan dan sedang dalam proses pengesahan (ACC) oleh Atasan (Tim Kerja Umum & Kepegawaian Dispusip).';
                 }
+                // Sertifikat baru bisa dibuka setelah diterbitkan Admin Dinas (aturan yang sama dengan Student\CertificateController).
+                if ($application && $certificateBlockers === [] && ! $certRecord) {
+                    $certificateBlockers[] = 'Sertifikat magang belum diterbitkan oleh Admin Dinas. Setelah diterbitkan, sertifikat masih perlu disahkan (ACC) oleh Atasan sebelum dapat dibuka.';
+                }
                 $isPassed = $application && $certificateBlockers === [];
 
                 // Nama status untuk banner: kode sistem standar (sama di semua role)
@@ -213,6 +217,9 @@
                                                     Menunggu verifikasi dan persetujuan dari instansi dinas terkait.
                                                 @elseif($isPassed)
                                                     Selamat! Seluruh kewajiban telah terpenuhi. E-Sertifikat resmi siap diunduh.
+                                                @elseif($rawSt === 'completed')
+                                                    Magang Anda telah selesai. E-Sertifikat dapat dibuka setelah syarat berikut terpenuhi:
+                                                    {{ implode(' ', $certificateBlockers) }}
                                                 @elseif(!$academicAdvisor)
                                                     Pengajuan diterima! Silakan <strong>pilih Dosen Pembimbing</strong> dari perguruan tinggi Anda.
                                                 @elseif($logbooksCount < 30)
@@ -250,6 +257,10 @@
                                                     class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition inline-block">
                                                     Unduh Sertifikat
                                                 </a>
+                                            @elseif($rawSt === 'completed')
+                                                <span class="px-3 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200 inline-block">
+                                                    Menunggu Sertifikat
+                                                </span>
                                             @elseif(!$academicAdvisor)
                                                 <a href="#change-advisor-box" @click="showDetailModal = false"
                                                     class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition inline-block">
