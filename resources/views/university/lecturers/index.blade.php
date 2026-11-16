@@ -3,7 +3,7 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
                 <h2 class="font-bold text-lg sm:text-2xl text-slate-800 leading-tight">
-                    {{ __('Daftar Dosen Pembimbing Lapangan') }}
+                    {{ __('Daftar Dosen Pembimbing') }}
                 </h2>
                 <p class="text-xs text-slate-500 mt-0.5">
                     Portal Pengelolaan Dosen Pembimbing Kampus &bull; <strong class="text-slate-700">{{ $univName ?? 'Universitas' }}</strong>

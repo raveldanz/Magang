@@ -275,7 +275,7 @@ class DashboardController extends Controller
         }
 
         $request->validate([
-            'consultation_date' => 'required|date',
+            'consultation_date' => 'required|date|before_or_equal:today',
             'stage' => 'required|string|max:100',
             'topic' => 'required|string|max:255',
             'notes' => 'required|string|max:2000',

@@ -132,6 +132,7 @@ class EvaluationController extends Controller
             'aspects.min' => 'Setidaknya satu aspek penilaian wajib diisi.',
             'aspects.*.name.required' => 'Nama aspek penilaian tidak boleh kosong.',
             'aspects.*.score.required' => 'Nilai aspek penilaian wajib diisi.',
+            'aspects.*.score.numeric' => 'Nilai aspek penilaian harus berupa angka.',
             'aspects.*.score.min' => 'Nilai minimal adalah 0.',
             'aspects.*.score.max' => 'Nilai maksimal adalah 100.',
             'score_mastery.required' => 'Nilai penguasaan materi wajib diisi.',
@@ -287,16 +288,21 @@ class EvaluationController extends Controller
 
         $request->validate([
             'status' => 'required|in:approved,revision,rejected,pending',
-            'feedback' => 'nullable|string|max:1500',
+            'feedback' => 'nullable|required_if:status,revision,rejected|string|max:1500',
         ]);
 
-        $finalReport = FinalReport::firstOrCreate(
-            ['placement_id' => $placement->id],
-            [
-                'file_path' => 'final_reports/default.pdf',
-                'status' => 'pending',
-            ]
-        );
+        // Laporan yang sudah mengantar mahasiswa lulus tidak boleh diubah lagi: mengembalikannya ke revisi
+        // akan mengunci ulang sertifikat yang sudah terbit.
+        if ($placement->application?->statusValue() === 'completed') {
+            return redirect()->back()->with('error', 'Laporan akhir tidak dapat diubah karena magang sudah dinyatakan selesai.');
+        }
+
+        // Hanya naskah yang benar-benar diunggah mahasiswa yang bisa ditinjau. Sebelumnya persetujuan di sini
+        // membuat laporan kosong berstatus disetujui, sehingga syarat laporan terlewati.
+        $finalReport = FinalReport::where('placement_id', $placement->id)->first();
+        if (! $finalReport || empty($finalReport->file_path) || basename((string) $finalReport->file_path) === 'default.pdf') {
+            return redirect()->back()->with('error', 'Mahasiswa belum mengunggah naskah laporan akhir, sehingga belum ada yang dapat ditinjau.');
+        }
 
         $finalReport->update([
             'status' => $request->status,

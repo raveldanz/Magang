@@ -85,6 +85,7 @@ class EvaluationController extends Controller
             'aspects.min' => 'Setidaknya satu aspek penilaian wajib diisi.',
             'aspects.*.name.required' => 'Nama aspek penilaian tidak boleh kosong.',
             'aspects.*.score.required' => 'Nilai aspek penilaian wajib diisi.',
+            'aspects.*.score.numeric' => 'Nilai aspek penilaian harus berupa angka.',
             'aspects.*.score.min' => 'Nilai minimal adalah 0.',
             'aspects.*.score.max' => 'Nilai maksimal adalah 100.',
             'nilai_disiplin.required' => 'Nilai disiplin wajib diisi.',

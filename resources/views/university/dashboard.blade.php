@@ -335,7 +335,7 @@
                 
                 <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
                     <div>
-                        <h3 class="font-bold text-base text-slate-900">Plotting Dosen Pembimbing Lapangan</h3>
+                        <h3 class="font-bold text-base text-slate-900">Penugasan Dosen Pembimbing</h3>
                         <p class="text-xs text-slate-400 mt-0.5">Mahasiswa: <strong class="text-slate-700" x-text="assignModal.studentName"></strong></p>
                     </div>
                     <button type="button" @click="assignModal.show = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>

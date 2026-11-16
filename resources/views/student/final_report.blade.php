@@ -108,7 +108,7 @@
                                 <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 text-xs font-bold flex items-center justify-center">3</span>
                                 <h4 class="font-bold text-xs text-slate-700">Penugasan Pembimbing</h4>
                             </div>
-                            <p class="text-[11px] text-slate-500">Penetapan Mentor Dinas & Dosen Pembimbing Lapangan.</p>
+                            <p class="text-[11px] text-slate-500">Penetapan Mentor Dinas & Dosen Pembimbing.</p>
                         </div>
 
                         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 opacity-60 space-y-1">

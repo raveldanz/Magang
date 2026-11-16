@@ -145,7 +145,7 @@ class LogbookController extends Controller
 
         $request->validate([
             'status' => 'required|in:approved,rejected,pending',
-            'feedback' => 'nullable|string',
+            'feedback' => 'nullable|required_if:status,rejected|string|max:1500',
         ]);
 
         $logbook = Logbook::with('placement.application.user')->findOrFail($id);

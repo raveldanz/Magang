@@ -190,7 +190,7 @@
                         <td class="py-1 text-slate-900">{{ $mentor->name ?? '-' }} (Instansi Kedinasan)</td>
                     </tr>
                     <tr>
-                        <td class="py-1 font-semibold text-slate-700">Dosen Pembimbing Lapangan</td>
+                        <td class="py-1 font-semibold text-slate-700">Dosen Pembimbing</td>
                         <td class="py-1">:</td>
                         <td class="py-1 font-semibold text-slate-900">{{ $dosen->name ?? '-' }} (Perguruan Tinggi)</td>
                     </tr>
@@ -302,7 +302,7 @@
             <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-1">
                 <span class="font-bold text-slate-800 block uppercase tracking-wider text-[11px]">Status Dokumen & Verifikasi:</span>
                 <p class="text-slate-700">
-                    &bull; Status Naskah Laporan: <strong class="{{ optional($finalReport)->status === 'approved' ? 'text-emerald-700' : 'text-amber-700' }} uppercase">{{ optional($finalReport)->status ?? 'Belum Lengkap' }}</strong>
+                    &bull; Status Naskah Laporan: <strong class="{{ optional($finalReport)->status === 'approved' ? 'text-emerald-700' : 'text-amber-700' }} uppercase">{{ \App\Enums\ReviewStatus::resolve(optional($finalReport)->status)?->localizedLabel() ?? 'Belum Lengkap' }}</strong>
                 </p>
                 <p class="text-slate-700">
                     &bull; Riwayat Sesi Konsultasi Dosen Pembimbing: <strong>{{ $consultations->count() }} Sesi Bimbingan Tercatat</strong>
@@ -378,7 +378,7 @@
                     @endif
                 </div>
 
-                <!-- Kolom 3 (Kanan): Dosen Pembimbing Lapangan (DPL) -->
+                {{-- Kolom 3 (kanan): Dosen Pembimbing --}}
                 <div>
                     <p class="text-slate-500 font-medium text-[10.5px]">Surabaya, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
                     <p class="font-bold text-slate-800 text-xs mt-0.5">Dosen Pembimbing</p>

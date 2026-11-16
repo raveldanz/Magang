@@ -361,7 +361,7 @@
                     <button type="button" @click="activeTab = 'laporan'"
                             class="p-3 sm:p-3.5 rounded-xl border transition text-left cursor-pointer group {{ $readyReport ? 'bg-emerald-50/50 border-emerald-200/80 hover:bg-emerald-50' : ($finalReport ? 'bg-amber-50/50 border-amber-200/80 hover:bg-amber-50' : 'bg-slate-50/70 border-slate-200/70 hover:bg-slate-50') }}">
                         <div class="flex items-center justify-between gap-1">
-                            <span class="text-xs font-semibold text-slate-600 group-hover:text-slate-800 transition">2. Laporan Akhir (Persetujuan Dosen Pembimbing)</span>
+                            <span class="text-xs font-semibold text-slate-600 group-hover:text-slate-800 transition">2. Laporan Akhir (Persetujuan Pembimbing)</span>
                             @if($readyReport)
                                 <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                             @elseif($finalReport)
@@ -372,7 +372,7 @@
                         </div>
                         <div class="font-bold mt-1 text-slate-900 group-hover:text-blue-600 transition">
                             @if($readyReport)
-                                Disetujui Dosen Pembimbing {{-- status-guard:ignore --}}
+                                Disetujui {{-- status-guard:ignore --}}
                             @elseif($finalReport)
                                 Menunggu Review {{-- status-guard:ignore --}}
                             @else
@@ -393,7 +393,7 @@
                             @endif
                         </div>
                         <div class="font-bold mt-1 text-slate-900 group-hover:text-blue-600 transition">
-                            {{ $readyMentorScore ? 'Skor: '.number_format($eval->nilai_pembimbing ?? 0, 1) : 'Menunggu Dinas' }}
+                            {{ $readyMentorScore ? 'Skor: '.rtrim(rtrim(number_format($eval->nilai_pembimbing ?? 0, 2), '0'), '.') : 'Menunggu Dinas' }}
                         </div>
                     </button>
 
@@ -411,7 +411,7 @@
                             </div>
                             <div class="font-bold mt-1 text-slate-900 group-hover:text-blue-600 transition">
                                 @if($hasEval)
-                                    Skor: {{ number_format($eval->nilai_dosen_calculated ?? ($eval->nilai_akademik ?? 0), 1) }}
+                                    Skor: {{ rtrim(rtrim(number_format($eval->nilai_dosen_calculated ?? ($eval->nilai_akademik ?? 0), 2), '0'), '.') }}
                                 @else
                                     Siap Diinput Dosen Pembimbing
                                 @endif

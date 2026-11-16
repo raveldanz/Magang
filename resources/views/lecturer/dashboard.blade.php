@@ -162,7 +162,7 @@
                         <span class="text-xs font-medium text-slate-500 uppercase tracking-wider block">Laporan ACC</span>
                         <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{{ $stats['total_reports_approved'] }}</div>
                     </div>
-                    <span class="text-xs text-slate-600 mt-2 block">Disetujui Dosen Pembimbing</span>
+                    <span class="text-xs text-slate-600 mt-2 block">Disetujui Mentor atau Dosen Pembimbing</span>
                 </div>
 
                 <!-- Belum Dinilai -->

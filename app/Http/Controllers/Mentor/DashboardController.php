@@ -244,6 +244,10 @@ class DashboardController extends Controller
             abort(403, 'Anda tidak memiliki hak akses ke laporan instansi lain.');
         }
 
+        if ($placement->application?->statusValue() === 'completed') {
+            return redirect()->back()->with('error', 'Laporan akhir tidak dapat diubah karena magang sudah dinyatakan selesai.');
+        }
+
         $report->update([
             'status' => $request->status,
             'feedback' => $request->feedback,
