@@ -109,6 +109,10 @@ if ($envText -notmatch '(?m)^DB_CONNECTION=sqlite') {
     }
     $envText = [regex]::Replace($envText, '(?m)^(DB_(?:DATABASE|HOST|PORT|USERNAME|PASSWORD)=.*)$', '# $1')
 }
+# Kata sandi server database laptop ini tidak boleh ikut ke zip, termasuk dalam baris yang dikomentari.
+if ($envText -match '(?m)^DB_CONNECTION=sqlite') {
+    $envText = [regex]::Replace($envText, '(?m)^#?\s*DB_PASSWORD=.*$', '# DB_PASSWORD=')
+}
 [System.IO.File]::WriteAllText($envPath, $envText, (New-Object System.Text.UTF8Encoding($false)))
 if ($envText -notmatch '(?m)^DB_CONNECTION=sqlite') {
     Write-Host '[PERHATIAN] .env tidak memakai SQLite: laptop tujuan harus punya server database yang sama.' -ForegroundColor Yellow

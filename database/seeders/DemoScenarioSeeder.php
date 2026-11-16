@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Enums\ApplicationStatus;
 use App\Models\AgencyProfile;
 use App\Models\Application;
+use App\Models\ApplicationDocument;
 use App\Models\Certificate;
 use App\Models\Evaluation;
 use App\Models\FinalReport;
@@ -226,6 +227,12 @@ class DemoScenarioSeeder extends Seeder
         // ---------------------------------------------------------------------------------------
         $this->backfillLogbooksForCompletedPlacements();
 
+        // ---------------------------------------------------------------------------------------
+        // 12. Pengajuan demo tanpa dokumen: halaman "periksa berkas" Admin Dinas akan kosong saat demo.
+        //     Juga lengkapi berkas profil akun yang diperagakan mengajukan ulang.
+        // ---------------------------------------------------------------------------------------
+        $this->backfillApplicationDocuments();
+
         $this->command?->info('DemoScenarioSeeder: 10 skenario demo tambahan siap dipakai (kata sandi bawaan).');
     }
 
@@ -286,6 +293,46 @@ class DemoScenarioSeeder extends Seeder
         ])->save();
 
         return $placement;
+    }
+
+    private function backfillApplicationDocuments(): void
+    {
+        // Akun dengan email pribadi bukan data demo; berkasnya tidak boleh diisi berkas contoh.
+        $isDemoAccount = fn (?User $user) => $user && ! preg_match('/@(gmail|yahoo|outlook|hotmail)\./i', (string) $user->email);
+
+        $applications = Application::whereDoesntHave('documents')->with('user')->get();
+        foreach ($applications as $application) {
+            if (! $isDemoAccount($application->user)) {
+                continue;
+            }
+
+            $paths = [
+                'Surat Pengantar' => $application->proposal_letter_path ?: self::SAMPLE_PDF,
+                'CV' => $application->cv_path ?: self::SAMPLE_PDF,
+                'Transkrip Nilai' => $application->transcript_path ?: self::SAMPLE_PDF,
+                'KTM / Kartu Identitas' => $application->id_card_path ?: self::SAMPLE_PDF,
+            ];
+
+            $application->forceFill([
+                'proposal_letter_path' => $paths['Surat Pengantar'],
+                'cv_path' => $paths['CV'],
+                'transcript_path' => $paths['Transkrip Nilai'],
+                'id_card_path' => $paths['KTM / Kartu Identitas'],
+            ])->saveQuietly();
+
+            foreach ($paths as $type => $path) {
+                ApplicationDocument::create(['application_id' => $application->id, 'document_type' => $type, 'file_path' => $path]);
+            }
+        }
+
+        $reapplyAccounts = User::whereIn('email', ['gilang.ditolak@unesa.ac.id', 'rina.mundur@unesa.ac.id'])->pluck('id');
+        StudentProfile::whereIn('user_id', $reapplyAccounts)->get()->each(function (StudentProfile $profile) {
+            $profile->forceFill([
+                'cv_path' => $profile->cv_path ?: self::SAMPLE_PDF,
+                'transcript_path' => $profile->transcript_path ?: self::SAMPLE_PDF,
+                'id_card_path' => $profile->id_card_path ?: self::SAMPLE_PDF,
+            ])->save();
+        });
     }
 
     private function backfillLogbooksForCompletedPlacements(): void

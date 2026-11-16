@@ -4456,3 +4456,17 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   3. Aturan Double ACC berlaku untuk SEMUA status tujuan pasca-seleksi (`accepted` dan `active`) di jalur perorangan, kelompok, dan massal.
   4. Wewenang yang disimpan di sesi (mis. `impersonator_id`) harus dicek ulang ke database setiap request.
   5. Redirect dari input pengguna hanya lewat `safeReturnTo()`; sel CSV dari input pengguna lewat `CsvSafe::row()`.
+
+### [LRN-151] QC per Peran 16 Nov 2026: Pola Bug yang Berulang
+- **Date:** 2026-11-16
+- **Problem / Symptom:** QC per peran menemukan pola yang sama di banyak tempat: (1) `$collection->whereIn('status', [...])` pada kolom ber-cast enum selalu menghasilkan 0 (dasbor "Mhs Aktif 0"); (2) tampilan memakai atribut yang tidak ada (`$log->mentor_note`) sehingga catatan mentor tidak pernah tampil, tanpa galat; (3) endpoint keputusan tidak memeriksa status asal (Atasan "menolak" magang aktif, dosen mengubah laporan setelah lulus, dosen menyetujui laporan yang belum diunggah lewat `firstOrCreate`); (4) Admin Dinas/Bidang bisa mereset password Supervisor lalu melompati Double ACC; (5) berkas lama dihapus saat diganti padahal baris lain masih merujuk jalurnya; (6) tanggal tanpa batas (1990, 2062) diterima; (7) `catch (\Throwable)` menelan "Class not found" sehingga aturan validasi diam-diam tidak jalan.
+- **Root Cause:** Pemeriksaan ditulis per aksi dan hanya untuk jalur yang tampil di layar; permintaan langsung ke alamat aksi tidak dipikirkan. Perbandingan enum dengan string dan atribut model yang tidak ada tidak memunculkan galat.
+- **Fix Applied:** Commit `3d4dd29`, `f6d6e35`, `5947b0a`, `835886c`, `e9a2a4e` beserta tes `StudentQcFlowTest`, `AdminQcFlowTest`, `SupervisorMentorQcFlowTest`, `LecturerUniversityQcFlowTest`, `SuperAdminPublicQcFlowTest`.
+- **Prevention Rule:**
+  1. Pada koleksi model, saring status dengan `->filter(fn ($a) => in_array($a->statusValue(), [...], true))`, bukan `whereIn('status', [...])`.
+  2. Setiap aksi keputusan (setujui/tolak/revisi) WAJIB memeriksa status asal dan menolak bila magang sudah `completed`; jangan pakai `firstOrCreate` untuk rekaman yang seharusnya dibuat pihak lain.
+  3. Akun peran yang lebih tinggi (Supervisor, Super Admin, pihak kampus) tidak boleh dikelola oleh peran di bawahnya; uji lewat `canManageUser()`.
+  4. Sebelum menghapus berkas lama, pastikan tidak ada baris lain (pengajuan, dokumen, profil) yang masih merujuk jalurnya.
+  5. Penolakan dan permintaan revisi wajib disertai catatan (`required_if`); tanggal masukan wajib punya batas bawah dan atas.
+  6. Jangan `catch (\Throwable)` di aturan validasi; tangkap hanya pengecualian yang memang diharapkan.
+  7. Uji tiap alamat aksi secara langsung (tanpa lewat tombol), dengan akun peran lain dan dengan data berstatus akhir.
