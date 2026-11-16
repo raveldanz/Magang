@@ -134,6 +134,9 @@ if ($envText -notmatch '(?m)^DB_CONNECTION=sqlite') {
     }
     $envText = [regex]::Replace($envText, '(?m)^(DB_(?:DATABASE|HOST|PORT|USERNAME|PASSWORD)=.*)$', '# $1')
 }
+# Kunci notifikasi push (VAPID) tidak dipakai lewat alamat WiFi (bukan HTTPS) dan kunci privatnya tidak boleh
+# ikut ke laptop lain; dengan kunci kosong, layout tidak mendaftarkan push sama sekali.
+$envText = [regex]::Replace($envText, '(?m)^(VAPID_(?:PUBLIC|PRIVATE)_KEY)=.*$', '$1=')
 # Kata sandi server database laptop ini tidak boleh ikut ke zip, termasuk dalam baris yang dikomentari.
 if ($envText -match '(?m)^DB_CONNECTION=sqlite') {
     $envText = [regex]::Replace($envText, '(?m)^#?\s*DB_PASSWORD=.*$', '# DB_PASSWORD=')
