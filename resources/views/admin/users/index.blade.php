@@ -6,7 +6,7 @@
                     <span>Master Pengguna Sistem</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Kelola akun seluruh role: Mahasiswa, Admin Bidang, Mentor Lapangan, DPL Kampus, & Universitas
+                    Kelola akun seluruh role: Mahasiswa, Admin Bidang, Mentor Lapangan, Pembimbing, & Universitas
                 </p>
             </div>
 
@@ -150,7 +150,7 @@
                         <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin Bidang / Dispusip</option>
                         <option value="supervisor" {{ request('role') === 'supervisor' ? 'selected' : '' }}>Supervisor</option>
                         <option value="mentor" {{ request('role') === 'mentor' ? 'selected' : '' }}>Mentor Lapangan</option>
-                        <option value="dosen" {{ request('role') === 'dosen' ? 'selected' : '' }}>Dosen Pembimbing</option>
+                        <option value="dosen" {{ request('role') === 'dosen' ? 'selected' : '' }}>Pembimbing</option>
                         <option value="universitas" {{ request('role') === 'universitas' ? 'selected' : '' }}>Akun Universitas</option>
                     </select>
 
@@ -294,7 +294,7 @@
                                             @endif
                                         @elseif(in_array($u->role, ['dosen', 'academic_advisor']))
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200 whitespace-nowrap">
-                                                Dosen Pembimbing
+                                                Pembimbing
                                             </span>
                                         @elseif($u->role === 'universitas')
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-100 text-sky-800 border border-sky-200 whitespace-nowrap">
@@ -503,7 +503,7 @@
                                             @endif
                                         @elseif(in_array($u->role, ['dosen', 'academic_advisor']))
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                                                Dosen Pembimbing
+                                                Pembimbing
                                             </span>
                                         @elseif($u->role === 'universitas')
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200">

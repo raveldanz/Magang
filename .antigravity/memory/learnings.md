@@ -162,6 +162,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-131** | 2026-11-05 | Lampiran Transkrip Keluar Batas Lembar Saat Penilaian Dua Pihak / Banyak Aspek | Keterangan skala menabrak strip bawah dan terpotong di tepi lembar A4 | RESOLVED |
 | **LRN-132** | 2026-11-11 | Integrasi Menu Keluar Akun (Logout) Multi-Device pada Home Page | Ketiadaan aksi logout pada home page (desktop header, mobile drawer, dan hero card) untuk pengguna terautentikasi | RESOLVED |
 | **LRN-133** | 2026-11-12 | Database Migration: Eksekusi Migrasi Pending certificate_themes & Robust Model Fallback | Error 500 relation "certificate_themes" does not exist saat membuka sertifikat mahasiswa | RESOLVED |
+| **LRN-134** | 2026-11-16 | Standardisasi Nomenklatur Role: Penyeragaman 'Dosen Pembimbing' Menjadi 'Pembimbing' | Penyeragaman sebutan role Dosen Pembimbing menjadi Pembimbing pada Master Pengguna Sistem | RESOLVED |
 ---
 
 ## 3. Catatan Masalah & Solusi (Knowledge Base)
@@ -4049,6 +4050,21 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   2. Memperkuat method `CertificateTheme::getActive()` dengan blok `try-catch (\Throwable $e)` agar selalu mengembalikan *fallback instance* default tema resmi Dispusip jika tabel database belum termigrasi atau terjadi kegagalan query.
   3. Memverifikasi langsung via Playwright bahwa rute `/student/certificate/12` kini berhasil dimuat dengan sempurna tanpa error query (HTTP 200).
 - **Prevention Rule**: Setiap ada penambahan model Eloquent yang memiliki query otomatis ke tabel baru, pastikan status migrasi selalu dipantau (`php artisan migrate:status`), dan terapkan proteksi *defensive fallback* pada model sentral.
+
+---
+
+### [LRN-134] Standardisasi Nomenklatur Role: Penyeragaman 'Dosen Pembimbing' Menjadi 'Pembimbing'
+- **Tanggal**: 2026-11-16
+- **Komponen**: `app/Models/User.php`, `resources/views/admin/users/index.blade.php`, `resources/views/admin/users/create.blade.php`, `resources/views/admin/users/edit.blade.php`, `scripts/verify_pembimbing_rename.mjs`
+- **Problem / Symptom**: Pada modul Master Pengguna Sistem (`/admin/users`), sebutan role dosen/pendamping akademik kampus tertulis sebagai "Dosen Pembimbing" pada dropdown filter, badge tabel, serta formulir pengguna.
+- **Root Cause**: Label peran sebelumnya dikunci ke string `'Dosen Pembimbing'` pada method `User::roleLabel()` dan ditulis secara eksplisit pada view Blade admin pengguna.
+- **Fix Applied**: 
+  1. Memperbarui `User::roleLabel()` agar memetakan peran `'dosen'`, `'academic_advisor'`, dan `'pembimbing'` secara seragam ke label `'Pembimbing'`.
+  2. Mengubah teks opsi dropdown filter peran di `resources/views/admin/users/index.blade.php` dari `Dosen Pembimbing` menjadi `Pembimbing`.
+  3. Mengubah badge kolom "ROLE SISTEM" di tabel desktop dan kartu mobile menjadi `Pembimbing`.
+  4. Menyelaraskan teks subtitle header dan opsi dropdown form tambah/ubah pengguna (`admin/users/create.blade.php` & `admin/users/edit.blade.php`).
+  5. Memvalidasi secara visual dengan Playwright Chrome Headless (`public/test-artifacts/pembimbing_filtered_table.png`) dan memastikan seluruh test suite lolos (Strict Exit Code 0).
+- **Prevention Rule**: Seluruh penamaan label peran pengguna wajib merujuk secara konsisten ke method `roleLabel()` pada model `User` guna menjaga keselarasan antarmuka dan mempermudah penyesuaian nomenklatur di masa depan.
 
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 
