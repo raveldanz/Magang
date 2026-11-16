@@ -348,7 +348,7 @@
                             <div class="flex items-center justify-between">
                                 <h4 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
                                     <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                                    <span>Daftar Anggota Kelompok: {{ $memberCount }} dari maksimal {{ $maxGroupMembers ?? 20 }} Mahasiswa</span>
+                                    <span>Daftar Anggota Kelompok: {{ $memberCount }} Mahasiswa</span>
                                 </h4>
                                 @if($memberCount < 2)
                                     <span class="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">

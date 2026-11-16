@@ -94,8 +94,8 @@ class FeedbackController extends Controller
     {
         $request->validate([
             'category' => 'required|in:error_bug,saran_fitur,pertanyaan,koordinasi,lainnya',
-            'subject' => 'required|string|max:255',
-            'message' => 'required|string|max:5000',
+            'subject' => 'required|string|min:5|max:255',
+            'message' => 'required|string|min:10|max:5000',
             'target_role' => 'nullable|string|in:super_admin,admin_dinas,universitas',
             'target_agency_id' => 'nullable|exists:agency_profiles,id',
             'target_university_id' => 'nullable|exists:universities,id',

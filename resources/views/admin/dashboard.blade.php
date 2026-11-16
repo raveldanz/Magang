@@ -217,13 +217,10 @@
                     </div>
                     <div>
                         <h4 class="font-bold text-slate-900 text-sm">
-                            Pemberitahuan: Terdapat {{ $pendingUniversities->count() }} Perguruan Tinggi Baru yang Terdaftar
-                            Otomatis
+                            Terdapat {{ $pendingUniversities->count() }} Perguruan Tinggi yang Belum Memiliki Akun Admin Kampus
                         </h4>
                         <p class="text-xs text-slate-600 mt-0.5">
-                            Mahasiswa mendaftar dari kampus baru:
-                            <strong>{{ $pendingUniversities->pluck('name')->implode(', ') }}</strong>. Silakan lengkapi
-                            profil kampus dan buatkan akun login PIC/Admin Kampus.
+                            Di antaranya: <strong>{{ $pendingUniversities->take(5)->pluck('name')->implode(', ') }}</strong>{{ $pendingUniversities->count() > 5 ? ' dan '.($pendingUniversities->count() - 5).' kampus lainnya' : '' }}. Buatkan akun login Admin Kampus bila kampus tersebut perlu memantau mahasiswanya.
                         </p>
                     </div>
                 </div>

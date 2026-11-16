@@ -84,6 +84,9 @@ echo       Tekan Ctrl + C untuk mematikan server.
 echo ===============================================================================
 echo.
 
+rem Saat demo, halaman galat tidak boleh menampilkan detail teknis ke perangkat lain di WiFi.
+rem Variabel lingkungan ini mengalahkan APP_DEBUG di .env tanpa mengubah berkasnya.
+set "APP_DEBUG=false"
 cd /d "%~dp0public"
 "%PHP_EXE%" -d upload_max_filesize=64M -d post_max_size=80M -d memory_limit=512M -d max_execution_time=120 -d max_file_uploads=30 -S 0.0.0.0:%DEMO_PORT% "%~dp0vendor\laravel\framework\src\Illuminate\Foundation\resources\server.php"
 

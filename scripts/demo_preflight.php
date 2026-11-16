@@ -122,7 +122,7 @@ if ($forcePgsql && ! $checkOnly) {
 }
 
 if (in_array(strtolower((string) $envValue('APP_DEBUG')), ['true', '1'], true)) {
-    $warnings[] = 'APP_DEBUG=true: halaman error menampilkan detail internal ke semua perangkat di WiFi. Untuk demo di depan orang lain, setel APP_DEBUG=false di .env.';
+    $warnings[] = 'APP_DEBUG=true: halaman error menampilkan detail internal ke semua perangkat di WiFi. start_demo.bat dan start_demo_kantor.bat sudah memaksanya mati; peringatan ini hanya berlaku bila server dijalankan dengan cara lain.';
 }
 
 if (! preg_match('/^APP_KEY=\S+/m', $envText) && ! $checkOnly) {

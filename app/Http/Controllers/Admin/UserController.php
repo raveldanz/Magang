@@ -122,10 +122,27 @@ class UserController extends Controller
         $query = User::with(['agencyProfile', 'university', 'studentProfile', 'unit']);
 
         // Isolasi Bidang & Multi-Tenant
-        if (! $isSuperAdmin && $currentUser->unit_id) {
-            $query->where('unit_id', $currentUser->unit_id);
-        } elseif (! $isSuperAdmin && $currentUser->agency_profile_id) {
-            $query->where('agency_profile_id', $currentUser->agency_profile_id);
+        // Daftar mengikuti wewenang canManageUser(): staf instansi/bidang sendiri (tanpa akun Supervisor, yang
+        // hanya dikelola Super Admin) ditambah mahasiswa yang mengajukan ke instansi/bidang tersebut.
+        if (! $isSuperAdmin && ($currentUser->unit_id || $currentUser->agency_profile_id)) {
+            $query->where(function ($scope) use ($currentUser) {
+                $scope->where(function ($staff) use ($currentUser) {
+                    $staff->where('role', '!=', 'supervisor');
+                    if ($currentUser->unit_id) {
+                        $staff->where('unit_id', $currentUser->unit_id);
+                    } else {
+                        $staff->where('agency_profile_id', $currentUser->agency_profile_id);
+                    }
+                })->orWhere(function ($students) use ($currentUser) {
+                    $students->where('role', 'mahasiswa')
+                        ->whereHas('applications.unit', function ($unit) use ($currentUser) {
+                            $unit->where('agency_profile_id', $currentUser->agency_profile_id);
+                            if ($currentUser->unit_id) {
+                                $unit->whereKey($currentUser->unit_id);
+                            }
+                        });
+                });
+            });
         }
 
         // Filter Role

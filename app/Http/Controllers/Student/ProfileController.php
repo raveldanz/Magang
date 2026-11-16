@@ -95,7 +95,7 @@ class ProfileController extends Controller
         // 2. Tambahkan validasi untuk photo
         $request->validate([
             'name' => 'required|string|max:255',
-            'nim' => 'required|string|max:50',
+            'nim' => ['required', 'string', 'max:30', 'regex:/^[A-Za-z0-9][A-Za-z0-9.\-\/ ]*$/'],
             'university_id' => [
                 'required',
                 function ($attribute, $value, $fail) {
@@ -110,8 +110,8 @@ class ProfileController extends Controller
             'custom_university_name' => 'nullable|required_if:university_id,other|string|min:3|max:255',
             'faculty' => 'nullable|string|max:255',
             'jurusan' => 'required|string|max:255',
-            'semester' => 'nullable|string|max:20',
-            'phone' => 'required|string|max:20',
+            'semester' => 'nullable|integer|between:1,16',
+            'phone' => ['required', 'string', 'max:20', 'regex:/^\+?[0-9][0-9 \-]{7,18}$/'],
             'alamat' => 'nullable|string',
             'emergency_contact_name' => 'nullable|string|max:255',
             'emergency_contact_phone' => 'nullable|string|max:30',
@@ -121,6 +121,10 @@ class ProfileController extends Controller
             'id_card' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
         ], [
             'university_id.required' => 'Silakan pilih perguruan tinggi Anda.',
+            'nim.regex' => 'NIM hanya boleh berisi huruf, angka, titik, garis miring, atau tanda hubung.',
+            'phone.regex' => 'Nomor telepon harus berupa 8 sampai 19 angka, boleh diawali tanda +.',
+            'semester.integer' => 'Semester harus berupa angka.',
+            'semester.between' => 'Semester harus antara 1 sampai 16.',
             'custom_university_name.required_if' => 'Nama perguruan tinggi wajib diisi jika memilih "Perguruan Tinggi Lainnya".',
             'cv.mimes' => 'File CV harus berformat PDF.',
             'cv.max' => 'Ukuran file CV maksimal 2MB.',

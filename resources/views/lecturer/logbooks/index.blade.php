@@ -24,7 +24,7 @@
                     $currStatus = request('status', '');
                 @endphp
                 <div class="border-b border-slate-200">
-                    <nav class="flex items-center w-full sm:space-x-6 sm:w-auto" aria-label="Tabs">
+                    <nav class="flex items-center w-full sm:space-x-6 sm:w-auto overflow-x-auto" aria-label="Tabs">
                         <a href="{{ route('lecturer.logbooks.index', array_merge(request()->except('status'), ['status' => ''])) }}"
                            class="flex-1 sm:flex-initial min-h-[44px] py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ $currStatus === '' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300 font-semibold' }}">
                             <span class="sm:hidden">Semua</span>

@@ -429,7 +429,7 @@ class UniversityController extends Controller
 
         // Data dosen, mahasiswa (urut prioritas tindakan) & statistik kampus disusun di service
         [$dosens, $students, $stats, $requireAdvisor] = app(UniversityHubService::class)
-            ->build($university, (string) $request->input('student_status', ''), $request->input('student_search'));
+            ->build($university, (string) $request->input('student_status', ''), $request->input('student_search'), $isSuperAdmin ? null : Auth::user());
 
         $activeTab = $request->query('tab', 'dosen');
 

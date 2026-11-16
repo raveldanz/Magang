@@ -253,7 +253,7 @@ class Phase3SecurityDataIntegrityTest extends TestCase
 
         // Foto profil
         $this->actingAs($this->student)->post(route('student.profile.update'), [
-            'name' => 'Mhs', 'nim' => '1', 'university_id' => (string) $this->unesa->id, 'jurusan' => 'TI', 'phone' => '08',
+            'name' => 'Mhs', 'nim' => '1', 'university_id' => (string) $this->unesa->id, 'jurusan' => 'TI', 'phone' => '081234567890',
             'photo' => UploadedFile::fake()->image('foto.jpg'),
         ])->assertSessionHasNoErrors();
         $photo = $this->student->studentProfile()->first()->photo;
@@ -332,7 +332,7 @@ class Phase3SecurityDataIntegrityTest extends TestCase
 
     public function test_student_typing_existing_campus_is_matched_or_asked_to_confirm(): void
     {
-        $payload = ['name' => 'Mhs', 'nim' => '1', 'jurusan' => 'TI', 'phone' => '08', 'university_id' => 'other'];
+        $payload = ['name' => 'Mhs', 'nim' => '1', 'jurusan' => 'TI', 'phone' => '081234567890', 'university_id' => 'other'];
 
         // Akronim persis → otomatis memakai kampus yang ada, tidak membuat entri baru
         $this->actingAs($this->student)->post(route('student.profile.update'), $payload + ['custom_university_name' => 'its'])
