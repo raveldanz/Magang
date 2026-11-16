@@ -33,9 +33,7 @@ class NotificationService
         // 1. SUPER ADMIN NOTIFICATIONS
         if ($isSuperAdmin) {
             // A. Universitas Baru Tanpa Akun
-            $pendingUnivs = University::whereDoesntHave('users', function ($q) {
-                $q->where('role', 'universitas');
-            })->withCount('students')->get();
+            $pendingUnivs = University::needingAdminAccount()->withCount('students')->get();
 
             foreach ($pendingUnivs as $u) {
                 $actionable[] = [

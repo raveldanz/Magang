@@ -62,7 +62,7 @@ class UniversityController extends Controller
         $universities = $query->get();
 
         // Count un-provisioned university accounts
-        $unregisteredCount = University::doesntHave('universityAdmin')->count();
+        $unregisteredCount = University::needingAdminAccount()->count();
 
         // Kampus baru hasil input mandiri mahasiswa yang belum divalidasi admin
         $pendingVerificationCount = University::pendingVerification()->count();

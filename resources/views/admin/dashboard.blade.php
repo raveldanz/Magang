@@ -460,7 +460,7 @@
                                             <p class="text-[11px] text-slate-500 truncate mt-0.5" title="{{ $mentor->email }}">{{ $mentor->email }}</p>
                                         </div>
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-bold bg-blue-100 text-blue-800 shrink-0">
-                                            {{ $mentor->active_students_count ?? 0 }} Mhs
+                                            {{ $mentor->active_students_count ?? 0 }} Peserta
                                         </span>
                                     </div>
                                 @empty
@@ -492,10 +492,10 @@
                             <tr class="border-b border-slate-200 bg-slate-100/50 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
                                 <th class="py-3.5 px-6">Nama Unit Bidang</th>
                                 <th class="py-3.5 px-4 text-center">Kuota Total</th>
-                                <th class="py-3.5 px-4 text-center">Mhs Aktif</th>
+                                <th class="py-3.5 px-4 text-center">Peserta Aktif</th>
                                 <th class="py-3.5 px-4 text-center">Sisa Kuota</th>
                                 <th class="py-3.5 px-4 text-center">Menunggu ACC</th>
-                                <th class="py-3.5 px-4 text-center">Mhs Lulus</th>
+                                <th class="py-3.5 px-4 text-center">Peserta Lulus</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -585,7 +585,7 @@
                                     <div class="text-sm font-extrabold text-slate-800 mt-0.5">{{ $dUnit->quota }}</div>
                                 </div>
                                 <div class="bg-emerald-50/50 rounded-xl p-2 text-center border border-emerald-100">
-                                    <div class="text-[10px] text-emerald-600 uppercase font-bold tracking-wider">Mhs Aktif</div>
+                                    <div class="text-[10px] text-emerald-600 uppercase font-bold tracking-wider">Peserta Aktif</div>
                                     <div class="text-sm font-extrabold text-emerald-700 mt-0.5">{{ $uActive }}</div>
                                 </div>
                                 <div class="{{ $uWaiting > 0 ? 'bg-purple-50/60 border-purple-200' : 'bg-slate-50/60 border-slate-100' }} rounded-xl p-2 text-center border">
@@ -593,7 +593,7 @@
                                     <div class="text-sm font-extrabold {{ $uWaiting > 0 ? 'text-purple-700' : 'text-slate-400' }} mt-0.5">{{ $uWaiting }}</div>
                                 </div>
                                 <div class="bg-blue-50/50 rounded-xl p-2 text-center border border-blue-100">
-                                    <div class="text-[10px] text-blue-600 uppercase font-bold tracking-wider">Mhs Lulus</div>
+                                    <div class="text-[10px] text-blue-600 uppercase font-bold tracking-wider">Peserta Lulus</div>
                                     <div class="text-sm font-extrabold text-blue-700 mt-0.5">{{ $uCompleted }}</div>
                                 </div>
                             </div>
@@ -728,22 +728,24 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 pb-3 border-b border-slate-100">
                     <div class="min-w-0 flex-1">
                         <h3 class="text-sm font-bold text-slate-800 leading-snug">
-                            {{ $isSuperAdmin ? 'Distribusi Asal Kampus Surabaya' : (Auth::user()->isBidangAdmin() ? 'Distribusi Kampus Peserta Magang Bidang' : 'Distribusi Asal Kampus Peserta Magang Dinas') }}
+                            {{ $isSuperAdmin ? 'Distribusi Asal Kampus & Sekolah' : (Auth::user()->isBidangAdmin() ? 'Distribusi Kampus/Sekolah Peserta Magang Bidang' : 'Distribusi Asal Kampus/Sekolah Peserta Magang Dinas') }}
                         </h3>
-                        <p class="text-xs text-slate-400 mt-0.5">
-                            {{ $isSuperAdmin ? 'Sebaran perguruan tinggi mitra resmi program magang' : (Auth::user()->isBidangAdmin() ? 'Sebaran perguruan tinggi pendaftar magang di bidang ini' : 'Sebaran kampus pendaftar di ' . ($currentAgency->agency_name ?? 'dinas ini')) }}
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            {{ $isSuperAdmin ? 'Sebaran kampus dan sekolah asal peserta magang' : (Auth::user()->isBidangAdmin() ? 'Sebaran kampus/sekolah pendaftar magang di bidang ini' : 'Sebaran kampus/sekolah pendaftar di ' . ($currentAgency->agency_name ?? 'dinas ini')) }}
                         </p>
                     </div>
                     @if($isSuperAdmin)
                         <a href="{{ route('admin.universities.index') }}"
                             class="self-start sm:self-auto shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-sky-700 hover:text-sky-900 bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-xl transition border border-sky-200 shadow-2xs">
-                            <span>Kelola Kampus</span>
+                            <span>Kelola Kampus & Sekolah</span>
                         </a>
                     @endif
                 </div>
 
                 @php
+                    // Hanya institusi yang punya peserta: master sekolah/kampus tanpa peserta tidak perlu ditampilkan
                     $campusList = collect($universityStats ?? [])
+                        ->filter(fn ($row) => (int) data_get($row, 'count', 0) > 0)
                         ->sortByDesc(fn ($row) => data_get($row, 'count', 0))->values()->all();
                 @endphp
                 <div class="space-y-4 pt-1">

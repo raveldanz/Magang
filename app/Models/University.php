@@ -240,6 +240,16 @@ class University extends Model
     }
 
     /**
+     * Kampus/sekolah yang sudah punya peserta magang tetapi belum punya akun Admin Kampus/Sekolah.
+     * Master institusi tanpa peserta (mis. 283 sekolah hasil impor) tidak perlu dibuatkan akun.
+     */
+    public function scopeNeedingAdminAccount(Builder $query): Builder
+    {
+        return $query->whereDoesntHave('users', fn ($q) => $q->where('role', 'universitas'))
+            ->whereHas('students');
+    }
+
+    /**
      * URL logo universitas yang benar-benar ada dengan fallback default resmi.
      */
     public function getLogoUrlAttribute(): string

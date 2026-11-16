@@ -170,9 +170,7 @@ class DashboardController extends Controller
         $recentApplications = (clone $appQuery)->latest()->take(6)->get();
 
         // Perguruan tinggi baru yang belum punya akun portal
-        $pendingUniversities = University::whereDoesntHave('users', function ($q) {
-            $q->where('role', 'universitas');
-        })->withCount('students')->get();
+        $pendingUniversities = University::needingAdminAccount()->withCount('students')->get();
 
         // Instansi dinas baru yang belum punya akun admin dinas
         $pendingAgencies = AgencyProfile::whereDoesntHave('users', function ($q) {
