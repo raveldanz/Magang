@@ -188,6 +188,30 @@ class AdvisorSelfRegistrationTest extends TestCase
         app(PlacementAssignmentService::class)->resolveAdvisor($placement->application, $fake->id);
     }
 
+    public function test_campus_admin_cannot_assign_advisor_to_rejected_application(): void
+    {
+        $advisor = User::factory()->create(['role' => 'dosen', 'university_id' => $this->unesa->id, 'status' => AccountStatus::ACTIVE->value]);
+        $campusAdmin = User::factory()->create(['role' => 'universitas', 'university_id' => $this->unesa->id]);
+        $rejected = Application::create([
+            'user_id' => $this->student->id,
+            'unit_id' => $this->unit->id,
+            'status' => 'rejected',
+            'start_date' => Carbon::now()->addDays(5)->toDateString(),
+            'end_date' => Carbon::now()->addDays(40)->toDateString(),
+        ]);
+
+        $this->actingAs($campusAdmin)
+            ->post(route('university.students.assign_advisor', $rejected->id), ['academic_advisor_id' => $advisor->id])
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseMissing('placements', ['application_id' => $rejected->id]);
+
+        // Tombol penugasan tidak ditampilkan untuk pengajuan yang ditolak
+        $this->actingAs($campusAdmin)->get(route('university.dashboard'))
+            ->assertOk()
+            ->assertDontSee("appId: '{$rejected->id}'", false);
+    }
+
     public function test_campus_admin_of_same_institution_approves_then_student_can_pick(): void
     {
         $placement = $this->activeApplication();

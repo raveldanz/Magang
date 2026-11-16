@@ -245,6 +245,12 @@ class DashboardController extends Controller
             abort(403, 'Anda tidak memiliki hak akses untuk memplot pembimbing peserta magang kampus lain.');
         }
 
+        // Pengajuan yang ditolak, mengundurkan diri, atau masih draf tidak boleh mendapat penempatan/pembimbing
+        $closedStatus = ApplicationStatus::tryFrom($application->statusValue());
+        if (in_array($closedStatus, [ApplicationStatus::REJECTED, ApplicationStatus::RESIGNED, ApplicationStatus::DRAFT], true)) {
+            return redirect()->back()->with('error', "Pembimbing tidak dapat ditugaskan karena pengajuan {$student->name} berstatus {$closedStatus->description()}.");
+        }
+
         // Pastikan dosen yang dipilih berasal dari universitas yang sama
         $advisor = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($request->academic_advisor_id);
         $isAdvisorSameUniv = app(UniversityResolver::class)->belongsTo($advisor, $university);
@@ -319,7 +325,7 @@ class DashboardController extends Controller
             // Header Kolom
             fputcsv($handle, [
                 'No',
-                'NIM',
+                'NIM/NIS',
                 'Nama Peserta Magang',
                 'Tipe Pendaftaran',
                 'Kelompok Magang',

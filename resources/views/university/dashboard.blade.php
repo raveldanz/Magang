@@ -292,11 +292,13 @@
                                         Belum Ditentukan
                                     </span>
                                 </div>
-                                <button type="button" 
+                                @if (! in_array($app->statusValue(), ['rejected', 'resigned', 'draft'], true))
+                                <button type="button"
                                         @click="assignModal = { show: true, appId: '{{ $app->id }}', studentName: @js((string) ($student->name)), currentAdvisorId: '' }"
                                         class="mt-1 text-[11px] text-blue-600 hover:text-blue-800 font-bold bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 py-0.5 rounded-md inline-block cursor-pointer">
                                     + Pilih Pembimbing
                                 </button>
+                                @endif
                             @endif
                         </td>
                         <td class="px-4 py-4">

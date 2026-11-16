@@ -126,11 +126,13 @@
                             <h3 class="font-bold text-sm text-slate-900 leading-tight">Pembimbing</h3>
                             <p class="text-[11px] text-slate-400 mt-0.5">Pembimbing & Mentor Dinas</p>
                         </div>
-                        <button type="button" 
-                                @click="showAssignModal = true" 
+                        @if (! in_array($application->statusValue(), ['rejected', 'resigned', 'draft'], true))
+                        <button type="button"
+                                @click="showAssignModal = true"
                                 class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-lg transition shrink-0">
                             {{ $dosen ? 'Ganti' : '+ Pembimbing' }}
                         </button>
+                        @endif
                     </div>
 
                     <div class="space-y-2 text-xs">
