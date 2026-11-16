@@ -20,7 +20,7 @@ echo HASIL: ada [GAGAL] di atas yang harus diperbaiki dulu.
 goto end
 
 :ready
-echo HASIL: siap. Baca [PERHATIAN] bila ada, lalu jalankan start_demo.bat.
+echo HASIL: siap. Baca [PERHATIAN] bila ada, lalu jalankan 1_MULAI_DEMO.bat.
 goto end
 
 :no_php

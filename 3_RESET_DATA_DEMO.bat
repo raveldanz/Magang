@@ -19,7 +19,7 @@ if not exist "%~dp0database\database.awal.sqlite" (
 rem Server harus mati dulu: database yang sedang dipakai tidak bisa ditimpa
 powershell -NoProfile -ExecutionPolicy Bypass -Command "if (@(Get-CimInstance Win32_Process | Where-Object { $_.Name -eq 'php.exe' -and $_.CommandLine -and $_.CommandLine.Contains('sip_magang_demo_server') }).Count -gt 0) { exit 1 } else { exit 0 }"
 if errorlevel 1 (
-    echo [GAGAL] Server demo masih menyala. Tutup jendela start_demo.bat ^(Ctrl+C^) dulu,
+    echo [GAGAL] Server demo masih menyala. Tutup jendela demo ^(Ctrl+C lalu Y^) dulu,
     echo         lalu jalankan berkas ini lagi.
     goto end
 )
@@ -39,7 +39,7 @@ if errorlevel 1 (
 echo.
 echo [OK] Data demo kembali ke awal. Data sebelumnya disimpan di:
 echo      database\cadangan\database-%STAMP%.sqlite
-echo      Jalankan start_demo.bat lagi.
+echo      Jalankan 1_MULAI_DEMO.bat lagi.
 
 :end
 echo.

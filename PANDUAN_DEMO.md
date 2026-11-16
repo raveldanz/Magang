@@ -71,11 +71,12 @@ setelah server menyala menunggu ±13 detik; dengan pemanasan ±2 detik, dan sete
 
 | Berkas | Fungsi |
 |---|---|
+| `1_MULAI_DEMO.bat` | **Satu-satunya yang perlu diklik.** Cek lokasi (menolak bila dari dalam zip), buka blokir *Mark of the Web*, cek PHP/VC++ Runtime, minta izin firewall lewat UAC bila aturan `SIP-MAGANG Demo (PHP)` untuk semua profil jaringan belum ada (`izinkan_firewall.bat /auto`), jaga agar tidak sleep (`scripts/keep_awake.ps1`), lalu `start_demo.bat`. Bila demo sudah berjalan: B = buka halaman alamat, U = ulang. |
 | `BACA_DULU.txt` | Langkah singkat. Panduan lengkap: `PANDUAN_IT_SIP-MAGANG.pdf` (dibuat `php scripts/build_it_guide.php`). |
 | `CEK_KESIAPAN.bat` | `demo_preflight.php --check` (tidak mengubah apa pun). |
 | `ALAMAT_DEMO.html` | Dibuat setiap `start_demo.bat`: alamat besar + kode QR + akun demo; dibuka otomatis untuk ditampilkan ke layar. |
-| `UJI_20_PENGGUNA.bat` | `demo_loadtest.php` 20 pengguna, 60 detik, ke alamat lokal (atau argumen `http://IP:PORT`). |
-| `RESET_DATA_DEMO.bat` | Menyalin `database\database.awal.sqlite` ke `database.sqlite` (data lama ke `database\cadangan`); server harus mati. |
+| `2_UJI_20_PENGGUNA.bat` | `demo_loadtest.php` 20 pengguna, 60 detik, ke alamat lokal (atau argumen `http://IP:PORT`). |
+| `3_RESET_DATA_DEMO.bat` | Menyalin `database\database.awal.sqlite` ke `database.sqlite` (data lama ke `database\cadangan`); server harus mati. |
 
 Zip berisi database demo yang **dibuat baru** dari seeder (`migrate:fresh --seed` di folder salinan), bukan
 `database.sqlite` folder kerja; unggahan/lampiran chat hasil uji lokal dan cadangan database tidak ikut, dan folder

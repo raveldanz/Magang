@@ -262,5 +262,5 @@ Remove-Item $stage -Recurse -Force
 $sizeMb = [math]::Round((Get-Item $zip).Length / 1MB, 1)
 Write-Host ''
 Write-Host "SELESAI: $zip ($sizeMb MB)" -ForegroundColor Green
-Write-Host 'Di laptop tujuan: ekstrak zip, buka folder SIP-MAGANG, klik dua kali start_demo.bat.'
-Write-Host 'Baca PANDUAN_DEMO.md untuk langkah firewall dan daftar akun.'
+Write-Host 'Di laptop tujuan: ekstrak zip ke C:\, buka folder SIP-MAGANG, klik dua kali 1_MULAI_DEMO.bat.'
+Write-Host 'Panduan untuk petugas IT: PANDUAN_IT_SIP-MAGANG.pdf dan BACA_DULU.txt di dalam zip.'

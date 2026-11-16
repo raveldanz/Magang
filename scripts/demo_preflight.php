@@ -364,9 +364,15 @@ if (! $ips) {
 // 9. Windows Firewall ---------------------------------------------------------------------
 if (PHP_OS_FAMILY === 'Windows') {
     $ps = '$r = Get-NetFirewallApplicationFilter -Program \''.str_replace("'", "''", $php).'\' -ErrorAction SilentlyContinue | Get-NetFirewallRule | Where-Object { $_.Enabled -eq \'True\' -and $_.Direction -eq \'Inbound\' };'
-        .' \'B=\' + @($r | Where-Object { $_.Action -eq \'Block\' }).Count + \' A=\' + @($r | Where-Object { $_.Action -eq \'Allow\' }).Count';
+        .' \'B=\' + @($r | Where-Object { $_.Action -eq \'Block\' }).Count + \' A=\' + @($r | Where-Object { $_.Action -eq \'Allow\' }).Count'
+        // Izin dari jendela "Windows Security Alert" sering hanya untuk jaringan Public; aturan buatan
+        // izinkan_firewall.bat berlaku untuk semua jenis jaringan (Profile Any = 0, atau 7).
+        .' + \' O=\' + @($r | Where-Object { $_.DisplayName -eq \'SIP-MAGANG Demo (PHP)\' -and $_.Action -eq \'Allow\' -and [int]$_.Profile -in 0,7 }).Count';
     $fw = (string) @shell_exec('powershell -NoProfile -ExecutionPolicy Bypass -Command "'.$ps.'" 2>NUL');
-    if (preg_match('/B=(\d+) A=(\d+)/', $fw, $f)) {
+    if (preg_match('/B=(\d+) A=(\d+) O=(\d+)/', $fw, $f)) {
+        if ((int) $f[1] === 0 && (int) $f[2] > 0 && (int) $f[3] === 0) {
+            $warnings[] = 'Izin Windows Firewall untuk php.exe hanya berlaku di sebagian jenis jaringan (biasanya hanya Public). Bila WiFi kantor dianggap Private/Domain, HP peserta tetap diblokir. Jalankan 1_MULAI_DEMO.bat (meminta izin otomatis) atau izinkan_firewall.bat sebagai administrator.';
+        }
         if ((int) $f[1] > 0) {
             $warnings[] = 'WINDOWS FIREWALL MEMBLOKIR php.exe: perangkat lain TIDAK akan bisa membuka aplikasi. Klik kanan izinkan_firewall.bat > Run as administrator, lalu jalankan ulang.';
         } elseif ((int) $f[2] === 0) {

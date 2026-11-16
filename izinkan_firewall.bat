@@ -11,7 +11,7 @@ if errorlevel 1 (
     echo [GAGAL] Berkas ini harus dijalankan sebagai Administrator.
     echo         Klik kanan izinkan_firewall.bat ^> Run as administrator.
     echo.
-    pause
+    if /i not "%~1"=="/auto" pause
     exit /b 1
 )
 
@@ -35,8 +35,11 @@ echo Yang akan dilakukan:
 echo   1. Menghapus aturan firewall "Block" untuk php.exe di atas (bila ada)
 echo   2. Menambah aturan "SIP-MAGANG Demo (PHP)" yang mengizinkan koneksi masuk TCP ke php.exe
 echo.
+rem /auto: dipanggil 1_MULAI_DEMO.bat (sudah diminta izin lewat jendela UAC), tanpa pertanyaan & jeda
+if /i "%~1"=="/auto" goto apply
 choice /c YT /m "Lanjutkan"
 if errorlevel 2 exit /b 0
+:apply
 
 set "SIPMAGANG_PHP=%PHP_EXE%"
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$p = $env:SIPMAGANG_PHP; Get-NetFirewallApplicationFilter -Program $p -ErrorAction SilentlyContinue | Get-NetFirewallRule | Where-Object { $_.Direction -eq 'Inbound' -and $_.Action -eq 'Block' } | Remove-NetFirewallRule; Get-NetFirewallRule -DisplayName 'SIP-MAGANG Demo (PHP)' -ErrorAction SilentlyContinue | Remove-NetFirewallRule; New-NetFirewallRule -DisplayName 'SIP-MAGANG Demo (PHP)' -Direction Inbound -Action Allow -Protocol TCP -Program $p -Profile Any | Out-Null; 'Selesai. Aturan firewall untuk php.exe sudah diizinkan.'"
@@ -44,5 +47,10 @@ echo.
 echo Untuk mencabut izin setelah demo:
 echo   netsh advfirewall firewall delete rule name="SIP-MAGANG Demo (PHP)"
 echo.
+if /i "%~1"=="/auto" (
+    timeout /t 3 /nobreak >nul
+    endlocal
+    exit /b 0
+)
 pause
 endlocal

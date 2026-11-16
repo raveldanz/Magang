@@ -1,35 +1,39 @@
 SIP-MAGANG - DEMO LEWAT WIFI (Dispusip Kota Surabaya)
 =====================================================
 
-Panduan lengkap bergambar: PANDUAN_IT_SIP-MAGANG.pdf (di folder ini).
+Panduan lengkap: PANDUAN_IT_SIP-MAGANG.pdf (di folder ini).
 Tidak perlu internet, Node.js, Composer, PostgreSQL, maupun instalasi apa pun.
 
-LANGKAH SINGKAT (komputer server)
----------------------------------
-1. Ekstrak zip ke C:\SIP-MAGANG (hindari Desktop/OneDrive), lalu buka folder SIP-MAGANG.
-2. SEKALI SAJA: klik kanan  izinkan_firewall.bat  > Run as administrator > tekan Y.
-3. Klik dua kali  CEK_KESIAPAN.bat  -> pastikan HASIL: siap.
-4. Klik dua kali  start_demo.bat  -> tunggu sampai muncul "Server berjalan".
-   Browser otomatis membuka ALAMAT_DEMO.html (alamat + kode QR + akun demo).
-   Tampilkan halaman itu ke layar/proyektor; peserta cukup memindai QR.
-5. JANGAN tutup jendela hitam start_demo.bat dan jendela kecil "SIP-MAGANG Server 1..N".
+CARA PAKAI (komputer server)
+----------------------------
+0. Sebelum diekstrak: klik kanan berkas zip > Properties > centang "Unblock" > OK (bila ada).
+1. Klik kanan zip > Extract All > tujuan C:\  (hasilnya C:\SIP-MAGANG).
+   Jangan menjalankan dari dalam zip, flashdisk, atau folder OneDrive.
+2. Buka C:\SIP-MAGANG lalu klik dua kali:  1_MULAI_DEMO.bat
+   - Bila muncul "Windows protected your PC": klik More info > Run anyway.
+   - Bila muncul "Izinkan aplikasi ini membuat perubahan?": klik YES / YA
+     (sekali saja, untuk izin Windows Firewall agar HP peserta bisa masuk).
+   - Tunggu sekitar 1 menit sampai muncul "Server berjalan".
+   - Browser otomatis membuka ALAMAT_DEMO.html (alamat + kode QR + akun demo).
+     Tampilkan ke layar/proyektor; peserta cukup memindai QR.
+3. JANGAN tutup jendela hitam dan jendela kecil "SIP-MAGANG ..." selama demo.
 
-UJI SEBELUM HARI-H
-------------------
-- Coba buka alamatnya dari 1 HP yang tersambung ke WiFi yang sama.
-- Klik dua kali  UJI_20_PENGGUNA.bat  (saat start_demo.bat menyala) untuk meniru
-  20 peserta selama 1 menit. Hasil yang diharapkan: "HASIL: lancar".
+Berkas lain (tidak wajib):
+  2_UJI_20_PENGGUNA.bat   uji otomatis 20 peserta selama 1 menit (saat demo menyala)
+  3_RESET_DATA_DEMO.bat   kembalikan data demo ke awal (setelah demo dimatikan)
+  CEK_KESIAPAN.bat        hanya memeriksa, tidak mengubah apa pun
+  izinkan_firewall.bat    izin firewall manual (klik kanan > Run as administrator)
 
 JARINGAN
 --------
 - Komputer server dan SEMUA perangkat peserta harus di WiFi/router yang SAMA.
-- Bila komputer server pindah WiFi, alamatnya berubah: tutup start_demo.bat lalu jalankan lagi.
+- Bila komputer server pindah WiFi, alamatnya berubah: klik 1_MULAI_DEMO.bat > pilih U (ulang).
 - Bila HP tidak bisa membuka alamat padahal komputer server bisa: WiFi memblokir sesama
   perangkat (client isolation). Pakai router WiFi sendiri (tidak perlu internet).
 
-SETELAH UJI COBA
-----------------
-- Hentikan server: klik jendela start_demo.bat, tekan Ctrl+C, lalu Y.
-- Kembalikan data ke awal: RESET_DATA_DEMO.bat (data lama disimpan di database\cadangan).
+SELESAI
+-------
+- Hentikan: klik jendela hitam, tekan Ctrl+C, lalu Y.
+- Klik 1_MULAI_DEMO.bat saat demo masih berjalan: pilih B untuk membuka lagi halaman alamat.
 
 Kata sandi akun demo: password  (Super Admin admin@gmail.com: admin123)

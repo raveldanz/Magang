@@ -116,7 +116,7 @@ PHP, database, dan semua komponen sudah ada di dalam zip.</p>
 
 <table class="diagram">
     <tr>
-        <td style="width:30%"><div class="node"><b>Komputer server</b><br>menjalankan<br><span class="code">start_demo.bat</span></div></td>
+        <td style="width:30%"><div class="node"><b>Komputer server</b><br>menjalankan<br><span class="code">1_MULAI_DEMO.bat</span></div></td>
         <td style="width:8%" class="arrow">&harr;</td>
         <td style="width:24%"><div class="node"><b>WiFi / router</b><br>yang sama untuk semua<br><span class="muted">(internet tidak wajib)</span></div></td>
         <td style="width:8%" class="arrow">&harr;</td>
@@ -124,16 +124,16 @@ PHP, database, dan semua komponen sudah ada di dalam zip.</p>
     </tr>
 </table>
 
-<h3>5 langkah inti</h3>
+<h3>Cukup 3 langkah</h3>
 <?= $table(['', 'Langkah', 'Cara'], [
-    ['1', 'Ekstrak zip', 'Klik kanan zip &rarr; <i>Extract All</i> &rarr; ke '.$code('C:\\').' (hasilnya '.$code('C:\\SIP-MAGANG').').'],
-    ['2', 'Izinkan firewall (sekali saja)', 'Klik kanan '.$code('izinkan_firewall.bat').' &rarr; <i>Run as administrator</i> &rarr; tekan <b>Y</b>.'],
-    ['3', 'Cek kesiapan', 'Klik dua kali '.$code('CEK_KESIAPAN.bat').' &rarr; harus muncul <b>HASIL: siap</b>.'],
-    ['4', 'Nyalakan demo', 'Klik dua kali '.$code('start_demo.bat').'. Browser otomatis membuka halaman <b>ALAMAT DEMO</b> (alamat + kode QR + akun).'],
-    ['5', 'Peserta masuk', 'Tampilkan halaman ALAMAT DEMO di layar/proyektor. Peserta di WiFi yang sama cukup memindai QR.'],
-], ['6%', '26%', '68%']) ?>
+    ['1', 'Ekstrak zip', 'Klik kanan zip &rarr; <i>Properties</i> &rarr; centang <b>Unblock</b> (bila ada) &rarr; OK. Lalu klik kanan &rarr; <i>Extract All</i> &rarr; ke '.$code('C:\\').' (hasilnya '.$code('C:\\SIP-MAGANG').').'],
+    ['2', 'Klik <b>1_MULAI_DEMO.bat</b>', 'Satu berkas ini mengerjakan semua persiapan: memeriksa lokasi &amp; PHP, <b>meminta izin Windows Firewall</b> (klik <b>YES</b> pada jendela izin), menjaga komputer tidak sleep, menyiapkan database, menyalakan &amp; memanaskan server. Tunggu &plusmn;1 menit.'],
+    ['3', 'Peserta masuk', 'Browser otomatis membuka halaman <b>ALAMAT DEMO</b> (alamat besar + kode QR + akun). Tampilkan ke layar/proyektor; peserta di WiFi yang sama cukup memindai QR.'],
+], ['6%', '24%', '70%']) ?>
+<p class="muted">Berkas tambahan (tidak wajib): <?= $code('2_UJI_20_PENGGUNA.bat') ?> uji otomatis 20 peserta,
+<?= $code('3_RESET_DATA_DEMO.bat') ?> kembalikan data ke awal, <?= $code('CEK_KESIAPAN.bat') ?> pemeriksaan saja.</p>
 
-<div class="tip"><b>Sudah dioptimalkan untuk 20 orang.</b> <span class="code">start_demo.bat</span> menyalakan beberapa server sekaligus
+<div class="tip"><b>Sudah dioptimalkan untuk 20 orang.</b> <span class="code">1_MULAI_DEMO.bat</span> menyalakan beberapa server sekaligus
 (4&ndash;8, sesuai jumlah inti prosesor) dan membagi peserta secara bergiliran. Hasil uji: 20 peserta serentak, separuh halaman terbuka
 dalam &plusmn;0,1&ndash;0,3 detik dan 95% halaman dalam &lt; 2 detik, tanpa galat.</div>
 
@@ -141,7 +141,8 @@ dalam &plusmn;0,1&ndash;0,3 detik dan 95% halaman dalam &lt; 2 detik, tanpa gala
 yang sama</b>, dan jaringan itu <b>tidak boleh memblokir sesama perangkat</b> (lihat bagian 3).</div>
 
 <!-- ===================== 1. KEBUTUHAN ===================== -->
-<h2 style="margin-top:16px">1. Kebutuhan</h2>
+<div class="page-break"></div>
+<h2>1. Kebutuhan</h2>
 <h3>Komputer server (komputer kantor)</h3>
 <?= $table(['Komponen', 'Minimal', 'Disarankan'], [
     ['Sistem operasi', 'Windows 10 64-bit', 'Windows 10/11 64-bit terbaru'],
@@ -170,45 +171,47 @@ Microsoft Visual C++ Runtime, database SQLite berisi data demo, dan tampilan yan
 <h2>2. Pemasangan &amp; Uji Coba Awal (Selasa)</h2>
 
 <table class="step">
-<tr><td class="no"><span>1</span></td><td><b>Ekstrak zip ke C:\</b><br>
-Salin zip ke komputer server, klik kanan &rarr; <i>Extract All</i> &rarr; tujuan <?= $code('C:\\') ?>. Hasilnya folder <?= $code('C:\\SIP-MAGANG') ?>.
-Hindari menjalankan langsung dari flashdisk, Desktop yang tersinkron OneDrive, atau dari dalam zip tanpa diekstrak.<br>
-<span class="ok">&#10003; Berhasil bila di dalam folder ada BACA_DULU.txt, start_demo.bat, dan folder php.</span></td></tr>
+<tr><td class="no"><span>1</span></td><td><b>Buka blokir &amp; ekstrak zip ke C:\</b><br>
+Salin zip ke komputer server. Klik kanan zip &rarr; <i>Properties</i> &rarr; bila ada kotak <b>Unblock</b>, centang &rarr; OK
+(mencegah peringatan keamanan Windows untuk berkas hasil unduhan). Lalu klik kanan &rarr; <i>Extract All</i> &rarr; tujuan <?= $code('C:\\') ?>.
+Hasilnya folder <?= $code('C:\\SIP-MAGANG') ?>. Jangan menjalankan dari dalam zip, flashdisk, atau folder yang tersinkron OneDrive.<br>
+<span class="ok">&#10003; Berhasil bila di dalam folder ada BACA_DULU.txt, 1_MULAI_DEMO.bat, dan folder php.</span></td></tr>
 
-<tr><td class="no"><span>2</span></td><td><b>Izinkan Windows Firewall (sekali saja)</b><br>
-Klik kanan <?= $code('izinkan_firewall.bat') ?> &rarr; <i>Run as administrator</i> &rarr; tekan <b>Y</b>. Skrip menghapus aturan blokir untuk php.exe
-(bila ada) dan menambah aturan izin <?= $code('SIP-MAGANG Demo (PHP)') ?>. Tanpa langkah ini, perangkat lain melihat "situs tidak dapat dijangkau".<br>
-<span class="ok">&#10003; Berhasil bila muncul pesan aturan dibuat.</span></td></tr>
+<tr><td class="no"><span>2</span></td><td><b>Klik dua kali 1_MULAI_DEMO.bat</b><br>
+Jendela hitam menampilkan 5 tahap persiapan, masing-masing diakhiri <b>OK</b>:
+<ol style="margin-top:3px">
+<li><b>Lokasi folder</b> &mdash; menolak bila dijalankan dari dalam zip; memberi peringatan bila di OneDrive.</li>
+<li><b>Buka blokir berkas</b> &mdash; membuang tanda "berkas dari internet" pada program di folder ini.</li>
+<li><b>PHP</b> &mdash; memastikan PHP bawaan zip bisa berjalan.</li>
+<li><b>Izin Windows Firewall</b> &mdash; bila belum ada, muncul jendela <i>"Izinkan aplikasi ini membuat perubahan?"</i>: klik <b>YES / YA</b>.
+    Izin dibuat untuk <b>semua jenis jaringan</b> (Public, Private, Domain). Cukup sekali per komputer.</li>
+<li><b>Daya</b> &mdash; mencegah sleep dan layar mati selama demo; memberi peringatan bila laptop memakai baterai.</li>
+</ol>
+Setelah itu demo dinyalakan otomatis (&plusmn;1 menit): database disiapkan, beberapa server aplikasi menyala di jendela kecil
+(<b>SIP-MAGANG Server 1..N</b>, <b>Scheduler</b>, <b>Queue Worker</b>, <b>Jaga Agar Tidak Sleep</b>), lalu server dipanaskan.<br>
+<span class="ok">&#10003; Berhasil bila muncul "Server berjalan" dan browser membuka halaman ALAMAT DEMO (alamat besar + QR + akun).</span><br>
+<span class="muted">Bila muncul <i>"Windows protected your PC"</i>: klik <b>More info</b> &rarr; <b>Run anyway</b>. Bila jendela izin ditolak atau akun
+bukan Administrator, demo tetap menyala tetapi HP peserta mungkin tidak bisa masuk; minta Administrator mengeklik kanan
+<?= $code('izinkan_firewall.bat') ?> &rarr; <i>Run as administrator</i>.</span></td></tr>
 
-<tr><td class="no"><span>3</span></td><td><b>Cek kesiapan</b><br>
-Klik dua kali <?= $code('CEK_KESIAPAN.bat') ?>. Skrip hanya memeriksa (PHP, ekstensi, database, daftar sekolah, port, alamat WiFi, firewall) dan tidak mengubah apa pun.<br>
-<span class="ok">&#10003; Berhasil bila baris terakhir: HASIL: siap. Baris [PERHATIAN] cukup dibaca; [GAGAL] harus diperbaiki (bagian 6).</span></td></tr>
-
-<tr><td class="no"><span>4</span></td><td><b>Nyalakan demo</b><br>
-Klik dua kali <?= $code('start_demo.bat') ?>. Tunggu &plusmn;1 menit (server dipanaskan dulu agar peserta pertama tidak menunggu lama). Yang terjadi:
-<ul>
-<li>Jendela hitam utama menampilkan alamat, misalnya <?= $code('http://192.168.1.23:8000') ?>, lalu "Server berjalan" dan "... server aplikasi sudah dipanaskan".</li>
-<li>Muncul beberapa jendela kecil (diperkecil di taskbar): <b>SIP-MAGANG Server 1..N</b>, <b>Scheduler</b>, dan <b>Queue Worker</b>.</li>
-<li>Browser membuka <b>ALAMAT_DEMO.html</b>: alamat besar, kode QR, dan daftar akun demo.</li>
-</ul>
-<span class="ok">&#10003; Berhasil bila halaman ALAMAT DEMO terbuka dan alamat di halaman itu bisa dibuka di browser komputer server.</span></td></tr>
-
-<tr><td class="no"><span>5</span></td><td><b>Coba dari 1 HP</b><br>
+<tr><td class="no"><span>3</span></td><td><b>Coba dari 1 HP</b><br>
 Sambungkan HP ke WiFi yang sama &rarr; pindai QR di halaman ALAMAT DEMO (atau ketik alamatnya) &rarr; klik <b>MASUK</b> &rarr;
 login <?= $code('admin@gmail.com') ?> / <?= $code('admin123') ?>.<br>
 <span class="ok">&#10003; Berhasil bila dasbor tampil di HP. Bila "situs tidak dapat dijangkau": lihat bagian 3 dan 6.</span></td></tr>
 
-<tr><td class="no"><span>6</span></td><td><b>Uji 20 pengguna (otomatis)</b><br>
-Saat demo menyala, klik dua kali <?= $code('UJI_20_PENGGUNA.bat') ?>. Skrip meniru 20 peserta yang login lalu membuka dasbor, logbook,
+<tr><td class="no"><span>4</span></td><td><b>Uji 20 pengguna (otomatis)</b><br>
+Saat demo menyala, klik dua kali <?= $code('2_UJI_20_PENGGUNA.bat') ?>. Skrip meniru 20 peserta yang login lalu membuka dasbor, logbook,
 notifikasi, dan chat selama 1 menit (hanya membaca, tidak mengubah data magang).<br>
 <span class="ok">&#10003; Berhasil bila: HASIL: lancar, dan "Permintaan gagal: 0".</span><br>
 <span class="muted">Lebih akurat bila dijalankan dari laptop lain yang juga berisi folder zip ini: buka Command Prompt di folder itu lalu ketik
-<?= $code('UJI_20_PENGGUNA.bat http://ALAMAT-SERVER:PORT') ?>.</span></td></tr>
+<?= $code('2_UJI_20_PENGGUNA.bat http://ALAMAT-SERVER:PORT') ?>.</span></td></tr>
 
-<tr><td class="no"><span>7</span></td><td><b>Matikan &amp; kembalikan data</b><br>
+<tr><td class="no"><span>5</span></td><td><b>Matikan &amp; kembalikan data</b><br>
 Klik jendela hitam utama &rarr; tekan <b>Ctrl+C</b> &rarr; <b>Y</b>. Semua jendela server ikut berhenti. Agar data Rabu bersih dari uji coba Selasa,
-klik dua kali <?= $code('RESET_DATA_DEMO.bat') ?> (data lama disimpan ke <?= $code('database\\cadangan') ?>).</td></tr>
+klik dua kali <?= $code('3_RESET_DATA_DEMO.bat') ?> (data lama disimpan ke <?= $code('database\\cadangan') ?>).</td></tr>
 </table>
+<p class="muted">Bila 1_MULAI_DEMO.bat diklik lagi saat demo masih berjalan, demo <b>tidak</b> dimatikan: pilih <b>B</b> untuk membuka lagi
+halaman alamat, atau <b>U</b> untuk mengulang dari awal (mis. setelah pindah WiFi).</p>
 
 <!-- ===================== 3. JARINGAN ===================== -->
 <h2 style="margin-top:16px">3. Jaringan &amp; Alamat</h2>
@@ -217,7 +220,7 @@ klik dua kali <?= $code('RESET_DATA_DEMO.bat') ?> (data lama disimpan ke <?= $co
 <ul>
     <li><b>Semua peserta harus di jaringan yang sama</b> dengan komputer server.</li>
     <li><b>Bila komputer server pindah WiFi</b> (atau router di-restart dan IP berubah), alamat lama tidak bisa dibuka lagi.
-        <b>Data tidak hilang.</b> Cukup tutup <?= $code('start_demo.bat') ?>, jalankan lagi, dan tampilkan halaman ALAMAT DEMO yang baru.</li>
+        <b>Data tidak hilang.</b> Cukup klik lagi <?= $code('1_MULAI_DEMO.bat') ?> &rarr; pilih <b>U</b> (ulang), lalu tampilkan halaman ALAMAT DEMO yang baru.</li>
     <li><b>Saran untuk IT:</b> beri komputer server alamat tetap (reservasi DHCP di router) agar alamat tidak berubah selama uji coba.</li>
     <li>Bila jendela server menampilkan <b>beberapa alamat</b> (komputer punya LAN, WiFi, atau adaptor virtual), pakai alamat yang
         satu jaringan dengan WiFi peserta (umumnya diawali <?= $code('192.168.') ?> atau <?= $code('10.') ?>).</li>
@@ -242,11 +245,11 @@ Email "lupa kata sandi" tidak dikirim; reset kata sandi lewat Super Admin.</div>
 <?= $table(['', 'Waktu', 'Yang dilakukan'], [
     [$box, '&minus;30 menit', 'Komputer server: charger terpasang, mode daya <i>Best performance</i>, sleep/hibernate dimatikan, aplikasi berat lain ditutup.'],
     [$box, '&minus;30 menit', 'Router/WiFi menyala; komputer server tersambung ke jaringan yang sama dengan peserta.'],
-    [$box, '&minus;20 menit', 'Jalankan '.$code('start_demo.bat').'; tampilkan halaman ALAMAT DEMO di layar/proyektor.'],
-    [$box, '&minus;15 menit', 'Coba login dari 1&ndash;2 HP. Opsional: '.$code('UJI_20_PENGGUNA.bat').'.'],
+    [$box, '&minus;20 menit', 'Klik '.$code('1_MULAI_DEMO.bat').' (YES pada jendela izin bila muncul); tunggu &plusmn;1 menit; tampilkan halaman ALAMAT DEMO di layar/proyektor.'],
+    [$box, '&minus;15 menit', 'Coba login dari 1&ndash;2 HP. Opsional: '.$code('2_UJI_20_PENGGUNA.bat').'.'],
     [$box, 'Mulai', 'Minta peserta login bergantian beberapa detik (login adalah halaman terberat). Bagikan akun sesuai peran.'],
     [$box, 'Selama uji', '<b>Jangan menutup</b> jendela hitam utama maupun jendela kecil "SIP-MAGANG Server n". Cek kesehatan: buka '.$code('http://localhost:PORT/__demo-status').'.'],
-    [$box, 'Selesai', 'Ctrl+C di jendela utama &rarr; Y. Bila ingin mengulang dari awal: '.$code('RESET_DATA_DEMO.bat').'.'],
+    [$box, 'Selesai', 'Ctrl+C di jendela utama &rarr; Y. Bila ingin mengulang dari awal: '.$code('3_RESET_DATA_DEMO.bat').'.'],
 ], ['6%', '18%', '76%']) ?>
 
 <!-- ===================== 5. AKUN ===================== -->
@@ -276,26 +279,44 @@ Daftar ini juga tampil di halaman ALAMAT DEMO. Beberapa peserta boleh memakai ak
 <?= $table(['Gejala', 'Penyebab', 'Solusi'], [
     ['[GAGAL] PHP ditemukan tetapi tidak bisa dijalankan', 'Windows belum punya Visual C++ Runtime (jarang, karena sudah disertakan di zip)', 'Pasang <b>VC_redist.x64.exe</b> (Visual C++ 2015&ndash;2022, x64) dari situs resmi Microsoft: '.$code('aka.ms/vs/17/release/vc_redist.x64.exe').', lalu ulangi.'],
     ['HP: "situs tidak dapat dijangkau"', 'Firewall belum diizinkan, beda WiFi, atau client isolation', 'Ulangi langkah 2 (Run as administrator); pastikan HP di WiFi yang sama; lihat bagian 3.'],
-    ['Alamat lama tidak bisa dibuka', 'Komputer server pindah WiFi / IP berubah', 'Tutup dan jalankan ulang '.$code('start_demo.bat').'; pakai alamat baru.'],
+    ['Alamat lama tidak bisa dibuka', 'Komputer server pindah WiFi / IP berubah', 'Klik '.$code('1_MULAI_DEMO.bat').' &rarr; pilih <b>U</b> (ulang); pakai alamat baru.'],
     ['Halaman "Server demo belum siap"', 'Server baru dinyalakan atau jendela "SIP-MAGANG Server n" tertutup', 'Tunggu 10 detik lalu muat ulang. Bila tetap, jalankan ulang '.$code('start_demo.bat').'.'],
     ['[PERHATIAN] port 8000 sedang dipakai', 'Ada program lain di port itu', 'Tidak masalah: demo otomatis memakai port lain. Pakai alamat yang tertulis.'],
     ['Terasa lambat saat ramai', 'Komputer sibuk / prosesor sedikit', 'Tutup aplikasi lain, pastikan charger terpasang, cek '.$code('/__demo-status').'. Jumlah server bisa diatur: tambahkan baris '.$code('DEMO_WORKERS=6').' di berkas '.$code('.env').'.'],
-    ['Tampilan polos tanpa warna', 'Berkas sisa pengembangan', 'Jalankan ulang '.$code('start_demo.bat').' (membersihkannya otomatis).'],
-    ['Logo/gambar tidak muncul', 'Tautan folder unggahan belum dibuat', 'Jalankan ulang '.$code('start_demo.bat').'.'],
+    ['Tampilan polos tanpa warna', 'Berkas sisa pengembangan', 'Klik '.$code('1_MULAI_DEMO.bat').' &rarr; <b>U</b> (membersihkannya otomatis).'],
+    ['Logo/gambar tidak muncul', 'Tautan folder unggahan belum dibuat', 'Klik '.$code('1_MULAI_DEMO.bat').' &rarr; <b>U</b>.'],
     ['Lupa kata sandi akun uji', '&mdash;', 'Login sebagai Super Admin &rarr; Master Pengguna &rarr; reset kata sandi.'],
 ], ['26%', '30%', '44%']) ?>
+
+<!-- ===================== 6a. RISIKO ===================== -->
+<h2 style="margin-top:16px">Risiko yang Sudah Diantisipasi</h2>
+<?= $table(['Risiko', 'Yang sudah dilakukan otomatis', 'Yang tetap perlu dicek manusia'], [
+    ['Laptop sleep / layar mati di tengah demo', '1_MULAI_DEMO.bat menjaga komputer &amp; layar tetap menyala selama server hidup (tanpa mengubah pengaturan daya).', 'Charger terpasang. Peringatan muncul bila memakai baterai.'],
+    ['Izin firewall hanya untuk sebagian jaringan', 'Izin dibuat untuk semua jenis jaringan; izin otomatis Windows yang hanya "Public" tidak dianggap cukup.', 'Klik <b>YES</b> pada jendela izin. Butuh akun Administrator sekali.'],
+    ['Dijalankan dari dalam zip', 'Ditolak dengan pesan "ekstrak dulu".', '&mdash;'],
+    ['Berkas diblokir karena dari internet', 'Tanda blokir pada program di folder dibuang otomatis.', 'Bila muncul "Windows protected your PC": More info &rarr; Run anyway.'],
+    ['PHP tidak jalan (Visual C++ Runtime)', 'Runtime disertakan di folder php; bila tetap gagal, pesan berisi tautan resmi Microsoft.', '&mdash;'],
+    ['Tombol diklik dua kali', 'Demo yang sedang berjalan tidak dimatikan; pengguna memilih buka halaman alamat (B) atau ulang (U).', '&mdash;'],
+    ['20 orang login bersamaan', 'Beberapa server + pembagi beban + server dipanaskan sebelum dibuka; diuji 20 pengguna tanpa galat.', 'Minta peserta login bergantian beberapa detik.'],
+    ['Port 8000 dipakai program lain', 'Otomatis pindah ke port lain dan alamatnya ditampilkan.', 'Pakai alamat di halaman ALAMAT DEMO.'],
+    ['Komputer pindah WiFi / IP berubah', 'Data tetap aman di komputer server.', 'Klik 1_MULAI_DEMO.bat &rarr; U, bagikan alamat baru. Saran: reservasi DHCP.'],
+    ['WiFi memblokir sesama perangkat', 'Tidak bisa diatasi dari aplikasi.', 'Uji 1 HP pada hari Selasa; siapkan router WiFi sendiri sebagai cadangan.'],
+    ['Data uji Selasa terbawa ke Rabu', '3_RESET_DATA_DEMO.bat mengembalikan data awal (data lama dicadangkan).', 'Jalankan setelah uji Selasa.'],
+    ['Data pribadi ikut di zip', 'Zip berisi database demo baru; unggahan &amp; chat hasil uji pengembang tidak disertakan.', '&mdash;'],
+], ['24%', '44%', '32%']) ?>
 
 <!-- ===================== 7. ISI ZIP ===================== -->
 <h2 style="margin-top:16px">7. Isi Folder SIP-MAGANG</h2>
 <?= $table(['Berkas / folder', 'Fungsi'], [
     [$code('BACA_DULU.txt'), 'Ringkasan langkah dalam bentuk teks.'],
     [$code('PANDUAN_IT_SIP-MAGANG.pdf'), 'Panduan ini.'],
-    [$code('izinkan_firewall.bat'), 'Sekali saja, sebagai Administrator: izin Windows Firewall untuk php.exe.'],
+    [$code('1_MULAI_DEMO.bat'), '<b>Satu-satunya yang perlu diklik.</b> Semua persiapan (lokasi, PHP, izin firewall, anti-sleep, database, server) lalu membuka halaman ALAMAT DEMO.'],
+    [$code('2_UJI_20_PENGGUNA.bat'), 'Uji beban otomatis 20 pengguna selama 1 menit.'],
+    [$code('3_RESET_DATA_DEMO.bat'), 'Mengembalikan data demo ke keadaan saat zip diekstrak (server harus dimatikan dulu).'],
+    [$code('izinkan_firewall.bat'), 'Cadangan manual izin firewall (klik kanan &rarr; Run as administrator). Biasanya tidak perlu karena sudah diminta 1_MULAI_DEMO.bat.'],
     [$code('CEK_KESIAPAN.bat'), 'Memeriksa kesiapan tanpa mengubah apa pun.'],
-    [$code('start_demo.bat'), 'Menyalakan demo (database, beberapa server, gerbang pembagi beban, penjadwal) dan membuka halaman ALAMAT DEMO.'],
-    [$code('UJI_20_PENGGUNA.bat'), 'Uji beban otomatis 20 pengguna selama 1 menit.'],
-    [$code('RESET_DATA_DEMO.bat'), 'Mengembalikan data demo ke keadaan saat zip diekstrak (server harus dimatikan dulu).'],
-    [$code('ALAMAT_DEMO.html'), 'Dibuat setiap '.$code('start_demo.bat').' dijalankan: alamat + QR + akun, untuk ditampilkan ke layar.'],
+    [$code('start_demo.bat'), 'Mesin penyala demo (dipanggil 1_MULAI_DEMO.bat); tidak perlu diklik langsung.'],
+    [$code('ALAMAT_DEMO.html'), 'Dibuat setiap demo dinyalakan: alamat + QR + akun, untuk ditampilkan ke layar.'],
     [$code('PANDUAN_DEMO.md'), 'Panduan teknis lengkap, termasuk semua akun skenario.'],
     [$code('php\\'), 'PHP 8.3 portabel + Visual C++ Runtime.'],
     [$code('database\\database.sqlite'), 'Database demo. '.$code('database.awal.sqlite').' = salinan awal untuk reset; '.$code('database\\cadangan\\').' = cadangan otomatis saat reset.'],
