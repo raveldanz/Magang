@@ -168,10 +168,14 @@
                         $certJurusan = trim(preg_replace('/^\s*(program\s+studi|prodi|jurusan)\s+/i', '', (string) ($profile->jurusan ?? '')));
                         $certFakultas = trim(preg_replace('/^\s*fakultas\s+/i', '', (string) ($profile->fakultas ?? '')));
                     @endphp
-                    Peserta Magang Program Studi {{ $certJurusan !== '' ? $certJurusan : 'Semua Jurusan' }}{{ $certFakultas !== '' ? ' Fakultas ' . $certFakultas : '' }}
+                    @if ($profile?->isSchoolStudent())
+                Peserta Magang Jurusan {{ $certJurusan !== '' ? $certJurusan : 'Semua Jurusan' }}
+                @else
+                Peserta Magang Program Studi {{ $certJurusan !== '' ? $certJurusan : 'Semua Jurusan' }}{{ $certFakultas !== '' ? ' Fakultas ' . $certFakultas : '' }}
+                @endif
                 </p>
                 <p class="font-cert-body text-sm sm:text-base md:text-[19px] font-medium text-black leading-normal">
-                    {{ $profile->universitas ?? ($university->name ?? 'Universitas') }}
+                    {{ $profile->universitas ?? ($university->name ?? 'Kampus / Sekolah') }}
                 </p>
             </div>
 
@@ -317,19 +321,19 @@
                         <td class="font-bold text-slate-900">{{ $student->name }}</td>
                     </tr>
                     <tr>
-                        <td class="text-slate-500">NIM/NIS</td>
+                        <td class="text-slate-500">{{ $profile?->identityNumberLabel() ?? 'NIM/NIS' }}</td>
                         <td class="text-slate-400">:</td>
                         <td class="font-bold text-slate-900">{{ $profile->nim ?? '-' }}</td>
                     </tr>
                     <tr>
-                        <td class="text-slate-500">Program Studi</td>
+                        <td class="text-slate-500">{{ $profile?->isSchoolStudent() ? 'Jurusan' : 'Program Studi' }}</td>
                         <td class="text-slate-400">:</td>
                         <td class="text-slate-800">{{ $profile->jurusan ?? 'Semua Jurusan' }}</td>
                     </tr>
                 </table>
                 <table class="w-full">
                     <tr>
-                        <td class="w-36 text-slate-500">Universitas Asal</td>
+                        <td class="w-36 text-slate-500">{{ $profile?->isSchoolStudent() ? 'Sekolah Asal' : 'Universitas Asal' }}</td>
                         <td class="w-3 text-slate-400">:</td>
                         <td class="font-bold text-slate-900">{{ $profile->universitas ?? ($university->name ?? '-') }}</td>
                     </tr>

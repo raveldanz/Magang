@@ -128,6 +128,10 @@
     </style>
 </head>
 <body class="antialiased">
+    @php
+        // Institusi pengirim berupa sekolah (SMK/SMA/MA): kalimat PKL, NIS, jurusan & kelas
+        $isSchool = (bool) ($university?->isSchool() || $profile?->isSchoolStudent());
+    @endphp
 
     <!-- Action Bar (Hidden when Printing) -->
     <div class="topbar-wrapper no-print">
@@ -137,7 +141,7 @@
                 <span>Kembali ke Dashboard</span>
             </a>
             <span style="font-size: 12px; color: #94a3b8; border-left: 1px solid #334155; padding-left: 12px;">
-                Dokumen Resmi: <strong style="color: #ffffff;">Surat Tugas Pengantar Magang MBKM</strong>
+                Dokumen Resmi: <strong style="color: #ffffff;">{{ $isSchool ? 'Surat Tugas Pengantar PKL' : 'Surat Tugas Pengantar Magang MBKM' }}</strong>
             </span>
         </div>
         <div style="display: flex; align-items: center; gap: 8px;">
@@ -203,7 +207,7 @@
                     <tr>
                         <td class="font-semibold align-top">Perihal</td>
                         <td class="align-top">:</td>
-                        <td class="font-bold">Surat Tugas / Pengantar Pelaksanaan Magang MBKM</td>
+                        <td class="font-bold">{{ $isSchool ? 'Surat Tugas / Pengantar Praktik Kerja Lapangan (PKL)' : 'Surat Tugas / Pengantar Pelaksanaan Magang MBKM' }}</td>
                     </tr>
                 </table>
             </div>
@@ -225,7 +229,11 @@
         <div class="text-[12px] text-justify space-y-3 mb-4">
             <p>
                 Dengan hormat,<br>
-                Sehubungan dengan program Merdeka Belajar Kampus Merdeka (MBKM) dan peningkatan kompetensi praktis mahasiswa di dunia kerja profesional, bersama ini Pimpinan <strong>{{ $university->name ?? 'Perguruan Tinggi' }}</strong> memberikan tugas dan merekomendasikan mahasiswa berikut untuk melaksanakan Praktik Kerja Lapangan / Magang:
+                @if ($isSchool)
+                    Sehubungan dengan program Praktik Kerja Lapangan (PKL) dan peningkatan kompetensi keahlian siswa di dunia kerja, bersama ini Kepala <strong>{{ $university->name ?? 'Sekolah' }}</strong> memberikan tugas dan merekomendasikan peserta magang berikut untuk melaksanakan Praktik Kerja Lapangan:
+                @else
+                    Sehubungan dengan program Merdeka Belajar Kampus Merdeka (MBKM) dan peningkatan kompetensi praktis mahasiswa di dunia kerja profesional, bersama ini Pimpinan <strong>{{ $university->name ?? 'Perguruan Tinggi' }}</strong> memberikan tugas dan merekomendasikan peserta magang berikut untuk melaksanakan Praktik Kerja Lapangan / Magang:
+                @endif
             </p>
         </div>
 
@@ -238,14 +246,14 @@
                     <td class="py-1 font-bold text-black uppercase">{{ $student->name }}</td>
                 </tr>
                 <tr class="py-1">
-                    <td class="py-1 font-semibold">NIM / NIS</td>
+                    <td class="py-1 font-semibold">{{ $isSchool ? 'NIS' : 'NIM' }}</td>
                     <td class="py-1">:</td>
                     <td class="py-1 font-mono font-bold">{{ $profile?->nim ?? '-' }}</td>
                 </tr>
                 <tr class="py-1">
-                    <td class="py-1 font-semibold">Fakultas / Program Studi</td>
+                    <td class="py-1 font-semibold">{{ $isSchool ? 'Jurusan / Kelas' : 'Fakultas / Program Studi' }}</td>
                     <td class="py-1">:</td>
-                    <td class="py-1">{{ $profile?->fakultas ?? 'Teknik' }} / {{ $profile?->jurusan ?? 'Informatika' }}</td>
+                    <td class="py-1">{{ $isSchool ? ($profile?->jurusan ?? '-').' / '.($profile?->periodLabel() ?? '-') : ($profile?->fakultas ?? 'Teknik').' / '.($profile?->jurusan ?? 'Informatika') }}</td>
                 </tr>
                 <tr class="py-1">
                     <td class="py-1 font-semibold">Nomor Telepon / WhatsApp</td>
@@ -291,7 +299,7 @@
                         @if ($application->start_date && $application->end_date)
                             {{ Carbon\Carbon::parse($application->start_date)->translatedFormat('d F Y') }} s.d. {{ Carbon\Carbon::parse($application->end_date)->translatedFormat('d F Y') }}
                         @else
-                            Semester Ganjil / Genap Tahun Akademik {{ date('Y') }}/{{ date('Y')+1 }}
+                            {{ $isSchool ? 'Tahun Ajaran' : 'Semester Ganjil / Genap Tahun Akademik' }} {{ date('Y') }}/{{ date('Y')+1 }}
                         @endif
                     </td>
                 </tr>
@@ -309,7 +317,7 @@
         <div class="flex justify-end text-[12px] pt-4">
             <div class="text-left w-72 space-y-1">
                 <p>Surabaya, {{ Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
-                <p class="font-bold">{{ $university->pic_position ?? 'Rektor Universitas Dr. Soetomo' }}</p>
+                <p class="font-bold">{{ $university->pic_position ?? ($isSchool ? 'Kepala Sekolah' : 'Rektor Universitas Dr. Soetomo') }}</p>
                 
                 <!-- Spasi Tanda Tangan / Stempel -->
                 <div class="h-20 flex items-center">

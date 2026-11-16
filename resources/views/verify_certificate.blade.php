@@ -134,11 +134,11 @@
                         <dd class="vvalue">{{ strtoupper($student->name ?? '-') }}</dd>
                     </div>
                     <div class="vrow">
-                        <dt class="vlabel">NIM/NIS / NPM</dt>
+                        <dt class="vlabel">{{ $profile?->identityNumberLabel() ?? 'NIM/NIS' }}</dt>
                         <dd class="vvalue is-mono">{{ $profile->nim ?? '-' }}</dd>
                     </div>
                     <div class="vrow">
-                        <dt class="vlabel">Perguruan Tinggi</dt>
+                        <dt class="vlabel">{{ $profile?->isSchoolStudent() ? 'Sekolah' : 'Perguruan Tinggi' }}</dt>
                         <dd class="vvalue">{{ $profile->universitas ?? '-' }}<span class="vsub">{{ $profile->jurusan ?? '-' }}</span></dd>
                     </div>
                     <div class="vrow">

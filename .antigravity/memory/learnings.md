@@ -175,6 +175,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-155** | 2026-11-16 | Standardisasi Nomenklatur Role: Penyeragaman 'Dosen Pembimbing' Menjadi 'Pembimbing' (semula LRN-134 di main) | Penyeragaman sebutan role Dosen Pembimbing menjadi Pembimbing pada Master Pengguna Sistem | RESOLVED |
 | **LRN-156** | 2026-11-16 | Keamanan: Pembimbing Daftar Mandiri Wajib Disetujui | Akun dosen/guru daftar mandiri langsung aktif sehingga mahasiswa bisa membuat pembimbing palsu dan menilai dirinya sendiri; nama kampus bebas membuat kampus dobel | RESOLVED |
 | **LRN-157** | 2026-11-16 | Revisi Istilah & Peserta dari Sekolah | "Mahasiswa"/"Dosen"/"DPL" diganti "Peserta Magang"/"Pembimbing" di seluruh tampilan; profil peserta mendapat pilihan Sekolah (NIS, kelas) | RESOLVED |
+| **LRN-158** | 2026-11-16 | Master Sekolah & Surat untuk Peserta Sekolah | Pilihan sekolah di profil kosong tanpa data master; surat penerimaan/pengantar menulis "Universitas Saudara", "Dekan", "MBKM", NIM & semester untuk siswa SMK | RESOLVED |
 ---
 
 ## 3. Catatan Masalah & Solusi (Knowledge Base)
@@ -4556,3 +4557,13 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   1. Teks baru untuk peserta memakai "Peserta Magang" (atau "Peserta" bila sudah jelas), untuk dosen/guru memakai "Pembimbing"; di halaman yang juga menampilkan mentor, pakai "Pembimbing Kampus/Sekolah" agar tidak tertukar dengan Mentor Lapangan.
   2. Label identitas/periode peserta wajib lewat `identityNumberLabel()` dan `periodLabel()`, jangan menulis "NIM"/"Semester" langsung.
   3. Penggantian istilah massal hanya untuk teks tampilan: lindungi kata kode yang dikutip, `->relasi`, `$variabel`, `route.name`, `role:x`; lalu cari hasil ganda ("Pembimbing Pembimbing", "Peserta Magang magang") dan label yang menempel titik dua. Jangan menghasilkan "Magang Aktif" (nama status lama yang dilarang).
+
+### [LRN-158] Master Sekolah SMA/SMK/MA dan Surat yang Menyesuaikan Jenis Institusi
+- **Date:** 2026-11-16
+- **Problem / Symptom:** Pilihan Sekolah di profil peserta (LRN-157) hanya berisi sekolah yang diketik peserta sendiri. Surat penerimaan dinas dan surat pengantar kampus tetap menulis `Yth. Dekan`, `Universitas Saudara`, `MBKM`, kolom Fakultas, NIM, dan Semester walau pesertanya siswa SMK. Sertifikat dan halaman verifikasi QR memakai label kampus.
+- **Root Cause:** Data master hanya berisi perguruan tinggi; template surat ditulis untuk mahasiswa saja.
+- **Fix Applied:** `database/data/master_schools.json` (283 SMA/SMK/MA Kota Surabaya dari Data Referensi Kemendikdasmen, cocok dengan rekap per kecamatan) + `scripts/fetch_master_schools.php` (manual, tidak dipanggil aplikasi). `MasterUniversityService` mencari dan mengimpor sekolah (`institution_type` = sekolah, `code` = NPSN) dengan pencocokan NPSN lalu `UniversityResolver::findExact`; `universities:sync-master --only-schools/--skip-schools`; `MasterSchoolsSeeder`; `demo_preflight` mengimpor sekolah setiap kali. Surat penerimaan: `Yth. Kepala`, `Sekolah Saudara`, PKL, kolom NIS/Jurusan/Kelas tanpa Fakultas. Surat pengantar: kalimat PKL tanpa MBKM, NIS, Jurusan/Kelas. Sertifikat dan verifikasi memakai `identityNumberLabel()`/`isSchoolStudent()`. Tes `MasterSchoolsTest`, `SchoolParticipantLettersTest`.
+- **Prevention Rule:**
+  1. Setiap template yang menyebut institusi asal peserta wajib bercabang pada `StudentProfile::isSchoolStudent()` / `University::isSchool()` (penerima surat, nama program, label NIM/NIS, Semester/Kelas, Fakultas).
+  2. Impor master institusi harus aman dijalankan berulang dan mencocokkan kode resmi (NPSN/kode PT) sebelum nama, tanpa LIKE.
+  3. Saat menyusun teks pengganti di PowerShell, jangan menggabung string dengan `+` di dalam array literal `@('a', 'b' + $x)`: koma lebih kuat dari `+` sehingga teks terpotong. Pakai variabel terpisah atau Edit langsung.

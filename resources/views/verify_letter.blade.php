@@ -95,11 +95,11 @@
                             <dd class="vvalue">{{ $application->user->name }}</dd>
                         </div>
                         <div class="vrow">
-                            <dt class="vlabel">NIM/NIS / NPM</dt>
+                            <dt class="vlabel">{{ $sp?->identityNumberLabel() ?? 'NIM/NIS' }}</dt>
                             <dd class="vvalue is-mono">{{ $sp?->nim ?? '-' }}</dd>
                         </div>
                         <div class="vrow">
-                            <dt class="vlabel">Universitas / Jurusan</dt>
+                            <dt class="vlabel">{{ $sp?->isSchoolStudent() ? 'Sekolah / Jurusan' : 'Universitas / Jurusan' }}</dt>
                             <dd class="vvalue">{{ $sp?->universitas ?? '-' }}<span class="vsub">{{ $sp?->jurusan ?? '-' }}</span></dd>
                         </div>
                     @endif

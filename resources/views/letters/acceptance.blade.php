@@ -354,7 +354,9 @@
 
         // Data mahasiswa & permohonan
         $student = $application->user?->studentProfile;
-        $fakultas = $student?->fakultas ?? $student?->faculty ?? 'Fakultas Peserta Magang';
+        $fakultas = $student?->fakultas ?? $student?->faculty ?? 'Fakultas';
+        // Peserta dari sekolah (SMK/SMA/MA): surat ditujukan ke Kepala Sekolah, tanpa fakultas, memakai NIS & kelas
+        $isSchool = (bool) $student?->isSchoolStudent();
         $universitas = $student?->universitas ?? $application->user?->university ?? 'Perguruan Tinggi';
         $nim = $student?->nim ?? '-';
         $jurusan = $student?->jurusan ?? $student?->major ?? '-';
@@ -481,7 +483,7 @@
 
         <!-- 3. TUJUAN SURAT (FORMAT RESMI DINAS PEMKOT) -->
         <div class="recipient-box">
-            Yth. Dekan {{ $fakultas }}<br>
+            {{ $isSchool ? 'Yth. Kepala' : 'Yth. Dekan ' . $fakultas }}<br>
             <div style="padding-left: 26px;">
                 {{ $universitas }}<br>
                 di -<br>
@@ -492,7 +494,7 @@
         <!-- 4. PARAGRAF PENGANTAR & TABEL IDENTITAS MAHASISWA -->
         <div class="content-body">
             <p>
-                Menindaklanjuti surat permohonan izin Praktik Kerja Magang dari Universitas Saudara, bersama ini disampaikan bahwa Pemerintah Kota Surabaya melalui {{ $agencyName }} menyetujui / menerima {{ $application->group_id ? 'kelompok peserta magang' : 'mahasiswa' }} berikut:
+                Menindaklanjuti surat permohonan izin {{ $isSchool ? 'Praktik Kerja Lapangan (PKL)' : 'Praktik Kerja Magang' }} dari {{ $isSchool ? 'Sekolah' : 'Universitas' }} Saudara, bersama ini disampaikan bahwa Pemerintah Kota Surabaya melalui {{ $agencyName }} menyetujui / menerima {{ $application->group_id ? 'kelompok peserta magang' : 'peserta magang' }} berikut:
             </p>
 
             <table class="student-table">
@@ -500,10 +502,12 @@
                     <tr>
                         <th style="width: 32px;">No</th>
                         <th>Nama</th>
-                        <th style="width: 120px;">NIM/NIS</th>
-                        <th>Program Studi</th>
-                        <th>Fakultas</th>
-                        <th style="width: 80px;">Semester</th>
+                        <th style="width: 120px;">{{ $isSchool ? 'NIS' : 'NIM' }}</th>
+                        <th>{{ $isSchool ? 'Jurusan' : 'Program Studi' }}</th>
+                        @unless($isSchool)
+                            <th>Fakultas</th>
+                        @endunless
+                        <th style="width: 80px;">{{ $isSchool ? 'Kelas' : 'Semester' }}</th>
                         @if($application->group_id)
                             <th style="width: 80px;">Posisi</th>
                         @endif
@@ -526,7 +530,9 @@
                                 <td style="font-weight: bold;">{{ $mCleanName }}</td>
                                 <td style="text-align: center;">{{ $mNim }}</td>
                                 <td>{{ $mJurusan }}</td>
-                                <td>{{ $mFakultas }}</td>
+                                @unless($isSchool)
+                                    <td>{{ $mFakultas }}</td>
+                                @endunless
                                 <td style="text-align: center;">{{ $mSemester }}</td>
                                 <td style="text-align: center; font-weight: bold; color: {{ $grpApp->role_in_group === 'leader' ? '#1d4ed8' : '#334155' }};">{{ $mRole }}</td>
                             </tr>
@@ -537,7 +543,9 @@
                             <td style="font-weight: bold;">{{ $cleanStudentName }}</td>
                             <td style="text-align: center;">{{ $nim }}</td>
                             <td>{{ $jurusan }}</td>
-                            <td>{{ $fakultas }}</td>
+                            @unless($isSchool)
+                                <td>{{ $fakultas }}</td>
+                            @endunless
                             <td style="text-align: center;">{{ $semester }}</td>
                         </tr>
                     @endif
