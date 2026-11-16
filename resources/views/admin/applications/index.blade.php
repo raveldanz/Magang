@@ -66,7 +66,7 @@
                                 </svg>
                             </div>
                             <input type="text" name="search" value="{{ request('search') }}" 
-                                placeholder="Cari nama peserta magang, NIM/NIS, atau universitas..." 
+                                placeholder="Cari nama peserta magang, NIM/NIS, atau kampus/sekolah..." 
                                 class="w-full text-xs sm:text-sm bg-white border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs font-medium placeholder:text-gray-400 h-10"
                                 style="padding-left: 2.75rem !important; padding-right: 1rem !important;" />
                         </div>
@@ -94,7 +94,7 @@
                         @if(isset($universities))
                             <div>
                                 <select name="university_id" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-2xs bg-white font-medium">
-                                    <option value="">-- Semua Kampus --</option>
+                                    <option value="">-- Semua Kampus/Sekolah --</option>
                                     @foreach ($universities as $unv)
                                         <option value="{{ $unv->id }}" {{ request('university_id') == $unv->id ? 'selected' : '' }}>
                                             {{ $unv->name }} ({{ $unv->code }})
@@ -828,7 +828,7 @@
                                     </div>
                                     <div class="flex items-center justify-between text-slate-600">
                                         <span class="text-slate-400">Diajukan:</span>
-                                        <span class="font-mono text-slate-500">{{ $app->group->created_at ? $app->group->created_at->format('d M Y, H:i') : $app->created_at->format('d M Y, H:i') }}</span>
+                                        <span class="font-mono text-slate-500">{{ $app->group->created_at ? $app->group->created_at->translatedFormat('d M Y, H:i') : $app->created_at->translatedFormat('d M Y, H:i') }}</span>
                                     </div>
                                 </div>
 
@@ -920,7 +920,7 @@
                                     </div>
                                     <div class="flex items-center justify-between text-slate-600">
                                         <span class="text-slate-400">Diajukan:</span>
-                                        <span class="font-mono text-slate-500">{{ $app->created_at->format('d M Y, H:i') }}</span>
+                                        <span class="font-mono text-slate-500">{{ $app->created_at->translatedFormat('d M Y, H:i') }}</span>
                                     </div>
                                 </div>
 

@@ -281,10 +281,10 @@
                                     <td class="py-4 px-4 text-center text-slate-600">
                                         @if($app->start_date && $app->end_date)
                                             <div class="font-medium text-[11px]">
-                                                {{ \Carbon\Carbon::parse($app->start_date)->format('d M Y') }}
+                                                {{ \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M Y') }}
                                             </div>
                                             <div class="text-[10px] text-slate-400">
-                                                s.d. {{ \Carbon\Carbon::parse($app->end_date)->format('d M Y') }}
+                                                s.d. {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}
                                             </div>
                                         @else
                                             <span class="text-slate-400 italic">Belum Dijadwalkan</span>
@@ -358,7 +358,7 @@
                                         <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Periode Magang</span>
                                         @if($app->start_date && $app->end_date)
                                             <span class="text-slate-700 font-medium">
-                                                {{ \Carbon\Carbon::parse($app->start_date)->format('d M') }} - {{ \Carbon\Carbon::parse($app->end_date)->format('d M Y') }}
+                                                {{ \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M') }} - {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}
                                             </span>
                                         @else
                                             <span class="text-slate-400 italic">Belum Dijadwalkan</span>
@@ -426,7 +426,7 @@
                                     @endif
                                 </div>
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-100 text-blue-800 shrink-0">
-                                    {{ $mentor->active_students_count ?? 0 }} Mhs Aktif
+                                    {{ $mentor->active_students_count ?? 0 }} Peserta Aktif
                                 </span>
                             </div>
                         @empty

@@ -53,12 +53,12 @@
                                         </td>
                                         <td class="p-3.5 text-center" data-label="Bimbingan Aktif">
                                             <span class="whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-semibold {{ $dosen->active_students_count > 0 ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-slate-50 text-slate-500' }}">
-                                                {{ $dosen->active_students_count }} Mhs
+                                                {{ $dosen->active_students_count }} Peserta
                                             </span>
                                         </td>
                                         <td class="p-3.5 text-center" data-label="Bimbingan Selesai">
                                             <span class="whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-semibold {{ $dosen->completed_students_count > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-50 text-slate-500' }}">
-                                                {{ $dosen->completed_students_count }} Mhs
+                                                {{ $dosen->completed_students_count }} Peserta
                                             </span>
                                         </td>
                                         <td class="p-3.5 text-center font-bold text-slate-900" data-label="Total Peserta Magang">
@@ -137,7 +137,7 @@
                                 <div class="cc-stat3">
                                     <div><b style="color:#2563eb">{{ $dosen->active_students_count }}</b><span>{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</span></div>
                                     <div><b style="color:#059669">{{ $dosen->completed_students_count }}</b><span>{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</span></div>
-                                    <div><b>{{ $dosen->total_students_count }}</b><span>Total Mhs</span></div>
+                                    <div><b>{{ $dosen->total_students_count }}</b><span>Total Peserta</span></div>
                                 </div>
                             </div>
                             @if($isSuperAdmin)

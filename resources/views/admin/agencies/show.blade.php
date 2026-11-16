@@ -648,7 +648,7 @@
                                             {{ $app->unit->name ?? '-' }}
                                         </td>
                                         <td class="py-3.5 px-4 text-slate-500 text-xs" data-label="Tanggal Daftar">
-                                            {{ $app->created_at ? $app->created_at->format('d M Y') : '-' }}
+                                            {{ $app->created_at ? $app->created_at->translatedFormat('d M Y') : '-' }}
                                         </td>
                                         <td class="py-3.5 px-4 text-center" data-label="Status">
                                             @php $actionHint = $app->actionHint(); @endphp
@@ -696,7 +696,7 @@
                                     <div class="mavatar">{{ strtoupper(substr($appName, 0, 2)) }}</div>
                                     <div class="mcard-main">
                                         <div class="mcard-title">{{ $appName }}</div>
-                                        <div class="mcard-sub"><span class="mono">{{ $app->user->studentProfile->nim ?? '-' }}</span> &middot; {{ $app->created_at ? $app->created_at->format('d M Y') : '-' }}</div>
+                                        <div class="mcard-sub"><span class="mono">{{ $app->user->studentProfile->nim ?? '-' }}</span> &middot; {{ $app->created_at ? $app->created_at->translatedFormat('d M Y') : '-' }}</div>
                                     </div>
                                 </div>
                                 <div class="mcard-body cc-grid2">

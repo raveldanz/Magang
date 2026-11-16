@@ -298,7 +298,7 @@
                                             </span>
                                         @elseif($u->role === 'universitas')
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-100 text-sky-800 border border-sky-200 whitespace-nowrap">
-                                                Universitas
+                                                Admin Kampus/Sekolah
                                             </span>
                                         @else
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 whitespace-nowrap">
@@ -511,7 +511,7 @@
                                             </span>
                                         @elseif($u->role === 'universitas')
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
-                                                Universitas
+                                                Admin Kampus/Sekolah
                                             </span>
                                         @else
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">

@@ -178,10 +178,10 @@ class ApplicationController extends Controller
                 $missingDocs[] = 'CV';
             }
             if (! $transcriptPath) {
-                $missingDocs[] = 'Transkrip Nilai';
+                $missingDocs[] = 'Transkrip Nilai / Rapor';
             }
             if (! $idCardPath) {
-                $missingDocs[] = 'KTM / Kartu Identitas';
+                $missingDocs[] = 'KTM / Kartu Pelajar';
             }
 
             return redirect()->back()

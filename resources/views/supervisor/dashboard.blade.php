@@ -81,10 +81,10 @@
                             <tr class="border-b border-slate-200 bg-slate-100/70 text-slate-700 text-xs font-bold uppercase tracking-wider">
                                 <th class="py-3.5 px-6">Bidang</th>
                                 <th class="py-3.5 px-4 text-center">Kuota Total</th>
-                                <th class="py-3.5 px-4 text-center">Mhs Aktif</th>
+                                <th class="py-3.5 px-4 text-center">Peserta Aktif</th>
                                 <th class="py-3.5 px-4 text-center">Sisa Kuota</th>
                                 <th class="py-3.5 px-4 text-center">Menunggu ACC</th>
-                                <th class="py-3.5 px-4 text-center">Mhs Lulus</th>
+                                <th class="py-3.5 px-4 text-center">Peserta Lulus</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200 text-sm">
@@ -106,7 +106,7 @@
                                         {{ $unit->quota }}
                                     </td>
 
-                                    {{-- Mhs Aktif --}}
+                                    {{-- Peserta Aktif --}}
                                     <td class="py-4 px-4 text-center font-bold text-slate-900">
                                         {{ $unitActiveCount }}
                                     </td>
@@ -183,7 +183,7 @@
                                     <div class="text-sm font-extrabold text-slate-800 mt-0.5">{{ $unit->quota }}</div>
                                 </div>
                                 <div class="bg-emerald-50/50 rounded-xl p-2 text-center border border-emerald-100">
-                                    <div class="text-xs text-emerald-700 uppercase font-bold tracking-wider">Mhs Aktif</div>
+                                    <div class="text-xs text-emerald-700 uppercase font-bold tracking-wider">Peserta Aktif</div>
                                     <div class="text-sm font-extrabold text-emerald-800 mt-0.5">{{ $unitActiveCount }}</div>
                                 </div>
                                 <div class="{{ $unitWaitingCount > 0 ? 'bg-purple-50/60 border-purple-200' : 'bg-slate-50/60 border-slate-200' }} rounded-xl p-2 text-center border">
@@ -191,7 +191,7 @@
                                     <div class="text-sm font-extrabold {{ $unitWaitingCount > 0 ? 'text-purple-700' : 'text-slate-600' }} mt-0.5">{{ $unitWaitingCount }}</div>
                                 </div>
                                 <div class="bg-blue-50/50 rounded-xl p-2 text-center border border-blue-100">
-                                    <div class="text-xs text-blue-700 uppercase font-bold tracking-wider">Mhs Lulus</div>
+                                    <div class="text-xs text-blue-700 uppercase font-bold tracking-wider">Peserta Lulus</div>
                                     <div class="text-sm font-extrabold text-blue-800 mt-0.5">{{ $unitCompletedCount }}</div>
                                 </div>
                             </div>

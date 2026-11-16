@@ -49,7 +49,7 @@
                                 </div>
                             @elseif(($university->weight_mentor ?? 0) === 0)
                                 <div class="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-100">
-                                    <span class="text-xs font-bold text-slate-700">Pembimbing Kampus</span>
+                                    <span class="text-xs font-bold text-slate-700">Pembimbing Kampus/Sekolah</span>
                                     <span class="text-xs font-black text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-100">100%</span>
                                 </div>
                             @else
@@ -59,7 +59,7 @@
                                         <span class="text-xs font-black text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">{{ $university->weight_mentor ?? 100 }}%</span>
                                     </div>
                                     <div class="flex items-center justify-between p-2.5 rounded-xl bg-white border border-slate-100">
-                                        <span class="text-xs font-bold text-slate-700">Pembimbing Kampus</span>
+                                        <span class="text-xs font-bold text-slate-700">Pembimbing Kampus/Sekolah</span>
                                         <span class="text-xs font-black text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-100">{{ $university->weight_lecturer ?? 0 }}%</span>
                                     </div>
                                 </div>

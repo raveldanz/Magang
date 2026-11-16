@@ -39,7 +39,7 @@
 
                             <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
                                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Waktu Pembuatan</span>
-                                <div class="font-mono text-xs text-slate-700 mt-1">{{ $adminAccount->created_at ? $adminAccount->created_at->format('d M Y H:i') : '-' }}</div>
+                                <div class="font-mono text-xs text-slate-700 mt-1">{{ $adminAccount->created_at ? $adminAccount->created_at->translatedFormat('d M Y H:i') : '-' }}</div>
                                 <div class="text-xs text-slate-500">Kredensial Default: password</div>
                             </div>
                         </div>

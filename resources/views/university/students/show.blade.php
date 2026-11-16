@@ -409,7 +409,7 @@
                             Pilih Pembimbing <span class="text-rose-500">*</span>
                         </label>
                         <select name="academic_advisor_id" required class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                            <option value="">-- Pilih Pembimbing Kampus --</option>
+                            <option value="">-- Pilih Pembimbing Kampus/Sekolah --</option>
                             @foreach ($availableDosens as $d)
                                 <option value="{{ $d->id }}" {{ $dosen?->id == $d->id ? 'selected' : '' }}>
                                     {{ $d->name }} ({{ $d->email }})

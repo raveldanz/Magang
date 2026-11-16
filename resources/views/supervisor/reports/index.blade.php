@@ -57,7 +57,7 @@
             <!-- 2. Filter Bar Rapi & Kondusif -->
             <form method="GET" action="{{ route('supervisor.reports.index') }}" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col md:flex-row gap-3">
                 <div class="flex-1">
-                    <input type="text" name="search" value="{{ $searchQuery }}" placeholder="Cari nama peserta magang, NIM/NIS, atau universitas..." class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
+                    <input type="text" name="search" value="{{ $searchQuery }}" placeholder="Cari nama peserta magang, NIM/NIS, atau kampus/sekolah..." class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
                 </div>
 
                 <div class="w-full md:w-56">

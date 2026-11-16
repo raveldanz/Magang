@@ -286,7 +286,7 @@
                                 </div>
                                 <input type="range" min="0" max="100" step="5" x-model="weightMentor" @input="updateLecturer()" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
                                 <input type="number" name="weight_mentor" min="0" max="100" x-model="weightMentor" @input="updateLecturer()" class="w-full text-xs border-gray-300 rounded-xl font-mono text-center font-bold">
-                                <p class="text-[11px] text-gray-400">Atur 0% jika evaluasi murni diserahkan 100% ke Pembimbing Kampus.</p>
+                                <p class="text-[11px] text-gray-400">Atur 0% jika evaluasi murni diserahkan 100% ke Pembimbing Kampus/Sekolah.</p>
                             </div>
 
                             <!-- Bobot DPL Kampus -->

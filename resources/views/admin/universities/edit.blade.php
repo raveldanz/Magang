@@ -162,7 +162,7 @@
 
                                 <div class="space-y-1">
                                     <div class="flex justify-between text-xs font-semibold text-gray-700">
-                                        <span>Bobot Pembimbing Kampus:</span>
+                                        <span>Bobot Pembimbing Kampus/Sekolah:</span>
                                         <span class="font-mono text-purple-600 font-bold" x-text="weightLecturer + '%'"></span>
                                     </div>
                                     <input type="range" min="0" max="100" step="5" x-model="weightLecturer" @input="updateMentor()" class="w-full h-2 bg-gray-200 rounded-lg accent-purple-600">
@@ -211,7 +211,7 @@
                                 <!-- Dosen Pembimbing -->
                                 <div class="p-3.5 rounded-xl bg-white border border-slate-200 space-y-2.5">
                                     <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
-                                        <span class="font-bold text-purple-900 uppercase text-[10px]">Aspek Pembimbing Kampus</span>
+                                        <span class="font-bold text-purple-900 uppercase text-[10px]">Aspek Pembimbing Kampus/Sekolah</span>
                                         <button type="button" @click="resetDpl()" class="text-[10px] font-semibold text-purple-600 hover:underline">Reset</button>
                                     </div>
                                     <div>

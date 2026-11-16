@@ -126,7 +126,7 @@
                         <!-- Filter Universitas -->
                         @if(isset($universities))
                             <select name="university_id" onchange="this.form.submit()" class="w-full sm:w-auto min-h-[44px] py-2.5 pl-3.5 pr-9 text-xs border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">-- Semua Kampus --</option>
+                                <option value="">-- Semua Kampus/Sekolah --</option>
                                 @foreach ($universities as $unv)
                                     <option value="{{ $unv->id }}" {{ request('university_id') == $unv->id ? 'selected' : '' }}>
                                         {{ $unv->name }} ({{ $unv->code }})
@@ -345,7 +345,7 @@
 
                                     <td class="py-4 px-4 text-center whitespace-nowrap text-xs text-gray-600" data-label="Logbook Terakhir">
                                         @if ($latestLog)
-                                            <span class="font-mono">{{ \Carbon\Carbon::parse($latestLog->date)->format('d M Y') }}</span>
+                                            <span class="font-mono">{{ \Carbon\Carbon::parse($latestLog->date)->translatedFormat('d M Y') }}</span>
                                         @else
                                             <span class="text-slate-600 italic text-xs">Belum Ada</span>
                                         @endif

@@ -60,7 +60,7 @@
 
                 <div class="flex-1">
                     <input type="text" name="search" value="{{ request('search') }}" 
-                           placeholder="Cari nama peserta magang, NIM/NIS, atau universitas..." 
+                           placeholder="Cari nama peserta magang, NIM/NIS, atau kampus/sekolah..." 
                            class="w-full h-12 px-4 rounded-xl border-2 border-slate-200 focus:border-blue-600 focus:ring-0 text-sm font-medium text-slate-800">
                 </div>
 
@@ -83,7 +83,7 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="border-b-2 border-slate-200 bg-slate-100/70 text-slate-700 text-xs font-bold uppercase tracking-wider">
-                                <th class="py-4 px-6">Peserta Magang & Kampus</th>
+                                <th class="py-4 px-6">Peserta Magang & Kampus/Sekolah</th>
                                 <th class="py-4 px-6">Bidang & No. Sertifikat</th>
                                 <th class="py-4 px-4 text-center">Nilai Akhir</th>
                                 <th class="py-4 px-4 text-center">Status ACC</th>

@@ -784,8 +784,8 @@
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     </div>
                                     <div class="min-w-0">
-                                        <div class="text-xs font-bold text-emerald-950 truncate">Surat Pengantar Kampus: {{ $suratPengantar->document_type }}</div>
-                                        <div class="text-[11px] text-slate-500">Tinjau permohonan resmi dari perguruan tinggi sebelum menetapkan balasan</div>
+                                        <div class="text-xs font-bold text-emerald-950 truncate">Surat Pengantar Kampus/Sekolah: {{ $suratPengantar->document_type }}</div>
+                                        <div class="text-[11px] text-slate-500">Tinjau permohonan resmi dari kampus/sekolah sebelum menetapkan balasan</div>
                                     </div>
                                 </div>
                                 <a href="{{ route('documents.application', $suratPengantar->id) }}" target="_blank"
@@ -863,7 +863,7 @@
                                     @endunless
                                 </div>
                                 <div class="p-3.5 rounded-xl border bg-white/95 {{ $currAdvisor ? 'border-emerald-200 shadow-2xs' : 'border-amber-200 bg-amber-50/40' }}">
-                                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Pembimbing Kampus Saat Ini</div>
+                                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Pembimbing Kampus/Sekolah Saat Ini</div>
                                     <div class="font-bold text-slate-900 text-xs mt-1 flex items-center justify-between">
                                         <span>{{ $currAdvisor?->name ?? 'Belum Ditugaskan' }}</span>
                                         @if($currAdvisor)
@@ -897,10 +897,10 @@
                                 name="academic_advisor_id"
                                 :items="$dosenItems"
                                 :selected="$selectedDosenId"
-                                label="Plotting Pembimbing Kampus"
+                                label="Plotting Pembimbing Kampus/Sekolah"
                                 placeholder="-- Cari atau Pilih Pembimbing (Ketik nama / email / kampus) --"
                             />
-                            <p class="text-[11px] text-slate-500 mt-1 font-medium">Pembimbing resmi dari perguruan tinggi peserta magang yang bersangkutan.</p>
+                            <p class="text-[11px] text-slate-500 mt-1 font-medium">Pembimbing resmi dari kampus/sekolah peserta magang yang bersangkutan.</p>
                         </div>
 
                         <!-- Grid Nomor Surat & Tanggal Surat -->

@@ -401,8 +401,8 @@
                 @if ($role === 'mentor')
                     <p class="mt-2.5 text-sm text-slate-700 font-medium">
                         {{ $isMentorOnly
-                            ? 'Ketentuan kampus peserta magang ini: 100% nilai akhir berasal dari Mentor Lapangan.'
-                            : "Ketentuan kampus peserta magang ini: Bobot {$weightMentor}% nilai Mentor Lapangan dan {$weightLecturer}% nilai Pembimbing." }}
+                            ? 'Ketentuan kampus/sekolah peserta magang ini: 100% nilai akhir berasal dari Mentor Lapangan.'
+                            : "Ketentuan kampus/sekolah peserta magang ini: Bobot {$weightMentor}% nilai Mentor Lapangan dan {$weightLecturer}% nilai Pembimbing." }}
                     </p>
                 @endif
             </div>

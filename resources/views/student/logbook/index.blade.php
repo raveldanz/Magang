@@ -297,7 +297,7 @@
                         </div>
                         <div class="p-3 bg-white/10 rounded-xl">
                             <p class="text-blue-200 uppercase tracking-wider mb-0.5">Periode Magang</p>
-                            <p class="font-bold text-sm text-white">{{ \Carbon\Carbon::parse($application->start_date)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($application->end_date)->format('d M Y') }}</p>
+                            <p class="font-bold text-sm text-white">{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d M Y') }}</p>
                         </div>
                     </div>
                 </div>
@@ -332,7 +332,7 @@
                             <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">
                                 Daftar Logbook Harian
                             </h3>
-                            <p class="text-xs text-gray-400 mt-0.5">Catatan aktivitas dan verifikasi dua arah (Mentor Dinas & Pembimbing Kampus)</p>
+                            <p class="text-xs text-gray-400 mt-0.5">Catatan aktivitas dan verifikasi dua arah (Mentor Dinas & Pembimbing Kampus/Sekolah)</p>
                         </div>
 
                         {{-- Tombol Tambah Logbook (Hanya Tampil Jika Status ACTIVE) --}}
@@ -377,7 +377,7 @@
                                     <th class="p-4">Kegiatan</th>
                                     <th class="p-4">Lampiran</th>
                                     <th class="p-4 text-center">Status Mentor Dinas</th>
-                                    <th class="p-4 text-center">Status Pembimbing Kampus</th>
+                                    <th class="p-4 text-center">Status Pembimbing</th>
                                     <th class="p-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -386,7 +386,7 @@
                                     <tr class="hover:bg-gray-50/50 transition">
                                         <td class="p-4 text-gray-500">{{ $index + 1 }}</td>
                                         <td class="p-4 font-semibold text-gray-700 whitespace-nowrap">
-                                            {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}
+                                            {{ \Carbon\Carbon::parse($log->date)->translatedFormat('d M Y') }}
                                         </td>
                                         <td class="p-4 text-gray-700 max-w-xs">
                                             <p class="font-medium text-slate-800">{{ Str::limit($log->activity, 120) }}</p>
@@ -413,7 +413,7 @@
                                                    @click.prevent="$dispatch('open-lightbox', { 
                                                        url: '{{ $log->attachment_url }}', 
                                                        isImage: {{ $isImg ? 'true' : 'false' }}, 
-                                                       title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}' 
+                                                       title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->translatedFormat('d M Y') }}' 
                                                    })"
                                                    target="_blank" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold inline-flex items-center gap-1 transition cursor-pointer">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
@@ -448,7 +448,7 @@
                                                                 @click="$dispatch('open-delete-modal', {
                                                                     action: '{{ route('student.logbook.destroy', $log->id) }}',
                                                                     title: 'Hapus Catatan Logbook',
-                                                                    name: @js('Logbook ' . \Carbon\Carbon::parse($log->date)->format('d M Y')),
+                                                                    name: @js('Logbook ' . \Carbon\Carbon::parse($log->date)->translatedFormat('d M Y')),
                                                                     desc: @js(\Illuminate\Support\Str::limit(strip_tags($log->activity ?? ''), 90))
                                                                 })"
                                                                 class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white shadow-sm cursor-pointer active:scale-95" title="Hapus Logbook">
@@ -486,7 +486,7 @@
                                             {{ $index + 1 }}
                                         </span>
                                         <span class="font-bold text-xs text-slate-800">
-                                            {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}
+                                            {{ \Carbon\Carbon::parse($log->date)->translatedFormat('d M Y') }}
                                         </span>
                                     </div>
                                     @if ($log->attachment)
@@ -498,7 +498,7 @@
                                            @click.prevent="$dispatch('open-lightbox', { 
                                                url: '{{ $log->attachment_url }}', 
                                                isImage: {{ $isImg ? 'true' : 'false' }}, 
-                                               title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}' 
+                                               title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->translatedFormat('d M Y') }}' 
                                            })"
                                            target="_blank" class="px-2.5 py-1 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-lg border border-blue-100 flex items-center gap-1 cursor-pointer">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
@@ -550,7 +550,7 @@
                                                     @click="$dispatch('open-delete-modal', {
                                                         action: '{{ route('student.logbook.destroy', $log->id) }}',
                                                         title: 'Hapus Catatan Logbook',
-                                                        name: @js('Logbook ' . \Carbon\Carbon::parse($log->date)->format('d M Y')),
+                                                        name: @js('Logbook ' . \Carbon\Carbon::parse($log->date)->translatedFormat('d M Y')),
                                                         desc: @js(\Illuminate\Support\Str::limit(strip_tags($log->activity ?? ''), 90))
                                                     })"
                                                     class="px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition cursor-pointer">
