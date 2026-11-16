@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\University;
 
+use App\Enums\AccountStatus;
 use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
@@ -176,6 +177,20 @@ class DashboardController extends Controller
             ->orderBy('name')
             ->get();
 
+        // Pembimbing yang mendaftar sendiri dan menunggu persetujuan Admin Kampus/Sekolah
+        $pendingAdvisorsCount = User::whereIn('role', User::ADVISOR_ROLES)
+            ->where('status', AccountStatus::PENDING->value)
+            ->where(function ($q) use ($user, $university) {
+                if ($user->university_id) {
+                    $q->where('university_id', $user->university_id);
+                } elseif ($university) {
+                    $q->where('university', $university->name);
+                } else {
+                    $q->whereRaw('1 = 0');
+                }
+            })
+            ->count();
+
         $stats = [
             'total_students' => $totalStudents,
             'total_active' => $totalActive,
@@ -198,7 +213,8 @@ class DashboardController extends Controller
             'agencies',
             'availableDosens',
             'totalAgenciesCount',
-            'activeAgenciesCount'
+            'activeAgenciesCount',
+            'pendingAdvisorsCount'
         ));
     }
 

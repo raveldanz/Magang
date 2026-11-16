@@ -29,6 +29,22 @@
                 </div>
             @endif
 
+            @if (($pendingAdvisorsCount ?? 0) > 0)
+                <!-- Pengingat: pembimbing daftar sendiri menunggu persetujuan -->
+                <div class="p-4 sm:p-5 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <div>
+                            <p class="text-sm font-bold text-amber-900">{{ $pendingAdvisorsCount }} pembimbing menunggu persetujuan Anda</p>
+                            <p class="text-xs text-amber-800 mt-0.5">Akun ini didaftarkan sendiri oleh dosen/guru. Peserta magang baru bisa memilihnya setelah Anda setujui.</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('university.lecturers.index') }}" class="inline-flex items-center justify-center min-h-[40px] px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold transition shrink-0">
+                        Tinjau Sekarang
+                    </a>
+                </div>
+            @endif
+
             <!-- Welcome Banner Resmi Universitas -->
             <div class="bg-gradient-to-r from-blue-700 via-blue-800 to-blue-950 rounded-2xl sm:rounded-3xl p-5 sm:p-7 text-white shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
@@ -349,7 +365,7 @@
                             Pilih Pembimbing <span class="text-rose-500">*</span>
                         </label>
                         <select name="academic_advisor_id" x-model="assignModal.currentAdvisorId" required class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                            <option value="">-- Pilih Pembimbing Kampus --</option>
+                            <option value="">-- Pilih Pembimbing Kampus/Sekolah --</option>
                             @foreach ($availableDosens as $d)
                                 <option value="{{ $d->id }}">
                                     {{ $d->name }} ({{ $d->email }})

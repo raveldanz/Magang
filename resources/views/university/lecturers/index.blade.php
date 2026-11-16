@@ -59,7 +59,7 @@
                             </svg>
                         </span>
                         <input type="text" name="search" value="{{ request('search') }}" 
-                               placeholder="Cari nama, NIDN, atau email..." 
+                               placeholder="Cari nama atau email pembimbing..."
                                class="w-full pl-9 pr-3 py-2 text-xs sm:text-sm border-slate-200 bg-slate-50 focus:bg-white rounded-xl focus:ring-blue-500 focus:border-blue-500">
                     </div>
 

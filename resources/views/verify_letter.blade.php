@@ -12,9 +12,12 @@
             
             <!-- Header Logo / Instansi -->
             <div class="text-center pb-4 border-b">
-                @if($agency)
-                    <img src="{{ $agency->logo_url }}" alt="Logo {{ $agencyName }}" class="w-16 h-16 mx-auto mb-2 object-contain">
-                @endif
+                <div class="flex items-center justify-center gap-3 mb-2">
+                    <img src="{{ asset('images/logos/surabaya.png') }}" alt="Logo {{ $govName }}" class="h-14 w-auto object-contain">
+                    @if($agency)
+                        <img src="{{ $agency->logo_url }}" alt="Logo {{ $agencyName }}" class="w-14 h-14 object-contain">
+                    @endif
+                </div>
                 <h2 class="text-lg font-bold text-gray-800 uppercase tracking-wide">{{ $govName }}</h2>
                 <h1 class="text-xl font-extrabold text-blue-900 uppercase">{{ $agencyName }}</h1>
                 <p class="text-xs text-gray-500 mt-1">Sistem Informasi Pendaftaran & Validasi Magang Resmi</p>

@@ -107,7 +107,7 @@
                             <!-- Executive Info Chips (Desktop Only: Sharp Rectangular Badges, Zero Circles) -->
                             <div class="hidden md:flex flex-wrap items-center gap-2 text-xs">
                                 <div class="px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 bg-white/10 border border-white/20 text-white">
-                                    <span class="text-blue-200">NIM/NIS:</span>
+                                    <span class="text-blue-200">{{ $profile?->education_level ? $profile->identityNumberLabel() : 'NIM/NIS' }}:</span>
                                     <strong class="font-mono text-white">{{ $profile->nim ?? 'Belum Diisi' }}</strong>
                                 </div>
                                 <div class="px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 bg-white/10 border border-white/20 text-white">
@@ -127,21 +127,21 @@
                         <div class="lg:col-span-4 w-full p-4 rounded-xl bg-white/10 border border-white/20 space-y-3">
                             <div class="flex items-center justify-between text-xs text-white">
                                 <span class="text-blue-200">Institusi</span>
-                                <span class="font-bold truncate max-w-[150px] text-right" title="{{ $univName ?? $profile->universitas ?? 'Perguruan Tinggi' }}">
-                                    {{ $univName ?? $profile->universitas ?? 'Perguruan Tinggi' }}
+                                <span class="font-bold truncate max-w-[150px] text-right" title="{{ $univName ?? $profile->universitas ?? 'Kampus/Sekolah' }}">
+                                    {{ $univName ?? $profile->universitas ?? 'Kampus/Sekolah' }}
                                 </span>
                             </div>
 
                             <div class="space-y-1.5 pt-2 border-t border-white/15">
                                 <div class="flex items-center justify-between text-xs font-bold text-white">
-                                    <span>Kelengkapan Berkas</span>
+                                    <span>Progres Tahapan Magang</span>
                                     <span class="text-amber-300 font-mono">{{ $progressPercent }}%</span>
                                 </div>
                                 <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
                                     <div class="h-1.5 bg-emerald-400 rounded-full transition-all duration-500" style="width: {{ $progressPercent }}%;"></div>
                                 </div>
                                 <div class="pt-1 flex items-center justify-between text-[11px]">
-                                    <span class="text-blue-200/90">{{ $stepCount }} dari 7 Syarat</span>
+                                    <span class="text-blue-200/90">{{ $stepCount }} dari 7 Tahap</span>
                                     <button type="button" @click="showDetailModal = true" class="font-bold text-white hover:text-amber-300 underline transition cursor-pointer">
                                         Lihat Detail
                                     </button>
@@ -179,10 +179,10 @@
                             <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                                 <div>
                                     <h3 class="text-sm font-bold text-slate-800" id="modal-title">
-                                        Rincian Kelengkapan & Kekurangan Berkas Magang
+                                        Rincian Tahapan Magang
                                     </h3>
                                     <p class="text-xs text-slate-500 mt-0.5">
-                                        {{ $stepCount }} dari 7 syarat telah terpenuhi ({{ $progressPercent }}%)
+                                        {{ $stepCount }} dari 7 tahap telah terpenuhi ({{ $progressPercent }}%)
                                     </p>
                                 </div>
                                 <button type="button" @click="showDetailModal = false"
@@ -624,7 +624,7 @@
                                         </p>
                                         <div class="text-xs text-slate-500 mt-1 space-y-0.5">
                                             <p class="truncate"><span class="text-slate-400">Email:</span> <span class="font-mono text-slate-700">{{ $academicAdvisor->email }}</span></p>
-                                            <p class="truncate"><span class="text-slate-400">Kampus:</span> <strong>{{ is_string($academicAdvisor->university) ? $academicAdvisor->university : ($academicAdvisor->universityRelation?->name ?? $academicAdvisor->university?->name ?? $univName ?? $profile->universitas) }}</strong></p>
+                                            <p class="truncate"><span class="text-slate-400">{{ $profile?->isSchoolStudent() ? 'Sekolah' : 'Kampus' }}:</span> <strong>{{ is_string($academicAdvisor->university) ? $academicAdvisor->university : ($academicAdvisor->universityRelation?->name ?? $academicAdvisor->university?->name ?? $univName ?? $profile->universitas) }}</strong></p>
                                         </div>
                                     @elseif ($application && in_array($rawAppSt, ['accepted', 'active', 'completed'], true))
                                         <p class="text-sm font-semibold text-slate-700">Belum memilih pembimbing</p>

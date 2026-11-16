@@ -78,8 +78,8 @@
             @php
                 $missingDocs = [];
                 if (empty($profile?->cv_path)) $missingDocs[] = 'Curriculum Vitae (CV)';
-                if (empty($profile?->transcript_path)) $missingDocs[] = 'Transkrip Nilai';
-                if (empty($profile?->id_card_path)) $missingDocs[] = 'KTM / Kartu Identitas';
+                if (empty($profile?->transcript_path)) $missingDocs[] = 'Transkrip Nilai / Rapor';
+                if (empty($profile?->id_card_path)) $missingDocs[] = 'KTM / Kartu Pelajar';
             @endphp
             @if (!empty($missingDocs) && !session('success'))
                 <div class="p-4 bg-amber-50/90 border-l-4 border-amber-500 rounded-r-xl shadow-xs text-amber-950 text-xs sm:text-sm space-y-1">
@@ -135,7 +135,7 @@
 
                                 <div class="mt-1.5">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
-                                        {{ $profile?->isSchoolStudent() ? 'Siswa PKL' : 'Mahasiswa MBKM' }}
+                                        {{ empty($profile?->education_level) ? 'Peserta Magang' : ($profile->isSchoolStudent() ? 'Siswa PKL' : 'Mahasiswa Magang') }}
                                     </span>
                                 </div>
                             </div>
@@ -144,23 +144,23 @@
                         <!-- Ringkasan Akademik -->
                         <div class="pt-4 border-t border-slate-100 space-y-3 text-xs">
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400 font-medium">{{ $profile?->identityNumberLabel() ?? 'NIM' }}</span>
+                                <span class="text-slate-400 font-medium">{{ empty($profile?->education_level) ? 'NIM/NIS' : $profile->identityNumberLabel() }}</span>
                                 <strong class="text-slate-800 font-bold text-right truncate max-w-[170px]">{{ $profile?->nim ?: 'Belum Diisi' }}</strong>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400 font-medium">{{ $profile?->isSchoolStudent() ? 'Sekolah' : 'Kampus' }}</span>
+                                <span class="text-slate-400 font-medium">{{ empty($profile?->education_level) ? 'Kampus/Sekolah' : ($profile->isSchoolStudent() ? 'Sekolah' : 'Kampus') }}</span>
                                 <strong class="text-slate-800 font-bold text-right truncate max-w-[170px]" title="{{ $profile?->universitas ?? $user->university ?? '-' }}">
                                     {{ $profile?->universitas ?? $user->university ?? '-' }}
                                 </strong>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400 font-medium">{{ $profile?->isSchoolStudent() ? 'Jurusan' : 'Program Studi' }}</span>
+                                <span class="text-slate-400 font-medium">{{ empty($profile?->education_level) ? 'Prodi/Jurusan' : ($profile->isSchoolStudent() ? 'Jurusan' : 'Program Studi') }}</span>
                                 <strong class="text-slate-800 font-bold text-right truncate max-w-[170px]" title="{{ $profile?->jurusan ?? $profile?->major ?? '-' }}">
                                     {{ $profile?->jurusan ?? $profile?->major ?? '-' }}
                                 </strong>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-400 font-medium">{{ $profile?->isSchoolStudent() ? 'Kelas' : 'Semester' }}</span>
+                                <span class="text-slate-400 font-medium">{{ empty($profile?->education_level) ? 'Semester/Kelas' : ($profile->isSchoolStudent() ? 'Kelas' : 'Semester') }}</span>
                                 <strong class="text-slate-800 font-bold">{{ $profile?->periodLabel() ?? '-' }}</strong>
                             </div>
                         </div>

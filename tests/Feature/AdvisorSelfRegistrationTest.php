@@ -202,9 +202,19 @@ class AdvisorSelfRegistrationTest extends TestCase
         $ids = array_column(NotificationService::getNotificationsForUser($campusAdmin), 'id');
         $this->assertContains('univ_advisors_pending_approval', $ids);
 
+        // Dasbor Admin Kampus/Sekolah ikut mengingatkan dan menautkan ke halaman persetujuan
+        $this->actingAs($campusAdmin)->get(route('university.dashboard'))
+            ->assertOk()
+            ->assertSee('1 pembimbing menunggu persetujuan Anda')
+            ->assertSee(route('university.lecturers.index'), false);
+
         $this->actingAs($campusAdmin)->post(route('university.lecturers.approve', $advisor->id))
             ->assertRedirect(route('university.lecturers.index'))
             ->assertSessionHas('success');
+
+        $this->actingAs($campusAdmin)->get(route('university.dashboard'))
+            ->assertOk()
+            ->assertDontSee('pembimbing menunggu persetujuan Anda');
         $this->assertSame(AccountStatus::ACTIVE->value, $advisor->fresh()->status);
         $this->assertDatabaseHas('system_notifications', ['user_id' => $advisor->id, 'title' => 'Akun Pembimbing Anda Sudah Disetujui']);
         $this->assertDatabaseHas('audit_logs', ['action' => 'ADVISOR_ACCOUNT_APPROVE', 'target_id' => $advisor->id]);
