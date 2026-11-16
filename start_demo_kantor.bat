@@ -72,10 +72,10 @@ echo.
 echo   AKUN DEMO PENGUJIAN (Kata sandi semua akun: password):
 echo   -----------------------------------------------------------------------------
 echo   [Admin Dinas]      admin.dispusip@surabaya.go.id  (Verifikasi ^& Pantau)
-echo   [Mahasiswa Aktif]  mahasiswa.aktif@unesa.ac.id    (Isi Logbook ^& Proyek)
-echo   [Mahasiswa Lulus]  mahasiswa.lulus@unesa.ac.id    (Unduh E-Sertifikat)
+echo   [Peserta Aktif]    mahasiswa.aktif@unesa.ac.id    (Isi Logbook ^& Proyek)
+echo   [Peserta Lulus]    mahasiswa.lulus@unesa.ac.id    (Unduh E-Sertifikat)
 echo   [Mentor Lapangan]  mentor.dispusip@surabaya.go.id (Tinjau Logbook ^& Nilai Mentor)
-echo   [Dosen Pembimbing] dosen.unesa@unesa.ac.id        (Pemantauan ^& Catatan)
+echo   [Pembimbing]       dosen.unesa@unesa.ac.id        (Pemantauan ^& Catatan)
 echo   [Supervisor]       supervisor@dispusip.surabaya.go.id (Pengesahan Dokumen)
 echo ===============================================================================
 echo [6/6] Server HTTP aktif (batas unggah 64 MB).

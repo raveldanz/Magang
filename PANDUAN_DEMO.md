@@ -26,7 +26,7 @@ yang tanggal mulainya sudah tiba, menaikkan batas unggah ke 64 MB, dan menjalank
 | Peran | Email |
 |---|---|
 | Super Admin | `admin@surabaya.go.id` |
-| Super Admin (demo, tanpa banner password bawaan) | `admin@gmail.com` — kata sandi `admin123`, bukan `password` |
+| Super Admin (demo, tanpa banner password bawaan) | `admin@gmail.com` — kata sandi `admin123`, bukan `password` (bisa diganti lewat `DEMO_ADMIN_PASSWORD` di `.env` sebelum seeding) |
 | Admin Dinas | `admin.dispusip@surabaya.go.id` |
 | Supervisor (pengesahan) | `supervisor@dispusip.surabaya.go.id` |
 | Mentor lapangan | `mentor.dispusip@surabaya.go.id` |

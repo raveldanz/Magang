@@ -218,6 +218,26 @@ if ($driver === 'sqlite') {
 } else {
     $warnings[] = "DB_CONNECTION=$driver: pastikan server database itu hidup di komputer ini. Untuk demo paling aman pakai sqlite.";
 }
+// Mode --check: laporkan migrasi tertunda & daftar sekolah tanpa mengubah database
+if ($checkOnly && ! $errors && ! $fresh && ($driver !== 'pgsql' || ! empty($hasUsers))) {
+    [$code, $out] = $artisan('migrate:status');
+    $pending = preg_match_all('/\bPending\b/', $out);
+    if ($code !== 0) {
+        $warnings[] = 'Status migrasi tidak bisa dibaca:'.PHP_EOL.trim($out);
+    } elseif ($pending > 0) {
+        $warnings[] = "{$pending} migrasi database belum dijalankan, sehingga sebagian halaman bisa galat. start_demo.bat menjalankannya otomatis; atau jalankan: php artisan migrate";
+    } else {
+        $say('DB', 'Skema database sudah terbaru (tidak ada migrasi tertunda).');
+        [$code, $out] = $artisan('tinker --execute="echo \'SEKOLAH=\'.App\Models\University::where(\'institution_type\', \'sekolah\')->count();"');
+        $schools = preg_match('/SEKOLAH=(\d+)/', $out, $sm) ? (int) $sm[1] : null;
+        if ($schools === 0) {
+            $warnings[] = 'Daftar sekolah (SMA/SMK/MA) belum diimpor: pilihan "Sekolah" di profil peserta akan kosong. start_demo.bat mengimpornya otomatis; atau jalankan: php artisan universities:sync-master --only-schools';
+        } elseif ($schools !== null) {
+            $say('SEKOLAH', "{$schools} sekolah (SMA/SMK/MA) siap dipilih di profil peserta.");
+        }
+    }
+}
+
 if (! $checkOnly && ! $errors) {
     [$code, $out] = $artisan('optimize:clear');
     [$code, $out] = $artisan($fresh ? 'migrate --force --seed' : 'migrate --force');

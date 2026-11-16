@@ -100,6 +100,12 @@ return [
     */
     'force_password_change' => (bool) env('AUTH_FORCE_PASSWORD_CHANGE', env('APP_ENV', 'production') === 'production'),
 
+    /*
+    | Kata sandi akun demo admin@gmail.com yang dibuat seeder demo (hanya local/testing/development).
+    | Sengaja bukan 'password' agar banner "password bawaan" tidak muncul saat presentasi.
+    */
+    'demo_admin_password' => (string) env('DEMO_ADMIN_PASSWORD', 'admin123'),
+
     'passwords' => [
         'users' => [
             'provider' => 'users',

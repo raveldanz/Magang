@@ -129,7 +129,7 @@ class DemoE2ESeeder extends Seeder
             [
                 'name' => 'Super Admin Dispusip',
                 // Sengaja bukan 'password' agar banner "password bawaan" tidak muncul saat demo.
-                'password' => Hash::make('admin123'),
+                'password' => Hash::make(config('auth.demo_admin_password')),
                 'role' => 'super_admin',
                 'agency_profile_id' => $dispusip->id,
                 'status' => 'active',
