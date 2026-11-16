@@ -54,6 +54,7 @@ powershell -ExecutionPolicy Bypass -File scripts\make_demo_zip.ps1   # build →
 ```
 
 - The demo serves with `php -S` (not `artisan serve`) bound to `0.0.0.0`, with `-d upload_max_filesize=64M` etc.; the system php.ini only allows 2 MB uploads.
+- For 15-20 concurrent users `scripts/demo_serve.bat` runs N `php -S` app servers (main port+1..N, `DEMO_WORKERS`, default = CPU cores 4-8, OPcache via `-d zend_extension=opcache`) plus `scripts/demo_gateway.php` on the main port, which redirects visitors round-robin; each server gets its own `VIEW_COMPILED_PATH` (Windows `rename` race, LRN-160). Measure with `php scripts/demo_loadtest.php --url=... --users=20`.
 - Pages opened via `http://<LAN-IP>` are not a secure context: service worker/web push and chat voice recording are unavailable there; `navigator.clipboard` is polyfilled in `resources/js/app.js`.
 - QR verification links must use `App\Support\PublicUrl::route()` (replaces a loopback host with `APP_PUBLIC_URL`, which `start_demo.bat` sets to the LAN address) so phones can open them.
 - Never leave `public/hot` behind (Vite dev server is bound to 127.0.0.1, so other devices get unstyled pages); the preflight deletes it. Never load Tailwind/JS from a CDN — the demo may have no internet; external web fonts are loaded non-blocking.

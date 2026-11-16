@@ -279,6 +279,14 @@ if (! $checkOnly && ! $errors) {
 
     // 6. Yang biasanya dikerjakan scheduler harian: mahasiswa "Diterima" jadi "Aktif" saat tanggal mulai tiba
     $artisan('app:sync-internship-status');
+
+    // 7. Kompilasi semua tampilan Blade sekarang. Demo menjalankan beberapa server sekaligus; bila mereka
+    //    mengompilasi tampilan yang sama bersamaan, Windows menolak menimpa berkas yang sedang dibuka
+    //    ("rename ... Access is denied") dan peserta mendapat galat 500.
+    [$code, $out] = $artisan('view:cache');
+    $code === 0
+        ? $say('TAMPILAN', 'Semua tampilan sudah dikompilasi (server tidak perlu mengompilasi saat ramai).')
+        : $warnings[] = 'Kompilasi tampilan gagal; halaman pertama bisa lambat atau galat saat ramai:'.PHP_EOL.$out;
 }
 
 // 7. Batas unggah (hanya info: start_demo.bat menaikkannya lewat opsi -d) ------------------
@@ -300,21 +308,54 @@ $ips = array_values(array_unique(array_filter($ips, fn ($ip) => filter_var($ip, 
 // Utamakan alamat jaringan privat (WiFi/LAN)
 usort($ips, fn ($a, $b) => (int) (! preg_match('/^(192\.168|10|172\.(1[6-9]|2\d|3[01]))\./', $a)) <=> (int) (! preg_match('/^(192\.168|10|172\.(1[6-9]|2\d|3[01]))\./', $b)));
 
-$port = null;
-foreach ([8000, 8080, 8888, 8001] as $candidate) {
+// Server bawaan PHP hanya melayani satu permintaan pada satu waktu. Agar 15-20 peserta tetap lancar,
+// demo_serve.bat menjalankan beberapa server aplikasi (port utama + 1 ... + N) dan sebuah gerbang di
+// port utama yang membagi pengunjung bergiliran (scripts/demo_gateway.php). Jumlah server mengikuti
+// jumlah inti prosesor (4-8), atau DEMO_WORKERS di lingkungan / .env.
+$envWorkers = getenv('DEMO_WORKERS') ?: (preg_match('/^DEMO_WORKERS=(\d+)/m', (string) @file_get_contents($base.'/.env'), $wm) ? $wm[1] : null);
+$workers = $envWorkers !== null && $envWorkers !== false
+    ? max(1, min(16, (int) $envWorkers))
+    : max(4, min(8, (int) (getenv('NUMBER_OF_PROCESSORS') ?: 4)));
+
+$portFree = function (int $candidate): bool {
     $probe = @fsockopen('127.0.0.1', $candidate, $e1, $e2, 0.3);
     if ($probe) {
         fclose($probe);
 
-        continue;
+        return false;
     }
-    $port = $candidate;
-    break;
+
+    return true;
+};
+
+$port = null;
+foreach ([8000, 8080, 8100, 8200, 8300] as $candidate) {
+    $block = range($candidate, $candidate + $workers);
+    if (count(array_filter($block, $portFree)) === count($block)) {
+        $port = $candidate;
+        break;
+    }
 }
 if ($port === null) {
-    $errors[] = 'Port 8000, 8080, 8888 dan 8001 semuanya sedang dipakai. Tutup server lain terlebih dahulu.';
+    $errors[] = "Tidak ada deretan {$workers} port kosong di sekitar 8000/8080/8100/8200/8300. Tutup server lain terlebih dahulu.";
 } elseif ($port !== 8000) {
-    $warnings[] = "Port 8000 sedang dipakai program lain (mungkin server dev yang masih terbuka), demo memakai port $port.";
+    $warnings[] = 'Port 8000-'.(8000 + $workers)." sebagian sedang dipakai program lain (mungkin server dev yang masih terbuka), demo memakai port $port.";
+}
+
+// OPcache menyimpan hasil kompilasi PHP di memori: tanpa ini setiap klik mengompilasi ulang ratusan berkas Laravel.
+$opcache = 0; // 0 = tidak tersedia, 1 = perlu dimuat lewat -d zend_extension=opcache, 2 = sudah dimuat php.ini
+if (extension_loaded('Zend OPcache')) {
+    $opcache = 2;
+} else {
+    exec('"'.$php.'" -d zend_extension=opcache -r "echo extension_loaded(\'Zend OPcache\') ? \'OPCACHE=1\' : \'OPCACHE=0\';" 2>&1', $oc);
+    $opcache = str_contains(implode('', $oc), 'OPCACHE=1') ? 1 : 0;
+}
+if ($opcache === 0) {
+    $warnings[] = 'OPcache PHP tidak tersedia (ext/php_opcache.dll tidak ada): aplikasi tetap jalan, tetapi lebih lambat saat ramai.';
+}
+if ($port !== null) {
+    $say('SERVER', "{$workers} server aplikasi + gerbang pembagi beban".($opcache ? ', OPcache aktif' : '')
+        .($workers >= 4 && $opcache ? ' (diuji lancar untuk 20 pengguna serentak).' : '.'));
 }
 if (! $ips) {
     $warnings[] = 'Laptop ini belum terhubung ke WiFi/LAN. Sambungkan dulu, lalu jalankan ulang agar alamat untuk perangkat lain muncul.';
@@ -346,7 +387,8 @@ if ($errors) {
     exit(1);
 }
 if (! $checkOnly) {
-    file_put_contents($base.'/storage/framework/demo_server.txt', ($ips[0] ?? '127.0.0.1').' '.$port.PHP_EOL);
+    // Dibaca start_demo.bat / demo_serve.bat: IP  PORT_UTAMA  JUMLAH_SERVER  MODE_OPCACHE
+    file_put_contents($base.'/storage/framework/demo_server.txt', ($ips[0] ?? '127.0.0.1').' '.$port.' '.$workers.' '.$opcache.PHP_EOL);
 }
 echo PHP_EOL.'  Di laptop ini      : http://localhost:'.$port.PHP_EOL;
 foreach ($ips as $ip) {

@@ -19,7 +19,49 @@ Tidak perlu internet, composer, npm, maupun PostgreSQL.
 
 `start_demo.bat` otomatis: mencari PHP (folder `php\` di zip lebih dulu), membuat `.env`/database bila belum ada,
 menjalankan migrasi, memperbaiki tautan `public/storage`, membuang cache path komputer lama, mengaktifkan magang
-yang tanggal mulainya sudah tiba, menaikkan batas unggah ke 64 MB, dan menjalankan penjadwal di jendela kecil.
+yang tanggal mulainya sudah tiba, mengompilasi semua tampilan, menaikkan batas unggah ke 64 MB, menjalankan
+penjadwal di jendela kecil, dan menyalakan **beberapa server sekaligus** (lihat 1a).
+
+Laptop server tidak perlu Node.js, Composer, PostgreSQL, maupun internet. Zip sudah membawa PHP portabel beserta
+Microsoft Visual C++ Runtime yang dibutuhkannya. Bila tetap muncul `[GAGAL] PHP ditemukan ... tetapi tidak bisa
+dijalankan`, pasang `VC_redist.x64.exe` (Visual C++ 2015-2022, x64) dari Microsoft, lalu jalankan ulang.
+
+## 1a. Kapasitas: 15-20 peserta sekaligus
+
+Server bawaan PHP hanya melayani **satu** permintaan pada satu waktu. Karena itu `start_demo.bat` (lewat
+`scripts\demo_serve.bat`) menyalakan beberapa server aplikasi di jendela kecil bernama **"SIP-MAGANG Server 1..N"**
+(port utama+1 ... +N) dan sebuah **gerbang** di port utama yang membagi peserta bergiliran ke server yang hidup.
+Peserta cukup membuka alamat utama; alamat di browser akan berpindah ke port server yang melayaninya, dan login tetap
+berlaku di semua port. OPcache PHP juga diaktifkan otomatis.
+
+- Jumlah server mengikuti jumlah inti prosesor (4-8). Untuk mengubahnya, tambahkan `DEMO_WORKERS=6` di `.env`.
+- **Jangan tutup** jendela "SIP-MAGANG Server n" yang diperkecil; menutup jendela utama mematikan semuanya.
+- Kesehatan server: buka `http://localhost:<port utama>/__demo-status`.
+
+Hasil uji beban di laptop pengembang (8 inti, peserta tiruan berjalan di laptop yang sama, klik tiap ±5 detik):
+
+| Susunan | Median | 95% halaman terbuka dalam |
+|---|---|---|
+| 1 server tanpa OPcache (cara lama), 20 peserta | 11 detik | 26 detik |
+| 1 server + OPcache, 20 peserta | 1,8 detik | 8 detik |
+| 4-6 server + gerbang + OPcache, 20 peserta | 0,1-0,3 detik | 0,5-1,8 detik |
+| 6 server + gerbang + OPcache, 30 peserta | 0,4 detik | 2,3 detik |
+
+Login adalah halaman paling lambat (±1-3 detik saat 20 orang masuk bersamaan) karena pengecekan kata sandi memang
+sengaja berat demi keamanan. Unduh PDF (surat/sertifikat) memakai satu server selama beberapa detik; server lain tetap
+melayani peserta lain.
+
+Uji sendiri sebelum hari-H (dari laptop lain di WiFi yang sama, setelah `start_demo.bat` berjalan):
+
+```bat
+php scripts\demo_loadtest.php --url=http://192.168.1.23:8000 --users=20 --seconds=60 --think=5000
+```
+
+Skrip meniru 20 peserta yang login lalu membuka dasbor, logbook, notifikasi, dan chat (hanya membaca, tidak mengubah
+data magang) dan menyimpulkan apakah server lancar.
+
+Tips agar tetap lancar: colokkan charger dan pilih mode daya "Best performance", matikan sleep, tutup aplikasi berat
+lain di laptop server, dan mulai uji coba dengan meminta peserta login bergantian beberapa detik.
 
 ## 2. Akun demo (semua kata sandi `password`)
 
@@ -94,7 +136,9 @@ php artisan db:seed --class=DemoScenarioSeeder
 |---|---|
 | HP: "situs tidak dapat dijangkau" | Firewall (langkah 1.2), beda WiFi, atau WiFi tamu/kampus yang memakai *client isolation* — pakai hotspot HP/router sendiri. |
 | Alamat IP berubah | Terjadi bila pindah WiFi. Tutup jendela server lalu jalankan ulang `start_demo.bat`. |
-| "Port 8000 sedang dipakai" | Server lain masih terbuka; demo otomatis pindah ke 8080. Pakai alamat yang tertulis. |
+| "Port 8000-800N sebagian sedang dipakai" | Server lain masih terbuka; demo otomatis pindah ke 8080/8100/... Pakai alamat yang tertulis. |
+| Halaman "Server demo belum siap" | Jendela "SIP-MAGANG Server n" tertutup atau baru dinyalakan. Tunggu sebentar; bila tetap, jalankan ulang `start_demo.bat`. |
+| Terasa lambat saat ramai | Cek `/__demo-status`, tutup aplikasi lain, atau naikkan `DEMO_WORKERS` di `.env`. |
 | Tampilan polos tanpa gaya | Ada berkas `public\hot` dari `npm run dev`: tutup Vite; `start_demo.bat` menghapusnya otomatis. |
 | Logo/gambar tidak muncul | Jalankan ulang `start_demo.bat` (tautan `public\storage` dibuat ulang). |
 
@@ -110,7 +154,9 @@ powershell -ExecutionPolicy Bypass -File scripts\make_demo_zip.ps1
 ```
 
 Skrip membangun aset, menjalankan seluruh pengujian, menyalin proyek tanpa `.git`/`node_modules`/log/token,
-menyetel `APP_DEBUG=false`, menyertakan PHP portabel, memeriksa hasil salinan, lalu membuat zip di folder induk.
+menyetel `APP_DEBUG=false`, menyertakan PHP portabel beserta Visual C++ Runtime, memeriksa hasil salinan, lalu
+membuat zip di folder induk. Buat zip hanya saat tidak ada perubahan yang belum di-commit (`git status` bersih),
+karena skrip menyalin isi folder kerja apa adanya.
 
 Setelah demo, cabut izin firewall bila perlu:
 

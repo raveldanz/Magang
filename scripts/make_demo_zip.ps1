@@ -125,6 +125,24 @@ if (-not $NoPhp) {
     & robocopy (Split-Path -Parent $phpExe) (Join-Path $dest 'php') /E /R:1 /W:1 /NFL /NDL /NJH /NJS /NP /XD dev extras /XF *.pdb php8phpdbg.dll phpdbg.exe php-cgi.exe php-win.exe | Out-Null
     if ($LASTEXITCODE -ge 8) { Fail 'Gagal menyalin PHP.' }
     if (-not (Test-Path (Join-Path $dest 'php\php.ini'))) { Fail 'php.ini tidak ditemukan di folder PHP: ekstensi tidak akan aktif di laptop tujuan.' }
+
+    # PHP untuk Windows butuh Microsoft Visual C++ Runtime. Laptop baru/kantor sering belum punya,
+    # sehingga php.exe gagal dibuka. Microsoft mengizinkan DLL runtime ini disertakan di samping aplikasi
+    # (app-local), dan Windows mencarinya di folder php.exe lebih dulu.
+    $vcDlls = 'vcruntime140.dll', 'vcruntime140_1.dll', 'msvcp140.dll'
+    $vcCopied = 0
+    foreach ($dll in $vcDlls) {
+        $src = Join-Path $env:SystemRoot "System32\$dll"
+        if (Test-Path $src) {
+            Copy-Item $src (Join-Path $dest "php\$dll") -Force
+            $vcCopied++
+        }
+    }
+    if ($vcCopied -lt 2) {
+        Write-Host '[PERHATIAN] Visual C++ Runtime tidak ditemukan di laptop ini, jadi tidak ikut ke zip. Bawa VC_redist.x64.exe untuk laptop tujuan.' -ForegroundColor Yellow
+    } else {
+        Info "Visual C++ Runtime disertakan ($vcCopied berkas) agar PHP jalan tanpa instalasi tambahan."
+    }
 }
 
 # --- Uji folder hasil salinan (bukan folder kerja) ---------------------------------------------

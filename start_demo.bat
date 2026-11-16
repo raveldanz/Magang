@@ -25,6 +25,11 @@ echo         buatan scripts\make_demo_zip.ps1 yang sudah menyertakan folder php\
 goto fail
 
 :php_ok
+rem PHP untuk Windows butuh Microsoft Visual C++ Runtime (vcruntime140.dll). Zip demo sudah
+rem menyertakannya di folder php\; bila tetap gagal, pasang VC_redist.x64.exe dari Microsoft.
+"%PHP_EXE%" -v >nul 2>&1
+if errorlevel 1 goto php_broken
+
 rem Worker/penjadwal sisa sesi sebelumnya dihentikan dulu agar tidak berjalan ganda
 call :stop_workers
 
@@ -51,18 +56,24 @@ echo  Tekan Ctrl+C untuk menghentikan.
 echo ====================================================
 echo.
 
-rem Batas unggah bawaan PHP hanya 2 MB, sedangkan aplikasi menerima berkas sampai 50 MB
 rem Saat demo, halaman galat tidak boleh menampilkan detail teknis ke perangkat lain di WiFi.
 rem Variabel lingkungan ini mengalahkan APP_DEBUG di .env tanpa mengubah berkasnya.
 set "APP_DEBUG=false"
-cd /d "%~dp0public"
-"%PHP_EXE%" -d upload_max_filesize=64M -d post_max_size=80M -d memory_limit=512M -d max_execution_time=120 -d max_file_uploads=30 -S 0.0.0.0:%DEMO_PORT% "%~dp0vendor\laravel\framework\src\Illuminate\Foundation\resources\server.php"
+rem Beberapa server aplikasi + gerbang pembagi beban (batas unggah 64 MB, OPcache bila tersedia)
+call "%~dp0scripts\demo_serve.bat" "%PHP_EXE%"
 
 echo.
 echo  Server berhenti. Menghentikan Penjadwal ^& Queue Worker...
 call :stop_workers
 pause
 goto end
+
+:php_broken
+echo [GAGAL] PHP ditemukan (%PHP_EXE%) tetapi tidak bisa dijalankan.
+echo         Biasanya karena laptop ini belum punya Microsoft Visual C++ Runtime.
+echo         Pasang "VC_redist.x64.exe" (Visual C++ 2015-2022, x64) dari situs resmi Microsoft:
+echo         https://aka.ms/vs/17/release/vc_redist.x64.exe  lalu jalankan start_demo.bat lagi.
+goto fail
 
 :fail
 echo.
