@@ -333,5 +333,6 @@
 
     </div>
 
+    @include('partials.sheet-fit', ['selector' => '.paper-container', 'toolbar' => '.topbar-wrapper'])
 </body>
 </html>

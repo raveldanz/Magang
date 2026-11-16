@@ -18,7 +18,7 @@
         <!-- Scripts & Styles -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-700 min-h-screen lg:h-screen lg:h-[100dvh] lg:overflow-hidden flex flex-col justify-between"
+    <body class="app-readable bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-700 min-h-screen lg:h-screen lg:h-[100dvh] lg:overflow-hidden flex flex-col justify-between"
           x-data="{ mobileMenuOpen: false, openQuotaModal: false }">
 
         @php

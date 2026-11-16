@@ -407,5 +407,6 @@
     </div>
     </div>
 
+    @include('partials.sheet-fit', ['selector' => '.paper-container'])
 </body>
 </html>

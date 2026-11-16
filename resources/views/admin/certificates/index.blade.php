@@ -84,7 +84,7 @@
                         <input type="hidden" name="tab" value="students">
                         <div class="relative flex-1 max-w-md">
                             <input type="text" name="search" value="{{ request('search') }}" 
-                                   placeholder="Cari nama peserta magang, NIM/NIS, atau universitas..."
+                                   placeholder="Cari nama peserta magang, NIM/NIS, atau kampus/sekolah..."
                                    class="w-full text-xs rounded-xl border-gray-200 pl-9 pr-4 py-2 focus:border-blue-600 focus:ring-blue-600">
                             <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         </div>
@@ -569,7 +569,7 @@
                                         'base' => $activeTheme->secondary_color ?? '#FF6700', 'medium' => '#ff8d38', 'light' => '#ffb37a'
                                     ];
                                 @endphp
-                                <div id="previewCard" class="relative w-full aspect-[297/210] bg-white border border-slate-300 rounded-xl overflow-hidden shadow-sm flex flex-col justify-between p-2 select-none text-[8px] leading-tight" style="font-family: 'Times New Roman', Times, serif;">
+                                <div id="previewCard" class="keep-size relative w-full aspect-[297/210] bg-white border border-slate-300 rounded-xl overflow-hidden shadow-sm flex flex-col justify-between p-2 select-none text-[8px] leading-tight" style="font-family: 'Times New Roman', Times, serif;">
                                     
                                     <!-- Dynamic SVG Vector Artwork -->
                                     <svg viewBox="0 0 297 210" class="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">

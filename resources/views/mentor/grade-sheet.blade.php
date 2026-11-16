@@ -109,5 +109,6 @@
             </div>
         </div>
     </div>
+    @include('partials.sheet-fit', ['selector' => '.paper'])
 </body>
 </html>

@@ -288,6 +288,17 @@
             padding-left: 8px;
         }
 
+        @media screen and (max-width: 860px) {
+            body {
+                padding: 8px 0;
+            }
+
+            .no-print {
+                margin: 0 8px 10px 8px;
+                padding: 10px 12px;
+            }
+        }
+
         @media print {
             body {
                 background-color: #ffffff;
@@ -618,5 +629,6 @@
 
     </div>
 
+    @include('partials.sheet-fit', ['selector' => '.page-container', 'toolbar' => '.no-print'])
 </body>
 </html>

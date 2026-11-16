@@ -138,3 +138,18 @@
         background-color: #94a3b8;
     }
 }
+
+/* ==========================================================================
+   Keterbacaan (pengguna senior & layar HP): huruf tampilan minimal 11px.
+   Hanya untuk layout layar (kelas app-readable di <body>), bukan sertifikat
+   atau surat cetak yang ukurannya diatur untuk kertas A4.
+   ========================================================================== */
+.app-readable .text-\[8px\]:not(.keep-size *),
+.app-readable .text-\[8\.5px\]:not(.keep-size *),
+.app-readable .text-\[9px\]:not(.keep-size *),
+.app-readable .text-\[9\.5px\]:not(.keep-size *),
+.app-readable .text-\[10px\]:not(.keep-size *),
+.app-readable .text-\[10\.5px\]:not(.keep-size *) {
+    font-size: 11px !important;
+    line-height: 1.35;
+}
