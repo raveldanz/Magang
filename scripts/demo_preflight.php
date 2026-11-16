@@ -227,6 +227,12 @@ if (! $checkOnly && ! $errors) {
     }
     $say('DB', $fresh ? 'Database baru dibuat dan diisi data demo.' : 'Skema database sudah terbaru.');
 
+    // Master sekolah SMA/SMK/MA (pilihan "Sekolah" di profil peserta); aman diulang, tidak menggandakan
+    [$code, $out] = $artisan('universities:sync-master --only-schools');
+    $code === 0
+        ? $say('SEKOLAH', 'Daftar sekolah (SMA/SMK/MA) siap dipilih di profil peserta.')
+        : $warnings[] = 'Impor daftar sekolah gagal; pilihan sekolah di profil peserta bisa kosong:'.PHP_EOL.$out;
+
     // 5. Tautan public/storage (junction Windows tidak ikut ter-zip dengan benar) -----------
     $link = $base.'/public/storage';
     $target = realpath($base.'/storage/app/public');

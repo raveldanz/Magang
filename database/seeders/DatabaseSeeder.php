@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             SurabayaAndTopUniversitiesSeeder::class,
+            MasterSchoolsSeeder::class,
             SurabayaAgenciesSeeder::class,
             DemoE2ESeeder::class,
             AdminWorkflowSeeder::class,

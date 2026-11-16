@@ -7,9 +7,19 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
+/**
+ * Master institusi asal peserta magang:
+ *  - database/data/master_universities.json : perguruan tinggi (institution_type = perguruan_tinggi)
+ *  - database/data/master_schools.json      : SMA/SMK/MA dari Data Referensi Kemendikdasmen
+ *    (institution_type = sekolah; diperbarui manual lewat scripts/fetch_master_schools.php)
+ */
 class MasterUniversityService
 {
     protected ?array $masterData = null;
+
+    protected ?array $schoolData = null;
+
+    public function __construct(private UniversityResolver $resolver) {}
 
     /**
      * Path ke dataset Master Perguruan Tinggi Indonesia
@@ -19,6 +29,11 @@ class MasterUniversityService
         return database_path('data/master_universities.json');
     }
 
+    protected function getSchoolDatasetPath(): string
+    {
+        return database_path('data/master_schools.json');
+    }
+
     /**
      * Muat seluruh data master perguruan tinggi
      *
@@ -26,37 +41,50 @@ class MasterUniversityService
      */
     public function allMaster(): array
     {
-        if ($this->masterData !== null) {
-            return $this->masterData;
-        }
-
-        $path = $this->getDatasetPath();
-        if (File::exists($path)) {
-            $json = File::get($path);
-            $decoded = json_decode($json, true);
-            $this->masterData = is_array($decoded) ? $decoded : [];
-        } else {
-            $this->masterData = [];
-        }
-
-        return $this->masterData;
+        return $this->masterData ??= $this->loadJson($this->getDatasetPath());
     }
 
     /**
-     * Pencarian cerdas Master Perguruan Tinggi berdasarkan nama, akronim, atau kota
+     * Muat seluruh data master sekolah menengah (SMA/SMK/MA).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function allSchools(): array
+    {
+        return $this->schoolData ??= $this->loadJson($this->getSchoolDatasetPath());
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    protected function loadJson(string $path): array
+    {
+        if (! File::exists($path)) {
+            return [];
+        }
+
+        $decoded = json_decode(File::get($path), true);
+
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Pencarian cerdas kampus dan sekolah berdasarkan nama, akronim/nama resmi, NPSN, atau kode.
+     * Setiap hasil membawa 'institution_type' (perguruan_tinggi | sekolah).
      */
     public function search(string $keyword, int $limit = 25): Collection
     {
         $keyword = trim($keyword);
         if ($keyword === '') {
-            return collect($this->allMaster())->take($limit);
+            return collect($this->allMaster())
+                ->map(fn ($item) => $item + ['institution_type' => University::TYPE_COLLEGE])
+                ->take($limit);
         }
 
         $normKey = $this->normalize($keyword);
-        $masterList = $this->allMaster();
         $like = DB::getDriverName() === 'pgsql' ? 'ilike' : 'like';
 
-        // 1. Ambil universitas yang sudah terdaftar di database lokal terlebih dahulu
+        // 1. Ambil institusi yang sudah terdaftar di database lokal terlebih dahulu
         $dbUnivs = University::query()
             ->where('is_verified', true)
             ->where(function ($q) use ($keyword, $like) {
@@ -71,8 +99,7 @@ class MasterUniversityService
         $seenKeys = [];
 
         foreach ($dbUnivs as $univ) {
-            $key = $this->normalize($univ->name);
-            $seenKeys[$key] = true;
+            $seenKeys[$this->normalize($univ->name)] = true;
             $results->push([
                 'id' => $univ->id,
                 'name' => $univ->name,
@@ -80,58 +107,30 @@ class MasterUniversityService
                 'acronym' => $univ->acronym ?: $univ->code,
                 'city' => $univ->city ?? 'Indonesia',
                 'province' => $univ->province ?? 'Indonesia',
-                'type' => str_contains(strtolower($univ->name), 'negeri') ? 'PTN' : 'PTS',
+                'type' => $univ->isSchool()
+                    ? (str_contains(strtolower($univ->name), 'negeri') ? 'NEGERI' : 'SWASTA')
+                    : (str_contains(strtolower($univ->name), 'negeri') ? 'PTN' : 'PTS'),
+                'institution_type' => $univ->institution_type ?? University::TYPE_COLLEGE,
                 'is_in_db' => true,
             ]);
         }
 
-        // 2. Cari dari Master Dataset PDDikti / Kemdikbud
+        // 2. Cari dari master dataset perguruan tinggi dan sekolah
         $scored = [];
-        foreach ($masterList as $item) {
-            $name = $item['name'] ?? '';
-            $acronym = $item['acronym'] ?? ($item['code'] ?? '');
-            $cleanKey = $this->normalize($name);
-
-            if (isset($seenKeys[$cleanKey])) {
-                continue;
-            }
-
-            $score = 0;
-            $normName = $this->normalize($name);
-            $normAcr = $this->normalize($acronym);
-
-            // Exact acronym match (misal cari "UNESA" atau "ITS")
-            if ($normAcr === $normKey) {
-                $score = 100;
-            } elseif (str_starts_with($normAcr, $normKey)) {
-                $score = 80;
-            } elseif ($normName === $normKey) {
-                $score = 90;
-            } elseif (str_contains($normName, $normKey)) {
-                $score = 70;
-            } else {
-                // Token matching
-                $tokens = explode(' ', $normKey);
-                $allMatched = true;
-                foreach ($tokens as $t) {
-                    if (! str_contains($normName, $t) && ! str_contains($normAcr, $t)) {
-                        $allMatched = false;
-                        break;
-                    }
-                }
-                if ($allMatched) {
-                    $score = 60;
-                }
-            }
-
+        foreach ($this->allMaster() as $item) {
+            $score = $this->score($normKey, [$item['name'] ?? ''], [$item['acronym'] ?? ($item['code'] ?? '')]);
             if ($score > 0) {
-                $scored[] = [
-                    'score' => $score,
-                    'item' => array_merge($item, [
-                        'id' => null,
-                        'is_in_db' => false,
-                    ]),
-                ];
+                $scored[] = ['score' => $score, 'item' => array_merge($item, [
+                    'id' => null,
+                    'institution_type' => University::TYPE_COLLEGE,
+                    'is_in_db' => false,
+                ])];
+            }
+        }
+        foreach ($this->allSchools() as $school) {
+            $score = $this->score($normKey, [$school['name'] ?? '', $school['official_name'] ?? ''], [$school['npsn'] ?? '']);
+            if ($score > 0) {
+                $scored[] = ['score' => $score, 'item' => $this->schoolItem($school)];
             }
         }
 
@@ -152,47 +151,213 @@ class MasterUniversityService
     }
 
     /**
-     * Resolve data master terpilih ke Model University resmi di database
+     * Skor kecocokan kata kunci terhadap nama-nama dan kode-kode sebuah entri master (0 = tidak cocok).
+     *
+     * @param  array<int, string>  $names
+     * @param  array<int, string>  $codes
+     */
+    protected function score(string $normKey, array $names, array $codes): int
+    {
+        $normNames = array_values(array_filter(array_map(fn ($n) => $this->normalize($n), $names)));
+        $normCodes = array_values(array_filter(array_map(fn ($c) => $this->normalize($c), $codes)));
+
+        foreach ($normCodes as $code) {
+            if ($code === $normKey) {
+                return 100;
+            }
+        }
+        if (in_array($normKey, $normNames, true)) {
+            return 90;
+        }
+        foreach ($normCodes as $code) {
+            if (str_starts_with($code, $normKey)) {
+                return 80;
+            }
+        }
+        foreach ($normNames as $name) {
+            if (str_contains($name, $normKey)) {
+                return 70;
+            }
+        }
+
+        // Semua kata kunci muncul di salah satu nama/kode
+        $haystack = implode(' ', array_merge($normNames, $normCodes));
+        foreach (explode(' ', $normKey) as $token) {
+            if ($token !== '' && ! str_contains($haystack, $token)) {
+                return 0;
+            }
+        }
+
+        return 60;
+    }
+
+    /**
+     * @param  array<string, mixed>  $school
+     * @return array<string, mixed>
+     */
+    protected function schoolItem(array $school): array
+    {
+        return [
+            'id' => null,
+            'name' => $school['name'] ?? '',
+            'code' => $school['npsn'] ?? null,
+            'acronym' => $school['official_name'] ?? null,
+            'npsn' => $school['npsn'] ?? null,
+            'official_name' => $school['official_name'] ?? null,
+            'form' => $school['form'] ?? null,
+            'address' => $school['address'] ?? null,
+            'city' => $school['city'] ?? 'Indonesia',
+            'province' => $school['province'] ?? 'Indonesia',
+            'type' => $school['status'] ?? null,
+            'institution_type' => University::TYPE_SCHOOL,
+            'is_in_db' => false,
+        ];
+    }
+
+    /**
+     * Resolve data master terpilih (kampus atau sekolah) ke Model University resmi di database
      *
      * @param  array<string, mixed>  $masterItem
      */
     public function resolveToUniversity(array $masterItem): University
     {
-        $name = trim($masterItem['name'] ?? '');
-        $code = trim($masterItem['code'] ?? ($masterItem['acronym'] ?? 'UNIV'));
-        $acronym = trim($masterItem['acronym'] ?? $code);
-        $city = trim($masterItem['city'] ?? 'Indonesia');
-        $province = trim($masterItem['province'] ?? 'Indonesia');
+        if (($masterItem['institution_type'] ?? null) === University::TYPE_SCHOOL || ! empty($masterItem['npsn'])) {
+            return $this->upsertSchool($masterItem)['university'];
+        }
 
-        // Cari apakah sudah ada di database
-        $existing = University::whereRaw('LOWER(name) = ?', [strtolower($name)])
-            ->orWhere(function ($q) use ($code) {
-                $q->whereNotNull('code')->where('code', $code);
-            })
+        return $this->upsertCollege($masterItem, false)['university'];
+    }
+
+    /**
+     * Impor seluruh master perguruan tinggi.
+     *
+     * @return array{created: int, updated: int}
+     */
+    public function syncColleges(): array
+    {
+        $counts = ['created' => 0, 'updated' => 0];
+        DB::transaction(function () use (&$counts) {
+            foreach ($this->allMaster() as $item) {
+                if (trim($item['name'] ?? '') === '') {
+                    continue;
+                }
+                $result = $this->upsertCollege($item, true);
+                $counts[$result['created'] ? 'created' : 'updated']++;
+            }
+        });
+
+        return $counts;
+    }
+
+    /**
+     * Impor seluruh master sekolah (aman dijalankan berulang: dicocokkan lewat NPSN dan nama).
+     *
+     * @return array{created: int, updated: int}
+     */
+    public function syncSchools(): array
+    {
+        $counts = ['created' => 0, 'updated' => 0];
+        DB::transaction(function () use (&$counts) {
+            foreach ($this->allSchools() as $school) {
+                if (trim($school['name'] ?? '') === '' || trim($school['npsn'] ?? '') === '') {
+                    continue;
+                }
+                $result = $this->upsertSchool($this->schoolItem($school));
+                $counts[$result['created'] ? 'created' : 'updated']++;
+            }
+        });
+
+        return $counts;
+    }
+
+    /**
+     * @param  array<string, mixed>  $item
+     * @return array{university: University, created: bool}
+     */
+    protected function upsertCollege(array $item, bool $fillAcronym): array
+    {
+        $name = trim($item['name'] ?? '');
+        $code = trim($item['code'] ?? ($item['acronym'] ?? 'UNIV'));
+        $acronym = trim($item['acronym'] ?? $code);
+        $city = trim($item['city'] ?? 'Indonesia');
+        $province = trim($item['province'] ?? 'Indonesia');
+
+        $existing = University::whereRaw('LOWER(name) = ?', [mb_strtolower($name)])
+            ->orWhere(fn ($q) => $q->whereNotNull('code')->where('code', $code))
             ->first();
 
         if ($existing) {
-            if (! $existing->is_verified) {
-                $existing->update(['is_verified' => true, 'status' => 'active']);
+            $changes = ['is_verified' => true, 'status' => 'active'];
+            if ($fillAcronym && ! $existing->acronym) {
+                $changes['acronym'] = $acronym;
             }
+            $existing->update($changes);
 
-            return $existing;
+            return ['university' => $existing, 'created' => false];
         }
 
-        return University::create([
+        return ['university' => University::create([
             'name' => $name,
             'code' => $code,
             'acronym' => $acronym,
             'address' => $city.', '.$province,
-            'city' => $city,
-            'province' => $province,
             'is_verified' => true,
             'status' => 'active',
+            'institution_type' => University::TYPE_COLLEGE,
             'evaluation_scheme' => 'mentor_only',
             'weight_mentor' => 100,
             'weight_lecturer' => 0,
             'require_dpl' => false,
-        ]);
+        ]), 'created' => true];
+    }
+
+    /**
+     * Sekolah: cocokkan lewat NPSN (kode), lalu nama panjang / nama resmi Dapodik (tanpa LIKE),
+     * agar sekolah yang sebelumnya diketik manual oleh peserta ikut terverifikasi, bukan digandakan.
+     *
+     * @param  array<string, mixed>  $item
+     * @return array{university: University, created: bool}
+     */
+    protected function upsertSchool(array $item): array
+    {
+        $name = trim($item['name'] ?? '');
+        $npsn = trim((string) ($item['npsn'] ?? $item['code'] ?? ''));
+        $official = trim((string) ($item['official_name'] ?? $item['acronym'] ?? ''));
+        $address = collect([$item['address'] ?? null, $item['city'] ?? null, $item['province'] ?? null])
+            ->filter(fn ($part) => trim((string) $part) !== '')
+            ->implode(', ');
+
+        $existing = ($npsn !== '' ? University::where('code', $npsn)->first() : null)
+            ?? $this->resolver->findExact($name)
+            ?? ($official !== '' ? $this->resolver->findExact($official) : null)
+            ?? University::whereRaw('LOWER(name) = ?', [mb_strtolower($name)])->first();
+
+        if ($existing) {
+            $existing->update(array_filter([
+                'institution_type' => University::TYPE_SCHOOL,
+                'is_verified' => true,
+                'status' => 'active',
+                'code' => $existing->code ?: ($npsn ?: null),
+                'acronym' => $existing->acronym ?: ($official ?: null),
+                'address' => $existing->address ?: ($address ?: null),
+            ], fn ($value) => $value !== null));
+
+            return ['university' => $existing, 'created' => false];
+        }
+
+        return ['university' => University::create([
+            'name' => $name,
+            'code' => $npsn ?: null,
+            'acronym' => $official ?: null,
+            'address' => $address ?: null,
+            'is_verified' => true,
+            'status' => 'active',
+            'institution_type' => University::TYPE_SCHOOL,
+            'evaluation_scheme' => 'mentor_only',
+            'weight_mentor' => 100,
+            'weight_lecturer' => 0,
+            'require_dpl' => false,
+        ]), 'created' => true];
     }
 
     /**
