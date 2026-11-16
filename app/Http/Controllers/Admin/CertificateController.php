@@ -23,6 +23,9 @@ use Illuminate\Support\Str;
 
 class CertificateController extends Controller
 {
+    /** Warna tema masuk ke CSS sertifikat, jadi hanya kode heksadesimal yang diterima. */
+    private const HEX_COLOR_RULE = 'regex:/^#(?:[0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/';
+
     // Menampilkan daftar mahasiswa yang siap cetak sertifikat (Multi-Tenant Scoped)
     public function index()
     {
@@ -417,9 +420,9 @@ class CertificateController extends Controller
             $validated = $request->validate([
                 'year' => 'required|integer|min:2020|max:2099',
                 'theme_name' => 'required|string|max:255',
-                'primary_color' => 'required|string|max:20',
-                'secondary_color' => 'required|string|max:20',
-                'accent_color' => 'required|string|max:20',
+                'primary_color' => ['required', 'string', 'max:20', self::HEX_COLOR_RULE],
+                'secondary_color' => ['required', 'string', 'max:20', self::HEX_COLOR_RULE],
+                'accent_color' => ['required', 'string', 'max:20', self::HEX_COLOR_RULE],
                 'is_active' => 'nullable',
             ]);
 
@@ -469,9 +472,9 @@ class CertificateController extends Controller
         $validated = $request->validate([
             'year' => 'required|integer|min:2020|max:2099',
             'theme_name' => 'required|string|max:255',
-            'primary_color' => 'required|string|max:20',
-            'secondary_color' => 'required|string|max:20',
-            'accent_color' => 'required|string|max:20',
+            'primary_color' => ['required', 'string', 'max:20', self::HEX_COLOR_RULE],
+            'secondary_color' => ['required', 'string', 'max:20', self::HEX_COLOR_RULE],
+            'accent_color' => ['required', 'string', 'max:20', self::HEX_COLOR_RULE],
             'number_format_pattern' => 'required|string|max:255',
             'signee_name' => 'required|string|max:255',
             'signee_position' => 'required|string|max:255',

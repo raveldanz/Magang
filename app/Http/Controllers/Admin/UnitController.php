@@ -116,6 +116,12 @@ class UnitController extends Controller
 
         $agencyId = $userAgencyId ?? ($request->agency_profile_id ?? AgencyProfile::first()?->id);
 
+        // Klik ganda pada tombol simpan (atau salah ketik) tidak boleh menghasilkan dua bidang bernama sama.
+        if ($this->unitNameTaken((string) $request->name, $agencyId)) {
+            return redirect()->back()->withInput()
+                ->withErrors(['name' => 'Bidang / divisi dengan nama ini sudah ada pada instansi yang sama.']);
+        }
+
         $unit = Unit::create([
             'name' => $request->name,
             'description' => $request->description,
@@ -288,6 +294,11 @@ class UnitController extends Controller
             'quota.min' => "Kuota tidak boleh kurang dari jumlah mahasiswa yang sedang menempati divisi ini ({$occupied} orang).",
         ]);
 
+        if ($this->unitNameTaken((string) $request->name, $unit->agency_profile_id, $unit->id)) {
+            return redirect()->back()->withInput()
+                ->withErrors(['name' => 'Bidang / divisi dengan nama ini sudah ada pada instansi yang sama.']);
+        }
+
         $updateData = [
             'name' => $request->name,
             'description' => $request->description,
@@ -444,5 +455,13 @@ class UnitController extends Controller
         }
 
         return redirect()->back()->with('success', $successMsg);
+    }
+
+    private function unitNameTaken(string $name, $agencyId, ?int $exceptId = null): bool
+    {
+        return Unit::where('agency_profile_id', $agencyId)
+            ->whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($name))])
+            ->when($exceptId, fn ($q) => $q->whereKeyNot($exceptId))
+            ->exists();
     }
 }

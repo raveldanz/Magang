@@ -49,6 +49,12 @@ class UserController extends Controller
             return false;
         }
 
+        // Akun Atasan (Supervisor) adalah pengesah akhir Double ACC. Bila Admin Dinas/Bidang bisa mereset
+        // password, mengubah peran, atau menghapusnya, pengesahan itu bisa dilompati. Hanya Super Admin.
+        if ($target->role === 'supervisor') {
+            return false;
+        }
+
         // Akun pihak kampus (dosen/DPL & admin universitas) hanya dikelola Super Admin
         if (in_array($target->role, self::CAMPUS_ROLES, true)) {
             return false;

@@ -175,7 +175,7 @@
                                         <option value="">-- Tetapkan Nanti atau Tetap Saat Ini --</option>
                                         @if(isset($pembimbings))
                                             @foreach($pembimbings as $pmb)
-                                                <option value="{{ $pmb->id }}">{{ $pmb->name }} - {{ $pmb->unit->name ?? 'Bidang Kerja' }}</option>
+                                                <option value="{{ $pmb->id }}">{{ $pmb->name }} ({{ $pmb->email }}) - {{ $pmb->unit->name ?? 'Bidang Kerja' }}</option>
                                             @endforeach
                                         @endif
                                     </select>
@@ -811,11 +811,19 @@
                                 }
                             }
 
-                            $mentorItems = $filteredPembimbings->map(function ($m) {
+                            // Beberapa mentor bisa bernama sama persis; email ditempelkan agar pilihan tetap bisa dibedakan
+                            // baik di daftar maupun setelah dipilih.
+                            $duplicateMentorNames = $pembimbings->groupBy(fn ($m) => mb_strtolower(trim((string) $m->name)))
+                                ->filter(fn ($group) => $group->count() > 1)->keys()->all();
+                            $mentorLabel = fn ($m) => in_array(mb_strtolower(trim((string) $m->name)), $duplicateMentorNames, true)
+                                ? $m->name.' ('.$m->email.')'
+                                : $m->name;
+
+                            $mentorItems = $filteredPembimbings->map(function ($m) use ($mentorLabel) {
                                 $unitName = $m->unit?->name;
                                 return [
                                     'id' => $m->id,
-                                    'name' => $m->name,
+                                    'name' => $mentorLabel($m),
                                     'acronym' => 'Mentor',
                                     'meta' => ($unitName ? $unitName . ' • ' : '') . $m->email . ($m->phone ? ' • ' . $m->phone : ''),
                                 ];

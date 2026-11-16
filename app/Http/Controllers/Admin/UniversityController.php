@@ -609,6 +609,16 @@ class UniversityController extends Controller
                 ->orWhere('university', $university->name)
                 ->orWhereHas('studentProfile', fn ($sp) => $sp->where('university_id', $university->id)->orWhereRaw('LOWER(universitas) = ?', [mb_strtolower($university->name)]));
         })
+            // Admin Dinas hanya mengekspor mahasiswa yang magang di instansinya; Admin Bidang hanya bidangnya.
+            ->when(! $this->currentUserIsSuperAdmin(), function ($query) {
+                $current = Auth::user();
+                $query->whereHas('unit', function ($uq) use ($current) {
+                    $uq->where('agency_profile_id', $current->agency_profile_id);
+                    if ($current->unit_id) {
+                        $uq->whereKey($current->unit_id);
+                    }
+                });
+            })
             ->latest()
             ->get();
 
