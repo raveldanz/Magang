@@ -21,24 +21,28 @@ class CertificateTheme extends Model
      */
     public static function getActive(?int $year = null): self
     {
-        if ($year) {
-            $theme = self::where('year', $year)->first();
-            if ($theme) {
-                return $theme;
+        try {
+            if ($year) {
+                $theme = self::where('year', $year)->first();
+                if ($theme) {
+                    return $theme;
+                }
             }
+
+            $active = self::where('is_active', true)->orderByDesc('year')->first();
+            if ($active) {
+                return $active;
+            }
+
+            $latest = self::latest('id')->first();
+            if ($latest) {
+                return $latest;
+            }
+        } catch (\Throwable $e) {
+            // Graceful fallback jika tabel belum ada atau koneksi database terkendala
         }
 
-        $active = self::where('is_active', true)->orderByDesc('year')->first();
-        if ($active) {
-            return $active;
-        }
-
-        $latest = self::latest('id')->first();
-        if ($latest) {
-            return $latest;
-        }
-
-        // Fallback default jika tabel kosong
+        // Fallback default jika tabel kosong atau belum tersedia
         return new self([
             'year' => 2026,
             'theme_name' => 'Tema Resmi Dispusip 2026 — Cyan & Orange',

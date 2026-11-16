@@ -107,7 +107,7 @@
         @if (Route::has('register'))
             <div class="mt-6 pt-5 border-t border-slate-100 text-center">
                 <p class="text-xs text-slate-500">
-                    Belum punya akun pendaftaran magang?
+                    Belum punya akun?
                     <a href="{{ route('register') }}" class="font-bold text-blue-600 hover:text-blue-800 ml-1">
                         Daftar sekarang
                     </a>

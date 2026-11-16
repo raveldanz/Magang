@@ -3,7 +3,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h2 class="font-bold text-xl sm:text-2xl text-slate-900 leading-tight">
-                    Portal Dosen Pembimbing
+                    Portal Pembimbing
                 </h2>
             </div>
             
@@ -35,7 +35,7 @@
                 <div class="bg-white rounded-2xl p-5 shadow-xs space-y-4">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-2">
                         <div class="flex items-center gap-2">
-                            <h3 class="text-sm font-bold text-slate-900">Perlu Tindakan Dosen <span class="sr-only">Smart Action Center</span></h3>
+                            <h3 class="text-sm font-bold text-slate-900">Perlu Tindakan Pembimbing <span class="sr-only">Smart Action Center</span></h3>
                             <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800">Prioritas</span>
                         </div>
                     </div>
@@ -162,7 +162,7 @@
                         <span class="text-xs font-medium text-slate-500 uppercase tracking-wider block">Laporan ACC</span>
                         <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{{ $stats['total_reports_approved'] }}</div>
                     </div>
-                    <span class="text-xs text-slate-600 mt-2 block">Disetujui Mentor atau Dosen Pembimbing</span>
+                    <span class="text-xs text-slate-600 mt-2 block">Disetujui Mentor atau Pembimbing</span>
                 </div>
 
                 <!-- Belum Dinilai -->
@@ -313,7 +313,7 @@
                                             @endif
                                         @else
                                             @if($hasEval)
-                                                <span class="text-blue-700 font-bold bg-blue-50 px-2.5 py-0.5 rounded-md">Nilai Dosen Pembimbing: {{ number_format($eval->nilai_dosen_calculated, 1) }}</span>
+                                                <span class="text-blue-700 font-bold bg-blue-50 px-2.5 py-0.5 rounded-md">Nilai Pembimbing: {{ number_format($eval->nilai_dosen_calculated, 1) }}</span>
                                             @else
                                                 <span class="text-amber-700 font-semibold bg-amber-50 px-2.5 py-0.5 rounded-md">Belum Dinilai</span>
                                             @endif
@@ -459,11 +459,11 @@
                                                     @endif
 
                                                     @if($hasEval)
-                                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700" title="Nilai Akademik Dosen Pembimbing Kampus">
-                                                            Dosen Pembimbing: {{ number_format($eval->nilai_dosen_calculated, 1) }}
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700" title="Nilai Akademik Pembimbing">
+                                                            Pembimbing: {{ number_format($eval->nilai_dosen_calculated, 1) }}
                                                         </span>
                                                     @else
-                                                        <a href="{{ route('lecturer.evaluations.create', $p->id) }}" class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-50 text-rose-700 hover:bg-rose-100 transition" title="Dosen Pembimbing belum mengisi nilai">
+                                                        <a href="{{ route('lecturer.evaluations.create', $p->id) }}" class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-50 text-rose-700 hover:bg-rose-100 transition" title="Pembimbing belum mengisi nilai">
                                                             Nilai
                                                         </a>
                                                     @endif

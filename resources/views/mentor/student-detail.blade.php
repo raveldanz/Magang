@@ -171,7 +171,7 @@
                         <dd class="font-semibold text-slate-900 mt-0.5">{{ $mentor->name ?? 'Belum ditunjuk' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-sm text-slate-700 font-semibold">Dosen Pembimbing (Kampus)</dt>
+                        <dt class="text-sm text-slate-700 font-semibold">Pembimbing Kampus/Sekolah</dt>
                         <dd class="font-semibold text-slate-900 mt-0.5">{{ $academicAdvisor->name ?? 'Belum Ditugaskan' }}</dd>
                     </div>
                     <div>
@@ -241,7 +241,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                         <h3 id="judul-nilai" class="text-xl font-bold text-slate-900">Langkah 3 &mdash; Nilai Akhir</h3>
-                        <p class="text-base text-slate-700 mt-0.5">Nilai dari Anda dan dari dosen pembimbing kampus.</p>
+                        <p class="text-base text-slate-700 mt-0.5">Nilai dari Anda dan dari pembimbing kampus/sekolah.</p>
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
@@ -303,7 +303,7 @@
                     </div>
 
                     <div class="p-4 sm:p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-                        <span class="text-base font-bold text-slate-900 block">Nilai dari Dosen Pembimbing (Kampus)</span>
+                        <span class="text-base font-bold text-slate-900 block">Nilai dari Pembimbing Kampus/Sekolah</span>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             @forelse ($eval?->dosen_aspects_list ?? [] as $dAspect)
                                 <div class="p-3 bg-white rounded-xl border border-slate-200">
@@ -312,7 +312,7 @@
                                 </div>
                             @empty
                                 <div class="sm:col-span-3 p-3 bg-white rounded-xl text-slate-700 text-base">
-                                    Dosen pembimbing belum mengisi nilai.
+                                    Pembimbing kampus/sekolah belum mengisi nilai.
                                 </div>
                             @endforelse
                         </div>

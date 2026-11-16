@@ -51,7 +51,7 @@
                             <a href="{{ route('lecturer.logbooks.index', array_merge(request()->except('status'), ['status' => 'mentor_approved'])) }}"
                                class="flex-1 sm:flex-initial min-h-[44px] py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ $currStatus === 'mentor_approved' ? 'border-emerald-600 text-emerald-700 font-bold' : 'border-transparent text-emerald-700 hover:text-emerald-800 hover:border-emerald-300 font-semibold' }}">
                                 <span class="sm:hidden">Siap Setujui</span>
-                                <span class="hidden sm:inline">Siap Disetujui Dosen Pembimbing</span>
+                                <span class="hidden sm:inline">Siap Disetujui Pembimbing</span>
                                 <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $currStatus === 'mentor_approved' ? 'bg-emerald-200 text-emerald-800' : 'bg-emerald-100 text-emerald-700' }}">{{ $mentorApprovedPendingCount }}</span>
                             </a>
                         @endif
@@ -120,7 +120,7 @@
                                 </span>
                             </div>
                             <p class="text-xs text-emerald-900 mt-1">
-                                Seluruh entri ini telah diverifikasi oleh Mentor Instansi terkait dan menunggu validasi Dosen Pembimbing kampus. Anda dapat menyetujui seluruhnya secara instan.
+                                Seluruh entri ini telah diverifikasi oleh Mentor Instansi terkait dan menunggu validasi Pembimbing kampus. Anda dapat menyetujui seluruhnya secara instan.
                             </p>
                         </div>
                     </div>
@@ -133,7 +133,7 @@
                                 @click="$dispatch('open-confirm-modal', {
                                     form: $el.closest('form'),
                                     title: 'Setujui Semua Logbook Terverifikasi Mentor?',
-                                    message: 'Seluruh {{ $mentorApprovedPendingCount }} logbook yang telah disetujui mentor instansi pada daftar ini akan langsung disetujui oleh Dosen Pembimbing.',
+                                    message: 'Seluruh {{ $mentorApprovedPendingCount }} logbook yang telah disetujui mentor instansi pada daftar ini akan langsung disetujui oleh Pembimbing.',
                                     label: 'Jumlah entri:',
                                     name: '{{ $mentorApprovedPendingCount }} Logbook',
                                     confirmText: 'Ya, Setujui Semua',

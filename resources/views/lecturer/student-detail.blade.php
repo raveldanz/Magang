@@ -274,7 +274,7 @@
                     <!-- 4. Skema Evaluasi Kampus -->
                     <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50/70 border border-slate-100 min-w-0">
                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Skema Penilaian</span>
-                        <div class="font-bold text-slate-900 truncate mt-1">{{ $isMentorOnly ? '100% Mentor Dinas' : 'Dosen Pembimbing + Mentor Dinas' }}</div>
+                        <div class="font-bold text-slate-900 truncate mt-1">{{ $isMentorOnly ? '100% Mentor Dinas' : 'Pembimbing + Mentor Dinas' }}</div>
                         <div class="text-[11px] text-slate-500 truncate mt-0.5" title="{{ $univ->name ?? '-' }}">{{ $univ->name ?? 'Kampus Mitra' }}</div>
                     </div>
                 </div>
@@ -398,11 +398,11 @@
                     </button>
 
                     @if (!$isMentorOnly)
-                        <!-- 4. Nilai DPL (Hanya untuk skema evaluasi ganda) -->
+                        <!-- 4. Nilai Pembimbing (Hanya untuk skema evaluasi ganda) -->
                         <button type="button" @click="activeTab = 'evaluasi'"
                                 class="p-3 sm:p-3.5 rounded-xl border transition text-left cursor-pointer group {{ $readyLecturerScore ? 'bg-emerald-50/50 border-emerald-200/80 hover:bg-emerald-50' : 'bg-blue-50/40 border-blue-200/80 hover:bg-blue-50/70' }}">
                             <div class="flex items-center justify-between gap-1">
-                                <span class="text-xs font-semibold text-slate-600 group-hover:text-slate-800 transition">4. Nilai Dosen Pembimbing</span>
+                                <span class="text-xs font-semibold text-slate-600 group-hover:text-slate-800 transition">4. Nilai Pembimbing</span>
                                 @if($readyLecturerScore)
                                     <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                                 @else
@@ -413,7 +413,7 @@
                                 @if($hasEval)
                                     Skor: {{ rtrim(rtrim(number_format($eval->nilai_dosen_calculated ?? ($eval->nilai_akademik ?? 0), 2), '0'), '.') }}
                                 @else
-                                    Siap Diinput Dosen Pembimbing
+                                    Siap Diinput Pembimbing
                                 @endif
                             </div>
                         </button>
@@ -501,11 +501,11 @@
 
                     <!-- Komparasi Nilai (Clean Soft Gray Cards - No Outlines) -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Nilai DPL -->
+                        <!-- Nilai Pembimbing -->
                         <div class="p-5 bg-slate-50 rounded-2xl space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                    Nilai Dosen Pembimbing
+                                    Nilai Pembimbing
                                 </span>
                                 @if (!$isMentorOnly && ($eval?->nilai_dosen_calculated ?? 0) > 0)
                                     <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-blue-100 text-blue-800">
@@ -518,7 +518,7 @@
                                 <div class="p-3 bg-white rounded-xl shadow-2xs space-y-1">
                                     <p class="text-xs font-semibold text-slate-700">Kebijakan Kampus: 100% Penilaian Mentor Dinas</p>
                                     <p class="text-xs text-slate-600 leading-relaxed">
-                                        Perguruan tinggi menetapkan bahwa seluruh nilai angka (100%) diberikan oleh Mentor Lapangan di instansi. Dosen Pembimbing mendampingi mahasiswa, menyetujui logbook, mereview laporan akhir, dan memberikan catatan evaluasi akhir.
+                                        Perguruan tinggi menetapkan bahwa seluruh nilai angka (100%) diberikan oleh Mentor Lapangan di instansi. Pembimbing mendampingi mahasiswa, menyetujui logbook, mereview laporan akhir, dan memberikan catatan evaluasi akhir.
                                     </p>
                                 </div>
                             @else
@@ -530,7 +530,7 @@
                                         </div>
                                     @empty
                                         <div class="col-span-2 sm:col-span-3 p-3 bg-white rounded-xl text-slate-600 text-xs">
-                                            Belum ada nilai bimbingan akademik Dosen Pembimbing.
+                                            Belum ada nilai bimbingan akademik Pembimbing.
                                         </div>
                                     @endforelse
                                 </div>
@@ -593,16 +593,16 @@
 
                     @if ($eval?->feedback_dosen ?? $eval?->catatan_dosen)
                         <div class="p-4 bg-slate-50 rounded-xl text-xs text-slate-700">
-                            <strong>Catatan Dosen:</strong> "{{ $eval->feedback_dosen ?? $eval->catatan_dosen }}"
+                            <strong>Catatan Pembimbing:</strong> "{{ $eval->feedback_dosen ?? $eval->catatan_dosen }}"
                         </div>
                     @endif
                 </div>
 
-                <!-- 5. Catatan Internal Pribadi Dosen (Private Notes) -->
+                <!-- 5. Catatan Internal Pribadi Pembimbing (Private Notes) -->
                 <div class="bg-white rounded-2xl p-6 shadow-xs space-y-3">
                     <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                         <div>
-                            <h4 class="font-bold text-sm text-slate-900">Catatan Pribadi Dosen Pembimbing</h4>
+                            <h4 class="font-bold text-sm text-slate-900">Catatan Pribadi Pembimbing</h4>
                             <span class="text-[11px] text-slate-500">Catatan ini bersifat internal untuk arsip Anda dan tidak dapat dilihat oleh mahasiswa.</span>
                         </div>
                     </div>
@@ -648,7 +648,7 @@
                                             @click="$dispatch('open-confirm-modal', {
                                                 form: $el.closest('form'),
                                                 title: 'Setujui Semua Logbook Terverifikasi Mentor?',
-                                                message: 'Seluruh {{ $mentorApprovedPendingCount }} logbook milik mahasiswa ini yang telah disetujui Mentor Lapangan akan langsung disetujui oleh Dosen Pembimbing.',
+                                                message: 'Seluruh {{ $mentorApprovedPendingCount }} logbook milik mahasiswa ini yang telah disetujui Mentor Lapangan akan langsung disetujui oleh Pembimbing.',
                                                 label: 'Jumlah logbook:',
                                                 name: '{{ $mentorApprovedPendingCount }} Entri Logbook',
                                                 confirmText: 'Ya, Setujui Semua',
@@ -713,14 +713,14 @@
             </div>
 
             <!-- ========================================================================= -->
-            <!-- TAB 4: CATATAN BIMBINGAN DPL -->
+            <!-- TAB 4: CATATAN BIMBINGAN PEMBIMBING -->
             <!-- ========================================================================= -->
             <div x-show="activeTab === 'bimbingan'" class="space-y-5">
                 <div id="supervision-log" class="bg-white rounded-2xl p-6 shadow-xs space-y-5" x-data="{ openForm: {{ $consultations->isEmpty() ? 'true' : 'false' }} }">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-100">
                         <div>
                             <h3 class="font-bold text-base text-slate-900">
-                                Riwayat Konsultasi Bimbingan Dosen Pembimbing
+                                Riwayat Konsultasi Bimbingan Pembimbing
                             </h3>
                         </div>
 
@@ -764,7 +764,7 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan &amp; Masukan Dosen Pembimbing <span class="text-rose-500">*</span></label>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan &amp; Masukan Pembimbing <span class="text-rose-500">*</span></label>
                                 <textarea name="notes" rows="3" placeholder="Tuliskan arahan revisi atau masukan untuk mahasiswa..." required
                                           class="w-full text-xs bg-white border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 rounded-xl py-2 px-3"></textarea>
                             </div>

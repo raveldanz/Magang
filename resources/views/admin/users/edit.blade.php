@@ -71,7 +71,7 @@
                                 @endif
                                 <option value="mentor">Mentor Lapangan Dinas</option>
                                 @if(auth()->user()->isSuperAdmin())
-                                    <option value="dosen">Dosen Pembimbing</option>
+                                    <option value="dosen">Pembimbing</option>
                                     <option value="universitas">Admin Universitas</option>
                                 @endif
                             </select>

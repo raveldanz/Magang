@@ -108,7 +108,7 @@
                                 <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 text-xs font-bold flex items-center justify-center">3</span>
                                 <h4 class="font-bold text-xs text-slate-700">Penugasan Pembimbing</h4>
                             </div>
-                            <p class="text-[11px] text-slate-500">Penetapan Mentor Dinas & Dosen Pembimbing.</p>
+                            <p class="text-[11px] text-slate-500">Penetapan Mentor Dinas & Pembimbing.</p>
                         </div>
 
                         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 opacity-60 space-y-1">
@@ -150,7 +150,7 @@
                         <div class="text-xs text-blue-900 space-y-1">
                             <p class="font-bold">Informasi Akses Laporan Akhir:</p>
                             <p class="text-blue-800 leading-relaxed">
-                                Formulir pengunggahan naskah laporan ilmiah dan tautan luaran proyek magang akan otomatis aktif dan terbuka untuk diisi setelah pengajuan magang Anda <strong>diterima (disetujui)</strong> oleh pihak instansi kedinasan dan data Dosen Pembimbing telah dilengkapi. Anda dapat mengecek pembaruan status secara berkala di portal ini.
+                                Formulir pengunggahan naskah laporan ilmiah dan tautan luaran proyek magang akan otomatis aktif dan terbuka untuk diisi setelah pengajuan magang Anda <strong>diterima (disetujui)</strong> oleh pihak instansi kedinasan dan data Pembimbing telah dilengkapi. Anda dapat mengecek pembaruan status secara berkala di portal ini.
                             </p>
                         </div>
                     </div>
@@ -195,7 +195,7 @@
                                 <span>Evaluasi 2 Pihak</span>
                             </div>
                             <p class="text-xs text-slate-600 leading-relaxed">
-                                Naskah dan karya yang diunggah akan dinilai langsung oleh <strong>Mentor Dinas</strong> dan <strong>Dosen Pembimbing</strong> sebagai penentu nilai akhir.
+                                Naskah dan karya yang diunggah akan dinilai langsung oleh <strong>Mentor Dinas</strong> dan <strong>Pembimbing</strong> sebagai penentu nilai akhir.
                             </p>
                         </div>
 
@@ -482,7 +482,7 @@
                                         <span class="px-2 py-0.5 rounded-md bg-slate-200 text-slate-700 text-[10px] font-bold uppercase tracking-wider shrink-0">Format Baku</span>
                                     </div>
                                     <p class="text-slate-600 leading-relaxed text-[11px] sm:text-xs">
-                                        Agar memudahkan Dosen Pembimbing dan Mentor Dinas dalam memeriksa berkas Anda, pastikan nama file telah berformat standar:
+                                        Agar memudahkan Pembimbing dan Mentor Dinas dalam memeriksa berkas Anda, pastikan nama file telah berformat standar:
                                     </p>
                                     <div class="p-2 sm:p-2.5 bg-white border border-slate-200 rounded-xl space-y-1">
                                         <div class="flex items-center gap-1.5 font-mono text-[11px] sm:text-xs font-bold text-blue-700">
@@ -579,7 +579,7 @@
                             </div>
                             <h3 class="font-black text-base sm:text-xl text-emerald-950">Laporan Akhir Anda Telah Disetujui Secara Resmi (ACC)</h3>
                             <p class="text-xs sm:text-sm text-emerald-800 max-w-xl mx-auto leading-relaxed">
-                                Selamat! Naskah laporan ilmiah dan luaran magang Anda telah diverifikasi dan disetujui oleh Dosen Pembimbing Lapangan dan Mentor Instansi Pemerintah Kota Surabaya.
+                                Selamat! Naskah laporan ilmiah dan luaran magang Anda telah diverifikasi dan disetujui oleh Pembimbing dan Mentor Instansi Pemerintah Kota Surabaya.
                             </p>
                         </div>
 
@@ -640,7 +640,7 @@
                                             <p class="text-slate-700"><strong class="text-slate-900">Ulasan Pembimbing Lapangan:</strong> <span class="italic text-slate-600">"{{ $evaluation->catatan }}"</span></p>
                                         @endif
                                         @if($evaluation->feedback_dosen)
-                                            <p class="text-slate-700"><strong class="text-slate-900">Ulasan Dosen Pembimbing:</strong> <span class="italic text-slate-600">"{{ $evaluation->feedback_dosen }}"</span></p>
+                                            <p class="text-slate-700"><strong class="text-slate-900">Ulasan Pembimbing:</strong> <span class="italic text-slate-600">"{{ $evaluation->feedback_dosen }}"</span></p>
                                         @endif
                                     </div>
                                 @endif
@@ -751,14 +751,14 @@
                                     <div class="flex items-center gap-1.5 font-bold">
                                         @if($hasDosenScore || $isMentorOnly)
                                             <span class="text-emerald-600 font-bold">✓</span>
-                                            <span>3. Dosen Pembimbing</span>
+                                            <span>3. Pembimbing</span>
                                         @else
                                             <span class="text-amber-500 font-bold">⏳</span>
-                                            <span>3. Dosen Pembimbing</span>
+                                            <span>3. Pembimbing</span>
                                         @endif
                                     </div>
                                     <p class="text-[11px] {{ ($hasDosenScore || $isMentorOnly) ? 'text-emerald-700' : 'text-slate-500' }}">
-                                        {{ $isMentorOnly ? 'Skema Kampus 100% Dinas' : ($hasDosenScore ? 'Selesai Menilai' : 'Menunggu Nilai Dosen Pembimbing') }}
+                                        {{ $isMentorOnly ? 'Skema Kampus 100% Dinas' : ($hasDosenScore ? 'Selesai Menilai' : 'Menunggu Nilai Pembimbing') }}
                                     </p>
                                 </div>
 

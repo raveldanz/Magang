@@ -170,6 +170,10 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-148** | 2026-11-16 | Skrip Demo Windows (`start_demo*.bat`, `demo_preflight.php`) | QR demo kantor berisi localhost, `.env` ditimpa permanen oleh `--pgsql`, database PostgreSQL kosong dianggap gagal sambung, worker/penjadwal berjalan ganda | RESOLVED |
 | **LRN-149** | 2026-11-16 | Keamanan: Mentor Kelompok & Command Batch Universitas | Jalur keputusan kelompok menerima `mentor_id` sembarang pengguna; `universities:process-batch*` membuat akun ber-password bawaan dan menimpa peran/status akun yang sudah ada | RESOLVED |
 | **LRN-152** | 2026-11-16 | Alur Kerja Mentor Ramah Pengguna Lansia | Catatan revisi lama ikut terkirim saat logbook disetujui; "Minta Revisi" tanpa catatan gagal tanpa pesan; angka dasbor mentor saling berbeda; modal konfirmasi kadang tertutup oleh klik pembukanya | RESOLVED |
+| **LRN-131** | 2026-11-05 | Lampiran Transkrip Keluar Batas Lembar Saat Penilaian Dua Pihak / Banyak Aspek | Keterangan skala menabrak strip bawah dan terpotong di tepi lembar A4 | RESOLVED |
+| **LRN-132** | 2026-11-11 | Integrasi Menu Keluar Akun (Logout) Multi-Device pada Home Page | Ketiadaan aksi logout pada home page (desktop header, mobile drawer, dan hero card) untuk pengguna terautentikasi | RESOLVED |
+| **LRN-133** | 2026-11-12 | Database Migration: Eksekusi Migrasi Pending certificate_themes & Robust Model Fallback | Error 500 relation "certificate_themes" does not exist saat membuka sertifikat mahasiswa | RESOLVED |
+| **LRN-134** | 2026-11-16 | Standardisasi Nomenklatur Role: Penyeragaman 'Dosen Pembimbing' Menjadi 'Pembimbing' | Penyeragaman sebutan role Dosen Pembimbing menjadi Pembimbing pada Master Pengguna Sistem | RESOLVED |
 ---
 
 ## 3. Catatan Masalah & Solusi (Knowledge Base)
@@ -4254,6 +4258,46 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   1. **Larangan Asumsi Aman Tanpa Cross-Check**: Jangan pernah menyatakan suatu sistem aman atau selesai sebelum setiap peran dan modul dalam matriks 9 domain teruji secara konkret di terminal dan browser.
   2. **Larangan Fixation on Example**: Jika pengguna memberikan contoh fitur yang terlewat (misal: "lihat notifikasi dan chat"), hal tersebut merupakan indikator kegagalan cakupan, BUKAN batasan lingkup baru. Wajib periksa seluruh domain sistem tanpa kecuali.
   3. **Wajib Jalankan Master QC Suite**: Setiap sebelum menyerahkan hasil pengerjaan, jalankan `php artisan test --filter=SystemWideHolisticQcTest` dan pastikan Exit Code 0.
+### [LRN-132] Integrasi Menu Keluar Akun (Logout) Multi-Device pada Home Page
+- **Tanggal**: 2026-11-11
+- **Komponen**: `resources/views/welcome.blade.php`, `tests/Feature/ExampleTest.php`, `scripts/verify_home_logout_menu.mjs`
+- **Problem / Symptom**: Pengguna yang telah login (`@auth`) saat berada di halaman utama (*Landing / Home Page*) tidak memiliki akses cepat untuk keluar akun (*Logout*). Pada header desktop dan hero card hanya terdapat tautan *Dashboard*, sedangkan pada drawer navigasi mobile menu hanya ada tombol *Buka Dashboard* tanpa opsi *Keluar Akun*.
+- **Root Cause**: Halaman `welcome.blade.php` dirancang secara *standalone* (tidak menggunakan layout monolitik `navigation.blade.php`), dan percabangan `@auth` di bagian header, drawer mobile, serta hero CTA sebelumnya hanya menyediakan navigasi satu arah menuju dashboard.
+- **Fix Applied**: 
+  1. Menambahkan tombol aksi `Keluar Akun` berbasis form POST CSRF (`{{ route('logout') }}`) pada header desktop (`hidden md:flex`).
+  2. Menambahkan kartu identitas pengguna (`Auth::user()->name`, `Auth::user()->roleLabel()`, status `Aktif`), tombol `Buka Dashboard`, dan tombol `Keluar Akun` berpalet warna rose-50 / border rose-200 pada drawer navigasi mobile atas (`x-show="mobileMenuOpen"`).
+  3. Mempertahankan tombol utama hero card di bawah khusus untuk `Pindah ke Dashboard` (sesuai arahan pengguna agar opsi keluar akun hanya terfokus di menu atas).
+  4. Menulis automated test di `tests/Feature/ExampleTest.php` untuk memastikan status guest vs auth pada home page.
+  5. Melakukan verifikasi visual E2E dengan Playwright Chrome Headless (Exit Code 0) dan menangkap bukti visual di `public/test-artifacts/`.
+- **Prevention Rule**: Seluruh halaman publik/hybrid yang dapat diakses oleh pengguna terautentikasi wajib menyediakan mekanisme keluar akun (*Logout*) yang mudah diakses di seluruh breakpoint (Desktop & Mobile Drawer), lengkap dengan proteksi token CSRF Laravel.
+
+---
+
+### [LRN-133] Database Migration: Eksekusi Migrasi Pending certificate_themes & Robust Model Fallback
+- **Tanggal**: 2026-11-12
+- **Komponen**: `database/migrations/2026_11_02_160000_create_certificate_themes_table.php`, `app/Models/CertificateTheme.php`, `app/Http/Controllers/Student/CertificateController.php`
+- **Problem / Symptom**: Terjadi error 500 `Illuminate\Database\QueryException: SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "certificate_themes" does not exist` saat mengakses sertifikat di rute `/student/certificate/{id}`.
+- **Root Cause**: Migrasi tabel `certificate_themes` masih berstatus `Pending` di database PostgreSQL. Selain itu, pemanggilan query di model `CertificateTheme::getActive()` belum memiliki proteksi `try-catch` sehingga jika tabel belum tersedia, query database melempar *unhandled exception*.
+- **Fix Applied**: 
+  1. Menjalankan perintah Artisan `php artisan migrate` untuk mengeksekusi migrasi pending `certificate_themes` (dan `internship_project_members`).
+  2. Memperkuat method `CertificateTheme::getActive()` dengan blok `try-catch (\Throwable $e)` agar selalu mengembalikan *fallback instance* default tema resmi Dispusip jika tabel database belum termigrasi atau terjadi kegagalan query.
+  3. Memverifikasi langsung via Playwright bahwa rute `/student/certificate/12` kini berhasil dimuat dengan sempurna tanpa error query (HTTP 200).
+- **Prevention Rule**: Setiap ada penambahan model Eloquent yang memiliki query otomatis ke tabel baru, pastikan status migrasi selalu dipantau (`php artisan migrate:status`), dan terapkan proteksi *defensive fallback* pada model sentral.
+
+---
+
+### [LRN-134] Standardisasi Nomenklatur Role: Penyeragaman 'Dosen Pembimbing' Menjadi 'Pembimbing'
+- **Tanggal**: 2026-11-16
+- **Komponen**: `app/Models/User.php`, `resources/views/admin/users/index.blade.php`, `resources/views/admin/users/create.blade.php`, `resources/views/admin/users/edit.blade.php`, `scripts/verify_pembimbing_rename.mjs`
+- **Problem / Symptom**: Pada modul Master Pengguna Sistem (`/admin/users`), sebutan role dosen/pendamping akademik kampus tertulis sebagai "Dosen Pembimbing" pada dropdown filter, badge tabel, serta formulir pengguna.
+- **Root Cause**: Label peran sebelumnya dikunci ke string `'Dosen Pembimbing'` pada method `User::roleLabel()` dan ditulis secara eksplisit pada view Blade admin pengguna.
+- **Fix Applied**: 
+  1. Memperbarui `User::roleLabel()` agar memetakan peran `'dosen'`, `'academic_advisor'`, dan `'pembimbing'` secara seragam ke label `'Pembimbing'`.
+  2. Mengubah teks opsi dropdown filter peran di `resources/views/admin/users/index.blade.php` dari `Dosen Pembimbing` menjadi `Pembimbing`.
+  3. Mengubah badge kolom "ROLE SISTEM" di tabel desktop dan kartu mobile menjadi `Pembimbing`.
+  4. Menyelaraskan teks subtitle header dan opsi dropdown form tambah/ubah pengguna (`admin/users/create.blade.php` & `admin/users/edit.blade.php`).
+  5. Memvalidasi secara visual dengan Playwright Chrome Headless (`public/test-artifacts/pembimbing_filtered_table.png`) dan memastikan seluruh test suite lolos (Strict Exit Code 0).
+- **Prevention Rule**: Seluruh penamaan label peran pengguna wajib merujuk secara konsisten ke method `roleLabel()` pada model `User` guna menjaga keselarasan antarmuka dan mempermudah penyesuaian nomenklatur di masa depan.
 
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 

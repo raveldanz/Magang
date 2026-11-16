@@ -222,7 +222,7 @@
                     <th class="px-4 py-3.5 whitespace-nowrap">Jurusan / NIM</th>
                     <th class="px-4 py-3.5 whitespace-nowrap">Instansi & Unit Kerja</th>
                     <th class="px-4 py-3.5 whitespace-nowrap text-center">Status Magang</th>
-                    <th class="px-4 py-3.5 whitespace-nowrap">Dosen Pembimbing</th>
+                    <th class="px-4 py-3.5 whitespace-nowrap">Pembimbing</th>
                     <th class="px-4 py-3.5 whitespace-nowrap">Mentor Dinas</th>
                     <th class="py-3.5 whitespace-nowrap text-center" style="padding-left: 12px; padding-right: 32px;">Aksi</th>
                 </tr>
@@ -335,7 +335,7 @@
                 
                 <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
                     <div>
-                        <h3 class="font-bold text-base text-slate-900">Penugasan Dosen Pembimbing</h3>
+                        <h3 class="font-bold text-base text-slate-900">Penugasan Pembimbing</h3>
                         <p class="text-xs text-slate-400 mt-0.5">Mahasiswa: <strong class="text-slate-700" x-text="assignModal.studentName"></strong></p>
                     </div>
                     <button type="button" @click="assignModal.show = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
@@ -346,17 +346,17 @@
                     
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                            Pilih Dosen Pembimbing <span class="text-rose-500">*</span>
+                            Pilih Pembimbing <span class="text-rose-500">*</span>
                         </label>
                         <select name="academic_advisor_id" x-model="assignModal.currentAdvisorId" required class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                            <option value="">-- Pilih Dosen Pembimbing Kampus --</option>
+                            <option value="">-- Pilih Pembimbing Kampus --</option>
                             @foreach ($availableDosens as $d)
                                 <option value="{{ $d->id }}">
                                     {{ $d->name }} ({{ $d->email }})
                                 </option>
                             @endforeach
                         </select>
-                        <p class="text-[11px] text-slate-400 mt-1">Daftar memuat seluruh dosen yang terdaftar di {{ $university?->name ?? 'kampus Anda' }}.</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Daftar memuat seluruh pembimbing yang terdaftar di {{ $university?->name ?? 'kampus Anda' }}.</p>
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">

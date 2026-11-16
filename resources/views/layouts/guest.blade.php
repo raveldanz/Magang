@@ -35,5 +35,27 @@
             </div>
 
         </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const formFields = document.querySelectorAll('input[required], select[required], textarea[required]');
+                formFields.forEach(field => {
+                    field.addEventListener('invalid', function () {
+                        if (this.validity.customError) return;
+
+                        if (this.validity.valueMissing) {
+                            this.setCustomValidity('Harap lengkapi kolom ini terlebih dahulu.');
+                        } else if (this.validity.typeMismatch && this.type === 'email') {
+                            this.setCustomValidity('Masukkan format alamat email yang valid.');
+                        } else if (this.validity.tooShort) {
+                            this.setCustomValidity(`Minimal panjang isian adalah ${this.minLength} karakter.`);
+                        }
+                    });
+                    field.addEventListener('input', function () {
+                        this.setCustomValidity('');
+                    });
+                });
+            });
+        </script>
     </body>
 </html>

@@ -77,7 +77,7 @@
                                 <button type="button"
                                     onclick="const el = document.getElementById('change-advisor-box-mobile'); el.classList.toggle('hidden'); if(!el.classList.contains('hidden')) el.scrollIntoView({behavior: 'smooth'});"
                                     class="text-xs font-bold text-blue-600 hover:text-blue-800 cursor-pointer">
-                                    {{ $academicAdvisor ? 'Ganti Dosen Pembimbing' : 'Pilih Dosen Pembimbing' }} &rarr;
+                                    {{ $academicAdvisor ? 'Ganti Dosen Pembimbing' : 'Pilih Dosen Pembimbing' }}
                                 </button>
                             </div>
                         @endif
@@ -213,7 +213,7 @@
                             </div>
                             <a href="{{ route('student.application.create') }}"
                                 class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs transition shadow-sm shrink-0">
-                                <span>Daftar Magang</span>
+                                <span>Daftar Akun</span>
                             </a>
                         </div>
                     @endif

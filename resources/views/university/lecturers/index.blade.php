@@ -3,10 +3,10 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
                 <h2 class="font-bold text-lg sm:text-2xl text-slate-800 leading-tight">
-                    {{ __('Daftar Dosen Pembimbing') }}
+                    {{ __('Daftar Pembimbing') }}
                 </h2>
                 <p class="text-xs text-slate-500 mt-0.5">
-                    Portal Pengelolaan Dosen Pembimbing Kampus &bull; <strong class="text-slate-700">{{ $univName ?? 'Universitas' }}</strong>
+                    Portal Pengelolaan Pembimbing Kampus &bull; <strong class="text-slate-700">{{ $univName ?? 'Universitas' }}</strong>
                 </p>
             </div>
 
@@ -16,7 +16,7 @@
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                 </svg>
-                <span>Tambah Dosen Baru</span>
+                <span>Tambah Pembimbing Baru</span>
             </button>
         </div>
     </x-slot>
@@ -80,11 +80,11 @@
             <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-100 shadow-xs overflow-hidden">
                 <div class="p-3.5 sm:p-5 border-b border-slate-100 flex items-center justify-between">
                     <div>
-                        <h3 class="font-bold text-slate-900 text-xs sm:text-base">Daftar Dosen Pembimbing Terdaftar</h3>
-                        <p class="text-[10px] sm:text-xs text-slate-400">Total: {{ $lecturers->count() }} dosen pembimbing aktif/cuti</p>
+                        <h3 class="font-bold text-slate-900 text-xs sm:text-base">Daftar Pembimbing Terdaftar</h3>
+                        <p class="text-[10px] sm:text-xs text-slate-400">Total: {{ $lecturers->count() }} pembimbing aktif/cuti</p>
                     </div>
                     <span class="text-[10px] sm:text-xs font-bold bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full border border-blue-100 shrink-0">
-                        {{ $lecturers->count() }} Dosen
+                        {{ $lecturers->count() }} Pembimbing
                     </span>
                 </div>
 
@@ -138,7 +138,7 @@
                                                 action: '{{ route('university.lecturers.reset_password', $l->id) }}',
                                                 name: @js($l->name),
                                                 email: @js($l->email),
-                                                role: 'Dosen Pembimbing'
+                                                role: 'Pembimbing'
                                             })"
                                                 class="inline-flex items-center justify-center h-6 px-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-[10px] rounded-lg transition">
                                             Reset
@@ -147,7 +147,7 @@
                                     <button type="button" 
                                             @click="$dispatch('open-delete-modal', {
                                                 action: '{{ route('university.lecturers.destroy', $l->id) }}',
-                                                title: 'Hapus Dosen Pembimbing',
+                                                title: 'Hapus Pembimbing',
                                                 name: @js((string) ($l->name)),
                                                 desc: 'NIDN/NIP: {{ $l->nidn ?? '-' }} &bull; Email: {{ $l->email }}'
                                             })"
@@ -158,7 +158,7 @@
                             </div>
                         </div>
                     @empty
-                        <div class="py-8 text-center text-slate-400 text-xs">Belum ada data dosen pembimbing.</div>
+                        <div class="py-8 text-center text-slate-400 text-xs">Belum ada data pembimbing.</div>
                     @endforelse
                 </div>
 
@@ -214,7 +214,7 @@
                                                         action: '{{ route('university.lecturers.reset_password', $l->id) }}',
                                                         name: @js($l->name),
                                                         email: @js($l->email),
-                                                        role: 'Dosen Pembimbing'
+                                                        role: 'Pembimbing'
                                                     })"
                                                     class="inline-flex items-center justify-center h-7 px-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold rounded-lg text-xs transition cursor-pointer">
                                                     Reset
@@ -223,7 +223,7 @@
                                             <button type="button" 
                                                     @click="$dispatch('open-delete-modal', {
                                                         action: '{{ route('university.lecturers.destroy', $l->id) }}',
-                                                        title: 'Hapus Dosen Pembimbing',
+                                                        title: 'Hapus Pembimbing',
                                                         name: @js((string) ($l->name)),
                                                         desc: 'NIDN/NIP: {{ $l->nidn ?? '-' }} &bull; Email: {{ $l->email }}'
                                                     })"
@@ -236,7 +236,7 @@
                             @empty
                                 <tr>
                                     <td colspan="6" class="py-8 text-center text-slate-400">
-                                        Belum ada data dosen pembimbing terdaftar.
+                                        Belum ada data pembimbing terdaftar.
                                     </td>
                                 </tr>
                             @endforelse
@@ -247,7 +247,7 @@
 
         </div>
 
-        <!-- MODAL 1: TAMBAH DOSEN PEMBIMBING BARU -->
+        <!-- MODAL 1: TAMBAH PEMBIMBING BARU -->
         <div x-show="showCreateModal" 
              x-cloak 
              style="display: none;"
@@ -264,8 +264,8 @@
                 
                 <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
                     <div>
-                        <h3 class="font-bold text-sm sm:text-base text-slate-900">Tambah Dosen Pembimbing Baru</h3>
-                        <p class="text-[11px] text-slate-400">Daftarkan dosen pembimbing lapangan kampus</p>
+                        <h3 class="font-bold text-sm sm:text-base text-slate-900">Tambah Pembimbing Baru</h3>
+                        <p class="text-[11px] text-slate-400">Daftarkan pembimbing kampus</p>
                     </div>
                     <button type="button" @click="showCreateModal = false" class="text-slate-400 hover:text-slate-600 text-sm font-bold">✕</button>
                 </div>
@@ -306,7 +306,7 @@
             </div>
         </div>
 
-        <!-- MODAL 2: EDIT DATA & STATUS DOSEN PEMBIMBING -->
+        <!-- MODAL 2: EDIT DATA & STATUS PEMBIMBING -->
         <div x-show="showEditModal" 
              x-cloak 
              style="display: none;"
@@ -323,8 +323,8 @@
                 
                 <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
                     <div>
-                        <h3 class="font-bold text-sm sm:text-base text-slate-900">Edit Data & Status Dosen Pembimbing</h3>
-                        <p class="text-[11px] text-slate-400">Perbarui identitas atau status keaktifan dosen</p>
+                        <h3 class="font-bold text-sm sm:text-base text-slate-900">Edit Data & Status Pembimbing</h3>
+                        <p class="text-[11px] text-slate-400">Perbarui identitas atau status keaktifan pembimbing</p>
                     </div>
                     <button type="button" @click="showEditModal = false" class="text-slate-400 hover:text-slate-600 text-sm font-bold">✕</button>
                 </div>
