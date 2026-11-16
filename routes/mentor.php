@@ -20,6 +20,7 @@ Route::middleware(['auth', 'role:mentor,pembimbing'])->group(function () {
     Route::post('/mentor/logbooks/bulk-review', [MentorLogbookController::class, 'bulkReview'])->name('mentor.logbooks.bulk_review');
     Route::get('/mentor/students/{placementId}/evaluation', [MentorEvaluationController::class, 'create'])->name('mentor.evaluations.create');
     Route::post('/mentor/students/{placementId}/evaluation', [MentorEvaluationController::class, 'store'])->name('mentor.evaluations.store');
+    Route::get('/mentor/students/{placementId}/evaluation/print', [MentorEvaluationController::class, 'print'])->name('mentor.evaluations.print');
     Route::match(['put', 'patch'], '/mentor/final-report/{reportId}', [MentorDashboardController::class, 'updateFinalReportStatus'])->name('mentor.final_report.updateStatus');
 
     // Backward compatibility

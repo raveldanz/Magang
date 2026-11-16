@@ -177,76 +177,111 @@
                 </div>
             </div>
 
+            @php
+                $reportStatusValue = strtolower($finalReport->status instanceof \BackedEnum ? $finalReport->status->value : (string) $finalReport->status);
+                $isLockedReport = $placement?->application?->statusValue() === 'completed';
+            @endphp
+
+            @if (! empty($finalReport->feedback))
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-base text-slate-800">
+                    <span class="block text-sm font-bold text-slate-600 mb-1">Catatan terakhir pada laporan ini</span>
+                    {{ $finalReport->feedback }}
+                </div>
+            @endif
+
             @if (! $canReview)
-                <p class="text-xs sm:text-sm text-slate-600">Persetujuan laporan dilakukan oleh mentor yang ditugaskan.</p>
+                <p class="text-base text-slate-700">Persetujuan laporan dilakukan oleh mentor yang ditugaskan.</p>
+            @elseif ($isLockedReport)
+                <p class="text-base text-slate-700">Magang sudah dinyatakan selesai, sehingga laporan akhir tidak dapat diubah lagi.</p>
+            @elseif (in_array($reportStatusValue, ['revision', 'rejected'], true))
+                <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl text-base text-amber-900">
+                    Laporan sedang diperbaiki mahasiswa. Tombol pemeriksaan akan muncul lagi setelah mahasiswa mengunggah naskah perbaikan.
+                </div>
             @else
-            <form action="{{ $submitRoute }}" method="POST" class="space-y-4 pt-1" x-data="{ feedbackText: @js(old('feedback', $finalReport->feedback ?? '')) }">
+            <form action="{{ $submitRoute }}" method="POST" class="space-y-4 pt-1"
+                  x-data="{
+                      feedbackText: @js((string) old('feedback', '')),
+                      showNoteError: @js($errors->has('feedback')),
+                      askRevision(button) {
+                          if (this.feedbackText.trim() === '') {
+                              this.showNoteError = true;
+                              this.$nextTick(() => this.$refs.reportNote && this.$refs.reportNote.focus());
+                              return;
+                          }
+                          this.$dispatch('open-confirm-modal', {
+                              form: button.closest('form'),
+                              submitter: button,
+                              title: 'Kembalikan Laporan untuk Diperbaiki',
+                              message: 'Naskah laporan akhir akan dikembalikan ke mahasiswa beserta catatan Anda.',
+                              label: 'Dokumen:',
+                              name: @js($finalReport->title ?? 'Laporan Akhir Magang'),
+                              confirmText: 'Ya, Kembalikan',
+                              tone: 'rose'
+                          });
+                      }
+                  }">
                 @csrf
                 @if (strtoupper($method) !== 'POST')
                     @method($method)
                 @endif
 
-                <div>
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-1.5">
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                            Catatan Evaluasi Laporan & Proyek:
-                        </label>
+                <ol class="list-decimal list-inside text-base text-slate-800 space-y-1">
+                    <li>Klik <strong>Buka Naskah Laporan</strong> di atas dan baca isinya.</li>
+                    <li>Bila sudah layak, klik <strong>Setujui Laporan</strong>.</li>
+                    <li>Bila ada yang kurang, tulis catatan perbaikan lalu klik <strong>Kembalikan untuk Diperbaiki</strong>.</li>
+                </ol>
 
-                        <!-- Quick Feedback Chips -->
-                        <div class="flex flex-wrap items-center gap-1.5">
-                            <button type="button" @click="feedbackText = feedbackText ? (feedbackText + '. Format naskah laporan sudah sesuai panduan.') : 'Format naskah laporan sudah sesuai panduan.'"
-                                    class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition cursor-pointer">
-                                + Format Sesuai
-                            </button>
-                            <button type="button" @click="feedbackText = feedbackText ? (feedbackText + '. Lengkapi bukti lampiran dan dokumentasi proyek.') : 'Lengkapi bukti lampiran dan dokumentasi proyek.'"
-                                    class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition cursor-pointer">
-                                + Lengkapi Dokumentasi
-                            </button>
-                            <button type="button" @click="feedbackText = feedbackText ? (feedbackText + '. Perbaiki abstrak dan kesimpulan Bab penutup.') : 'Perbaiki abstrak dan kesimpulan Bab penutup.'"
-                                    class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition cursor-pointer">
-                                + Revisi Bab Akhir
-                            </button>
-                            <button type="button" @click="feedbackText = feedbackText ? (feedbackText + '. Naskah laporan dan proyek inovasi sudah baik dan disetujui.') : 'Naskah laporan dan proyek inovasi sudah baik dan disetujui.'"
-                                    class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition cursor-pointer">
-                                + Laporan &amp; Proyek Sesuai
-                            </button>
-                        </div>
+                <div>
+                    <label for="catatan-laporan-{{ $finalReport->id }}" class="block text-base font-bold text-slate-900 mb-1">
+                        Catatan untuk mahasiswa <span class="font-normal text-slate-600">(wajib bila dikembalikan)</span>
+                    </label>
+
+                    <!-- Contoh catatan siap pakai -->
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="text-sm text-slate-600">Contoh cepat:</span>
+                        <button type="button" @click="feedbackText = (feedbackText ? feedbackText + ' ' : '') + 'Lengkapi bukti lampiran dan dokumentasi proyek.'; showNoteError = false"
+                                class="min-h-[40px] px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-800 text-sm font-semibold rounded-xl transition cursor-pointer">
+                            + Lengkapi dokumentasi
+                        </button>
+                        <button type="button" @click="feedbackText = (feedbackText ? feedbackText + ' ' : '') + 'Perbaiki abstrak dan kesimpulan pada bab penutup.'; showNoteError = false"
+                                class="min-h-[40px] px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-800 text-sm font-semibold rounded-xl transition cursor-pointer">
+                            + Perbaiki bab penutup
+                        </button>
+                        <button type="button" @click="feedbackText = (feedbackText ? feedbackText + ' ' : '') + 'Format naskah sudah sesuai panduan.'"
+                                class="min-h-[40px] px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-800 text-sm font-semibold rounded-xl transition cursor-pointer">
+                            + Format sudah sesuai
+                        </button>
                     </div>
 
-                    <textarea name="feedback" x-model="feedbackText" rows="3" placeholder="Tuliskan catatan arahan atau catatan revisi untuk mahasiswa..." 
-                              class="w-full text-sm bg-white border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 rounded-xl p-3 shadow-2xs"></textarea>
+                    <textarea id="catatan-laporan-{{ $finalReport->id }}" name="feedback" x-ref="reportNote" x-model="feedbackText" rows="3"
+                              @input="if (feedbackText.trim() !== '') showNoteError = false"
+                              placeholder="Tulis catatan untuk mahasiswa di sini..."
+                              class="w-full text-base bg-white border focus:ring-2 focus:ring-blue-600 focus:border-blue-600 rounded-xl p-3 shadow-2xs"
+                              :class="showNoteError ? 'border-rose-500' : 'border-slate-300'"></textarea>
+                    <p x-show="showNoteError" x-cloak class="mt-1 text-base font-semibold text-rose-700" role="alert">
+                        {{ $errors->first('feedback') ?: 'Tulis dulu apa yang harus diperbaiki sebelum mengembalikan laporan.' }}
+                    </p>
                 </div>
 
-                <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <div class="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3 pt-1">
                     <button type="button" name="status" value="revision"
-                            @click="$dispatch('open-confirm-modal', {
-                                form: $el.closest('form'),
-                                submitter: $el,
-                                title: 'Konfirmasi Minta Revisi Laporan Akhir',
-                                message: feedbackText.trim() === ''
-                                    ? 'Kolom catatan revisi masih kosong. Sebaiknya tuliskan alasan perbaikan agar mahasiswa tahu bagian yang perlu direvisi. Tetap minta revisi?'
-                                    : 'Naskah laporan akhir akan dikembalikan ke mahasiswa dengan status Perlu Revisi beserta catatan Anda.',
-                                label: 'Dokumen:',
-                                name: @js($finalReport->title ?? 'Laporan Akhir Magang'),
-                                confirmText: 'Ya, Minta Revisi',
-                                tone: 'rose'
-                            })"
-                            class="min-h-[44px] inline-flex items-center justify-center px-5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 text-sm font-bold rounded-xl transition cursor-pointer">
-                        Minta Revisi
+                            @click="askRevision($el)"
+                            class="min-h-[52px] inline-flex items-center justify-center px-5 py-3 bg-white hover:bg-rose-50 text-rose-800 border-2 border-rose-300 text-base font-bold rounded-xl transition cursor-pointer">
+                        Kembalikan untuk Diperbaiki
                     </button>
                     <button type="button" name="status" value="approved"
                             @click="$dispatch('open-confirm-modal', {
                                 form: $el.closest('form'),
                                 submitter: $el,
-                                title: 'Konfirmasi Setujui Laporan Akhir & Proyek',
-                                message: 'Naskah laporan akhir dan proyek inovasi mahasiswa akan disetujui sebagai bagian dari syarat kelulusan magang.',
+                                title: 'Setujui Laporan Akhir',
+                                message: 'Naskah laporan akhir dan proyek inovasi mahasiswa akan disetujui sebagai syarat kelulusan magang.',
                                 label: 'Dokumen:',
                                 name: @js($finalReport->title ?? 'Laporan Akhir Magang'),
                                 confirmText: 'Ya, Setujui Laporan',
                                 tone: 'emerald'
                             })"
-                            class="min-h-[44px] inline-flex items-center justify-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-xs transition cursor-pointer">
-                        Setujui Laporan & Proyek
+                            class="min-h-[52px] inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-base font-bold rounded-xl shadow-xs transition cursor-pointer">
+                        Setujui Laporan
                     </button>
                 </div>
             </form>

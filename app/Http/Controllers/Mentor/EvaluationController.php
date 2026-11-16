@@ -43,6 +43,52 @@ class EvaluationController extends Controller
     }
 
     /**
+     * Lembar nilai Mentor Lapangan siap cetak (untuk ditandatangani & diserahkan ke kampus).
+     */
+    public function print($placementId)
+    {
+        $mentor = Auth::user();
+
+        $placement = Placement::with([
+            'application.user.studentProfile',
+            'application.unit.agencyProfile',
+            'evaluation',
+            'mentor',
+            'pembimbing',
+            'academicAdvisor',
+        ])->where(function ($q) use ($mentor) {
+            $q->where('mentor_id', $mentor->id)
+                ->orWhere('pembimbing_id', $mentor->id);
+        })->findOrFail($placementId);
+
+        if ($mentor->agency_profile_id !== null && optional($placement->application?->unit)->agency_profile_id !== $mentor->agency_profile_id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mencetak nilai mahasiswa instansi lain.');
+        }
+
+        $evaluation = $placement->evaluation;
+        if (! $evaluation || (float) $evaluation->nilai_pembimbing <= 0) {
+            return redirect()->route('mentor.students.show', $placement->id)
+                ->with('error', 'Lembar nilai baru dapat dicetak setelah Anda mengisi nilai akhir.');
+        }
+
+        $aspects = $evaluation->mentor_aspects_list ?? [];
+        $average = (float) $evaluation->nilai_pembimbing;
+
+        return view('mentor.grade-sheet', [
+            'placement' => $placement,
+            'student' => $placement->application?->user,
+            'profile' => $placement->application?->user?->studentProfile,
+            'unit' => $placement->application?->unit,
+            'agency' => $placement->application?->unit?->agencyProfile ?? $placement->agencyProfile,
+            'mentorUser' => $placement->mentor ?? $placement->pembimbing ?? $mentor,
+            'evaluation' => $evaluation,
+            'aspects' => $aspects,
+            'average' => $average,
+            'grade' => Grade::letter($average),
+        ]);
+    }
+
+    /**
      * Simpan atau perbarui nilai evaluasi akhir (Disiplin, Kinerja, Laporan)
      */
     public function store(Request $request, $placementId)

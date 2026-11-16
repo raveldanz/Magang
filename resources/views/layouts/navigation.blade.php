@@ -266,13 +266,13 @@
                         </a>
 
                     @elseif ($isMentor)
-                        <a href="{{ route('mentor.dashboard') }}" 
-                           class="transition py-1 {{ request()->routeIs('mentor.dashboard') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Portal Mentor
+                        <a href="{{ route('mentor.dashboard') }}"
+                           class="transition py-1 text-base {{ request()->routeIs('mentor.dashboard', 'mentor.students.*', 'mentor.evaluations.*') ? 'text-blue-700 font-bold border-b-2 border-blue-600' : 'text-slate-700 hover:text-blue-700' }}">
+                            Beranda &amp; Tugas
                         </a>
-                        <a href="{{ route('mentor.logbooks.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('mentor.logbooks.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Tinjau Logbook
+                        <a href="{{ route('mentor.logbooks.index') }}"
+                           class="transition py-1 text-base {{ request()->routeIs('mentor.logbooks.*') ? 'text-blue-700 font-bold border-b-2 border-blue-600' : 'text-slate-700 hover:text-blue-700' }}">
+                            Periksa Logbook
                         </a>
 
                     @elseif ($isUniversitas)
@@ -522,11 +522,11 @@
                                 Pengaturan Akun
                             </a>
                         @elseif ($isMentor)
-                            <a href="{{ route('mentor.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Portal Mentor
+                            <a href="{{ route('mentor.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                Beranda &amp; Tugas
                             </a>
-                            <a href="{{ route('mentor.logbooks.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Tinjau Logbook
+                            <a href="{{ route('mentor.logbooks.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                Periksa Logbook
                             </a>
                             <a href="{{ route('profile.edit') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Pengaturan Akun
@@ -800,13 +800,11 @@
                     </a>
 
                 @elseif ($isMentor)
-                    <a href="{{ route('mentor.dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('mentor.dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        
-                        <span>Portal Mentor</span>
+                    <a href="{{ route('mentor.dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-base font-semibold transition min-h-[48px] {{ request()->routeIs('mentor.dashboard', 'mentor.students.*', 'mentor.evaluations.*') ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-800 hover:bg-slate-50' }}">
+                        <span>Beranda &amp; Tugas</span>
                     </a>
-                    <a href="{{ route('mentor.logbooks.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('mentor.logbooks.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        
-                        <span>Tinjau Logbook</span>
+                    <a href="{{ route('mentor.logbooks.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-base font-semibold transition min-h-[48px] {{ request()->routeIs('mentor.logbooks.*') ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-800 hover:bg-slate-50' }}">
+                        <span>Periksa Logbook</span>
                     </a>
                     <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition {{ request()->routeIs('profile.edit') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         <span>Pengaturan Akun</span>

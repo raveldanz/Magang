@@ -14,6 +14,7 @@
 -->
 <div x-data="{
     open: false,
+    openedAt: 0,
     action: '',
     form: null,
     submitter: null,
@@ -41,6 +42,7 @@
         this.desc = data.desc || '';
         this.confirmText = data.confirmText || 'Ya, Lanjutkan';
         this.tone = this.tones[data.tone] ? data.tone : 'blue';
+        this.openedAt = Date.now();
         this.open = true;
         this.$nextTick(() => {
             if (this.$refs.cancelBtn) this.$refs.cancelBtn.focus();
@@ -50,6 +52,12 @@
         this.open = false;
         this.form = null;
         this.submitter = null;
+    },
+    // Klik yang membuka modal ikut merambat ke dokumen; tanpa jeda ini modal bisa langsung
+    // tertutup lagi oleh klik yang sama sehingga tombol terasa tidak bereaksi.
+    closeFromOutside() {
+        if (Date.now() - this.openedAt < 400) return;
+        this.closeModal();
     },
     submitAction() {
         if (this.form) {
@@ -84,7 +92,7 @@
             x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
             x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-            x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" @click.outside="closeModal()"
+            x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" @click.outside="closeFromOutside()"
             class="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-md w-full overflow-hidden p-6 sm:p-7 space-y-5 text-left relative"
             role="dialog" aria-modal="true" :aria-label="title">
 
@@ -103,11 +111,11 @@
                     </svg>
                 </div>
                 <div class="flex-1 space-y-1">
-                    <h3 class="text-base font-black text-slate-900 leading-tight" x-text="title"></h3>
-                    <p class="text-xs text-slate-500 leading-relaxed" x-show="message" x-text="message"></p>
+                    <h3 class="text-lg font-black text-slate-900 leading-tight" x-text="title"></h3>
+                    <p class="text-base text-slate-700 leading-relaxed" x-show="message" x-text="message"></p>
                 </div>
                 <button type="button" @click="closeModal()"
-                    class="text-slate-400 hover:text-slate-600 p-1 rounded-lg transition" title="Tutup">
+                    class="text-slate-500 hover:text-slate-800 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg transition" title="Tutup" aria-label="Tutup">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -117,10 +125,10 @@
             <!-- Target Detail Box -->
             <template x-if="name">
                 <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block" x-text="label"></span>
-                    <div class="font-black text-sm text-slate-900 break-words" x-text="name"></div>
+                    <span class="text-sm font-semibold text-slate-600 block" x-text="label"></span>
+                    <div class="font-black text-base text-slate-900 break-words" x-text="name"></div>
                     <template x-if="desc">
-                        <div class="text-xs text-slate-500 font-medium break-words mt-0.5" x-text="desc"></div>
+                        <div class="text-sm text-slate-700 font-medium break-words mt-0.5" x-text="desc"></div>
                     </template>
                 </div>
             </template>
@@ -128,11 +136,11 @@
             <!-- Action Buttons -->
             <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 pt-2 border-t border-slate-100">
                 <button type="button" x-ref="cancelBtn" @click="closeModal()"
-                    class="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition text-center cursor-pointer">
+                    class="w-full sm:w-auto min-h-[48px] px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold rounded-xl transition text-center cursor-pointer">
                     Batal
                 </button>
                 <button type="button" @click="submitAction()"
-                    class="w-full sm:w-auto px-6 py-2.5 text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-sm text-white cursor-pointer"
+                    class="w-full sm:w-auto min-h-[48px] px-6 py-2.5 text-base font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-sm text-white cursor-pointer"
                     :class="tones[tone].btn">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />

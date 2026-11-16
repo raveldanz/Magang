@@ -288,7 +288,9 @@ class MentorElderlyFriendlyOptimizationTest extends TestCase
         $this->assertStringContainsString('#bagian-logbook', $studentHtml);
         $this->assertStringContainsString('#bagian-laporan', $studentHtml);
         $this->assertStringContainsString('#bagian-nilai', $studentHtml);
-        $this->assertStringContainsString('Setujui yang Dipilih', $studentHtml);
+        // Pemeriksaan logbook per hari (Sesuai / Perlu Diperbaiki) dengan satu tombol simpan + konfirmasi
+        $this->assertStringContainsString('Perlu Diperbaiki', $studentHtml);
+        $this->assertStringContainsString('Simpan Pemeriksaan Logbook', $studentHtml);
     }
 
     public function test_evaluation_form_shows_simplified_mode_grade_guide_early_notice_and_saves_decimals(): void

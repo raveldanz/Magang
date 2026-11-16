@@ -6,12 +6,11 @@ use App\Enums\ReviewStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\FinalReport;
-use App\Models\Logbook;
 use App\Models\Placement;
 use App\Models\University;
 use App\Services\LogbookWeeklyBundler;
+use App\Services\MentorTaskList;
 use App\Services\StudentNotifier;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,118 +20,63 @@ class DashboardController extends Controller
      * Halaman Dashboard Utama Pembimbing Lapangan / Mentor
      * Menampilkan metrik dan daftar mahasiswa bimbingan dengan segmentasi lifecycle.
      */
-    public function index(Request $request)
+    public function index(Request $request, MentorTaskList $taskList)
     {
         $mentor = Auth::user();
 
         // Sinkronkan seluruh pengajuan magang yang tanggal mulainya telah tiba ke ACTIVE
         Application::syncStartedApplications();
 
-        // Base query penempatan yang menjadi wewenang mentor ini (bimbingan langsung + fallback unit)
-        $baseQuery = Placement::fieldReviewableBy($mentor);
-
-        // Jangan sertakan yang mengundurkan diri atau ditolak
-        $baseQuery->whereHas('application', function ($q) {
-            $q->whereNotIn('status', ['resigned', 'rejected']);
-        });
-
-        // Hitung statistik bimbingan mentor secara akurat
-        $allBasePlacements = (clone $baseQuery)->with([
-            'application.user',
-            'application.unit',
-            'evaluation',
-            'finalreport',
-        ])->get();
-
-        $totalStudents = $allBasePlacements->count();
-        $hasMentorScoreFn = static fn (Placement $p): bool => (bool) ($p->evaluation && (
-            ($p->evaluation->nilai_disiplin ?? 0) > 0
-            || ($p->evaluation->nilai_kinerja ?? 0) > 0
-            || ($p->evaluation->nilai_laporan ?? 0) > 0
-        ));
-
-        $totalEvaluated = $allBasePlacements->filter($hasMentorScoreFn)->count();
-
-        // Hanya hitung mahasiswa bimbingan langsung yang magangnya aktif/terbuka nilainya & belum dinilai
-        $pendingEvalPlacements = $allBasePlacements->filter(
-            fn (Placement $p) => $p->isAssignedFieldMentor($mentor)
-                && $p->evaluationLockReason() === null
-                && ! $hasMentorScoreFn($p)
-        )->values();
-
-        $totalPendingEval = $pendingEvalPlacements->count();
-        $totalReportsApproved = $allBasePlacements->filter(fn (Placement $p) => $p->finalreport?->status === 'approved')->count();
-        $totalReportsPending = $allBasePlacements->filter(fn (Placement $p) => $p->finalreport && $p->finalreport->status !== 'approved')->count();
-
-        $activeStudents = $allBasePlacements->filter(fn (Placement $p) => $p->application?->statusValue() === 'active')->count();
-        $upcomingStudents = $allBasePlacements->filter(fn (Placement $p) => $p->application?->statusValue() === 'accepted')->count();
-        $completedStudents = $allBasePlacements->filter(fn (Placement $p) => $p->application?->statusValue() === 'completed')->count();
-
-        $placementIds = $allBasePlacements->pluck('id');
-        $pendingLogbooks = $placementIds->isNotEmpty()
-            ? Logbook::whereIn('placement_id', $placementIds)->where('status', 'pending')->count()
-            : 0;
+        // Satu perhitungan untuk daftar tugas, kartu angka, dan tab, agar angka di layar selalu sama.
+        ['placements' => $allBasePlacements, 'tasks' => $tasks, 'summary' => $summary] = $taskList->forMentor($mentor);
 
         $stats = [
-            'total_students' => $totalStudents,
-            'total_evaluated' => $totalEvaluated,
-            'total_pending_eval' => $totalPendingEval,
-            'total_reports_approved' => $totalReportsApproved,
-            'total_reports_pending' => $totalReportsPending,
-            'active_students' => $activeStudents,
-            'upcoming_students' => $upcomingStudents,
-            'completed_students' => $completedStudents,
-            'pending_logbooks' => $pendingLogbooks,
+            'total_students' => $summary['total_students'],
+            'total_evaluated' => $summary['evaluated'],
+            'total_pending_eval' => $summary['not_evaluated'],
+            'evaluation_due' => $summary['evaluation_due'],
+            'evaluation_overdue' => $summary['evaluation_overdue'],
+            'total_reports_approved' => $summary['approved_reports'],
+            'total_reports_pending' => $summary['pending_reports'],
+            'active_students' => $summary['active_students'],
+            'upcoming_students' => $summary['upcoming_students'],
+            'completed_students' => $summary['completed_students'],
+            'pending_logbooks' => $summary['pending_logbook_days'],
+            'pending_logbook_students' => $summary['pending_logbook_students'],
         ];
-
-        // Prioritas Tindakan Segera (selaras dengan Dashboard Dosen Pembimbing)
-        $pendingReports = $allBasePlacements->filter(
-            fn (Placement $p) => $p->isAssignedFieldMentor($mentor) && $p->finalreport?->status === 'pending'
-        )->values();
-
-        $urgentEndingPlacements = $pendingEvalPlacements->filter(function (Placement $p) {
-            $endDate = $p->application?->end_date ? Carbon::parse($p->application->end_date) : null;
-            $isNearEnd = $endDate && $endDate->diffInDays(Carbon::now(), false) >= -14;
-            $reportApproved = $p->finalreport?->status === 'approved';
-
-            return $isNearEnd || $reportApproved;
-        })->values();
 
         $actionAlerts = [
-            'pending_reports' => $pendingReports,
-            'urgent_ending' => $urgentEndingPlacements,
-            'pending_logbooks_count' => $pendingLogbooks,
-            'pending_eval_ready' => $pendingEvalPlacements,
+            'pending_reports' => $tasks->where('type', 'report')->values(),
+            'urgent_ending' => $tasks->where('type', 'evaluation')->values(),
+            'pending_logbooks_count' => $summary['pending_logbook_days'],
         ];
 
-        // Query penempatan dengan relasi lengkap untuk daftar & paginasi
-        $query = (clone $baseQuery)
+        // Query penempatan dengan relasi untuk daftar & paginasi (lingkup sama dengan daftar tugas)
+        $query = Placement::whereIn('id', $allBasePlacements->pluck('id'))
             ->with([
                 'application.user.studentProfile',
                 'application.user.universityRelation',
                 'application.unit.agencyProfile',
-                'logbooks',
                 'evaluation',
                 'finalreport',
-                'academicAdvisor',
             ])
             ->withCount([
+                'logbooks',
                 'logbooks as pending_logbooks_count' => fn ($q) => $q->where('status', 'pending'),
             ]);
 
         $tab = $request->get('tab');
         if ($tab && in_array($tab, ['upcoming', 'completed', 'active'], true)) {
-            $query->whereRelation('application', 'status', match ($tab) {
-                'upcoming' => 'accepted',
-                'completed' => 'completed',
-                default => 'active',
-            });
+            $query->whereHas('application', fn ($q) => $q->whereIn('status', match ($tab) {
+                'upcoming' => MentorTaskList::UPCOMING_STATUSES,
+                'completed' => ['completed'],
+                default => ['active'],
+            }));
         }
 
         // Filter pencarian nama / NIM / jurusan / kampus
         $search = trim((string) ($request->get('search') ?? $request->get('q', '')));
         if ($search !== '') {
-            $keyword = '%'.mb_strtolower($search).'%';
             $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
             $query->whereHas('application.user', function ($q) use ($search, $like) {
                 $q->where('name', $like, "%{$search}%")
@@ -170,13 +114,15 @@ class DashboardController extends Controller
             ? University::whereIn('id', $univIds)->orderBy('name')->get()
             : collect();
 
-        return view('mentor.dashboard', compact('placements', 'stats', 'universities', 'tab', 'search', 'actionAlerts'));
+        $tasksByPlacement = $tasks->groupBy('placement_id');
+
+        return view('mentor.dashboard', compact('placements', 'stats', 'universities', 'tab', 'search', 'actionAlerts', 'tasks', 'tasksByPlacement'));
     }
 
     /**
      * Detail Aktivitas & Logbook Mahasiswa Tertentu
      */
-    public function showStudent($placementId, LogbookWeeklyBundler $bundler)
+    public function showStudent($placementId, LogbookWeeklyBundler $bundler, MentorTaskList $taskList)
     {
         $mentor = Auth::user();
 
@@ -217,7 +163,11 @@ class DashboardController extends Controller
             perPage: null
         );
 
-        return view('mentor.student-detail', compact('placement', 'weeklyBundles', 'canEvaluate', 'evaluationLockReason'));
+        // Daftar periksa 3 langkah & tugas berikutnya memakai algoritma yang sama dengan dasbor
+        $checklist = $taskList->checklist($placement, $mentor);
+        $nextTasks = $taskList->tasksForPlacement($placement, $mentor);
+
+        return view('mentor.student-detail', compact('placement', 'weeklyBundles', 'canEvaluate', 'evaluationLockReason', 'checklist', 'nextTasks'));
     }
 
     /**
@@ -248,9 +198,17 @@ class DashboardController extends Controller
             return redirect()->back()->with('error', 'Laporan akhir tidak dapat diubah karena magang sudah dinyatakan selesai.');
         }
 
+        // Menyetujui tanpa catatan baru: catatan revisi lama sudah selesai ditangani, jadi dihapus
+        // agar mahasiswa tidak melihat "Disetujui" bersama teguran lama. Catatan pada laporan yang
+        // memang sudah disetujui sebelumnya tetap dipertahankan.
+        $previousStatus = $report->status instanceof \BackedEnum ? $report->status->value : strtolower((string) $report->status);
+        $feedback = $request->filled('feedback')
+            ? $request->feedback
+            : ($previousStatus === 'approved' ? $report->feedback : null);
+
         $report->update([
             'status' => $request->status,
-            'feedback' => $request->feedback,
+            'feedback' => $feedback,
         ]);
 
         // Jika laporan di-ACC, sinkronisasi otomatis status kelulusan (COMPLETED)
@@ -260,6 +218,8 @@ class DashboardController extends Controller
 
         StudentNotifier::finalReportReviewed($placement->application?->user, 'mentor', $request->status, $request->feedback);
 
-        return redirect()->back()->with('success', 'Status laporan akhir mahasiswa berhasil diperbarui!');
+        return redirect()->back()->with('success', $request->status === 'approved'
+            ? 'Laporan akhir disetujui. Langkah berikutnya: isi nilai akhir mahasiswa.'
+            : 'Laporan akhir dikembalikan ke mahasiswa untuk diperbaiki beserta catatan Anda.');
     }
 }

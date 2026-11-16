@@ -183,23 +183,33 @@
                         @method('PUT')
 
                         <div>
-                            <label for="feedback" class="block text-sm font-bold text-slate-800 mb-1.5">Catatan untuk mahasiswa</label>
+                            <label for="feedback" class="block text-base font-bold text-slate-900 mb-1.5">
+                                Catatan untuk mahasiswa <span class="font-normal text-slate-600">(wajib bila meminta revisi)</span>
+                            </label>
+                            {{-- Selalu mulai kosong: catatan lama sudah tampil di atas dan tidak boleh ikut terkirim tanpa sengaja --}}
                             <textarea id="feedback" name="feedback" rows="3" maxlength="1000"
-                                      class="w-full text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500"
-                                      placeholder="Tuliskan catatan, arahan, atau alasan revisi...">{{ old('feedback', $reviewForm['feedback']) }}</textarea>
+                                      class="w-full text-base border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500"
+                                      placeholder="Tuliskan catatan, arahan, atau alasan revisi...">{{ old('feedback', '') }}</textarea>
+                            @error('feedback')
+                                <p class="mt-1 text-base font-semibold text-rose-700" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
                             <button type="button" name="status" value="rejected"
                                     @click="
-                                        const fb = ($el.closest('form').querySelector('#feedback')?.value || '').trim();
+                                        const fbField = $el.closest('form').querySelector('#feedback');
+                                        const fb = (fbField?.value || '').trim();
+                                        if (fb === '') {
+                                            fbField?.focus();
+                                            $dispatch('toast', { type: 'error', message: 'Tulis dulu catatan perbaikan agar mahasiswa tahu apa yang harus diperbaiki.' });
+                                            return;
+                                        }
                                         $dispatch('open-confirm-modal', {
                                             form: $el.closest('form'),
                                             submitter: $el,
                                             title: 'Konfirmasi Permintaan Revisi Logbook',
-                                            message: fb === ''
-                                                ? 'Catatan revisi masih kosong. Sebaiknya tulis alasan agar mahasiswa tahu bagian mana yang perlu diperbaiki. Tetap kirim permintaan revisi?'
-                                                : 'Logbook akan dikembalikan kepada mahasiswa untuk diperbaiki sesuai catatan Anda.',
+                                            message: 'Logbook akan dikembalikan kepada mahasiswa untuk diperbaiki sesuai catatan Anda.',
                                             label: 'Status Tujuan',
                                             name: @js(\App\Enums\ReviewStatus::REJECTED->localizedLabel(auth()->user()?->role)),
                                             desc: fb !== '' ? 'Catatan: ' + fb : 'Belum ada catatan tertulis.',

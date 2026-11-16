@@ -169,6 +169,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-145** | 2026-11-14 | Master Universitas Batch 3: 50 Kampus Sumatera, Bali-Nusra, Kalimantan, Sulawesi & Papua | Sinkronisasi 50 kampus ketiga (no. 101-150), Rektor UNAND/UNUD/UNHAS/UNSRAT/UNCEN/UT, DPL TI riil, 49 logo SVG & pengujian 703 assertions | RESOLVED |
 | **LRN-148** | 2026-11-16 | Skrip Demo Windows (`start_demo*.bat`, `demo_preflight.php`) | QR demo kantor berisi localhost, `.env` ditimpa permanen oleh `--pgsql`, database PostgreSQL kosong dianggap gagal sambung, worker/penjadwal berjalan ganda | RESOLVED |
 | **LRN-149** | 2026-11-16 | Keamanan: Mentor Kelompok & Command Batch Universitas | Jalur keputusan kelompok menerima `mentor_id` sembarang pengguna; `universities:process-batch*` membuat akun ber-password bawaan dan menimpa peran/status akun yang sudah ada | RESOLVED |
+| **LRN-152** | 2026-11-16 | Alur Kerja Mentor Ramah Pengguna Lansia | Catatan revisi lama ikut terkirim saat logbook disetujui; "Minta Revisi" tanpa catatan gagal tanpa pesan; angka dasbor mentor saling berbeda; modal konfirmasi kadang tertutup oleh klik pembukanya | RESOLVED |
 ---
 
 ## 3. Catatan Masalah & Solusi (Knowledge Base)
@@ -4470,3 +4471,17 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   5. Penolakan dan permintaan revisi wajib disertai catatan (`required_if`); tanggal masukan wajib punya batas bawah dan atas.
   6. Jangan `catch (\Throwable)` di aturan validasi; tangkap hanya pengecualian yang memang diharapkan.
   7. Uji tiap alamat aksi secara langsung (tanpa lewat tombol), dengan akun peran lain dan dengan data berstatus akhir.
+
+### [LRN-152] Alur Kerja Mentor Ramah Pengguna Lansia: Satu Sumber Tugas, Keputusan Per Hari, dan Galat yang Terlihat
+- **Date:** 2026-11-16
+- **Problem / Symptom:** (1) Kotak catatan paket logbook mingguan dan laporan akhir terisi otomatis dengan catatan revisi lama; menekan "Setujui" menyimpan teguran lama ke semua hari yang disetujui. (2) "Minta Revisi" tanpa catatan ditolak server (`required_if`), tetapi halaman mentor tidak menampilkan `$errors`, jadi halaman dimuat ulang tanpa perubahan dan tanpa pesan. (3) Dasbor mentor menampilkan "3 Perlu Dinilai" dan "Perlu Nilai Akhir 4" sekaligus; total 8 tidak sama dengan jumlah tab karena status `waiting_approval` tidak masuk tab mana pun; logbook dihitung per hari di satu tempat dan per minggu di tempat lain. (4) Mentor hanya bisa menyetujui/menolak satu minggu utuh. (5) Modal konfirmasi global (`@click.outside`) kadang langsung tertutup oleh klik yang membukanya, sehingga tombol terasa tidak bereaksi. (6) Teks halaman mahasiswa "masa magang sedang berjalan" walau tanggal akhir sudah lewat, dan "sertifikat telah diterbitkan" padahal sertifikat menunggu pengesahan. (7) Tabel mahasiswa terpotong pada lebar 1024px (laptop kantor dengan zoom 125%).
+- **Root Cause:** Hitungan tugas ditulis terpisah di controller dasbor, Blade detail, dan `NotificationService`; tiap tempat memakai definisi sendiri. Komponen bersama mengisi textarea dari kolom feedback tersimpan. Validasi gagal hanya bergantung pada pesan inline yang tidak pernah dirender di halaman pemeriksaan.
+- **Fix Applied:** `App\Services\MentorTaskList` (satu algoritma untuk Daftar Tugas, kartu angka, tab, daftar periksa 3 langkah, dan lonceng); `App\Services\LogbookReviewDecision` (status `per_day` + `revise_ids`, catatan revisi lama dihapus saat hari disetujui) dipakai controller mentor dan dosen; komponen `supervision/logbook-weekly` dan `report-review` dirombak (catatan mulai kosong, tombol Sesuai/Perlu Diperbaiki per hari, cegah kirim revisi tanpa catatan, galat terlihat); toast galat tidak hilang sendiri + toast umum untuk `$errors`; jeda 400 ms pada `@click.outside` di empat modal; lembar nilai mentor siap cetak (`mentor.evaluations.print`); tes `MentorEndToEndWorkflowTest`.
+- **Prevention Rule:**
+  1. Angka "berapa yang harus dikerjakan" untuk satu peran harus berasal dari SATU service; dasbor, halaman detail, dan notifikasi memanggil service yang sama.
+  2. Textarea keputusan (setujui/revisi) selalu mulai kosong; tampilkan catatan lama sebagai teks terpisah, jangan sebagai nilai awal input.
+  3. Setiap halaman yang mengirim formulir keputusan wajib menampilkan galat validasinya; cegah di sisi klien juga (catatan wajib saat revisi) agar pengguna tidak menunggu muat ulang.
+  4. Jangan menulis tanda kutip ganda di dalam komentar JavaScript pada atribut `x-data="..."`; atribut HTML terpotong dan seluruh komponen Alpine mati tanpa tanda di layar.
+  5. Modal yang ditutup dengan `@click.outside` harus mengabaikan klik selama beberapa ratus milidetik setelah dibuka.
+  6. Teks status yang bergantung tanggal (berjalan/berakhir/terlambat) dihitung dari tanggal hari ini, bukan hanya dari status pengajuan.
+  7. Untuk tabel lebar di halaman pengguna senior, gunakan tampilan kartu di bawah `xl` (1280px) dan tombol aksi minimal 48px.

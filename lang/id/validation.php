@@ -164,6 +164,7 @@ return [
     'custom' => [
         'feedback' => [
             'required_if' => 'Catatan wajib diisi saat menolak atau meminta revisi, agar mahasiswa tahu apa yang perlu diperbaiki.',
+            'required_with' => 'Catatan wajib diisi saat menolak atau meminta revisi, agar mahasiswa tahu apa yang perlu diperbaiki.',
             'min' => 'Catatan minimal :min karakter agar jelas bagi mahasiswa.',
         ],
     ],

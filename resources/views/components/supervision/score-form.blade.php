@@ -202,14 +202,14 @@
     @endif
 
     @if ($lockReason)
-        <div class="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-300 text-sm text-slate-700">
+        <div class="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-300 text-base text-slate-800">
             <div class="font-bold text-slate-900 mb-1">Form penilaian terkunci</div>
             <p>{{ $lockReason }}</p>
         </div>
     @elseif ($isEarlyGrading)
-        <div class="bg-amber-50/80 rounded-2xl p-4 sm:p-5 border border-amber-300 text-sm text-amber-950">
+        <div class="bg-amber-50/80 rounded-2xl p-4 sm:p-5 border border-amber-300 text-base text-amber-950">
             <div class="font-bold mb-1">Catatan Jadwal Penilaian</div>
-            <p class="text-xs sm:text-sm leading-relaxed">
+            <p class="text-base leading-relaxed">
                 Masa magang mahasiswa berlangsung hingga <strong>{{ $endDate->translatedFormat('d M Y') }}</strong> ({{ $daysUntilEnd }} hari lagi). Penilaian akhir disarankan diisi menjelang selesai magang agar mencerminkan capaian penuh.
             </p>
         </div>
@@ -253,8 +253,8 @@
                             <h3 class="text-base font-bold text-slate-900">
                                 {{ $role === 'mentor' ? 'Aspek & Kriteria Penilaian Mentor Lapangan' : 'Aspek & Kriteria Penilaian Akademik Dosen Pembimbing' }}
                             </h3>
-                            <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
-                                Masukkan nilai angka 0 sampai 100 (boleh desimal, misalnya 85.5) pada setiap kriteria di bawah ini.
+                            <p class="text-base text-slate-700 mt-0.5">
+                                Ketik nilai 0 sampai 100 pada setiap kriteria (boleh desimal, misalnya 85.5). Rata-rata dan predikat dihitung otomatis.
                             </p>
                         </div>
                         @unless ($lockReason)
@@ -307,8 +307,8 @@
                                     <template x-if="!customizeAspects">
                                         <div>
                                             <input type="hidden" :name="'aspects[' + index + '][name]'" :value="aspect.name">
-                                            <span class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-0.5">Kriteria Penilaian</span>
-                                            <p class="text-sm sm:text-base font-bold text-slate-900 leading-snug" x-text="aspect.name"></p>
+                                            <span class="block text-sm font-semibold text-slate-700 mb-0.5">Kriteria Penilaian</span>
+                                            <p class="text-base sm:text-lg font-bold text-slate-900 leading-snug" x-text="aspect.name"></p>
                                         </div>
                                     </template>
                                     <template x-if="customizeAspects">
@@ -327,12 +327,13 @@
                             <!-- 2. Input Skor Nilai Numerik (0 - 100) & Tombol Hapus -->
                             <div class="flex items-center justify-between sm:justify-end gap-3 shrink-0">
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1 text-left sm:text-right">
-                                        Nilai (0 - 100) <span class="text-rose-600">*</span>
+                                    <label :for="'nilai-aspek-' + index" class="block text-sm font-bold text-slate-800 mb-1 text-left sm:text-right">
+                                        Nilai 0&ndash;100 <span class="text-rose-600">*</span>
                                     </label>
-                                    <div class="w-32 sm:w-36">
-                                        <input type="number" :name="'aspects[' + index + '][score]'" min="0" max="100" step="0.01" x-model="aspect.score" required placeholder="0"
-                                               class="w-full min-h-[48px] text-xl sm:text-2xl font-black text-center py-2 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition text-slate-900">
+                                    <div class="w-36 sm:w-40">
+                                        <input type="number" :id="'nilai-aspek-' + index" :name="'aspects[' + index + '][score]'" min="0" max="100" step="0.01" x-model="aspect.score" required placeholder="mis. 85"
+                                               inputmode="decimal"
+                                               class="w-full min-h-[52px] text-2xl font-black text-center py-2 bg-white border-2 border-slate-400 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition text-slate-900 placeholder:text-base placeholder:font-normal placeholder:text-slate-400">
                                     </div>
                                 </div>
 
@@ -363,21 +364,21 @@
 
             <!-- 3. Kotak Hasil Kalkulasi Real-time (Rata-rata, Predikat Mutu, Nilai Akhir) -->
             <div class="bg-slate-50 rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-2xs">
-                <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-3">
+                <span class="text-base font-bold text-slate-900 block mb-3">
                     Kalkulasi Hasil Nilai
                 </span>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                     <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                        <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider block">Rata-rata</span>
+                        <span class="text-sm font-semibold text-slate-700 block">Rata-rata</span>
                         <div class="text-2xl font-black text-slate-900 mt-1" x-text="avg !== null ? avg : '-'">-</div>
-                        <span class="text-xs text-slate-600 block mt-1" x-text="aspects.length + ' kriteria'"></span>
+                        <span class="text-sm text-slate-700 block mt-1" x-text="aspects.length + ' kriteria'"></span>
                     </div>
                     <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                        <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider block">Predikat Mutu</span>
+                        <span class="text-sm font-semibold text-slate-700 block">Predikat Mutu</span>
                         <div class="text-2xl font-black text-blue-700 mt-1" x-text="letterGrade">-</div>
                     </div>
                     <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                        <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider block">Nilai Akhir</span>
+                        <span class="text-sm font-semibold text-slate-700 block">Nilai Akhir</span>
                         <div class="text-2xl font-black text-slate-900 mt-1" x-text="finalScore !== null ? finalScore : (avg !== null ? avg : '-')">-</div>
                         @if ($role === 'lecturer' && !$isMentorOnly && $dinasScore > 0)
                             <span class="text-xs text-slate-600 block mt-1 font-medium">
@@ -386,7 +387,7 @@
                         @endif
                     </div>
                 </div>
-                <div class="mt-4 pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-700">
+                <div class="mt-4 pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-sm text-slate-800">
                     <span class="font-bold text-slate-800">Panduan Nilai &amp; Predikat:</span>
                     <div class="flex flex-wrap items-center gap-x-3 gap-y-1 font-medium">
                         <span><strong>A</strong> (&ge; 85)</span>
@@ -398,7 +399,7 @@
                     </div>
                 </div>
                 @if ($role === 'mentor')
-                    <p class="mt-2.5 text-xs text-slate-600 font-medium">
+                    <p class="mt-2.5 text-sm text-slate-700 font-medium">
                         {{ $isMentorOnly
                             ? 'Ketentuan kampus mahasiswa ini: 100% nilai akhir berasal dari Mentor Lapangan.'
                             : "Ketentuan kampus mahasiswa ini: Bobot {$weightMentor}% nilai Mentor Lapangan dan {$weightLecturer}% nilai Dosen Pembimbing." }}
@@ -408,14 +409,15 @@
 
             <!-- 4. Textarea Catatan -->
             <div>
-                <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-                    {{ $role === 'mentor' ? 'Catatan Evaluasi Mentor Lapangan:' : 'Catatan Evaluasi Dosen Pembimbing:' }}
+                <label for="catatan-penilaian" class="block text-base font-bold text-slate-900 mb-1.5">
+                    {{ $role === 'mentor' ? 'Catatan Evaluasi Mentor Lapangan' : 'Catatan Evaluasi Dosen Pembimbing' }}
+                    <span class="font-normal text-slate-600">(boleh dikosongkan)</span>
                 </label>
-                <textarea name="{{ $role === 'mentor' ? 'catatan' : 'feedback_dosen' }}" rows="3"
+                <textarea id="catatan-penilaian" name="{{ $role === 'mentor' ? 'catatan' : 'feedback_dosen' }}" rows="3"
                           placeholder="Tuliskan catatan evaluasi, rekomendasi karir, atau apresiasi untuk mahasiswa..."
-                          class="w-full text-sm border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 p-3 bg-white shadow-2xs">{{ $oldFeedback }}</textarea>
+                          class="w-full text-base border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 p-3 bg-white shadow-2xs">{{ $oldFeedback }}</textarea>
                 @error($role === 'mentor' ? 'catatan' : 'feedback_dosen')
-                    <span class="text-rose-600 text-xs block mt-1 font-medium">{{ $message }}</span>
+                    <span class="text-rose-700 text-base block mt-1 font-semibold">{{ $message }}</span>
                 @enderror
             </div>
 
@@ -423,13 +425,13 @@
 
             <!-- 5. Tombol Aksi di Kanan Bawah: Batal + Simpan Nilai -->
             <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4 border-t border-slate-200">
-                <a href="{{ $cancelRoute }}" 
-                   class="inline-flex items-center justify-center gap-1.5 min-h-[44px] px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 text-sm font-bold rounded-xl border border-slate-300 shadow-2xs transition active:scale-95 cursor-pointer">
+                <a href="{{ $cancelRoute }}"
+                   class="inline-flex items-center justify-center gap-1.5 min-h-[52px] px-5 py-3 bg-white hover:bg-slate-50 text-slate-900 text-base font-bold rounded-xl border-2 border-slate-300 shadow-2xs transition active:scale-95 cursor-pointer">
                     {{ $lockReason ? 'Kembali' : 'Batal' }}
                 </a>
                 @unless ($lockReason)
                     <button type="button" @click="openSaveConfirm($el)"
-                            class="inline-flex items-center justify-center min-h-[44px] px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition cursor-pointer shadow-xs">
+                            class="inline-flex items-center justify-center min-h-[52px] px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-base font-bold rounded-xl transition cursor-pointer shadow-xs">
                         Simpan Nilai
                     </button>
                 @endunless

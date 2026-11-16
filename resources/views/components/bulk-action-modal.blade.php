@@ -1,6 +1,7 @@
 <!-- Global Triple-Confirmation Bulk Action Modal (Alpine.js) -->
 <div x-data="{
     open: false,
+    openedAt: 0,
     mode: 'delete', // 'delete' or 'reset'
     action: '',
     title: 'Konfirmasi Aksi Massal',
@@ -22,10 +23,16 @@
         this.userIds = data.userIds || [];
         this.confirmedStep2 = false;
         this.inputKeyword = '';
+        this.openedAt = Date.now();
         this.open = true;
         this.$nextTick(() => {
             if (this.$refs.cancelBtn) this.$refs.cancelBtn.focus();
         });
+    },
+    // Abaikan klik yang sama dengan klik pembuka modal (lihat confirm-action-modal).
+    closeFromOutside() {
+        if (Date.now() - this.openedAt < 400) return;
+        this.closeModal();
     },
     closeModal() {
         this.open = false;
@@ -61,7 +68,7 @@ x-cloak>
              x-transition:leave="transition ease-in duration-150"
              x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
              x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-             @click.outside="closeModal()"
+             @click.outside="closeFromOutside()"
              class="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-lg w-full overflow-hidden p-6 sm:p-7 space-y-5 text-left relative max-h-[92vh] flex flex-col">
             
             <!-- Hidden Form to execute POST bulk -->

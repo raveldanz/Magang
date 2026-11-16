@@ -300,41 +300,49 @@ class NotificationService
 
         // 4. MENTOR LAPANGAN NOTIFICATIONS
         elseif ($role === 'mentor' || $role === 'pembimbing') {
-            // Lingkup sama persis dengan halaman Logbook mentor: mahasiswa bimbingan sendiri
-            // (mentor_id / pembimbing_id) + fallback Kepala Unit — bukan seluruh mahasiswa instansi.
-            $mentorPlacements = Placement::fieldReviewableBy($user)
-                ->whereHas('application', fn ($q) => $q->whereNotIn('status', ['resigned', 'rejected']))
-                ->get();
+            // Lingkup & hitungan sama persis dengan Daftar Tugas di dasbor mentor (MentorTaskList):
+            // mahasiswa bimbingan sendiri + fallback Kepala Unit, bukan seluruh mahasiswa instansi.
+            ['tasks' => $mentorTasks, 'summary' => $mentorSummary] = app(MentorTaskList::class)->forMentor($user);
 
-            $pendingMentorLogbooks = Logbook::where('status', 'pending')
-                ->whereIn('placement_id', $mentorPlacements->pluck('id'))
-                ->count();
-
-            if ($pendingMentorLogbooks > 0) {
+            if ($mentorSummary['pending_logbook_days'] > 0) {
                 $actionable[] = [
                     'id' => 'mentor_logbook_pending',
                     'type' => 'warning',
                     'category' => 'logbook',
-                    'title' => "{$pendingMentorLogbooks} Logbook Menunggu Validasi Mentor",
-                    'message' => 'Mahasiswa di divisi Anda telah mengisi logbook aktivitas magang.',
-                    'time' => 'Menunggu persetujuan',
+                    'title' => "{$mentorSummary['pending_logbook_days']} Logbook Harian Menunggu Pemeriksaan Anda",
+                    'message' => "Dari {$mentorSummary['pending_logbook_students']} mahasiswa bimbingan. Buka untuk memeriksa per minggu.",
+                    'time' => 'Menunggu pemeriksaan',
                     'action_url' => route('mentor.logbooks.index'),
-                    'action_label' => 'Validasi Logbook',
+                    'action_label' => 'Periksa Logbook',
                     'is_action_required' => true,
                 ];
             }
 
-            if ($mentorPlacements->count() > 0) {
+            foreach ($mentorTasks->where('type', 'report') as $task) {
                 $actionable[] = [
-                    'id' => 'mentor_active_students',
-                    'type' => 'info',
-                    'category' => 'mentor',
-                    'title' => "Supervisi {$mentorPlacements->count()} Mahasiswa di Unit Kerja",
-                    'message' => 'Pantau kehadiran, kinerja harian, dan berikan evaluasi lapangan.',
-                    'time' => 'Portal Mentor',
-                    'action_url' => route('mentor.dashboard'),
-                    'action_label' => 'Dashboard Mentor',
-                    'is_action_required' => false,
+                    'id' => 'mentor_report_pending_'.$task['placement_id'],
+                    'type' => 'warning',
+                    'category' => 'laporan',
+                    'title' => "Laporan Akhir {$task['student_name']} Menunggu Persetujuan",
+                    'message' => $task['description'],
+                    'time' => 'Menunggu pemeriksaan',
+                    'action_url' => $task['url'],
+                    'action_label' => $task['button'],
+                    'is_action_required' => true,
+                ];
+            }
+
+            foreach ($mentorTasks->where('type', 'evaluation') as $task) {
+                $actionable[] = [
+                    'id' => 'mentor_evaluation_due_'.$task['placement_id'],
+                    'type' => $task['urgent'] ? 'urgent' : 'warning',
+                    'category' => 'nilai',
+                    'title' => "Nilai Akhir {$task['student_name']} Belum Diisi",
+                    'message' => $task['description'],
+                    'time' => $task['badge'] ?? 'Segera diisi',
+                    'action_url' => $task['url'],
+                    'action_label' => $task['button'],
+                    'is_action_required' => true,
                 ];
             }
         }

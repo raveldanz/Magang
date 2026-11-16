@@ -6,10 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\Logbook;
 use App\Models\Placement;
+use App\Services\LogbookReviewDecision;
 use App\Services\LogbookWeeklyBundler;
 use App\Services\StudentNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class LogbookController extends Controller
 {
@@ -69,6 +72,13 @@ class LogbookController extends Controller
 
         $logsForBundling = $filteredQuery->orderBy('date', 'desc')->orderBy('id', 'desc')->get();
 
+        // Tanpa pilihan status, langsung tampilkan yang perlu diperiksa agar mentor tidak mencari-cari.
+        // Bila tidak ada yang menunggu, tampilkan semua supaya halaman tidak terlihat kosong.
+        $isNarrowed = $request->filled('placement_id') || $request->filled('search');
+        $statusFilter = $request->has('status')
+            ? ((string) $request->input('status') ?: 'all')
+            : ($pendingCount > 0 && ! $isNarrowed ? 'pending' : 'all');
+
         // 4. Kelompokkan menjadi paket mingguan (10 paket per halaman)
         $weeklyBundles = $bundler->bundle(
             logbooks: $logsForBundling,
@@ -76,16 +86,25 @@ class LogbookController extends Controller
             feedbackColumn: 'feedback',
             otherStatusColumn: 'lecturer_status',
             otherFeedbackColumn: 'lecturer_feedback',
-            statusFilter: $request->status,
+            statusFilter: $statusFilter,
             perPage: 10
         );
+
+        $pendingWeeks = $bundler->bundle(
+            logbooks: $allMentorLogs,
+            statusColumn: 'status',
+            statusFilter: 'pending',
+            perPage: null
+        )->count();
 
         return view('mentor.logbooks.index', compact(
             'weeklyBundles',
             'supervisedPlacements',
             'pendingCount',
             'approvedCount',
-            'rejectedCount'
+            'rejectedCount',
+            'statusFilter',
+            'pendingWeeks'
         ));
     }
 
@@ -164,9 +183,12 @@ class LogbookController extends Controller
         $request->validate([
             'logbook_ids' => 'required|array|min:1',
             'logbook_ids.*' => 'integer|exists:logbooks,id',
-            'status' => 'required|in:approved,rejected',
+            // per_day: hari yang dicentang "Perlu Diperbaiki" (revise_ids) dikembalikan, sisanya disetujui.
+            'status' => 'required|in:approved,rejected,per_day',
+            'revise_ids' => 'nullable|array',
+            'revise_ids.*' => ['integer', Rule::in(array_map('intval', (array) $request->input('logbook_ids', [])))],
             // Penolakan tanpa catatan membuat mahasiswa tidak tahu apa yang harus diperbaiki.
-            'feedback' => 'nullable|required_if:status,rejected|string|max:1000',
+            'feedback' => 'nullable|required_if:status,rejected|required_with:revise_ids|string|max:1000',
         ]);
 
         $logbooks = Logbook::with(['placement.application.unit', 'placement.application.user'])
@@ -181,35 +203,39 @@ class LogbookController extends Controller
             abort(403, 'Anda tidak memiliki hak akses untuk memverifikasi logbook ini.');
         }
 
-        $count = 0;
-        foreach ($authorizedLogbooks as $logbook) {
-            $isFallback = ! $logbook->placement->isAssignedFieldMentor($mentor);
+        $reviseIds = collect($request->input('revise_ids', []))->map(fn ($id) => (int) $id)->all();
+        $decisions = LogbookReviewDecision::resolve($authorizedLogbooks, $request->status, $reviseIds);
+        $note = $request->filled('feedback') ? (string) $request->feedback : null;
+        $noteTargetsRejected = in_array('rejected', $decisions, true);
 
-            // Setujui banyak sekaligus tanpa catatan: catatan lama per logbook tetap dipertahankan.
-            $logbook->update([
-                'status' => $request->status,
-                'feedback' => $request->filled('feedback') ? $request->feedback : $logbook->feedback,
-            ]);
+        DB::transaction(function () use ($authorizedLogbooks, $decisions, $note, $noteTargetsRejected, $mentor) {
+            foreach ($authorizedLogbooks as $logbook) {
+                $newStatus = $decisions[$logbook->id];
+                $isFallback = ! $logbook->placement->isAssignedFieldMentor($mentor);
 
-            AuditLog::record($isFallback ? 'UNIT_HEAD_LOGBOOK_FALLBACK_REVIEW' : 'MENTOR_LOGBOOK_REVIEW', 'Logbook', $logbook->id, [
-                'status' => $logbook->status,
-                'feedback' => $logbook->feedback,
-                'student_name' => optional($logbook->placement->application?->user)->name,
-                'bulk' => true,
-            ]);
+                $logbook->update([
+                    'status' => $newStatus,
+                    'feedback' => LogbookReviewDecision::feedbackFor($logbook->status, $logbook->feedback, $newStatus, $note, $noteTargetsRejected),
+                ]);
 
-            $count++;
-        }
+                AuditLog::record($isFallback ? 'UNIT_HEAD_LOGBOOK_FALLBACK_REVIEW' : 'MENTOR_LOGBOOK_REVIEW', 'Logbook', $logbook->id, [
+                    'status' => $logbook->status,
+                    'feedback' => $logbook->feedback,
+                    'student_name' => optional($logbook->placement->application?->user)->name,
+                    'bulk' => true,
+                ]);
+            }
+        });
 
         // Satu notifikasi per mahasiswa (bukan per logbook) agar lonceng mahasiswa tidak penuh.
-        if ($request->status === 'rejected') {
-            $authorizedLogbooks->groupBy('placement_id')->each(function ($group) use ($request) {
-                StudentNotifier::logbookRevision($group->first()->placement->application?->user, 'mentor', $group->count(), $request->feedback);
-            });
-        }
+        $rejected = $authorizedLogbooks->filter(fn ($logbook) => $decisions[$logbook->id] === 'rejected');
+        $rejected->groupBy('placement_id')->each(function ($group) use ($note) {
+            StudentNotifier::logbookRevision($group->first()->placement->application?->user, 'mentor', $group->count(), $note);
+        });
 
-        $statusMsg = $request->status === 'approved' ? 'disetujui' : 'diminta revisi';
-
-        return redirect()->back()->with('success', "Sebanyak {$count} logbook kegiatan mahasiswa berhasil {$statusMsg}!");
+        return redirect()->back()->with('success', LogbookReviewDecision::summaryMessage(
+            $authorizedLogbooks->count() - $rejected->count(),
+            $rejected->count()
+        ));
     }
 }
