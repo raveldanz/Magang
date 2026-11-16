@@ -244,8 +244,8 @@ class ApplicationController extends Controller
 
         $pembimbings = $pembimbingQuery->orderBy('name')->get();
 
-        // Dropdown Dosen Kampus untuk Super Admin Override
-        $dosens = User::whereIn('role', ['dosen', 'academic_advisor'])
+        // Dropdown Dosen Kampus untuk Super Admin Override (tanpa pembimbing yang masih Menunggu Persetujuan)
+        $dosens = User::assignableAdvisors()
             ->when($application->user?->university_id, fn ($q) => $q->where('university_id', $application->user->university_id))
             ->orderBy('name')
             ->get();

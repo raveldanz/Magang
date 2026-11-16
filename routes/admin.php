@@ -68,6 +68,7 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::post('/admin/users/bulk-reset-password', [AdminUserController::class, 'bulkResetPassword'])->name('admin.users.bulk_reset_password');
     Route::post('/admin/users/bulk-delete', [AdminUserController::class, 'bulkDelete'])->name('admin.users.bulk_delete');
     Route::post('/admin/users/{id}/reset-password', [AdminUserController::class, 'resetPassword'])->name('admin.users.reset_password');
+    Route::post('/admin/users/{id}/approve-advisor', [AdminUserController::class, 'approveAdvisor'])->name('admin.users.approve_advisor');
     Route::resource('/admin/users', AdminUserController::class)->names('admin.users');
 
     // Master Perguruan Tinggi (Universitas)

@@ -25,6 +25,18 @@
                 </div>
             @endif
 
+            @if (auth()->user()->isPendingApproval())
+                <!-- Akun Pembimbing daftar mandiri belum disetujui -->
+                <div class="p-4 sm:p-5 bg-amber-50 border border-amber-200 rounded-2xl text-amber-950" role="status">
+                    <p class="text-base font-bold">Akun Anda menunggu persetujuan</p>
+                    <p class="text-sm mt-1 leading-relaxed">
+                        Admin Kampus/Sekolah {{ auth()->user()->university ? '('.auth()->user()->university.')' : '' }} perlu menyetujui akun Anda terlebih dahulu.
+                        Setelah disetujui, peserta magang dapat memilih Anda sebagai pembimbing dan daftar bimbingan akan muncul di halaman ini.
+                        Bila lama belum disetujui, hubungi Admin Kampus/Sekolah Anda atau Dispusip Surabaya.
+                    </p>
+                </div>
+            @endif
+
             <!-- PUSAT TINDAKAN DPL (Clean & Simple Alert Center) -->
             @php
                 $hasUrgent = ($actionAlerts['pending_reports']->count() > 0) || 

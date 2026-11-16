@@ -135,9 +135,9 @@ class StatusLabelConsistencyTest extends TestCase
         }
         $this->assertSame('IN PROGRESS', FeedbackStatus::IN_PROGRESS->label());
 
-        // Status akun: hanya dua keadaan, label Bahasa Indonesia untuk semua role
-        $this->assertSame(['active', 'inactive'], AccountStatus::values());
-        $this->assertSame(['Aktif', 'Nonaktif'], array_map(fn ($c) => $c->label(), AccountStatus::cases()));
+        // Status akun: tiga keadaan (Menunggu Persetujuan = Pembimbing daftar sendiri), label Bahasa Indonesia untuk semua role
+        $this->assertSame(['active', 'pending', 'inactive'], AccountStatus::values());
+        $this->assertSame(['Aktif', 'Menunggu Persetujuan', 'Nonaktif'], array_map(fn ($c) => $c->label(), AccountStatus::cases()));
         $this->assertNull(AccountStatus::resolve('on_leave'));
     }
 

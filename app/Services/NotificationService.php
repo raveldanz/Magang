@@ -70,6 +70,22 @@ class NotificationService
                 ];
             }
 
+            // B2. Pembimbing daftar mandiri dari institusi yang belum punya Admin Kampus/Sekolah
+            $pendingAdvisorCount = app(AdvisorApprovalService::class)->pendingWithoutInstitutionAdmin()->count();
+            if ($pendingAdvisorCount > 0) {
+                $actionable[] = [
+                    'id' => 'advisors_pending_approval',
+                    'type' => 'warning',
+                    'category' => 'account',
+                    'title' => "{$pendingAdvisorCount} Pembimbing Menunggu Persetujuan",
+                    'message' => 'Dosen/guru mendaftar sendiri dari institusi yang belum punya Admin Kampus/Sekolah. Periksa lalu setujui agar peserta magang dapat memilihnya.',
+                    'time' => 'Perlu persetujuan',
+                    'action_url' => route('admin.users.index', ['role' => 'dosen', 'account_status' => 'pending']),
+                    'action_label' => 'Periksa Pembimbing',
+                    'is_action_required' => true,
+                ];
+            }
+
             // C. Pengajuan Magang Baru Menunggu Verifikasi
             $pendingAppsCount = Application::where('status', 'pending')->count();
             if ($pendingAppsCount > 0) {
@@ -462,6 +478,21 @@ class NotificationService
             if ($univ) {
                 $dosenCount = User::whereIn('role', ['dosen', 'academic_advisor'])->where('university_id', $univ->id)->count();
                 $studentCount = User::where('role', 'mahasiswa')->where('university_id', $univ->id)->count();
+
+                $pendingAdvisorCount = app(AdvisorApprovalService::class)->pendingForInstitutionAdmin($user)->count();
+                if ($pendingAdvisorCount > 0) {
+                    $actionable[] = [
+                        'id' => 'univ_advisors_pending_approval',
+                        'type' => 'urgent',
+                        'category' => 'account',
+                        'title' => "{$pendingAdvisorCount} Pembimbing Menunggu Persetujuan Anda",
+                        'message' => 'Dosen/guru dari institusi Anda mendaftar sendiri. Setujui agar peserta magang dapat memilihnya sebagai pembimbing.',
+                        'time' => 'Perlu persetujuan',
+                        'action_url' => route('university.lecturers.index'),
+                        'action_label' => 'Periksa Pembimbing',
+                        'is_action_required' => true,
+                    ];
+                }
 
                 if ($dosenCount === 0) {
                     $actionable[] = [

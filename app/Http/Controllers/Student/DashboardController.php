@@ -16,6 +16,8 @@ use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
+    private const PENDING_ADVISOR_MESSAGE = 'Akun pembimbing tersebut masih menunggu persetujuan Admin Kampus/Sekolah, jadi belum bisa dipilih. Pilih pembimbing lain atau hubungi Admin Kampus/Sekolah Anda.';
+
     /**
      * Tampilan Dashboard Mahasiswa dengan Data Terintegrasi
      */
@@ -106,10 +108,10 @@ class DashboardController extends Controller
         $university = $user->university_id ? University::find($user->university_id) : null;
         $univName = $university?->name ?? $user->university ?? $profile?->universitas;
 
-        // Query dosen dari universitas yang sama
+        // Query dosen dari universitas yang sama (pembimbing yang masih Menunggu Persetujuan tidak ditawarkan)
         $availableDosens = collect();
         if ($user->university_id) {
-            $availableDosens = User::whereIn('role', ['dosen', 'academic_advisor'])
+            $availableDosens = User::assignableAdvisors()
                 ->where('university_id', $user->university_id)
                 ->orderBy('name')
                 ->get();
@@ -149,6 +151,10 @@ class DashboardController extends Controller
         }
 
         $advisor = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($request->academic_advisor_id);
+
+        if ($advisor->isPendingApproval()) {
+            return redirect()->route('dashboard')->with('error', self::PENDING_ADVISOR_MESSAGE);
+        }
 
         // DPL wajib berasal dari perguruan tinggi mahasiswa sendiri
         $studentUnivId = $this->studentUniversityId($user);
@@ -262,6 +268,11 @@ class DashboardController extends Controller
         // Kasus 1: Dosen sudah terdaftar di database
         if ($existingLecturer && $existingLecturer->university_id && (int) $existingLecturer->university_id !== (int) $targetUnivId) {
             return redirect()->route('dashboard')->with('error', 'Email dosen tersebut terdaftar di perguruan tinggi lain. Hubungi Admin Kampus Anda untuk penugasan Dosen Pembimbing.');
+        }
+
+        // Akun pembimbing daftar mandiri yang belum disetujui tidak boleh dipakai (cegah akun palsu menilai mahasiswa)
+        if ($existingLecturer?->isPendingApproval()) {
+            return redirect()->route('dashboard')->with('error', self::PENDING_ADVISOR_MESSAGE);
         }
 
         if ($existingLecturer) {

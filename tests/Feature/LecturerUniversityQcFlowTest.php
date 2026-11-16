@@ -168,13 +168,14 @@ class LecturerUniversityQcFlowTest extends TestCase
             ->assertDontSee('Dosen Pembimbing Lapangan');
     }
 
-    public function test_halaman_admin_universitas_memakai_istilah_dosen_pembimbing(): void
+    public function test_halaman_admin_universitas_memakai_istilah_pembimbing(): void
     {
         $admin = User::factory()->create(['role' => 'universitas', 'university_id' => $this->univ->id]);
 
+        // Istilah tim (revisi 16 Nov 2026): "Dosen Pembimbing" menjadi "Pembimbing"
         $this->actingAs($admin)->get(route('university.lecturers.index'))
             ->assertOk()
-            ->assertSee('Daftar Dosen Pembimbing')
+            ->assertSee('Daftar Pembimbing')
             ->assertDontSee('Dosen Pembimbing Lapangan');
     }
 }

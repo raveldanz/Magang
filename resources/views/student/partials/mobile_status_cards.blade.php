@@ -213,7 +213,7 @@
                             </div>
                             <a href="{{ route('student.application.create') }}"
                                 class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs transition shadow-sm shrink-0">
-                                <span>Daftar Akun</span>
+                                <span>Ajukan Magang</span>
                             </a>
                         </div>
                     @endif

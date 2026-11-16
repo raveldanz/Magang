@@ -7,6 +7,7 @@ use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\University;
 use App\Models\User;
+use App\Services\AdvisorApprovalService;
 use App\Services\UniversityResolver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -83,11 +84,15 @@ class LecturerController extends Controller
             'total_assigned_students' => $totalActiveStudents + $totalCompletedStudents,
         ];
 
+        // Pembimbing yang mendaftar sendiri dan menunggu persetujuan Admin Kampus/Sekolah
+        $pendingLecturers = $lecturers->filter(fn (User $lecturer) => $lecturer->isPendingApproval())->values();
+
         return view('university.lecturers.index', compact(
             'user',
             'university',
             'univName',
             'lecturers',
+            'pendingLecturers',
             'stats'
         ));
     }
@@ -206,6 +211,26 @@ class LecturerController extends Controller
 
         return redirect()->route('university.lecturers.index')
             ->with('success', "Password untuk Dosen '{$lecturer->name}' ({$lecturer->email}) berhasil direset. Password sementara ditampilkan sekali di layar ini.");
+    }
+
+    /**
+     * Setujui akun Pembimbing yang mendaftar sendiri (status Menunggu Persetujuan → Aktif).
+     */
+    public function approve($id, AdvisorApprovalService $approvals)
+    {
+        $lecturer = User::whereIn('role', User::ADVISOR_ROLES)->findOrFail($id);
+
+        abort_unless($approvals->canApprove(Auth::user(), $lecturer), 403, 'Anda tidak memiliki hak akses untuk menyetujui pembimbing dari institusi lain.');
+
+        if (! $lecturer->isPendingApproval()) {
+            return redirect()->route('university.lecturers.index')
+                ->with('success', "Akun '{$lecturer->name}' sudah aktif sebelumnya.");
+        }
+
+        $approvals->approve(Auth::user(), $lecturer);
+
+        return redirect()->route('university.lecturers.index')
+            ->with('success', "Akun pembimbing '{$lecturer->name}' disetujui. Peserta magang kini dapat memilihnya sebagai pembimbing.");
     }
 
     /**

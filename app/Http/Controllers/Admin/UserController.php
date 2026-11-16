@@ -10,6 +10,7 @@ use App\Models\AuditLog;
 use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
+use App\Services\AdvisorApprovalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -155,6 +156,14 @@ class UserController extends Controller
             } else {
                 $query->where('role', $roleFilter);
             }
+        }
+
+        // Filter status akun (mis. Pembimbing daftar mandiri yang Menunggu Persetujuan)
+        $accountStatus = AccountStatus::tryFrom((string) $request->input('account_status'));
+        if ($accountStatus === AccountStatus::ACTIVE) {
+            $query->where(fn ($q) => $q->whereNull('status')->orWhere('status', AccountStatus::ACTIVE->value));
+        } elseif ($accountStatus) {
+            $query->where('status', $accountStatus->value);
         }
 
         // Filter Unit / Bidang Dinas
@@ -416,6 +425,25 @@ class UserController extends Controller
 
         return redirect()->back()
             ->with('success', "Password untuk '{$user->name}' berhasil direset. Password sementara ditampilkan sekali di layar ini.");
+    }
+
+    /**
+     * Setujui akun Pembimbing yang mendaftar sendiri (Super Admin; terutama sekolah tanpa Admin Sekolah).
+     */
+    public function approveAdvisor($id, AdvisorApprovalService $approvals)
+    {
+        $advisor = User::whereIn('role', User::ADVISOR_ROLES)->findOrFail($id);
+
+        abort_unless($approvals->canApprove(Auth::user(), $advisor), 403, 'Hanya Super Admin yang dapat menyetujui akun pembimbing dari halaman ini.');
+
+        if (! $advisor->isPendingApproval()) {
+            return redirect()->back()->with('success', "Akun '{$advisor->name}' sudah aktif sebelumnya.");
+        }
+
+        $approvals->approve(Auth::user(), $advisor);
+
+        return redirect()->back()
+            ->with('success', "Akun pembimbing '{$advisor->name}' disetujui. Peserta magang kini dapat memilihnya sebagai pembimbing.");
     }
 
     /**

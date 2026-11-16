@@ -122,6 +122,12 @@ class PlacementAssignmentService
             ]);
         }
 
+        if ($advisor->isPendingApproval()) {
+            throw ValidationException::withMessages([
+                'academic_advisor_id' => "Akun pembimbing {$advisor->name} masih menunggu persetujuan, jadi belum bisa ditugaskan.",
+            ]);
+        }
+
         return $advisor;
     }
 

@@ -308,7 +308,7 @@ class LecturerFeaturesUpdateTest extends TestCase
         $response = $this->actingAs($data['lecturer'])->get(route('lecturer.dashboard'));
 
         $response->assertOk()
-            ->assertSeeText('Perlu Tindakan Dosen')
+            ->assertSeeText('Perlu Tindakan Pembimbing')
             ->assertSeeText('Review Laporan')
             ->assertSeeText('Semua evaluasi tuntas')
             ->assertDontSeeText('bg-rose-600');

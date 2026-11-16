@@ -350,6 +350,10 @@
                                                 </form>
                                             @endif
 
+                                            @if($isSuperAdmin && $u->isAdvisor() && $u->isPendingApproval())
+                                                @include('admin.users.partials.approve-advisor-button', ['advisor' => $u])
+                                            @endif
+
                                             <!-- Tombol Edit -->
                                             <a href="{{ route('admin.users.edit', $u->id) }}"
                                                class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white">
@@ -358,14 +362,14 @@
 
                                             <!-- Reset Password (Double Confirmation Modal) -->
                                             @if(!$isSuperAdminUser || $u->id !== $currentUser->id)
-                                                <button type="button" 
+                                                <button type="button"
                                                         @click="$dispatch('open-reset-modal', {
                                                             action: '{{ route('admin.users.reset_password', $u->id) }}',
                                                             name: @js((string) ($u->name)),
                                                             email: @js((string) ($u->email)),
                                                             role: @js((string) ($u->roleLabel()))
-                                                        })" 
-                                                        class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-amber-50 border-amber-200 text-amber-600 hover:bg-amber-600 hover:text-white cursor-pointer" 
+                                                        })"
+                                                        class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-amber-50 border-amber-200 text-amber-600 hover:bg-amber-600 hover:text-white cursor-pointer"
                                                         title="Reset password ke default: password">
                                                     Reset
                                                 </button>
@@ -373,7 +377,7 @@
 
                                             <!-- Hapus User (Double Confirmation Modal) -->
                                             @if($u->id !== $currentUser->id && !$isSuperAdminUser)
-                                                <button type="button" 
+                                                <button type="button"
                                                         @click="$dispatch('open-delete-modal', {
                                                             action: '{{ route('admin.users.destroy', $u->id) }}',
                                                             title: 'Hapus Akun Pengguna',
@@ -535,6 +539,11 @@
 
                                 <!-- 3. Action Buttons Mobile: Dedicated Symmetrical Grid Action Bar -->
                                 <div class="pt-2.5 border-t border-slate-100">
+                                    @if($isSuperAdmin && $u->isAdvisor() && $u->isPendingApproval())
+                                        <div class="mb-2">
+                                            @include('admin.users.partials.approve-advisor-button', ['advisor' => $u, 'fullWidth' => true])
+                                        </div>
+                                    @endif
                                     @if($showLoginAs)
                                         <!-- Format 4 Tombol: 2x2 Grid Simetris Sempurna -->
                                         <div class="grid grid-cols-2 gap-2">

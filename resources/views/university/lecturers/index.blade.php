@@ -76,6 +76,45 @@
                 </form>
             </div>
 
+            @if ($pendingLecturers->isNotEmpty())
+                <!-- Pembimbing daftar mandiri yang menunggu persetujuan -->
+                <section class="bg-amber-50 border border-amber-200 rounded-2xl sm:rounded-3xl p-4 sm:p-5 space-y-3" aria-labelledby="pending-advisors-title">
+                    <div>
+                        <h3 id="pending-advisors-title" class="font-bold text-base text-amber-950">
+                            {{ $pendingLecturers->count() }} Pembimbing Menunggu Persetujuan Anda
+                        </h3>
+                        <p class="text-sm text-amber-900 mt-0.5">
+                            Akun ini didaftarkan sendiri oleh dosen/guru. Pastikan orangnya benar pembimbing dari institusi Anda, lalu tekan Setujui. Sebelum disetujui, peserta magang belum bisa memilihnya.
+                        </p>
+                    </div>
+                    <ul class="divide-y divide-amber-200/70 bg-white rounded-2xl border border-amber-200">
+                        @foreach ($pendingLecturers as $pending)
+                            <li class="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div class="min-w-0">
+                                    <p class="font-bold text-sm text-slate-900 break-words">{{ $pending->name }}</p>
+                                    <p class="text-sm text-slate-700 break-all">{{ $pending->email }}</p>
+                                    <p class="text-xs text-slate-600 mt-0.5">Mendaftar {{ $pending->created_at?->diffForHumans() ?? '-' }}</p>
+                                </div>
+                                <button type="button"
+                                        @click="$dispatch('open-confirm-modal', {
+                                            action: @js(route('university.lecturers.approve', $pending->id)),
+                                            title: 'Setujui Akun Pembimbing',
+                                            message: 'Setelah disetujui, peserta magang dari institusi Anda dapat memilih akun ini sebagai pembimbing.',
+                                            label: 'Pembimbing:',
+                                            name: @js((string) $pending->name),
+                                            desc: @js((string) $pending->email),
+                                            confirmText: 'Ya, Setujui',
+                                            tone: 'emerald'
+                                        })"
+                                        class="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-1.5 px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl transition shadow-xs cursor-pointer">
+                                    Setujui
+                                </button>
+                            </li>
+                        @endforeach
+                    </ul>
+                </section>
+            @endif
+
             <!-- Kontainer Daftar Dosen -->
             <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-100 shadow-xs overflow-hidden">
                 <div class="p-3.5 sm:p-5 border-b border-slate-100 flex items-center justify-between">

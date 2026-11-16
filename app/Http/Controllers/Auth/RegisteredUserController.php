@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\AccountStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\University;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Validation\Rules;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
@@ -26,60 +25,44 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Handle an incoming registration request.
+     * Daftar akun mandiri sebagai Peserta Magang atau Pembimbing (dosen/guru).
      *
-     * @throws ValidationException
+     * Pembimbing tidak perlu didaftarkan admin, tetapi akunnya berstatus Menunggu Persetujuan sampai
+     * Admin Kampus/Sekolah atau Super Admin menyetujuinya (AdvisorApprovalService), agar tidak ada
+     * akun pembimbing palsu yang dipilih mahasiswa untuk menilai dirinya sendiri.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(RegisterRequest $request): RedirectResponse
     {
-        $request->validate([
-            'register_as' => ['nullable', 'in:student,advisor'],
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'university' => ['required_if:register_as,advisor', 'nullable', 'string', 'max:255'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ], [
-            'university.required_if' => 'Nama Perguruan Tinggi atau Sekolah asal wajib diisi untuk akun Pembimbing.',
-        ]);
+        $isAdvisor = $request->registersAdvisor();
 
-        $isAdvisor = $request->input('register_as') === 'advisor';
-        $role = $isAdvisor ? 'dosen' : 'mahasiswa';
+        $user = DB::transaction(function () use ($request, $isAdvisor) {
+            $data = [
+                'name' => $request->validated('name'),
+                'email' => $request->validated('email'),
+                'password' => Hash::make($request->validated('password')),
+                'role' => $isAdvisor ? 'dosen' : 'mahasiswa',
+            ];
 
-        $userData = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $role,
-        ];
-
-        // Jika mendaftar sebagai Dosen / Guru Pembimbing, simpan asal Kampus / Sekolahnya
-        if ($isAdvisor && $request->filled('university')) {
-            $univName = trim($request->university);
-
-            if (Schema::hasColumn('users', 'university')) {
-                $userData['university'] = $univName;
+            if ($isAdvisor) {
+                // Nama/akronim yang dikenal (mis. "unesa") dipakai ulang; nama baru masuk daftar verifikasi Super Admin.
+                $institution = University::findOrCreateUnverified($request->validated('university'));
+                $data['university_id'] = $institution->id;
+                $data['university'] = $institution->name;
+                $data['status'] = AccountStatus::PENDING->value;
             }
 
-            if (class_exists(University::class)) {
-                $univRecord = University::firstOrCreate(['name' => $univName]);
-                if (Schema::hasColumn('users', 'university_id')) {
-                    $userData['university_id'] = $univRecord->id;
-                }
-            }
-        }
-
-        $user = User::create($userData);
+            return User::create($data);
+        });
 
         event(new Registered($user));
 
         Auth::login($user);
+        $request->session()->regenerate();
 
-        // Jika Dosen / Guru Pembimbing, arahkan langsung ke Dashboard Pembimbing
         if ($isAdvisor) {
-            return redirect()->route('dashboard')->with('success', 'Akun Pembimbing berhasil dibuat! Selamat datang di Portal Magang Dispusip.');
+            return redirect()->route('dashboard')->with('success', 'Akun Pembimbing berhasil dibuat. Akun Anda sedang menunggu persetujuan Admin Kampus/Sekolah. Setelah disetujui, peserta magang dapat memilih Anda sebagai pembimbing.');
         }
 
-        // Jika Mahasiswa / Siswa Peserta Magang, arahkan ke pengisian biodata profil
         return redirect()->route('student.profile.edit')->with('success', 'Akun berhasil dibuat! Silakan lengkapi profil Anda.');
     }
 }

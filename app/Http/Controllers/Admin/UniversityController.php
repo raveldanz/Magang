@@ -570,6 +570,11 @@ class UniversityController extends Controller
         $application = Application::with('user.studentProfile')->findOrFail($request->application_id);
         $advisor = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($request->academic_advisor_id);
 
+        if ($advisor->isPendingApproval()) {
+            return redirect()->route('admin.universities.show', ['university' => $university->id, 'tab' => 'mahasiswa'])
+                ->with('error', "Akun pembimbing {$advisor->name} masih menunggu persetujuan. Setujui dulu di Master Pengguna, lalu tugaskan kembali.");
+        }
+
         $placement = Placement::updateOrCreate(
             ['application_id' => $application->id],
             ['academic_advisor_id' => $advisor->id]

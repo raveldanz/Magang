@@ -30,13 +30,12 @@
     </div>
 
     @php
-        $universities = \App\Models\University::orderBy('name')->get();
+        // Hanya nama institusi yang sudah diverifikasi yang ditawarkan; nama baru tetap boleh diketik.
+        $institutionNames = \App\Models\University::where('is_verified', true)->orderBy('name')->pluck('name');
     @endphp
 
     <div class="bg-white pt-3.5 pb-5 px-5 sm:px-8 shadow-xl shadow-slate-200/60 rounded-3xl border border-slate-100"
-         x-data="{ 
-            roleType: '{{ old('register_as', 'student') }}' 
-         }">
+         x-data="{ roleType: @js(old('register_as') === 'advisor' ? 'advisor' : 'student') }">
 
         <form method="POST" action="{{ route('register') }}" class="space-y-3.5">
             @csrf
@@ -110,11 +109,14 @@
                        oninput="this.setCustomValidity('')"
                        class="block mt-1.5 w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm shadow-2xs py-2.5 px-3.5 transition" />
                 <datalist id="institution-list">
-                    @foreach($universities as $univ)
-                        <option value="{{ $univ->name }}"></option>
+                    @foreach($institutionNames as $institutionName)
+                        <option value="{{ $institutionName }}"></option>
                     @endforeach
                 </datalist>
                 <x-input-error :messages="$errors->get('university')" class="mt-1.5" />
+                <p class="mt-1.5 text-xs text-slate-600 leading-relaxed">
+                    Akun Pembimbing langsung bisa dipakai masuk. Peserta magang baru bisa memilih Anda setelah akun disetujui Admin Kampus/Sekolah.
+                </p>
             </div>
 
             <!-- Email Address -->

@@ -29,9 +29,6 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
-
-    
-
     protected function casts(): array
     {
         return [
@@ -189,8 +186,9 @@ class User extends Authenticatable
         return match ($this->role) {
             'super_admin' => 'Super Admin',
             'supervisor' => 'Supervisor',
-            'mentor' => 'Mentor Lapangan',
-            'pembimbing', 'lecturer', 'dosen', 'academic_advisor' => 'Pembimbing',
+            // Role 'pembimbing' adalah alias Mentor Lapangan (lihat CheckRole), bukan pembimbing kampus/sekolah.
+            'mentor', 'pembimbing' => 'Mentor Lapangan',
+            'lecturer', 'dosen', 'academic_advisor' => 'Pembimbing',
             'university', 'universitas' => 'Admin Universitas',
             'student', 'mahasiswa' => 'Mahasiswa Magang',
             default => ucwords(str_replace('_', ' ', (string) $this->role)),
@@ -272,5 +270,32 @@ class User extends Authenticatable
     public function isInactive(): bool
     {
         return AccountStatus::resolve($this->status) === AccountStatus::INACTIVE && ! $this->isSuperAdmin();
+    }
+
+    /** Role Pembimbing kampus/sekolah (dosen atau guru), termasuk alias lama. */
+    public const ADVISOR_ROLES = ['dosen', 'academic_advisor'];
+
+    public function isAdvisor(): bool
+    {
+        return in_array($this->role, self::ADVISOR_ROLES, true);
+    }
+
+    /**
+     * Pembimbing yang mendaftar sendiri dan belum disetujui Admin Kampus/Sekolah atau Super Admin.
+     * Boleh login, tetapi belum boleh dipilih mahasiswa atau ditugaskan membimbing.
+     */
+    public function isPendingApproval(): bool
+    {
+        return AccountStatus::resolve($this->status) === AccountStatus::PENDING;
+    }
+
+    /**
+     * Pembimbing yang boleh dipilih / ditugaskan: semua akun pembimbing kecuali yang masih
+     * Menunggu Persetujuan (status kosong pada data lama dianggap Aktif).
+     */
+    public function scopeAssignableAdvisors($query)
+    {
+        return $query->whereIn('role', self::ADVISOR_ROLES)
+            ->where(fn ($q) => $q->whereNull('status')->orWhere('status', '!=', AccountStatus::PENDING->value));
     }
 }

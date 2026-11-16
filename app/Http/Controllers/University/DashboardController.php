@@ -237,6 +237,10 @@ class DashboardController extends Controller
             return redirect()->back()->with('error', 'Dosen yang dipilih harus terdaftar di perguruan tinggi Anda.');
         }
 
+        if ($advisor->isPendingApproval()) {
+            return redirect()->back()->with('error', "Akun pembimbing {$advisor->name} masih menunggu persetujuan. Setujui dulu di menu Pembimbing, lalu tugaskan kembali.");
+        }
+
         $placement = Placement::updateOrCreate(
             ['application_id' => $application->id],
             ['academic_advisor_id' => $advisor->id]

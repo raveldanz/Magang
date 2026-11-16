@@ -170,10 +170,10 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-148** | 2026-11-16 | Skrip Demo Windows (`start_demo*.bat`, `demo_preflight.php`) | QR demo kantor berisi localhost, `.env` ditimpa permanen oleh `--pgsql`, database PostgreSQL kosong dianggap gagal sambung, worker/penjadwal berjalan ganda | RESOLVED |
 | **LRN-149** | 2026-11-16 | Keamanan: Mentor Kelompok & Command Batch Universitas | Jalur keputusan kelompok menerima `mentor_id` sembarang pengguna; `universities:process-batch*` membuat akun ber-password bawaan dan menimpa peran/status akun yang sudah ada | RESOLVED |
 | **LRN-152** | 2026-11-16 | Alur Kerja Mentor Ramah Pengguna Lansia | Catatan revisi lama ikut terkirim saat logbook disetujui; "Minta Revisi" tanpa catatan gagal tanpa pesan; angka dasbor mentor saling berbeda; modal konfirmasi kadang tertutup oleh klik pembukanya | RESOLVED |
-| **LRN-131** | 2026-11-05 | Lampiran Transkrip Keluar Batas Lembar Saat Penilaian Dua Pihak / Banyak Aspek | Keterangan skala menabrak strip bawah dan terpotong di tepi lembar A4 | RESOLVED |
-| **LRN-132** | 2026-11-11 | Integrasi Menu Keluar Akun (Logout) Multi-Device pada Home Page | Ketiadaan aksi logout pada home page (desktop header, mobile drawer, dan hero card) untuk pengguna terautentikasi | RESOLVED |
-| **LRN-133** | 2026-11-12 | Database Migration: Eksekusi Migrasi Pending certificate_themes & Robust Model Fallback | Error 500 relation "certificate_themes" does not exist saat membuka sertifikat mahasiswa | RESOLVED |
-| **LRN-134** | 2026-11-16 | Standardisasi Nomenklatur Role: Penyeragaman 'Dosen Pembimbing' Menjadi 'Pembimbing' | Penyeragaman sebutan role Dosen Pembimbing menjadi Pembimbing pada Master Pengguna Sistem | RESOLVED |
+| **LRN-153** | 2026-11-11 | Integrasi Menu Keluar Akun (Logout) Multi-Device pada Home Page (semula LRN-132 di main) | Ketiadaan aksi logout pada home page (desktop header, mobile drawer, dan hero card) untuk pengguna terautentikasi | RESOLVED |
+| **LRN-154** | 2026-11-12 | Database Migration: Eksekusi Migrasi Pending certificate_themes & Robust Model Fallback (semula LRN-133 di main) | Error 500 relation "certificate_themes" does not exist saat membuka sertifikat mahasiswa | RESOLVED |
+| **LRN-155** | 2026-11-16 | Standardisasi Nomenklatur Role: Penyeragaman 'Dosen Pembimbing' Menjadi 'Pembimbing' (semula LRN-134 di main) | Penyeragaman sebutan role Dosen Pembimbing menjadi Pembimbing pada Master Pengguna Sistem | RESOLVED |
+| **LRN-156** | 2026-11-16 | Keamanan: Pembimbing Daftar Mandiri Wajib Disetujui | Akun dosen/guru daftar mandiri langsung aktif sehingga mahasiswa bisa membuat pembimbing palsu dan menilai dirinya sendiri; nama kampus bebas membuat kampus dobel | RESOLVED |
 ---
 
 ## 3. Catatan Masalah & Solusi (Knowledge Base)
@@ -4258,7 +4258,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   1. **Larangan Asumsi Aman Tanpa Cross-Check**: Jangan pernah menyatakan suatu sistem aman atau selesai sebelum setiap peran dan modul dalam matriks 9 domain teruji secara konkret di terminal dan browser.
   2. **Larangan Fixation on Example**: Jika pengguna memberikan contoh fitur yang terlewat (misal: "lihat notifikasi dan chat"), hal tersebut merupakan indikator kegagalan cakupan, BUKAN batasan lingkup baru. Wajib periksa seluruh domain sistem tanpa kecuali.
   3. **Wajib Jalankan Master QC Suite**: Setiap sebelum menyerahkan hasil pengerjaan, jalankan `php artisan test --filter=SystemWideHolisticQcTest` dan pastikan Exit Code 0.
-### [LRN-132] Integrasi Menu Keluar Akun (Logout) Multi-Device pada Home Page
+### [LRN-153] Integrasi Menu Keluar Akun (Logout) Multi-Device pada Home Page
+> Nomor semula LRN-132 di branch main; diberi nomor baru saat merge 16 Nov 2026 karena LRN-132 sudah dipakai.
 - **Tanggal**: 2026-11-11
 - **Komponen**: `resources/views/welcome.blade.php`, `tests/Feature/ExampleTest.php`, `scripts/verify_home_logout_menu.mjs`
 - **Problem / Symptom**: Pengguna yang telah login (`@auth`) saat berada di halaman utama (*Landing / Home Page*) tidak memiliki akses cepat untuk keluar akun (*Logout*). Pada header desktop dan hero card hanya terdapat tautan *Dashboard*, sedangkan pada drawer navigasi mobile menu hanya ada tombol *Buka Dashboard* tanpa opsi *Keluar Akun*.
@@ -4273,7 +4274,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
-### [LRN-133] Database Migration: Eksekusi Migrasi Pending certificate_themes & Robust Model Fallback
+### [LRN-154] Database Migration: Eksekusi Migrasi Pending certificate_themes & Robust Model Fallback
+> Nomor semula LRN-133 di branch main; diberi nomor baru saat merge 16 Nov 2026 karena LRN-133 sudah dipakai.
 - **Tanggal**: 2026-11-12
 - **Komponen**: `database/migrations/2026_11_02_160000_create_certificate_themes_table.php`, `app/Models/CertificateTheme.php`, `app/Http/Controllers/Student/CertificateController.php`
 - **Problem / Symptom**: Terjadi error 500 `Illuminate\Database\QueryException: SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "certificate_themes" does not exist` saat mengakses sertifikat di rute `/student/certificate/{id}`.
@@ -4286,7 +4288,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
-### [LRN-134] Standardisasi Nomenklatur Role: Penyeragaman 'Dosen Pembimbing' Menjadi 'Pembimbing'
+### [LRN-155] Standardisasi Nomenklatur Role: Penyeragaman 'Dosen Pembimbing' Menjadi 'Pembimbing'
+> Nomor semula LRN-134 di branch main; diberi nomor baru saat merge 16 Nov 2026 karena LRN-134 sudah dipakai.
 - **Tanggal**: 2026-11-16
 - **Komponen**: `app/Models/User.php`, `resources/views/admin/users/index.blade.php`, `resources/views/admin/users/create.blade.php`, `resources/views/admin/users/edit.blade.php`, `scripts/verify_pembimbing_rename.mjs`
 - **Problem / Symptom**: Pada modul Master Pengguna Sistem (`/admin/users`), sebutan role dosen/pendamping akademik kampus tertulis sebagai "Dosen Pembimbing" pada dropdown filter, badge tabel, serta formulir pengguna.
@@ -4298,6 +4301,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   4. Menyelaraskan teks subtitle header dan opsi dropdown form tambah/ubah pengguna (`admin/users/create.blade.php` & `admin/users/edit.blade.php`).
   5. Memvalidasi secara visual dengan Playwright Chrome Headless (`public/test-artifacts/pembimbing_filtered_table.png`) dan memastikan seluruh test suite lolos (Strict Exit Code 0).
 - **Prevention Rule**: Seluruh penamaan label peran pengguna wajib merujuk secara konsisten ke method `roleLabel()` pada model `User` guna menjaga keselarasan antarmuka dan mempermudah penyesuaian nomenklatur di masa depan.
+- **Koreksi saat merge (16 Nov 2026)**: role `'pembimbing'` dikembalikan ke label `'Mentor Lapangan'` karena di `CheckRole` dan rute `pembimbing.*` role ini adalah alias mentor dinas, bukan pembimbing kampus/sekolah. Hanya `'dosen'` dan `'academic_advisor'` yang berlabel `'Pembimbing'`.
 
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 
@@ -4529,3 +4533,14 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   5. Modal yang ditutup dengan `@click.outside` harus mengabaikan klik selama beberapa ratus milidetik setelah dibuka.
   6. Teks status yang bergantung tanggal (berjalan/berakhir/terlambat) dihitung dari tanggal hari ini, bukan hanya dari status pengajuan.
   7. Untuk tabel lebar di halaman pengguna senior, gunakan tampilan kartu di bawah `xl` (1280px) dan tombol aksi minimal 48px.
+
+### [LRN-156] Keamanan: Pembimbing Daftar Mandiri Wajib Disetujui Admin Kampus/Sekolah
+- **Date:** 2026-11-16
+- **Problem / Symptom:** Revisi main "dosen/guru bisa daftar akun sendiri" membuat akun role `dosen` yang langsung aktif. Uji coba membuktikan mahasiswa bisa mendaftarkan akun pembimbing palsu dari kampusnya sendiri, memilih akun itu lewat `student.select_advisor`, lalu membuka form nilai pembimbing (bobot 60%) untuk dirinya sendiri. Nama kampus diketik bebas lalu `University::firstOrCreate(['name' => ...])`, sehingga "unesa" menjadi kampus baru terpisah dari Universitas Negeri Surabaya. `register.blade.php` menaruh `old('register_as')` ke JavaScript tanpa `@js()`.
+- **Root Cause:** Pendaftaran mandiri tidak punya tahap verifikasi, dan semua jalur pemilihan/penugasan pembimbing hanya memeriksa role serta kampus, bukan status akun. Pencocokan kampus tidak memakai `UniversityResolver`.
+- **Fix Applied:** Status akun baru `AccountStatus::PENDING` ("Menunggu Persetujuan"): boleh login dan melihat dashboard pembimbing (dengan keterangan), tetapi tidak muncul di daftar pilihan dan ditolak di semua jalur penugasan (pilihan mahasiswa, input email dosen oleh mahasiswa, Admin Kampus, Super Admin, `PlacementAssignmentService`). `AdvisorApprovalService` menentukan siapa yang boleh menyetujui (Admin Kampus/Sekolah institusi yang sama, atau Super Admin) dan mencatat log audit; tombol Setujui di `university/lecturers` dan Master Pengguna; lonceng memberi tahu Admin Kampus dan Super Admin (untuk institusi tanpa admin). `RegisterRequest` + `University::findOrCreateUnverified()` (nama/akronim dikenal dipakai ulang, nama baru masuk verifikasi Super Admin). Label role `pembimbing` dikembalikan ke Mentor Lapangan.
+- **Prevention Rule:**
+  1. Akun yang mendaftar sendiri tidak boleh langsung memperoleh wewenang atas pengguna lain (menilai, menyetujui); beri status menunggu persetujuan dan kunci di SEMUA jalur penugasan, bukan hanya di daftar pilihan.
+  2. Pakai `User::assignableAdvisors()` untuk daftar pembimbing yang bisa dipilih, dan `isPendingApproval()` di setiap aksi yang menetapkan `academic_advisor_id`.
+  3. Nama institusi dari input bebas wajib lewat `University::findOrCreateUnverified()` / `UniversityResolver`, jangan `firstOrCreate` langsung.
+  4. Saat menggabungkan branch lain, jalankan tes di folder salinan dengan `vendor` hasil salinan (bukan junction/symlink): PHP memuat kelas dari lokasi asli junction sehingga yang teruji adalah kode lama.
