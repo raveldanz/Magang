@@ -128,7 +128,7 @@
                                         {{ $evaluation->final_score ?? '-' }}
                                     </div>
                                     <div class="text-[11px] text-slate-500 mt-0.5">
-                                        Rata-rata Pembimbing Dinas: <strong class="text-slate-700" x-text="dinasAvg"></strong>
+                                        Rata-rata Mentor Dinas: <strong class="text-slate-700" x-text="dinasAvg"></strong>
                                     </div>
                                 </div>
                                 <div class="text-right">
@@ -143,10 +143,10 @@
                             {{-- 3 Aspek Kriteria Penilaian Lapangan --}}
                             <div class="space-y-4">
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    {{-- Disiplin / Presensi --}}
+                                    {{-- Disiplin / Kehadiran (logbook) --}}
                                     <div class="p-4 rounded-2xl bg-white border-2 border-slate-200 focus-within:border-blue-600 transition">
                                         <label class="block text-xs font-black text-slate-700 uppercase tracking-wider">
-                                            1. Disiplin & Presensi
+                                            1. Disiplin & Kehadiran
                                         </label>
                                         <p class="text-[11px] text-slate-500 mt-0.5">Skor kehadiran & ketepatan waktu</p>
                                         <input type="number" step="0.5" min="0" max="100" name="nilai_disiplin" required
@@ -185,7 +185,7 @@
                                                 <label class="block text-xs font-black text-indigo-900 uppercase tracking-wider">
                                                     Nilai Pembimbing
                                                 </label>
-                                                <p class="text-[11px] text-indigo-700 mt-0.5">Bobot Kampus: {{ $weightLecturer }}% (Bobot Dinas: {{ $weightMentor }}%)</p>
+                                                <p class="text-[11px] text-indigo-700 mt-0.5">Bobot Pembimbing: {{ $weightLecturer }}% (Bobot Dinas: {{ $weightMentor }}%)</p>
                                             </div>
                                             <input type="number" step="0.5" min="0" max="100" name="nilai_akademik"
                                                    x-model.number="akademik" @input="calculate()"
@@ -205,7 +205,7 @@
                             </div>
                         </div>
 
-                        {{-- Card 2: Monitoring Logbook Presensi & Laporan Akhir --}}
+                        {{-- Card 2: Monitoring Logbook & Laporan Akhir --}}
                         <div class="bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-xs space-y-4">
                             <div class="border-b border-slate-200 pb-3 flex items-center justify-between">
                                 <div>
@@ -223,12 +223,12 @@
                                 <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
                                     <div class="font-bold text-slate-800 flex items-center gap-2">
                                         <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                        <span>Presensi & Logbook Aktivitas</span>
+                                        <span>Logbook Aktivitas Harian</span>
                                     </div>
                                     <p class="text-slate-600">Total entri logbook yang telah diunggah: <strong>{{ $logbookCount }} hari kegiatan</strong>.</p>
                                     <a href="{{ route('admin.logbooks.index', ['search' => $student->name]) }}" target="_blank"
                                        class="inline-flex items-center gap-1 font-bold text-blue-700 hover:text-blue-800 mt-1">
-                                        Lihat Lembar Logbook & Presensi &rarr;
+                                        Lihat Logbook Harian &rarr;
                                     </a>
                                 </div>
 
@@ -376,7 +376,7 @@
                             </div>
 
                             <textarea name="resolution_note" rows="3" required
-                                      placeholder="Contoh: Skor kehadiran presensi telah disinkronisasi sesuai lembar absensi (dari 80 menjadi 85). Data peserta magang telah terverifikasi."
+                                      placeholder="Contoh: Skor kedisiplinan telah disesuaikan dengan catatan logbook harian (dari 80 menjadi 85). Data peserta magang telah terverifikasi."
                                       class="w-full text-xs p-3 rounded-xl border-2 border-slate-200 focus:border-blue-600 focus:ring-0">{{ old('resolution_note', 'Perbaikan nilai dan data kelulusan telah disesuaikan sesuai arahan catatan atasan.') }}</textarea>
 
                             {{-- Tombol Aksi --}}

@@ -355,7 +355,7 @@
                             <tr>
                                 <th class="py-3.5 px-4 w-[23%]">Peserta Magang</th>
                                 <th class="py-3.5 px-4 w-[21%]">Instansi & Unit Kerja</th>
-                                <th class="py-3.5 px-4 w-[18%]">Pembimbing Dinas</th>
+                                <th class="py-3.5 px-4 w-[18%]">Mentor Dinas</th>
                                 <th class="py-3.5 px-3 w-[9%] text-center">Logbook</th>
                                 <th class="py-3.5 px-3 w-[10%] text-center">Laporan Akhir</th>
                                 <th class="py-3.5 px-3 w-[10%] text-center">Evaluasi Nilai</th>

@@ -181,7 +181,7 @@
                                 Catatan Khusus Aspek Nilai:
                             </label>
                             <textarea name="aspect_notes[nilai]" rows="2" 
-                                      placeholder="Contoh: Skor kedisiplinan presensi mohon diverifikasi ulang dengan buku absensi..."
+                                      placeholder="Contoh: Skor kedisiplinan mohon diverifikasi ulang dengan catatan logbook harian..."
                                       class="w-full text-xs p-3 rounded-xl border border-amber-300 focus:border-amber-600 focus:ring-0 bg-white shadow-2xs">{{ old('aspect_notes.nilai') }}</textarea>
                         </div>
                     </div>
@@ -272,7 +272,7 @@
                         {{-- Ringkasan Status Logbook & Naskah Laporan --}}
                         <div class="p-3.5 bg-white/90 rounded-2xl border border-slate-200/80 space-y-2.5 text-xs">
                             <div class="flex items-center justify-between">
-                                <span class="text-slate-500">Presensi & Logbook Aktivitas:</span>
+                                <span class="text-slate-500">Logbook Aktivitas Harian:</span>
                                 <span class="font-bold text-slate-900">
                                     {{ $logbookApproved }} disetujui dari {{ $logbookTotal }} entri
                                 </span>
@@ -363,9 +363,9 @@
                                     class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
                                 + Ejaan nama sesuai KTP
                             </button>
-                            <button type="button" @click="appendNote('Nilai disiplin presensi perlu diperiksa ulang dengan logbook kehadiran.')"
+                            <button type="button" @click="appendNote('Nilai disiplin perlu diperiksa ulang dengan logbook harian.')"
                                     class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
-                                + Sinkronisasi nilai presensi
+                                + Cek nilai disiplin
                             </button>
                             <button type="button" @click="appendNote('Periksa kembali tanggal periode pelaksanaan magang pada sistem.')"
                                     class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">

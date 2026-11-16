@@ -993,7 +993,7 @@
                                             @csrf
                                             <div>
                                                 <x-input-label for="group_name" value="Nama Kelompok - Opsional" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
-                                                <x-text-input id="group_name" name="name" type="text" :value="old('name')" placeholder="Contoh: Tim Riset Kearsipan MBKM" class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-white mt-1 p-2.5" />
+                                                <x-text-input id="group_name" name="name" type="text" :value="old('name')" placeholder="Contoh: Tim Digitalisasi Arsip" class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-white mt-1 p-2.5" />
                                             </div>
 
                                             <div>

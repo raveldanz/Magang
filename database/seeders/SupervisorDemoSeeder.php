@@ -733,7 +733,7 @@ class SupervisorDemoSeeder extends Seeder
                 'approval_status' => 'revision',
                 'approved_by' => null,
                 'approved_at' => null,
-                'notes' => 'Catatan Atasan: Mohon diverifikasi kembali skor kehadiran pada lembar presensi sebelum pengesahan sertifikat.',
+                'notes' => 'Catatan Atasan: Mohon diverifikasi kembali skor kedisiplinan dengan catatan logbook harian sebelum pengesahan sertifikat.',
             ]
         );
     }

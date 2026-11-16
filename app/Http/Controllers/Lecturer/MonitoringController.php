@@ -169,7 +169,7 @@ class MonitoringController extends Controller
             fputcsv($handle, [
                 'No',
                 'Nama Peserta Magang',
-                'NIM',
+                'NIM/NIS',
                 'Tipe Pendaftaran',
                 'Kelompok Magang',
                 'Instansi Mitra',

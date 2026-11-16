@@ -360,7 +360,7 @@ class ApplicationController extends Controller
         });
 
         return redirect()->route('student.application.create')
-            ->with('success', 'Kelompok magang berhasil dibuat! Bagikan Kode Gabung kepada rekan se-kampus Anda.');
+            ->with('success', 'Kelompok magang berhasil dibuat! Bagikan Kode Gabung kepada rekan satu kampus/sekolah Anda.');
     }
 
     // Gabung kelompok menggunakan Kode Undangan (Anggota)

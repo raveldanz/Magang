@@ -251,7 +251,7 @@
 
                     <!-- 2. Pembimbing Dinas (Mentor) -->
                     <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50/70 border border-slate-100 min-w-0">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Pembimbing Dinas</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Mentor Dinas</span>
                         <div class="font-bold text-slate-900 truncate mt-1" title="{{ $mentor->name ?? 'Belum Ditugaskan' }}">{{ $mentor->name ?? 'Belum Ditugaskan' }}</div>
                         <div class="text-[11px] text-slate-500 truncate mt-0.5">
                             @if($nilaiDinas > 0)
@@ -535,7 +535,7 @@
                                     @endforelse
                                 </div>
                                 <div class="text-xs text-slate-500 flex justify-between pt-1">
-                                    <span>Bobot Kampus: {{ $univ->weight_lecturer ?? 40 }}%</span>
+                                    <span>Bobot Pembimbing: {{ $univ->weight_lecturer ?? 40 }}%</span>
                                     <span>Status: <strong class="{{ $hasEval ? 'text-emerald-700' : 'text-amber-700' }}">{{ $hasEval ? 'Telah Dinilai' : 'Belum Diisi' }}</strong></span>
                                 </div>
                             @endif

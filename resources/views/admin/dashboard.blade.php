@@ -217,10 +217,10 @@
                     </div>
                     <div>
                         <h4 class="font-bold text-slate-900 text-sm">
-                            Terdapat {{ $pendingUniversities->count() }} Kampus/Sekolah yang Belum Memiliki Akun Admin Kampus
+                            Terdapat {{ $pendingUniversities->count() }} Kampus/Sekolah yang Belum Memiliki Akun Admin Kampus/Sekolah
                         </h4>
                         <p class="text-xs text-slate-600 mt-0.5">
-                            Di antaranya: <strong>{{ $pendingUniversities->take(5)->pluck('name')->implode(', ') }}</strong>{{ $pendingUniversities->count() > 5 ? ' dan '.($pendingUniversities->count() - 5).' kampus lainnya' : '' }}. Buatkan akun login Admin Kampus bila kampus tersebut perlu memantau mahasiswanya.
+                            Di antaranya: <strong>{{ $pendingUniversities->take(5)->pluck('name')->implode(', ') }}</strong>{{ $pendingUniversities->count() > 5 ? ' dan '.($pendingUniversities->count() - 5).' kampus/sekolah lainnya' : '' }}. Buatkan akun login Admin Kampus/Sekolah bila institusi tersebut perlu memantau peserta magangnya.
                         </p>
                     </div>
                 </div>

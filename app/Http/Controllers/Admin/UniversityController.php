@@ -644,9 +644,9 @@ class UniversityController extends Controller
 
             fputcsv($handle, [
                 'No',
-                'NIM',
+                'NIM/NIS',
                 'Nama Peserta Magang',
-                'Program Studi',
+                'Program Studi/Jurusan',
                 'Instansi Magang',
                 'Unit / Bidang Kerja',
                 'Pembimbing',

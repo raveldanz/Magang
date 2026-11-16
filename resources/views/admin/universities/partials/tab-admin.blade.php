@@ -40,7 +40,7 @@
                             <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
                                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Waktu Pembuatan</span>
                                 <div class="font-mono text-xs text-slate-700 mt-1">{{ $adminAccount->created_at ? $adminAccount->created_at->translatedFormat('d M Y H:i') : '-' }}</div>
-                                <div class="text-xs text-slate-500">Kredensial Default: password</div>
+                                <div class="text-xs text-slate-500">Password sementara hanya ditampilkan sekali saat dibuat atau di-reset</div>
                             </div>
                         </div>
 
@@ -51,7 +51,7 @@
                                     @csrf
                                     <button type="submit" class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
-                                        <span>Masuk Sebagai Admin Kampus (Login As)</span>
+                                        <span>Masuk Sebagai Admin Kampus/Sekolah (Login As)</span>
                                     </button>
                                 </form>
                             @endif

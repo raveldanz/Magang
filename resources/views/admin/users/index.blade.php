@@ -308,7 +308,7 @@
                                     </td>
 
                                     <!-- Instansi (Ringkas & Proporsional, teks membungkus rapi) -->
-                                    <td class="py-4 px-4 text-xs text-slate-600 max-w-[220px]">
+                                    <td class="py-4 px-4 text-xs text-slate-600 min-w-[200px] max-w-[260px]">
                                         @if($u->agencyProfile || in_array($u->role, ['admin', 'supervisor', 'mentor', 'pembimbing']))
                                             <div class="font-semibold text-gray-800 text-xs">Dispusip Surabaya</div>
                                             <div class="text-[10px] text-gray-400">Pemerintah Kota Surabaya</div>

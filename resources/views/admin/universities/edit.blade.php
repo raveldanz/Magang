@@ -143,7 +143,7 @@
                                 <input type="radio" name="evaluation_scheme" value="dual_evaluation" x-model="scheme" class="mt-0.5 text-blue-600">
                                 <div>
                                     <strong class="text-gray-900 block">Kemitraan Dua Pihak / Kustom</strong>
-                                    <span class="text-gray-500 text-[11px] block mt-0.5">Dinilai Mentor Dinas & Pembimbing (atau opsi 100% Kampus).</span>
+                                    <span class="text-gray-500 text-[11px] block mt-0.5">Dinilai Mentor Dinas & Pembimbing (atau opsi 100% Pembimbing).</span>
                                 </div>
                             </label>
                         </div>

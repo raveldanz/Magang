@@ -247,7 +247,7 @@
                                         <span class="font-bold text-xs sm:text-sm text-gray-900">Kemitraan Terpadu (Dua Pihak / Kustom)</span>
                                     </div>
                                     <p class="text-xs text-gray-500 mt-1 leading-relaxed">
-                                        Peserta Magang dibimbing & dinilai secara fleksibel antara <strong>Mentor Dinas</strong> dan/atau <strong>Pembimbing</strong> (termasuk opsi 100% Kampus).
+                                        Peserta Magang dibimbing & dinilai secara fleksibel antara <strong>Mentor Dinas</strong> dan/atau <strong>Pembimbing</strong> (termasuk opsi 100% Pembimbing).
                                     </p>
                                     <div class="mt-2.5 pt-2 border-t border-gray-100/80 flex items-center gap-3 text-[11px] text-gray-600">
                                         <span>✓ Bobot Pembagian Nilai Dinamis</span>
@@ -376,7 +376,7 @@
                                 <div class="flex items-center justify-between border-b border-slate-200 pb-2">
                                     <div class="flex items-center gap-1.5">
                                         <span class="w-2 h-2 rounded-full bg-purple-600"></span>
-                                        <h5 class="text-xs font-bold text-slate-900 uppercase tracking-wide">Komponen Penilaian Pembimbing (Akademik Kampus)</h5>
+                                        <h5 class="text-xs font-bold text-slate-900 uppercase tracking-wide">Komponen Penilaian Pembimbing (Kampus/Sekolah)</h5>
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <button type="button" @click="addDpl()" class="text-[11px] font-bold text-purple-600 hover:text-purple-800 cursor-pointer">

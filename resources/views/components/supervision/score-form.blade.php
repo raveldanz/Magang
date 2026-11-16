@@ -277,7 +277,7 @@
                         </div>
                         <div class="flex flex-wrap items-center gap-1.5">
                             @if ($role === 'mentor')
-                                <button type="button" @click="addAspect('Kedisiplinan & Presensi Kehadiran')" class="min-h-[36px] px-3 py-1 bg-white hover:bg-slate-100 text-slate-800 text-xs font-medium rounded-lg border border-slate-300 transition cursor-pointer">+ Kehadiran</button>
+                                <button type="button" @click="addAspect('Kedisiplinan & Kehadiran (Logbook)')" class="min-h-[36px] px-3 py-1 bg-white hover:bg-slate-100 text-slate-800 text-xs font-medium rounded-lg border border-slate-300 transition cursor-pointer">+ Kehadiran</button>
                                 <button type="button" @click="addAspect('Kualitas Output & Ketepatan Tugas')" class="min-h-[36px] px-3 py-1 bg-white hover:bg-slate-100 text-slate-800 text-xs font-medium rounded-lg border border-slate-300 transition cursor-pointer">+ Kualitas Tugas</button>
                                 <button type="button" @click="addAspect('Inisiatif, Problem Solving & Kerja Tim')" class="min-h-[36px] px-3 py-1 bg-white hover:bg-slate-100 text-slate-800 text-xs font-medium rounded-lg border border-slate-300 transition cursor-pointer">+ Kerjasama Tim</button>
                                 <button type="button" @click="addAspect('Etika Kerja & Komunikasi Kedinasan')" class="min-h-[36px] px-3 py-1 bg-white hover:bg-slate-100 text-slate-800 text-xs font-medium rounded-lg border border-slate-300 transition cursor-pointer">+ Etika Kerja</button>
@@ -382,7 +382,7 @@
                         <div class="text-2xl font-black text-slate-900 mt-1" x-text="finalScore !== null ? finalScore : (avg !== null ? avg : '-')">-</div>
                         @if ($role === 'lecturer' && !$isMentorOnly && $dinasScore > 0)
                             <span class="text-xs text-slate-600 block mt-1 font-medium">
-                                Bobot: {{ $weightMentor }}% Dinas, {{ $weightLecturer }}% Kampus
+                                Bobot: {{ $weightMentor }}% Dinas, {{ $weightLecturer }}% Pembimbing
                             </span>
                         @endif
                     </div>

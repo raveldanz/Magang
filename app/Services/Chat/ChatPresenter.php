@@ -1409,7 +1409,7 @@ class ChatPresenter
             'super_admin' => 'Super Admin',
             'admin' => 'Admin Dispusip',
             'supervisor' => 'Tim Kerja Umum dan Kepegawaian',
-            'mentor', 'pembimbing' => 'Pembimbing Lapangan',
+            'mentor', 'pembimbing' => 'Mentor Lapangan',
             'dosen', 'academic_advisor' => 'Pembimbing',
             'universitas', 'university' => 'Admin Kampus/Sekolah',
             'mahasiswa', 'student' => 'Peserta Magang',

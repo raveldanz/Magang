@@ -13,7 +13,7 @@
                 <h2 class="font-black text-xl text-gray-900 tracking-tight">
                     Tambah Pengguna Sistem Baru
                 </h2>
-                <p class="text-xs text-gray-500">Registrasi akun baru untuk admin, mentor, pembimbing, universitas, atau
+                <p class="text-xs text-gray-500">Registrasi akun baru untuk admin, mentor, pembimbing, admin kampus/sekolah, atau
                     peserta magang</p>
             </div>
         </div>
@@ -62,8 +62,9 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Password Awal (Opsional)
                             </label>
-                            <input type="text" name="password" placeholder="Default: password"
+                            <input type="text" name="password" placeholder="Kosongkan: dibuat acak otomatis"
                                 class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                            <p class="mt-1 text-[11px] text-slate-500">Bila dikosongkan, sistem membuat password sementara acak yang ditampilkan sekali setelah disimpan.</p>
                         </div>
                     </div>
 
