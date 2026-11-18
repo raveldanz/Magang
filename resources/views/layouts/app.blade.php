@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth overflow-x-hidden w-full">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth overflow-x-clip w-full">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -32,7 +32,7 @@
             [x-cloak] { display: none !important; }
             html, body {
                 max-width: 100vw;
-                overflow-x: hidden;
+                overflow-x: clip;
             }
         </style>
     </head>
@@ -40,7 +40,7 @@
         // Jumlah pesan chat belum dibaca (badge navbar); diperbarui live oleh resources/js/chat/notifier.js
         $chatUnread = auth()->check() ? app(\App\Services\Chat\ChatService::class)->unreadTotalForNavbar(auth()->user()) : 0;
     @endphp
-    <body class="app-readable font-sans antialiased bg-[#F5F8FC] text-slate-900 overflow-x-hidden w-full relative" x-data="{}"
+    <body class="app-readable font-sans antialiased bg-[#F5F8FC] text-slate-900 overflow-x-clip w-full relative" x-data="{}"
           @auth
           data-chat-summary-url="{{ route('chat.api.summary', [], false) }}"
           data-chat-user="{{ auth()->id() }}"
@@ -48,7 +48,7 @@
           data-chat-poll-visible="{{ config('chat.poll.summary_visible') }}"
           data-chat-poll-hidden="{{ config('chat.poll.summary_hidden') }}"
           @endauth>
-        <div class="min-h-screen bg-[#F5F8FC] w-full overflow-x-hidden flex flex-col">
+        <div class="min-h-screen bg-[#F5F8FC] w-full overflow-x-clip flex flex-col">
             
             <header class="sticky top-0 z-50 bg-white w-full border-b border-slate-200/80">
                 @if(session()->has('impersonator_id'))
