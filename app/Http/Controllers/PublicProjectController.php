@@ -79,10 +79,10 @@ class PublicProjectController extends Controller
             default => $query->orderBy('created_at', 'desc'),
         };
 
-        $projects = $query->get();
+        $projects = $query->paginate(6)->withQueryString();
 
         // 5. Kelompokkan Proyek Berdasarkan Tahun untuk Tampilan Timeline Estetik
-        $groupedProjects = $projects->groupBy(function ($item) {
+        $groupedProjects = $projects->getCollection()->groupBy(function ($item) {
             return $item->created_at ? $item->created_at->format('Y') : date('Y');
         });
 
@@ -113,6 +113,7 @@ class PublicProjectController extends Controller
         ];
 
         return view('projects.index', compact(
+            'projects',
             'groupedProjects',
             'availableYears',
             'stats',
