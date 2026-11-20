@@ -228,7 +228,7 @@
         </button>
 
         <!-- Nama Berkas Foto (Dapat Diklik Langsung untuk Pratinjau) -->
-        <div class="min-w-0 flex-1 truncate text-xs">
+        <div class="min-w-0 flex-1 break-words text-xs sm:truncate">
             <!-- Jika baru saja memilih file dari komputer -->
             <template x-if="photoName">
                 <a href="javascript:void(0)"
@@ -484,10 +484,10 @@
                     </button>
 
                     <!-- Tempat Teks / Nama File yang Menggantikan 'No file chosen' -->
-                    <div class="min-w-0 flex-1 truncate text-xs">
+                    <div class="min-w-0 flex-1 break-words text-xs sm:truncate">
                         <!-- Jika ada file baru yang dipilih dari perangkat -->
                         <template x-if="selectedName">
-                            <span class="text-slate-700 font-medium truncate block" x-text="selectedName"></span>
+                            <span class="text-slate-700 font-medium block break-words sm:truncate" x-text="selectedName"></span>
                         </template>
 
                         <!-- Jika file sudah tersimpan di database: nama bersih & bisa diklik -->
@@ -558,9 +558,9 @@
                         Pilih Berkas
                     </button>
 
-                    <div class="min-w-0 flex-1 truncate text-xs">
+                    <div class="min-w-0 flex-1 break-words text-xs sm:truncate">
                         <template x-if="selectedName">
-                            <span class="text-slate-700 font-medium truncate block" x-text="selectedName"></span>
+                            <span class="text-slate-700 font-medium block break-words sm:truncate" x-text="selectedName"></span>
                         </template>
 
                         @if($hasTranscript)

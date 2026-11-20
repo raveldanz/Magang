@@ -84,6 +84,29 @@
                 $progressPercent = round(($stepCount / 7) * 100);
             @endphp
 
+            <section class="ui-card mb-4 space-y-3 md:hidden" aria-labelledby="student-next-heading">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <h3 id="student-next-heading" class="ui-h3">Status Magang</h3>
+                    @if ($application)
+                        <x-status-badge :status="$application->status" />
+                    @endif
+                </div>
+                @if ($application)
+                    <p class="ui-body">{{ $rawSt === 'waiting_approval' ? 'Menunggu pengesahan akhir' : (\App\Enums\ApplicationStatus::resolve($rawSt)?->description('mahasiswa') ?? $appStatusLabel) }}</p>
+                @endif
+                @php
+                    $nextStep = match (true) {
+                        empty($profile?->nim) => ['Lengkapi profil', route('student.profile.edit')],
+                        !$application || in_array($rawSt, ['draft', 'pending', 'waiting_approval', 'rejected', 'resigned'], true)
+                            => ['Buka pengajuan', route('student.application.create')],
+                        $rawSt === 'active' => ['Buka logbook', route('student.logbook.index')],
+                        $rawSt === 'completed' => ['Lihat laporan dan sertifikat', route('student.final_report.index')],
+                        default => ['Lihat detail pengajuan', route('student.application.create')],
+                    };
+                @endphp
+                <a class="btn-primary w-full min-h-[44px] justify-center" href="{{ $nextStep[1] }}">{{ $nextStep[0] }}</a>
+            </section>
+
             <!-- 1. EXECUTIVE CIVIC BANNER -->
             <div x-data="{ showDetailModal: false }" class="space-y-6">
                 <div class="rounded-2xl p-6 sm:p-8 text-white shadow-sm relative overflow-hidden bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 border border-blue-900">
@@ -92,14 +115,14 @@
                         <!-- Sisi Kiri: Teks & Info -->
                         <div class="lg:col-span-8 space-y-4">
                             <div class="space-y-1.5">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide bg-white/10 text-blue-100 border border-white/15">
+                                <span class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide bg-white/10 text-blue-100 border border-white/15">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                                     Status: {{ $appStatusLabel }}
                                 </span>
                                 <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
                                     Selamat Datang, {{ Auth::user()->name }}!
                                 </h1>
-                                <p class="text-xs sm:text-sm leading-relaxed text-blue-100/90 max-w-xl">
+                                <p class="hidden md:block text-xs sm:text-sm leading-relaxed text-blue-100/90 max-w-xl">
                                     Portal Terpadu Pelaksanaan Magang & Praktik Kerja Lapangan Dinas Perpustakaan dan Kearsipan Kota Surabaya
                                 </p>
                             </div>
@@ -142,7 +165,7 @@
                                 </div>
                                 <div class="pt-1 flex items-center justify-between text-[11px]">
                                     <span class="text-blue-200/90">{{ $stepCount }} dari 7 Tahap</span>
-                                    <button type="button" @click="showDetailModal = true" class="font-bold text-white hover:text-amber-300 underline transition cursor-pointer">
+                                    <button type="button" @click="showDetailModal = true" class="min-h-[44px] md:min-h-0 font-bold text-white hover:text-amber-300 underline transition cursor-pointer">
                                         Lihat Detail
                                     </button>
                                 </div>

@@ -436,13 +436,13 @@
 
                             <button type="button" 
                                     @click="document.getElementById('source_code').click()"
-                                    class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
+                                    class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 min-h-[44px] sm:min-h-0 cursor-pointer shadow-2xs">
                                 Pilih Berkas
                             </button>
 
-                            <div class="min-w-0 flex-1 truncate text-xs">
+                            <div class="min-w-0 flex-1 break-words text-xs sm:truncate">
                                 <template x-if="zipName">
-                                    <span class="text-blue-700 font-bold truncate block" x-text="zipName"></span>
+                                    <span class="text-blue-700 font-bold block break-words sm:truncate" x-text="zipName"></span>
                                 </template>
                                 <template x-if="!zipName">
                                     <span class="text-slate-400">Belum ada berkas dipilih</span>
@@ -481,13 +481,13 @@
 
                             <button type="button" 
                                     @click="document.getElementById('coverPhotoInput').click()"
-                                    class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
+                                    class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 min-h-[44px] sm:min-h-0 cursor-pointer shadow-2xs">
                                 Pilih Berkas
                             </button>
 
-                            <div class="min-w-0 flex-1 truncate text-xs">
+                            <div class="min-w-0 flex-1 break-words text-xs sm:truncate">
                                 <template x-if="coverName">
-                                    <span class="text-blue-700 font-bold truncate block" x-text="coverName"></span>
+                                    <span class="text-blue-700 font-bold block break-words sm:truncate" x-text="coverName"></span>
                                 </template>
                                 <template x-if="!coverName">
                                     <span class="text-slate-400">Belum ada berkas dipilih</span>
@@ -525,13 +525,13 @@
 
                             <button type="button" 
                                     @click="document.getElementById('screenshotsInput').click()"
-                                    class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
+                                    class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 min-h-[44px] sm:min-h-0 cursor-pointer shadow-2xs">
                                 Pilih Berkas
                             </button>
 
-                            <div class="min-w-0 flex-1 truncate text-xs">
+                            <div class="min-w-0 flex-1 break-words text-xs sm:truncate">
                                 <template x-if="ssCountText">
-                                    <span class="text-blue-700 font-bold truncate block" x-text="ssCountText"></span>
+                                    <span class="text-blue-700 font-bold block break-words sm:truncate" x-text="ssCountText"></span>
                                 </template>
                                 <template x-if="!ssCountText">
                                     <span class="text-slate-400">Belum ada berkas dipilih</span>
@@ -582,13 +582,13 @@
 
                             <button type="button" 
                                     @click="document.getElementById('communityPhotosInput').click()"
-                                    class="px-3.5 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
+                                    class="px-3.5 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-xl transition shrink-0 min-h-[44px] sm:min-h-0 cursor-pointer shadow-2xs">
                                 Pilih Berkas
                             </button>
 
-                            <div class="min-w-0 flex-1 truncate text-xs">
+                            <div class="min-w-0 flex-1 break-words text-xs sm:truncate">
                                 <template x-if="cpCountText">
-                                    <span class="text-emerald-800 font-bold truncate block" x-text="cpCountText"></span>
+                                    <span class="text-emerald-800 font-bold block break-words sm:truncate" x-text="cpCountText"></span>
                                 </template>
                                 <template x-if="!cpCountText">
                                     <span class="text-slate-400">Belum ada berkas dipilih</span>
@@ -637,13 +637,13 @@
 
                             <button type="button" 
                                     @click="document.getElementById('documentsInput').click()"
-                                    class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
+                                    class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 min-h-[44px] sm:min-h-0 cursor-pointer shadow-2xs">
                                 Pilih Berkas
                             </button>
 
-                            <div class="min-w-0 flex-1 truncate text-xs">
+                            <div class="min-w-0 flex-1 break-words text-xs sm:truncate">
                                 <template x-if="docCountText">
-                                    <span class="text-blue-700 font-bold truncate block" x-text="docCountText"></span>
+                                    <span class="text-blue-700 font-bold block break-words sm:truncate" x-text="docCountText"></span>
                                 </template>
                                 <template x-if="!docCountText">
                                     <span class="text-slate-400">Belum ada berkas dipilih</span>

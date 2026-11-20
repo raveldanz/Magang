@@ -82,7 +82,9 @@ Semua badge status wajib lewat `<x-status-badge :status="..." type="application|
   - Di bawah 640 px, daftar instansi mengikuti alur formulir dan dapat digulir. Mulai 640 px, daftar terbuka tepat di bawah input sebagai dropdown.
   - Jalankan `node scripts/ui_stage1_audit.mjs --tag after --strict` dengan token fixture lokal `STAGE1_LETTER_TOKEN` dan `STAGE1_CERTIFICATE_TOKEN`.
   - Audit mencakup 17 skenario pada 1440 x 900 dan 375 x 812, ditambah 16 tangkapan interaksi.
-- [ ] **Tahap 2 — Portal Mahasiswa** (`student/dashboard`, `profile`, `application`, `logbook`, `final_report`, `projects`)
+- [x] **Tahap 2 — Portal Mahasiswa** (`student/dashboard`, `profile`, `application`, `logbook`, `final_report`, `projects`) — **Selesai**
+  - Audit langsung memakai Edge pada 375 × 812 dan 1440 × 900. Playwright Chrome melengkapi matriks Beranda, Profil, pengajuan individu dan kelompok, riwayat dan editor Logbook, buat dan edit proyek, Laporan Akhir, serta pratinjau sertifikat. PHPUnit terkait lulus 136/136.
+  - Pola seluler: status dan langkah berikutnya di Beranda, kartu riwayat dengan aksi 44 piksel, pintasan ke naskah laporan, dan nama berkas yang bisa membungkus. Skenario transisi dan penyimpanan diuji melalui PHPUnit dengan data uji.
 - [ ] **Tahap 3A — Portal Admin Dinas & Super Admin (Dashboard, Pengajuan, Instansi/Unit)**
 - [ ] **Tahap 3B — Portal Admin Dinas & Super Admin (Kampus/Sekolah, Pengguna, Mentor, Logbook, Sertifikat, Feedback, Audit)**
 - [ ] **Tahap 4 — Portal Supervisor / Atasan** (`supervisor/dashboard`, `applications`, `reports`, `certificates`)

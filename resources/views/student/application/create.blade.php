@@ -1164,7 +1164,7 @@
                         @php $st = $app->statusValue(); @endphp
                         <div class="p-5 space-y-3 hover:bg-slate-50/70 transition-colors duration-150">
                             <!-- Header: Tanggal & Status -->
-                            <div class="flex items-center justify-between gap-2">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
                                 <div class="text-xs text-slate-400 font-mono">
                                     {{ $app->created_at->translatedFormat('d M Y, H:i') }}
                                 </div>
@@ -1173,7 +1173,7 @@
 
                             <!-- Body: Unit -->
                             <div>
-                                <div class="font-bold text-slate-900 text-sm leading-snug">{{ $app->unit->name ?? '-' }}</div>
+                                <div class="break-words font-bold text-slate-900 text-sm leading-snug">{{ $app->unit->name ?? '-' }}</div>
                                 @if($app->group_id && $app->group)
                                     <div class="mt-1">
                                         <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
@@ -1185,7 +1185,7 @@
                             </div>
 
                             <!-- Body: Periode Magang -->
-                            <div class="text-xs text-slate-600 bg-slate-50/80 px-3 py-2 rounded-xl border border-slate-100 flex items-center justify-between">
+                            <div class="text-xs text-slate-600 bg-slate-50/80 px-3 py-2 rounded-xl border border-slate-100 flex flex-wrap items-center justify-between gap-2">
                                 <span class="text-slate-400 text-[11px] font-semibold uppercase tracking-wider">Periode</span>
                                 <span class="font-medium text-slate-700">{{ \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M Y') }} - {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}</span>
                             </div>
@@ -1203,7 +1203,7 @@
                             @if (in_array($st, ['accepted', 'active', 'completed']))
                                 <div class="pt-1">
                                     <a href="{{ route('student.application.letter', $app->id) }}" target="_blank"
-                                       class="inline-flex w-full justify-center items-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 rounded-xl text-xs font-semibold transition">
+                                       class="inline-flex min-h-[44px] w-full justify-center items-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 rounded-xl text-xs font-semibold transition">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                                         <span>Unduh Surat PDF</span>
                                     </a>
