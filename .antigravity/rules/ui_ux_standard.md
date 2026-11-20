@@ -78,7 +78,10 @@ Semua badge status wajib lewat `<x-status-badge :status="..." type="application|
 ## 5. Checklist Progres 11 Tahap
 
 - [x] **Tahap 0 — Fondasi Layout Global & Design System** (`layouts/*`, `components/*`, `app.css`, `tailwind.config.js`, `Enums`, pagination) — **Selesai**
-- [ ] **Tahap 1 — Halaman Publik, Auth & Verifikasi QR** (`welcome`, `auth/*`, `public/projects/*`, `verify-*`)
+- [x] **Tahap 1 — Halaman Publik, Auth & Verifikasi QR** (`welcome`, `auth/*`, `projects/*`, `verify-*`) — **Selesai**
+  - Di bawah 640 px, daftar instansi mengikuti alur formulir dan dapat digulir. Mulai 640 px, daftar terbuka tepat di bawah input sebagai dropdown.
+  - Jalankan `node scripts/ui_stage1_audit.mjs --tag after --strict` dengan token fixture lokal `STAGE1_LETTER_TOKEN` dan `STAGE1_CERTIFICATE_TOKEN`.
+  - Audit mencakup 17 skenario pada 1440 x 900 dan 375 x 812, ditambah 16 tangkapan interaksi.
 - [ ] **Tahap 2 — Portal Mahasiswa** (`student/dashboard`, `profile`, `application`, `logbook`, `final_report`, `projects`)
 - [ ] **Tahap 3A — Portal Admin Dinas & Super Admin (Dashboard, Pengajuan, Instansi/Unit)**
 - [ ] **Tahap 3B — Portal Admin Dinas & Super Admin (Kampus/Sekolah, Pengguna, Mentor, Logbook, Sertifikat, Feedback, Audit)**

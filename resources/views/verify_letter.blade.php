@@ -7,35 +7,36 @@
     @endphp
 
 
-    <div class="py-10 max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-xl rounded-2xl p-6 border-t-8 border-green-500">
+    <div class="py-2 sm:py-4 w-full">
+        <div class="bg-white overflow-hidden shadow-xl shadow-slate-200/60 rounded-3xl p-5 sm:p-6 border border-slate-200/80 border-t-8 border-t-emerald-600">
             
             <!-- Header Logo / Instansi -->
-            <div class="text-center pb-4 border-b">
-                <div class="flex items-center justify-center gap-3 mb-2">
-                    <img src="{{ asset('images/logos/surabaya.png') }}" alt="Logo {{ $govName }}" class="h-14 w-auto object-contain">
+            <div class="text-center pb-4 border-b border-slate-100">
+                <div class="flex items-center justify-center gap-3 mb-2.5">
+                    <img src="{{ asset('images/logos/surabaya.png') }}" alt="Logo {{ $govName }}" class="h-12 sm:h-14 w-auto object-contain">
                     @if($agency)
-                        <img src="{{ $agency->logo_url }}" alt="Logo {{ $agencyName }}" class="w-14 h-14 object-contain">
+                        <div class="h-7 w-px bg-slate-200"></div>
+                        <img src="{{ $agency->logo_url }}" alt="Logo {{ $agencyName }}" class="h-12 sm:h-14 w-auto max-w-[120px] object-contain">
                     @endif
                 </div>
-                <h2 class="text-lg font-bold text-gray-800 uppercase tracking-wide">{{ $govName }}</h2>
-                <h1 class="text-xl font-extrabold text-blue-900 uppercase">{{ $agencyName }}</h1>
-                <p class="text-xs text-gray-500 mt-1">Sistem Informasi Pendaftaran & Validasi Magang Resmi</p>
+                <h2 class="text-xs font-bold text-slate-600 uppercase tracking-widest">{{ $govName }}</h2>
+                <h1 class="text-lg sm:text-xl font-black text-slate-900 uppercase tracking-wide mt-0.5">{{ $agencyName }}</h1>
+                <p class="text-xs text-slate-500 mt-1">Sistem Informasi Pendaftaran &amp; Validasi Magang Resmi</p>
             </div>
 
             <!-- Badge Status Verifikasi Sah -->
-            <div class="vstatus mt-6 flex items-center space-x-4 bg-green-50 p-4 rounded-xl border border-green-200 shadow-sm">
-                <div class="vstatus-icon flex-shrink-0 bg-green-500 text-white p-3 rounded-full shadow-md">
+            <div class="vstatus mt-6 flex items-center space-x-4 bg-emerald-50 p-4 rounded-2xl border border-emerald-200 shadow-xs">
+                <div class="vstatus-icon flex-shrink-0 bg-emerald-600 text-white p-3 rounded-full shadow-md">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
                     </svg>
                 </div>
                 <div>
-                    <span class="vbadge inline-block px-2.5 py-0.5 text-xs font-bold bg-green-200 text-green-800 rounded-full mb-1">
+                    <span class="vbadge inline-block px-2.5 py-0.5 text-xs font-black bg-emerald-200 text-emerald-900 rounded-full mb-1">
                         TERVERIFIKASI SAH
                     </span>
-                    <h3 class="font-extrabold text-green-900 text-base leading-tight">DOKUMEN SURAT BALASAN RESMI</h3>
-                    <p class="text-xs text-green-700 mt-0.5">Surat Keterangan Diterima Magang ini terdaftar dan tercatat valid pada database sistem.</p>
+                    <h3 class="font-extrabold text-emerald-950 text-base leading-tight">DOKUMEN SURAT BALASAN RESMI</h3>
+                    <p class="text-xs text-emerald-800 mt-0.5">Surat Keterangan Diterima Magang ini terdaftar dan tercatat valid pada database sistem.</p>
                 </div>
             </div>
 
@@ -78,13 +79,13 @@
                             <dd class="vvalue">
                                 <ul class="divide-y divide-slate-100 mt-1 border rounded-lg bg-slate-50 p-2 text-xs space-y-1.5">
                                     @foreach($verifiedGroupMembers as $gApp)
-                                        <li class="flex items-center justify-between py-1">
-                                            <div>
-                                                <span class="font-bold text-slate-800">{{ $gApp->user?->name }}</span>
+                                        <li class="flex items-start justify-between gap-2 py-1.5">
+                                            <div class="min-w-0">
+                                                <span class="font-bold text-slate-800 break-words">{{ $gApp->user?->name }}</span>
                                                 <span class="text-slate-500 font-mono">({{ $gApp->user?->studentProfile?->nim ?? 'NIM' }})</span>
                                                 <div class="text-[11px] text-slate-500">{{ $gApp->user?->studentProfile?->jurusan ?? '-' }}</div>
                                             </div>
-                                            <span class="text-[10px] font-bold px-2 py-0.5 rounded {{ $gApp->role_in_group === 'leader' ? 'bg-blue-100 text-blue-700' : 'bg-slate-200 text-slate-700' }}">
+                                            <span class="text-[11px] font-bold px-2 py-0.5 rounded shrink-0 {{ $gApp->role_in_group === 'leader' ? 'bg-blue-100 text-blue-700' : 'bg-slate-200 text-slate-700' }}">
                                                 {{ $gApp->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }}
                                             </span>
                                         </li>
@@ -122,9 +123,14 @@
             </div>
 
             <!-- Footer Keamanan -->
-            <div class="mt-8 pt-4 border-t text-center text-xs text-gray-400">
+            <div class="mt-8 pt-4 border-t border-slate-100 text-center text-xs text-slate-500 space-y-2">
                 <p>Halaman ini diterbitkan secara otomatis oleh Sistem Informasi Magang sebagai bentuk keaslian dokumen digital.</p>
-                <p class="mt-1 font-semibold text-gray-500">© {{ date('Y') }} {{ $agencyName }} {{ $govName }}</p>
+                <p class="font-semibold text-slate-600">© {{ date('Y') }} {{ $agencyName }} {{ $govName }}</p>
+                <div class="pt-1">
+                    <a href="{{ url('/') }}" class="inline-flex items-center justify-center min-h-[40px] px-3 text-xs font-bold text-blue-600 hover:text-blue-800 rounded-xl hover:bg-blue-50/70 transition">
+                        Kembali ke Beranda Portal Magang
+                    </a>
+                </div>
             </div>
 
         </div>

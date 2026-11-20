@@ -31,13 +31,32 @@
 
     @php
         // Hanya nama institusi yang sudah diverifikasi yang ditawarkan; nama baru tetap boleh diketik.
-        $institutionNames = \App\Models\University::where('is_verified', true)->orderBy('name')->pluck('name');
+        $institutionNames = \App\Models\University::where('is_verified', true)
+            ->orderBy('name')
+            ->pluck('name')
+            ->values()
+            ->all();
     @endphp
 
-    <div class="bg-white pt-3.5 pb-5 px-5 sm:px-8 shadow-xl shadow-slate-200/60 rounded-3xl border border-slate-100"
-         x-data="{ roleType: @js(old('register_as') === 'advisor' ? 'advisor' : 'student') }">
+    <div class="bg-white p-5 sm:px-8 sm:py-6 shadow-xl shadow-slate-200/60 rounded-3xl border border-slate-200/80"
+         x-data="{
+            roleType: @js(old('register_as') === 'advisor' ? 'advisor' : 'student'),
+            institutionQuery: @js((string) old('university', '')),
+            institutionOpen: false,
+            institutions: @js($institutionNames),
+            get filteredInstitutions() {
+                const q = (this.institutionQuery || '').trim().toLowerCase();
+                if (!q) return this.institutions.slice(0, 20);
+                return this.institutions.filter((name) => name.toLowerCase().includes(q)).slice(0, 25);
+            },
+            pickInstitution(name) {
+                this.institutionQuery = name;
+                this.$refs.institutionInput.focus();
+                this.institutionOpen = false;
+            }
+         }">
 
-        <form method="POST" action="{{ route('register') }}" class="space-y-3.5">
+        <form method="POST" action="{{ route('register') }}" class="space-y-4">
             @csrf
 
             <!-- Input Hidden Penentu Role -->
@@ -51,13 +70,13 @@
                 <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200/80">
                     <!-- Tab 1: Mahasiswa / Siswa -->
                     <button type="button"
-                            @click="roleType = 'student'"
+                            @click="roleType = 'student'; institutionOpen = false"
                             :class="roleType === 'student' 
                                 ? 'bg-blue-600 text-white shadow-sm font-bold' 
                                 : 'text-slate-600 hover:text-slate-900 font-semibold hover:bg-white/60'"
-                            class="py-2 px-2.5 rounded-xl text-xs transition-all duration-150 flex flex-col items-center justify-center cursor-pointer">
+                            class="min-h-[50px] py-2 px-2.5 rounded-xl text-xs transition-all duration-150 flex flex-col items-center justify-center cursor-pointer">
                         <span>Peserta Magang</span>
-                        <span class="text-[9.5px] opacity-85 font-normal">Mahasiswa / Siswa PKL</span>
+                        <span class="text-[11px] opacity-85 font-normal">Mahasiswa / Siswa PKL</span>
                     </button>
 
                     <!-- Tab 2: Dosen / Guru Pembimbing -->
@@ -66,9 +85,9 @@
                             :class="roleType === 'advisor' 
                                 ? 'bg-blue-600 text-white shadow-sm font-bold' 
                                 : 'text-slate-600 hover:text-slate-900 font-semibold hover:bg-white/60'"
-                            class="py-2 px-2.5 rounded-xl text-xs transition-all duration-150 flex flex-col items-center justify-center cursor-pointer">
+                            class="min-h-[50px] py-2 px-2.5 rounded-xl text-xs transition-all duration-150 flex flex-col items-center justify-center cursor-pointer">
                         <span>Pembimbing</span>
-                        <span class="text-[9.5px] opacity-85 font-normal">Dosen / Guru Sekolah</span>
+                        <span class="text-[11px] opacity-85 font-normal">Dosen / Guru Sekolah</span>
                     </button>
                 </div>
             </div>
@@ -79,40 +98,86 @@
                        x-text="roleType === 'advisor' ? 'NAMA LENGKAP & GELAR (DOSEN / GURU)' : 'NAMA LENGKAP PESERTA (SESUAI KTP/KTM/KARTU PELAJAR)'">
                 </label>
                 <input id="name" 
-                       class="block mt-1.5 w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm shadow-2xs py-2.5 px-3.5 transition" 
+                       class="block mt-1.5 w-full min-h-[44px] rounded-xl bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 text-sm shadow-2xs py-2.5 px-3.5 transition"
                        type="text" 
                        name="name" 
                        value="{{ old('name') }}" 
                        required 
                        autofocus 
                        autocomplete="name" 
-                       :placeholder="roleType === 'advisor' ? 'Contoh: Dr. Budi Santoso, S.Kom., M.Kom.' : 'Nama lengkap Anda'"
+                       :placeholder="roleType === 'advisor' ? 'Contoh: Dr. Budi Santoso, S.Kom.' : 'Nama lengkap Anda'"
                        oninvalid="this.setCustomValidity('Harap isi nama lengkap Anda terlebih dahulu.')"
                        oninput="this.setCustomValidity('')" />
                 <x-input-error :messages="$errors->get('name')" class="mt-1.5" />
             </div>
 
             <!-- Asal Instansi Pendidikan (Hanya Muncul Jika Daftar Sebagai Pembimbing) -->
-            <div x-show="roleType === 'advisor'" x-cloak>
+            <div x-show="roleType === 'advisor'" x-cloak class="relative" @click.outside="institutionOpen = false" @keydown.escape.stop="$refs.institutionInput.focus(); institutionOpen = false">
                 <label for="university" class="block font-bold text-slate-700 text-xs uppercase tracking-wider leading-snug">
                     ASAL PERGURUAN TINGGI / SEKOLAH <span class="text-rose-500">*</span>
                 </label>
-                <input type="text" 
-                       id="university" 
-                       name="university" 
-                       list="institution-list"
-                       value="{{ old('university') }}"
-                       :required="roleType === 'advisor'"
-                       :disabled="roleType !== 'advisor'"
-                       placeholder="Ketik atau pilih nama Kampus / SMK asal..."
-                       oninvalid="this.setCustomValidity('Harap isi nama Perguruan Tinggi atau Sekolah asal Anda.')"
-                       oninput="this.setCustomValidity('')"
-                       class="block mt-1.5 w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm shadow-2xs py-2.5 px-3.5 transition" />
-                <datalist id="institution-list">
-                    @foreach($institutionNames as $institutionName)
-                        <option value="{{ $institutionName }}"></option>
-                    @endforeach
-                </datalist>
+                <div class="relative mt-1.5">
+                    <input type="text"
+                           id="university"
+                           name="university"
+                           x-ref="institutionInput" x-model="institutionQuery"
+                           role="combobox"
+                           aria-autocomplete="list"
+                           aria-controls="institution-list"
+                           :aria-expanded="institutionOpen.toString()"
+                           @keydown.down.prevent="institutionOpen = true; $nextTick(() => $refs.institutionList.querySelector('button')?.focus())"
+                           @focus="institutionOpen = true"
+                           @input="institutionOpen = true; $el.setCustomValidity('')"
+                           autocomplete="off"
+                           :required="roleType === 'advisor'"
+                           :disabled="roleType !== 'advisor'"
+                           placeholder="Ketik atau pilih Kampus / SMK asal..."
+                           oninvalid="this.setCustomValidity('Harap isi nama Perguruan Tinggi atau Sekolah asal Anda.')"
+                           class="block w-full min-h-[44px] rounded-xl bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 text-sm shadow-2xs py-2.5 pl-3.5 pr-10 transition" />
+                    <button type="button"
+                            @click="institutionOpen = !institutionOpen"
+                            :disabled="roleType !== 'advisor'"
+                            aria-label="Tampilkan daftar perguruan tinggi atau sekolah"
+                            tabindex="-1"
+                            class="absolute top-0 right-0 h-11 w-11 sm:w-10 flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer">
+                        <svg class="w-4 h-4 transition-transform duration-150" :class="{ 'rotate-180 text-blue-600': institutionOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    <!-- Dropdown Autocomplete Responsif (Anti-Potong Mobile & Desktop) -->
+                    <div x-show="institutionOpen"
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="opacity-0 -translate-y-1"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="opacity-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 -translate-y-1"
+                         x-cloak
+                         id="institution-list"
+                         x-ref="institutionList"
+                         role="listbox"
+                         aria-label="Pilihan instansi pendidikan"
+                         class="relative sm:absolute sm:left-0 sm:right-0 sm:top-full mt-1.5 z-30 w-full max-w-full bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
+                        <div class="max-h-56 overflow-y-auto scrollbar-thin divide-y divide-slate-100">
+                            <template x-for="inst in filteredInstitutions" :key="inst">
+                                <button type="button"
+                                        role="option"
+                                        :aria-selected="(inst === institutionQuery).toString()"
+                                        @keydown.down.prevent="$el.nextElementSibling?.closest('button')?.focus()"
+                                        @keydown.up.prevent="($el.previousElementSibling?.closest('button') || $refs.institutionInput).focus()"
+                                        @click="pickInstitution(inst)"
+                                        class="w-full min-h-[44px] text-left px-3.5 py-2.5 text-sm text-slate-800 hover:bg-blue-50 hover:text-blue-700 transition cursor-pointer whitespace-normal break-words leading-snug">
+                                    <span x-text="inst"></span>
+                                </button>
+                            </template>
+                            <div x-show="filteredInstitutions.length === 0" class="px-3.5 py-3 text-xs text-slate-600 leading-relaxed bg-slate-50">
+                                Institusi belum ada di daftar. Lanjutkan mengetik nama lengkap kampus/sekolah Anda — akun tetap dapat didaftarkan.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <x-input-error :messages="$errors->get('university')" class="mt-1.5" />
                 <p class="mt-1.5 text-xs text-slate-600 leading-relaxed">
                     Akun Pembimbing langsung bisa dipakai masuk. Peserta magang baru bisa memilih Anda setelah akun disetujui Admin Kampus/Sekolah.
@@ -125,13 +190,13 @@
                     ALAMAT EMAIL AKTIF
                 </label>
                 <input id="email" 
-                       class="block mt-1.5 w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm shadow-2xs py-2.5 px-3.5 transition" 
+                       class="block mt-1.5 w-full min-h-[44px] rounded-xl bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 text-sm shadow-2xs py-2.5 px-3.5 transition"
                        type="email" 
                        name="email" 
                        value="{{ old('email') }}" 
                        required 
                        autocomplete="username" 
-                       :placeholder="roleType === 'advisor' ? 'email@kampus.ac.id / email@sekolah.sch.id / email aktif' : 'nama@email.com atau email institusi'"
+                       :placeholder="roleType === 'advisor' ? 'email@kampus.ac.id / email aktif' : 'nama@email.com / email institusi'"
                        oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Harap isi alamat email Anda.')}else if(this.validity.typeMismatch){this.setCustomValidity('Masukkan format alamat email yang valid.')}"
                        oninput="this.setCustomValidity('')" />
                 <x-input-error :messages="$errors->get('email')" class="mt-1.5" />
@@ -146,7 +211,7 @@
                     </label>
                     <div class="relative mt-1.5" x-data="{ show: false }">
                         <input id="password"
-                            class="block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm shadow-2xs py-2.5 pl-3.5 pr-9 transition"
+                            class="block w-full min-h-[44px] rounded-xl bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 text-sm shadow-2xs py-2.5 pl-3.5 pr-11 transition"
                             :type="show ? 'text' : 'password'"
                             type="password"
                             name="password"
@@ -158,7 +223,9 @@
                             oninput="this.setCustomValidity('')" />
                         <button type="button"
                             @click="show = !show"
-                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none transition cursor-pointer"
+                            :aria-label="show ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'"
+                            :title="show ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'"
+                            class="absolute inset-y-0 right-0 w-11 flex items-center justify-center text-slate-500 hover:text-slate-700 focus:outline-none transition cursor-pointer"
                             tabindex="-1">
                             <svg x-show="!show" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -179,7 +246,7 @@
                     </label>
                     <div class="relative mt-1.5" x-data="{ show: false }">
                         <input id="password_confirmation"
-                            class="block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm shadow-2xs py-2.5 pl-3.5 pr-9 transition"
+                            class="block w-full min-h-[44px] rounded-xl bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 text-sm shadow-2xs py-2.5 pl-3.5 pr-11 transition"
                             :type="show ? 'text' : 'password'"
                             type="password"
                             name="password_confirmation"
@@ -190,7 +257,9 @@
                             oninput="this.setCustomValidity('')" />
                         <button type="button"
                             @click="show = !show"
-                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none transition cursor-pointer"
+                            :aria-label="show ? 'Sembunyikan konfirmasi kata sandi' : 'Tampilkan konfirmasi kata sandi'"
+                            :title="show ? 'Sembunyikan konfirmasi kata sandi' : 'Tampilkan konfirmasi kata sandi'"
+                            class="absolute inset-y-0 right-0 w-11 flex items-center justify-center text-slate-500 hover:text-slate-700 focus:outline-none transition cursor-pointer"
                             tabindex="-1">
                             <svg x-show="!show" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -206,16 +275,16 @@
             </div>
 
             <!-- Submit Button -->
-            <div class="pt-1.5">
+            <div class="pt-1">
                 <button type="submit"
-                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-md shadow-blue-600/20 text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out uppercase tracking-wider cursor-pointer">
+                    class="w-full min-h-[46px] sm:min-h-[44px] flex items-center justify-center py-3 px-4 border border-transparent rounded-xl shadow-md shadow-blue-600/20 text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out uppercase tracking-wider cursor-pointer">
                     <span x-text="roleType === 'advisor' ? 'Daftar Sebagai Pembimbing' : 'Daftar Sebagai Peserta Magang'"></span>
                 </button>
             </div>
         </form>
 
-        <div class="mt-4 pt-4 border-t border-slate-100 text-center">
-            <p class="text-xs text-slate-500">
+        <div class="mt-5 pt-4 border-t border-slate-100 text-center">
+            <p class="text-xs sm:text-sm text-slate-600">
                 Sudah memiliki akun?
                 <a href="{{ route('login') }}" class="font-bold text-blue-600 hover:text-blue-800 ml-1">
                     Masuk ke portal
@@ -225,7 +294,7 @@
     </div>
 
     <!-- Footer Tagline -->
-    <p class="text-center text-[11px] text-slate-400 mt-4">
+    <p class="text-center text-xs text-slate-500 mt-4">
         &copy; {{ date('Y') }} Dinas Perpustakaan dan Kearsipan Kota Surabaya. Hak Cipta Dilindungi.
     </p>
 </x-guest-layout>

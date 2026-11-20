@@ -18,8 +18,9 @@
         <!-- Scripts & Styles -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="app-readable bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-700 min-h-screen lg:h-screen lg:h-[100dvh] lg:overflow-hidden flex flex-col justify-between"
-          x-data="{ mobileMenuOpen: false, openQuotaModal: false }">
+    <body class="app-readable bg-[#F5F8FC] text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-700 min-h-screen lg:h-screen lg:h-[100dvh] lg:overflow-hidden flex flex-col justify-between"
+          x-data="{ mobileMenuOpen: false, openQuotaModal: false }"
+          @keydown.escape.window="mobileMenuOpen = false; openQuotaModal = false">
 
         @php
             $dispusip = \App\Models\AgencyProfile::first();
@@ -44,7 +45,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
                 
                 <!-- Logo & Brand Dispusip Surabaya -->
-                <a href="{{ url('/') }}" class="flex items-center gap-2 sm:gap-4 min-w-0 flex-1 sm:flex-initial group" title="Portal Magang Dispusip Kota Surabaya">
+                <a href="{{ url('/') }}" class="flex items-center gap-2 sm:gap-4 min-w-0 flex-1 sm:flex-initial min-h-[44px] py-1 group" title="Portal Magang Dispusip Kota Surabaya">
                     <img src="{{ asset('images/logoPemkotSBY.png') }}" alt="Logo Pemkot Surabaya" 
                          class="h-8 sm:h-10 w-auto object-contain shrink-0"
                          style="aspect-ratio: 960/1234; height: 36px; width: auto; object-fit: contain;">
@@ -109,7 +110,8 @@
                 <div class="flex items-center md:hidden shrink-0 ml-2">
                     <button type="button" 
                             @click="mobileMenuOpen = !mobileMenuOpen" 
-                            class="inline-flex items-center justify-center p-2 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-slate-100 focus:outline-none transition-all border border-slate-200/80 shadow-2xs"
+                            :aria-expanded="mobileMenuOpen.toString()"
+                            class="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-xl text-slate-700 hover:text-blue-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all border border-slate-200/80 bg-white shadow-2xs cursor-pointer"
                             aria-label="Toggle navigasi menu">
                         <svg x-show="!mobileMenuOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -134,47 +136,47 @@
                  class="md:hidden border-b border-slate-200 bg-white/98 backdrop-blur-md px-4 pt-3 pb-5 shadow-xl space-y-3">
                 <div class="space-y-1">
                     <a href="{{ url('/') }}" 
-                       class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-800 hover:text-blue-600 hover:bg-blue-50/70 transition">
+                       class="min-h-[44px] flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-800 hover:text-blue-600 hover:bg-blue-50/70 transition">
                         <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                         <span>Beranda Utama</span>
                     </a>
                     <a href="{{ route('public.projects.index') }}" 
-                       class="flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-800 hover:text-blue-600 hover:bg-blue-50/70 transition">
+                       class="min-h-[44px] flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-bold text-slate-800 hover:text-blue-600 hover:bg-blue-50/70 transition">
                         <div class="flex items-center gap-3">
                             <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                             <span>Proyek Dinas</span>
                         </div>
-                        <span class="px-2 py-0.5 text-[9px] font-bold bg-blue-100 text-blue-700 rounded-full">Katalog</span>
+                        <span class="px-2.5 py-0.5 text-[11px] font-bold bg-blue-100 text-blue-700 rounded-full shrink-0">Katalog</span>
                     </a>
                 </div>
 
                 <div class="h-px bg-slate-100"></div>
 
-                <div class="space-y-2 pt-0.5">
+                <div class="space-y-2.5 pt-0.5">
                     @auth
-                        <div class="px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between">
+                        <div class="px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between gap-2">
                             <div class="flex items-center gap-2.5 min-w-0">
-                                <div class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
+                                <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
                                     {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 2)) }}
                                 </div>
                                 <div class="min-w-0">
                                     <p class="text-xs font-bold text-slate-900 truncate">{{ Auth::user()->name }}</p>
-                                    <p class="text-[10px] font-semibold text-blue-600 truncate">{{ Auth::user()->roleLabel() }}</p>
+                                    <p class="text-[11px] font-semibold text-blue-600 truncate">{{ Auth::user()->roleLabel() }}</p>
                                 </div>
                             </div>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
                                 Aktif
                             </span>
                         </div>
 
-                        <a href="{{ route('dashboard') }}" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition">
+                        <a href="{{ route('dashboard') }}" class="w-full min-h-[44px] flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             <span>Buka Dashboard</span>
                         </a>
 
                         <form method="POST" action="{{ route('logout') }}" class="w-full">
                             @csrf
-                            <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-50 hover:bg-rose-100 active:scale-98 text-rose-600 hover:text-rose-700 text-xs font-bold uppercase tracking-wider rounded-xl border border-rose-200/80 transition cursor-pointer">
+                            <button type="submit" class="w-full min-h-[44px] flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-50 hover:bg-rose-100 active:scale-98 text-rose-600 hover:text-rose-700 text-xs font-bold uppercase tracking-wider rounded-xl border border-rose-200/80 transition cursor-pointer">
                                 <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                 </svg>
@@ -182,10 +184,10 @@
                             </button>
                         </form>
                     @else
-                        <a href="{{ route('register') }}" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition">
+                        <a href="{{ route('register') }}" class="w-full min-h-[44px] flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition">
                             <span>Daftar Akun</span>
                         </a>
-                        <a href="{{ route('login') }}" class="w-full flex items-center justify-center px-4 py-2 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition">
+                        <a href="{{ route('login') }}" class="w-full min-h-[44px] flex items-center justify-center px-4 py-2.5 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition">
                             Masuk ke Akun
                         </a>
                     @endauth
@@ -240,15 +242,15 @@
                         <!-- Tombol Aksi Utama -->
                         <div class="flex flex-col sm:flex-row items-center justify-start gap-3 pt-1">
                             @auth
-                                <a href="{{ route('dashboard') }}" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-md shadow-blue-500/20 transition text-center flex items-center justify-center gap-2">
+                                <a href="{{ route('dashboard') }}" class="w-full sm:w-auto min-h-[46px] sm:min-h-[44px] px-6 py-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-md shadow-blue-500/20 transition text-center flex items-center justify-center gap-2">
                                     <span>Pindah ke Dashboard</span>
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                                 </a>
                             @else
-                                <a href="{{ route('register') }}" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-md shadow-blue-500/20 transition text-center flex items-center justify-center gap-2">
+                                <a href="{{ route('register') }}" class="w-full sm:w-auto min-h-[46px] sm:min-h-[44px] px-6 py-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-md shadow-blue-500/20 transition text-center flex items-center justify-center gap-2">
                                     <span>Daftar Akun Sekarang</span>
                                 </a>
-                                <a href="{{ route('login') }}" class="w-full sm:w-auto px-5 py-3 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition text-center shadow-2xs">
+                                <a href="{{ route('login') }}" class="w-full sm:w-auto min-h-[46px] sm:min-h-[44px] px-5 py-3 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition text-center flex items-center justify-center shadow-2xs">
                                     Masuk ke Akun
                                 </a>
                             @endauth
@@ -379,17 +381,18 @@
                      x-transition:leave="ease-in duration-150" 
                      x-transition:leave-start="opacity-100 scale-100" 
                      x-transition:leave-end="opacity-0 scale-95" 
-                     class="relative w-full max-w-sm sm:max-w-md transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all border border-slate-200 p-5 space-y-4 z-10">
+                     class="relative w-full max-w-[calc(100vw-1.5rem)] sm:max-w-md max-h-[90vh] flex flex-col transform overflow-hidden rounded-2xl sm:rounded-3xl bg-white text-left shadow-2xl transition-all border border-slate-200 p-5 space-y-4 z-10">
 
                     <!-- Modal Header -->
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                        <div>
+                    <div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-3 shrink-0">
+                        <div class="min-w-0">
                             <h3 class="text-sm sm:text-base font-extrabold text-slate-900">Bidang Pilihan Magang</h3>
                             <p class="text-[11px] text-slate-500">4 Bidang Kerja Aktif di Dispusip Surabaya</p>
                         </div>
                         <button type="button" 
                                 @click="openQuotaModal = false" 
-                                class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer">
+                                aria-label="Tutup rincian kuota"
+                                class="min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-slate-500 hover:text-slate-700 rounded-xl hover:bg-slate-100 transition cursor-pointer shrink-0">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
@@ -446,11 +449,11 @@
                     </div>
 
                     <!-- Modal Footer -->
-                    <div class="pt-2 flex items-center justify-between border-t border-slate-100">
-                        <span class="text-[10px] text-slate-400 font-medium">Terbuka MBKM & SMK</span>
+                    <div class="pt-3 flex items-center justify-between gap-3 border-t border-slate-100 shrink-0">
+                        <span class="text-[11px] text-slate-500 font-medium">Terbuka MBKM & SMK</span>
                         <button type="button" 
                                 @click="openQuotaModal = false" 
-                                class="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
+                                class="min-h-[44px] px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
                             Tutup
                         </button>
                     </div>
