@@ -93,7 +93,7 @@
             x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
             x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" @click.outside="closeFromOutside()"
-            class="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-md w-full overflow-hidden p-6 sm:p-7 space-y-5 text-left relative"
+            class="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-100 max-w-[calc(100vw-1.5rem)] sm:max-w-md w-full max-h-[90vh] overflow-y-auto p-5 sm:p-7 space-y-5 text-left relative"
             role="dialog" aria-modal="true" :aria-label="title">
 
             <!-- Hidden Form untuk aksi berbasis URL (POST) -->
@@ -115,7 +115,7 @@
                     <p class="text-base text-slate-700 leading-relaxed" x-show="message" x-text="message"></p>
                 </div>
                 <button type="button" @click="closeModal()"
-                    class="text-slate-500 hover:text-slate-800 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg transition" title="Tutup" aria-label="Tutup">
+                    class="text-slate-500 hover:text-slate-800 hover:bg-slate-100 min-w-[44px] min-h-[44px] sm:min-w-[36px] sm:min-h-[36px] flex items-center justify-center rounded-xl transition cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>

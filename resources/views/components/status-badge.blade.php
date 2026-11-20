@@ -19,9 +19,9 @@
     $text = $useIndonesianUi
         ? ($case?->localizedLabel($userRole) ?? ($raw !== '' ? strtoupper($raw) : '-'))
         : ($case?->label() ?? ($raw !== '' ? strtoupper($raw) : '-'));
-    $tone = $case?->badgeColor() ?? 'bg-slate-100 text-slate-700 border-slate-300';
+    $tone = $case?->badgeColor() ?? 'bg-slate-100 text-slate-800 border-slate-300';
     $code = strtolower($case?->value ?? $raw);
-    $pill = "inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold tracking-wide rounded-full border whitespace-nowrap {$tone}";
+    $pill = "inline-flex items-center gap-1.5 max-w-full px-2.5 py-1 text-xs font-bold tracking-wide rounded-full border shadow-2xs whitespace-nowrap {$tone}";
     $resolvedDesc = $case?->description($userRole);
 
     $isSuccess = in_array($code, ['approved', 'active', 'accepted', 'completed', 'resolved', 'closed'], true);

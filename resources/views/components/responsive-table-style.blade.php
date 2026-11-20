@@ -12,6 +12,8 @@
         table.rtable > tbody > tr > td {
             display: block;
             width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
         table.rtable > thead { display: none; }
         table.rtable > tbody {

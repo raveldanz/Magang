@@ -47,9 +47,9 @@ enum AccountStatus: string
     public function badgeColor(): string
     {
         return match ($this) {
-            self::ACTIVE => 'bg-emerald-50 text-emerald-700 border-emerald-300',
+            self::ACTIVE => 'bg-emerald-50 text-emerald-800 border-emerald-300',
             self::PENDING => 'bg-amber-50 text-amber-800 border-amber-300',
-            self::INACTIVE => 'bg-slate-100 text-slate-700 border-slate-300',
+            self::INACTIVE => 'bg-slate-100 text-slate-800 border-slate-300',
         };
     }
 

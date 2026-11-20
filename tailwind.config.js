@@ -19,6 +19,19 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            boxShadow: {
+                '2xs': '0 1px 2px 0 rgb(15 23 42 / 0.04)',
+                'xs': '0 1px 3px 0 rgb(15 23 42 / 0.06), 0 1px 2px -1px rgb(15 23 42 / 0.04)',
+            },
+            backdropBlur: {
+                'xs': '2px',
+            },
+            blur: {
+                'xs': '2px',
+            },
+            scale: {
+                '98': '0.98',
+            },
         },
     },
 
