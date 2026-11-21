@@ -332,11 +332,11 @@
 
             <!-- Data Terpilih dari Daftar -->
             <template x-if="!isCustom && selectedItem">
-                <div class="flex items-center gap-2 truncate">
+                <div class="flex items-center gap-2 min-w-0">
                     <template x-if="selectedItem.acronym">
-                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/60 uppercase tracking-wider shrink-0" x-text="selectedItem.acronym"></span>
+                        <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/60 uppercase tracking-wider shrink-0 max-w-[40%] truncate" x-text="selectedItem.acronym" :title="selectedItem.acronym"></span>
                     </template>
-                    <span class="font-semibold text-slate-900 truncate" x-text="selectedItem.name"></span>
+                    <span class="font-semibold text-slate-900 truncate min-w-0" x-text="selectedItem.name" :title="selectedItem.name"></span>
                 </div>
             </template>
 
@@ -354,7 +354,7 @@
                     role="button"
                     tabindex="0"
                     @click.stop="clear()"
-                    class="p-1 hover:text-rose-600 hover:bg-rose-50 rounded-md transition cursor-pointer"
+                    class="p-3 -m-2 sm:p-1 sm:m-0 hover:text-rose-600 hover:bg-rose-50 rounded-md transition cursor-pointer"
                     title="Hapus Pilihan"
                 >
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

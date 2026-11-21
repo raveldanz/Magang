@@ -11,7 +11,7 @@
                 </p>
             </div>
 
-            <a href="{{ route('feedbacks.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
+            <a href="{{ route('feedbacks.create') }}" class="inline-flex items-center min-h-[44px] sm:min-h-0 gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                 <span>Buat Laporan Baru</span>
             </a>
@@ -101,24 +101,24 @@
             <div class="cc-tabs-bare border-b border-slate-200">
                 <nav class="cc-tabs flex flex-nowrap space-x-2 sm:space-x-4 overflow-x-auto pb-px scrollbar-none" aria-label="Tabs Status">
                     <a href="{{ route('admin.feedbacks.index', array_merge(request()->except(['status', 'page']), ['status' => ''])) }}" 
-                       class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer {{ $currStatus === '' ? 'cc-active border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
+                       class="cc-tab min-h-[44px] sm:min-h-0 whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer {{ $currStatus === '' ? 'cc-active border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
                         <span>Semua Masukan</span>
                         <span class="cc-count">{{ $stats['total'] }}</span>
                     </a>
                     <a href="{{ route('admin.feedbacks.index', array_merge(request()->except(['status', 'page']), ['status' => 'pending'])) }}" 
-                       class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer {{ $currStatus === 'pending' ? 'cc-active border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
+                       class="cc-tab min-h-[44px] sm:min-h-0 whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer {{ $currStatus === 'pending' ? 'cc-active border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
                         <span>{{ \App\Enums\FeedbackStatus::PENDING->description() }}</span>
                         <span class="cc-count">{{ $stats['pending'] }}</span>
                     </a>
                     <a href="{{ route('admin.feedbacks.index', array_merge(request()->except(['status', 'page']), ['status' => 'in_progress'])) }}" 
-                       class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer {{ $currStatus === 'in_progress' ? 'cc-active border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
+                       class="cc-tab min-h-[44px] sm:min-h-0 whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer {{ $currStatus === 'in_progress' ? 'cc-active border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
                         <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>
                         <span>{{ \App\Enums\FeedbackStatus::IN_PROGRESS->description() }}</span>
                         <span class="cc-count">{{ $stats['in_progress'] }}</span>
                     </a>
                     <a href="{{ route('admin.feedbacks.index', array_merge(request()->except(['status', 'page']), ['status' => 'resolved'])) }}" 
-                       class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer {{ $currStatus === 'resolved' ? 'cc-active border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
+                       class="cc-tab min-h-[44px] sm:min-h-0 whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer {{ $currStatus === 'resolved' ? 'cc-active border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
                         <span>{{ \App\Enums\FeedbackStatus::RESOLVED->description() }}</span>
                         <span class="cc-count">{{ $stats['resolved'] }}</span>
@@ -141,11 +141,11 @@
                         </div>
                         <input type="text" name="search" value="{{ request('search') }}" 
                                placeholder="Cari subjek, isi pesan, nama pengirim, atau email..."
-                               class="w-full text-xs sm:text-sm bg-slate-50 focus:bg-white border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 rounded-xl pl-9 pr-3.5 py-2.5 transition">
+                               class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm bg-slate-50 focus:bg-white border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 rounded-xl pl-9 pr-3.5 py-2.5 transition">
                     </div>
 
                     <select name="category" onchange="this.form.submit()"
-                            class="text-xs sm:text-sm bg-slate-50 focus:bg-white border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 rounded-xl py-2.5 px-3.5 font-medium w-full sm:w-56 transition">
+                            class="min-h-[44px] sm:min-h-0 text-xs sm:text-sm bg-slate-50 focus:bg-white border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 rounded-xl py-2.5 px-3.5 font-medium w-full sm:w-56 transition">
                         <option value="">Semua Kategori</option>
                         <option value="error_bug" {{ request('category') === 'error_bug' ? 'selected' : '' }}>Bug / Kendala Teknis</option>
                         <option value="saran_fitur" {{ request('category') === 'saran_fitur' ? 'selected' : '' }}>Saran Fitur</option>
@@ -155,11 +155,11 @@
                     </select>
 
                     <div class="flex items-center gap-2">
-                        <button type="submit" class="flex-1 sm:flex-initial px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition cursor-pointer">
+                        <button type="submit" class="min-h-[44px] sm:min-h-0 inline-flex items-center justify-center flex-1 sm:flex-initial px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition cursor-pointer">
                             Filter
                         </button>
                         @if (request()->hasAny(['search', 'category', 'status']))
-                            <a href="{{ route('admin.feedbacks.index') }}" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition text-center">
+                            <a href="{{ route('admin.feedbacks.index') }}" class="min-h-[44px] sm:min-h-0 inline-flex items-center justify-center px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition text-center">
                                 Reset
                             </a>
                         @endif
@@ -246,7 +246,7 @@
                         <!-- Action Button -->
                         <div class="shrink-0 self-start sm:self-center">
                             <a href="{{ route('admin.feedbacks.show', $fb->id) }}" 
-                               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 hover:text-blue-600 border border-slate-200/80 rounded-xl text-xs font-bold shadow-2xs group-hover:border-blue-300 transition cursor-pointer">
+                               class="min-h-[44px] sm:min-h-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 hover:text-blue-600 border border-slate-200/80 rounded-xl text-xs font-bold shadow-2xs group-hover:border-blue-300 transition cursor-pointer">
                                 <span>Buka Tiket</span>
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                             </a>

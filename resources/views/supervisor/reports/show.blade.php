@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div class="flex items-center gap-3">
-                <a href="{{ route('supervisor.reports.index') }}" class="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition" title="Kembali">
+                <a href="{{ route('supervisor.reports.index') }}" class="w-11 h-11 sm:w-auto sm:h-auto inline-flex items-center justify-center p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition" title="Kembali">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 </a>
                 <div>
@@ -138,7 +138,7 @@
                                 Diunggah pada: {{ $finalReport->created_at ? $finalReport->created_at->translatedFormat('d F Y, H:i') : '-' }}
                             </p>
                         </div>
-                        <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank" class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-2xs">
+                        <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank" class="min-h-[44px] sm:min-h-0 inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-2xs">
                             Buka Naskah Laporan
                         </a>
                     </div>

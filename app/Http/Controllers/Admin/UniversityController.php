@@ -58,8 +58,9 @@ class UniversityController extends Controller
             });
         }
 
-        // Tampilkan semua card perguruan tinggi tanpa terpotong paginasi
-        $universities = $query->get();
+        // Paginasi sisi server: daftar mitra bisa mencapai ratusan hingga ribuan kampus/sekolah
+        // (render semuanya sekaligus membuat halaman mencapai ratusan ribu piksel).
+        $universities = $query->paginate(24)->withQueryString();
 
         // Count un-provisioned university accounts
         $unregisteredCount = University::needingAdminAccount()->count();

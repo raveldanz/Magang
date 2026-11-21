@@ -85,9 +85,16 @@ Semua badge status wajib lewat `<x-status-badge :status="..." type="application|
 - [x] **Tahap 2 — Portal Mahasiswa** (`student/dashboard`, `profile`, `application`, `logbook`, `final_report`, `projects`) — **Selesai**
   - Audit langsung memakai Edge pada 375 × 812 dan 1440 × 900. Playwright Chrome melengkapi matriks Beranda, Profil, pengajuan individu dan kelompok, riwayat dan editor Logbook, buat dan edit proyek, Laporan Akhir, serta pratinjau sertifikat. PHPUnit terkait lulus 136/136.
   - Pola seluler: status dan langkah berikutnya di Beranda, kartu riwayat dengan aksi 44 piksel, pintasan ke naskah laporan, dan nama berkas yang bisa membungkus. Skenario transisi dan penyimpanan diuji melalui PHPUnit dengan data uji.
-- [ ] **Tahap 3A — Portal Admin Dinas & Super Admin (Dashboard, Pengajuan, Instansi/Unit)**
-- [ ] **Tahap 3B — Portal Admin Dinas & Super Admin (Kampus/Sekolah, Pengguna, Mentor, Logbook, Sertifikat, Feedback, Audit)**
-- [ ] **Tahap 4 — Portal Supervisor / Atasan** (`supervisor/dashboard`, `applications`, `reports`, `certificates`)
+- [x] **Tahap 3A — Portal Admin Dinas & Super Admin (Dashboard, Pengajuan, Instansi/Unit)** — **Selesai**
+  - Audit pakai `node scripts/ui_stage_audit.mjs --stage 3a --tag after` (skenario di `scripts/stage_scenarios/3a.json`): mengukur overflow, elemen bertumpuk, jarak antar kontrol, target sentuh, teks terpotong, error console, serta membuka otomatis dropdown/modal.
+  - Pola baru: kontrol ketuk di HP `min-h-[44px] sm:min-h-0`; baris kartu dokumen `flex-col lg:flex-row` agar nama berkas tidak terjepit; daftar panjang (akun instansi) digulir di panel pada desktop dan diringkas 8 teratas + "Tampilkan semua" di HP; nama panjang di HP dibungkus (`sm:truncate`), bukan dipotong.
+- [x] **Tahap 3B — Portal Admin Dinas & Super Admin (Kampus/Sekolah, Pengguna, Mentor, Logbook, Sertifikat, Feedback, Audit)** — **Selesai**
+  - Bug nyata: `admin/universities/partials/tab-policy.blade.php` punya `</div>` berlebih sehingga modal Tambah DPL dan Penugasan DPL jatuh di luar scope Alpine (error "showAddDosenModal is not defined"). Aturan: setiap partial tab harus seimbang tag `<div>`-nya.
+  - Daftar kampus (`Admin\UniversityController@index`) kini `paginate(24)` (sebelumnya `get()` merender 535 kartu = 250.000 px di HP).
+  - `components/searchable-select`: lencana singkatan dibatasi `max-w-[40%]`, tombol hapus pilihan 44 px di HP.
+  - Halaman detail logbook admin tidak ditautkan dari daftar; diaudit lewat URL langsung. Halaman detail feedback belum teruji (tidak ada tiket di data demo) dan dicakup Tahap 8.
+- [x] **Tahap 4 — Portal Supervisor / Atasan** (`supervisor/dashboard`, `applications`, `reports`, `certificates`) — **Selesai**
+  - Halaman persetujuan di HP: tombol pintasan "Ke Panel Keputusan (Setujui / Tolak)" di atas karena panel keputusan berada di bagian bawah halaman; panel keputusan hanya `sticky` di `lg:`.
 - [ ] **Tahap 5 — Portal Mentor Lapangan** (`mentor/dashboard`, `logbooks`, `students`, `evaluations`)
 - [ ] **Tahap 6 — Portal Dosen / Pembimbing Kampus & Sekolah** (`lecturer/dashboard`, `monitoring`, `logbooks`, `evaluations`)
 - [ ] **Tahap 7 — Portal Admin Kampus / Sekolah** (`university/dashboard`, `lecturers`, `students`, `profile`)

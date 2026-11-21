@@ -5,7 +5,7 @@
             description="Tinjau berkas peserta magang yang telah diverifikasi oleh Admin Dispusip untuk disetujui dan diterbitkan Surat Balasan resminya.">
             <x-slot name="actions">
                 <a href="{{ route('supervisor.dashboard') }}"
-                   class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200 transition">
+                   class="min-h-[44px] sm:min-h-0 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200 transition">
                     &larr; Pemantauan Bidang
                 </a>
             </x-slot>
@@ -30,7 +30,7 @@
             {{-- TABS FILTER --}}
             <div class="flex overflow-x-auto pb-2 scrollbar-none gap-2 border-b-2 border-slate-200">
                 <a href="{{ route('supervisor.applications.index', ['status' => 'waiting_approval']) }}"
-                   class="whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 shrink-0 {{ $statusFilter === 'waiting_approval' ? 'bg-blue-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
+                   class="min-h-[44px] sm:min-h-0 whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 shrink-0 {{ $statusFilter === 'waiting_approval' ? 'bg-blue-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
                     <span>Menunggu Persetujuan</span>
                     <span class="px-2 py-0.5 rounded-full text-xs {{ $statusFilter === 'waiting_approval' ? 'bg-white text-blue-700' : 'bg-blue-100 text-blue-800' }}">
                         {{ $waitingCount }}
@@ -38,7 +38,7 @@
                 </a>
 
                 <a href="{{ route('supervisor.applications.index', ['status' => 'approved']) }}"
-                   class="whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 shrink-0 {{ $statusFilter === 'approved' ? 'bg-emerald-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
+                   class="min-h-[44px] sm:min-h-0 whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 shrink-0 {{ $statusFilter === 'approved' ? 'bg-emerald-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
                     <span>Telah Disetujui</span>
                     <span class="px-2 py-0.5 rounded-full text-xs {{ $statusFilter === 'approved' ? 'bg-white text-emerald-700' : 'bg-emerald-100 text-emerald-800' }}">
                         {{ $approvedCount }}
@@ -46,7 +46,7 @@
                 </a>
 
                 <a href="{{ route('supervisor.applications.index', ['status' => 'all']) }}"
-                   class="whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 shrink-0 {{ $statusFilter === 'all' ? 'bg-blue-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
+                   class="min-h-[44px] sm:min-h-0 whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 shrink-0 {{ $statusFilter === 'all' ? 'bg-blue-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
                     <span>Semua Riwayat</span>
                 </a>
             </div>

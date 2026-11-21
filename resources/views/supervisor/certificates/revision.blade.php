@@ -5,7 +5,7 @@
             description="Pilih aspek data yang memerlukan koreksi dan berikan instruksi perbaikan kepada Admin Dinas sebelum pengesahan resmi.">
             <x-slot name="actions">
                 <a href="{{ route('supervisor.certificates.index') }}" 
-                   class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200 shadow-xs transition">
+                   class="min-h-[44px] sm:min-h-0 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200 shadow-xs transition">
                     &larr; Kembali ke Daftar Sertifikat
                 </a>
             </x-slot>
@@ -67,7 +67,7 @@
 
                     <div class="shrink-0 flex items-center gap-2">
                         <a href="{{ route('supervisor.certificates.show', $placement->id) }}" target="_blank"
-                           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs border border-slate-300 shadow-2xs transition cursor-pointer">
+                           class="min-h-[44px] sm:min-h-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs border border-slate-300 shadow-2xs transition cursor-pointer">
                             <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             <span>Pratinjau Draf Sertifikat</span>
                         </a>
@@ -282,7 +282,7 @@
                                 <span class="text-slate-500">Naskah Laporan Akhir:</span>
                                 @if($finalReport && $finalReport->file_path)
                                     <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank"
-                                       class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800">
+                                       class="inline-flex items-center min-h-[44px] sm:min-h-0 gap-1 font-bold text-blue-600 hover:text-blue-800">
                                         <span>Buka Dokumen PDF</span>
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                     </a>
@@ -360,23 +360,23 @@
                         <span class="text-xs font-bold text-slate-600 block mb-2">Rekomendasi Template Catatan Cepat:</span>
                         <div class="flex flex-wrap gap-2">
                             <button type="button" @click="appendNote('Mohon sesuaikan ejaan nama lengkap peserta magang dengan KTP resmi.')"
-                                    class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
+                                    class="min-h-[44px] sm:min-h-0 inline-flex items-center px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
                                 + Ejaan nama sesuai KTP
                             </button>
                             <button type="button" @click="appendNote('Nilai disiplin perlu diperiksa ulang dengan logbook harian.')"
-                                    class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
+                                    class="min-h-[44px] sm:min-h-0 inline-flex items-center px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
                                 + Cek nilai disiplin
                             </button>
                             <button type="button" @click="appendNote('Periksa kembali tanggal periode pelaksanaan magang pada sistem.')"
-                                    class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
+                                    class="min-h-[44px] sm:min-h-0 inline-flex items-center px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
                                 + Koreksi periode magang
                             </button>
                             <button type="button" @click="appendNote('Naskah laporan akhir mohon dilengkapi lembar pengesahan bertanda tangan.')"
-                                    class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
+                                    class="min-h-[44px] sm:min-h-0 inline-flex items-center px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
                                 + Pengesahan naskah laporan
                             </button>
                             <button type="button" @click="appendNote('Format penulisan NIM/NIS dan Program Studi perlu disesuaikan.')"
-                                    class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
+                                    class="min-h-[44px] sm:min-h-0 inline-flex items-center px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
                                 + Format NIM/NIS dan Prodi
                             </button>
                         </div>
@@ -396,11 +396,11 @@
                 {{-- PANEL TOMBOL AKSI BAWAH --}}
                 <div class="flex items-center justify-end gap-3 pt-2">
                     <a href="{{ route('supervisor.certificates.index') }}" 
-                       class="px-6 py-3 rounded-2xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-sm border-2 border-slate-200 transition">
+                       class="min-h-[44px] sm:min-h-0 inline-flex items-center justify-center px-6 py-3 rounded-2xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-sm border-2 border-slate-200 transition">
                         Batal
                     </a>
                     <button type="submit" 
-                            class="px-8 py-3.5 rounded-2xl bg-amber-600 hover:bg-amber-700 active:scale-95 text-white font-black text-sm shadow-lg shadow-amber-600/30 transition flex items-center gap-2 cursor-pointer">
+                            class="min-h-[44px] sm:min-h-0 px-8 py-3.5 rounded-2xl bg-amber-600 hover:bg-amber-700 active:scale-95 text-white font-black text-sm shadow-lg shadow-amber-600/30 transition flex items-center gap-2 cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                         <span>Kirim Catatan Revisi</span>
                     </button>

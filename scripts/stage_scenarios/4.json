@@ -1,0 +1,9 @@
+[
+  { "key": "sv-dashboard", "path": "/supervisor/dashboard", "role": "supervisor@dispusip.surabaya.go.id", "probeNav": true },
+  { "key": "sv-applications-index", "path": "/supervisor/applications", "role": "supervisor@dispusip.surabaya.go.id" },
+  { "key": "sv-applications-show", "role": "supervisor@dispusip.surabaya.go.id", "follow": { "from": "/supervisor/applications", "pattern": "^/supervisor/applications/\\d+$" } },
+  { "key": "sv-certificates-index", "path": "/supervisor/certificates", "role": "supervisor@dispusip.surabaya.go.id" },
+  { "key": "sv-certificates-revision", "role": "supervisor@dispusip.surabaya.go.id", "follow": { "from": "/supervisor/certificates", "pattern": "^/supervisor/certificates/\\d+/revision$" } },
+  { "key": "sv-reports-index", "path": "/supervisor/reports", "role": "supervisor@dispusip.surabaya.go.id" },
+  { "key": "sv-reports-show", "role": "supervisor@dispusip.surabaya.go.id", "follow": { "from": "/supervisor/reports", "pattern": "^/supervisor/reports/\\d+$" } }
+]

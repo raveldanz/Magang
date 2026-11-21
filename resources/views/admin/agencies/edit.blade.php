@@ -28,14 +28,14 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Nama Entitas Pemerintah <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" name="government_name" value="{{ old('government_name', $agency->government_name) }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="government_name" value="{{ old('government_name', $agency->government_name) }}" required class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Nama Resmi Dinas / OPD <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" name="agency_name" value="{{ old('agency_name', $agency->agency_name) }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="agency_name" value="{{ old('agency_name', $agency->agency_name) }}" required class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
                     </div>
 
@@ -44,14 +44,14 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Email Resmi Dinas <span class="text-rose-500">*</span>
                             </label>
-                            <input type="email" name="email" value="{{ old('email', $agency->email) }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                            <input type="email" name="email" value="{{ old('email', $agency->email) }}" required class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Nomor Telepon / Fax
                             </label>
-                            <input type="text" name="phone" value="{{ old('phone', $agency->phone) }}" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="phone" value="{{ old('phone', $agency->phone) }}" class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
                     </div>
 
@@ -67,21 +67,21 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Nama Kepala Dinas
                             </label>
-                            <input type="text" name="signee_name" value="{{ old('signee_name', $agency->signee_name) }}" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="signee_name" value="{{ old('signee_name', $agency->signee_name) }}" class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 NIP Kepala Dinas
                             </label>
-                            <input type="text" name="signee_nip" value="{{ old('signee_nip', $agency->signee_nip) }}" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                            <input type="text" name="signee_nip" value="{{ old('signee_nip', $agency->signee_nip) }}" class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Jabatan Resmi
                             </label>
-                            <input type="text" name="signee_position" value="{{ old('signee_position', $agency->signee_position) }}" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="signee_position" value="{{ old('signee_position', $agency->signee_position) }}" class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
                     </div>
 
@@ -90,14 +90,14 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Website Dinas
                             </label>
-                            <input type="url" name="website" value="{{ old('website', $agency->website) }}" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="url" name="website" value="{{ old('website', $agency->website) }}" class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Kota <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" name="city" value="{{ old('city', $agency->city) }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="city" value="{{ old('city', $agency->city) }}" required class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
                     </div>
 

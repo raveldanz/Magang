@@ -57,11 +57,11 @@
             <!-- 2. Filter Bar Rapi & Kondusif -->
             <form method="GET" action="{{ route('supervisor.reports.index') }}" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col md:flex-row gap-3">
                 <div class="flex-1">
-                    <input type="text" name="search" value="{{ $searchQuery }}" placeholder="Cari nama peserta magang, NIM/NIS, atau kampus/sekolah..." class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
+                    <input type="text" name="search" value="{{ $searchQuery }}" placeholder="Cari nama peserta magang, NIM/NIS, atau kampus/sekolah..." class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
                 </div>
 
                 <div class="w-full md:w-56">
-                    <select name="unit_id" class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
+                    <select name="unit_id" class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
                         <option value="">Semua Unit Bidang</option>
                         @foreach ($units as $u)
                             <option value="{{ $u->id }}" {{ (string)$unitFilter === (string)$u->id ? 'selected' : '' }}>
@@ -72,7 +72,7 @@
                 </div>
 
                 <div class="w-full md:w-52">
-                    <select name="status" class="w-full text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
+                    <select name="status" class="min-h-[44px] sm:min-h-0 w-full text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
                         <option value="">Semua Status Laporan</option>
                         <option value="approved" {{ $statusFilter === 'approved' ? 'selected' : '' }}>Disetujui</option>{{-- status-guard:ignore --}}
                         <option value="pending" {{ $statusFilter === 'pending' ? 'selected' : '' }}>Menunggu Tinjauan</option>{{-- status-guard:ignore --}}
@@ -82,11 +82,11 @@
                 </div>
 
                 <div class="flex items-center gap-2 shrink-0">
-                    <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-2xs">
+                    <button type="submit" class="min-h-[44px] sm:min-h-0 inline-flex items-center justify-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-2xs">
                         Terapkan
                     </button>
                     @if ($searchQuery || $unitFilter || $statusFilter)
-                        <a href="{{ route('supervisor.reports.index') }}" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">
+                        <a href="{{ route('supervisor.reports.index') }}" class="min-h-[44px] sm:min-h-0 inline-flex items-center justify-center px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">
                             Reset
                         </a>
                     @endif
@@ -212,7 +212,7 @@
                             </div>
 
                             <div class="pt-1">
-                                <a href="{{ route('supervisor.reports.show', $item->id) }}" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl text-center block transition">
+                                <a href="{{ route('supervisor.reports.show', $item->id) }}" class="min-h-[44px] sm:min-h-0 w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl text-center flex items-center justify-center transition">
                                     Lihat Detail Laporan & Proyek
                                 </a>
                             </div>

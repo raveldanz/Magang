@@ -12,7 +12,7 @@
 
             @if($isSuperAdmin)
             <a href="{{ route('admin.universities.create') }}"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[44px] sm:min-h-0 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                 </svg>
@@ -82,7 +82,7 @@
                         <div class="flex flex-wrap items-center gap-2.5 shrink-0 pt-1 lg:pt-0">
                             <button type="button"
                                 onclick="navigator.clipboard.writeText('Universitas: {{ addslashes($cred['univ_name']) }}\nPortal: {{ $cred['login_url'] }}\nEmail: {{ $cred['email'] }}\nPassword: {{ $cred['password'] }}'); this.innerHTML = '<svg class=\'w-4 h-4 text-emerald-300\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M5 13l4 4L19 7\'/></svg><span>Tersalin!</span>'; setTimeout(() => this.innerHTML = '<svg class=\'w-4 h-4 text-blue-200\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3\'/></svg><span>Salin Semua</span>', 2500);"
-                                class="inline-flex items-center gap-2 px-3.5 py-2 bg-blue-950/70 hover:bg-blue-900/80 text-blue-100 border border-blue-400/30 rounded-xl text-xs font-bold transition shadow-sm hover:border-blue-300 cursor-pointer active:scale-95">
+                                class="inline-flex items-center gap-2 px-3.5 py-2 min-h-[44px] sm:min-h-0 bg-blue-950/70hover:bg-blue-900/80 text-blue-100 border border-blue-400/30 rounded-xl text-xs font-bold transition shadow-sm hover:border-blue-300 cursor-pointer active:scale-95">
                                 <svg class="w-4 h-4 text-blue-200 shrink-0" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -96,7 +96,7 @@
                                     class="inline-block m-0">
                                     @csrf
                                     <button type="submit"
-                                        class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl text-xs font-black transition-all shadow-lg border border-emerald-300/40 active:scale-95 cursor-pointer">
+                                        class="inline-flex items-center gap-2 px-4 py-2 min-h-[44px] sm:min-h-0 bg-gradient-to-r from-emerald-500via-teal-500 to-emerald-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl text-xs font-black transition-all shadow-lg border border-emerald-300/40 active:scale-95 cursor-pointer">
                                         <svg class="w-4 h-4 text-emerald-100 shrink-0" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -203,9 +203,9 @@
                         <strong>{{ $pendingVerificationCount }} perguruan tinggi</strong> didaftarkan mandiri oleh peserta magang dan menunggu verifikasi.
                     </p>
                     @if(request('verification') === 'pending')
-                        <a href="{{ route('admin.universities.index') }}" class="px-4 py-2 bg-white border border-yellow-300 text-yellow-800 text-xs font-bold rounded-xl shrink-0">Tampilkan Semua</a>
+                        <a href="{{ route('admin.universities.index') }}" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-4 py-2 bg-white border border-yellow-300 text-yellow-800 text-xs font-bold rounded-xl shrink-0">Tampilkan Semua</a>
                     @else
-                        <a href="{{ route('admin.universities.index', ['verification' => 'pending']) }}" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-bold rounded-xl shrink-0">Tinjau Sekarang</a>
+                        <a href="{{ route('admin.universities.index', ['verification' => 'pending']) }}" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-bold rounded-xl shrink-0">Tinjau Sekarang</a>
                     @endif
                 </div>
             @endif
@@ -223,16 +223,16 @@
                         </div>
                         <input type="text" name="search" value="{{ request('search') }}"
                             placeholder="Cari nama perguruan tinggi, kode kampus (e.g. UNESA, ITS), email..."
-                            class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
+                            class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
                             style="padding-left: 2.75rem !important; padding-right: 1rem !important; padding-top: 0.65rem !important; padding-bottom: 0.65rem !important;">
                     </div>
                     <button type="submit"
-                        class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
+                        class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
                         Cari
                     </button>
                     @if(request('search'))
                         <a href="{{ route('admin.universities.index') }}"
-                            class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition">
+                            class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition">
                             Reset
                         </a>
                     @endif
@@ -347,7 +347,7 @@
                                         desc: 'Setelah diverifikasi, kampus akan tampil di dropdown pendaftaran semua peserta magang.',
                                         confirmText: 'Ya, Verifikasi'
                                     })"
-                                    class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs">
+                                    class="w-full inline-flex items-center justify-center min-h-[44px] sm:min-h-0 py-2.5 px-3 rounded-xl bg-emerald-600hover:bg-emerald-700 text-white font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs">
                                     Verifikasi Kampus
                                 </button>
                             </form>
@@ -364,7 +364,7 @@
                                         <p class="text-[10px] font-bold text-blue-700">Kemungkinan dobel dengan kampus terdaftar (ditandai ★)</p>
                                     @endif
                                     <div class="flex items-center gap-1.5">
-                                        <select name="target_university_id" required class="flex-1 min-w-0 text-[11px] border-slate-200 rounded-xl py-2">
+                                        <select name="target_university_id" required class="flex-1 min-w-0 min-h-[44px] sm:min-h-0 text-[11px] border-slate-200 rounded-xl py-2">
                                             <option value="">Gabungkan ke…</option>
                                             @foreach ($mergeOptions as $opt)
                                                 <option value="{{ $opt->id }}" @selected(($suggestedIds[0] ?? null) === $opt->id)>{{ in_array($opt->id, $suggestedIds) ? '★ ' : '' }}{{ $opt->name }}{{ ($opt->acronym ?? $opt->code) ? ' (' . ($opt->acronym ?? $opt->code) . ')' : '' }}</option>
@@ -380,7 +380,7 @@
                                                 desc: 'Tindakan ini tidak dapat dibatalkan.',
                                                 confirmText: 'Ya, Gabungkan'
                                             })"
-                                            class="shrink-0 py-2 px-3 rounded-xl border border-blue-300 text-blue-700 bg-white hover:bg-blue-50 font-bold text-[11px] transition cursor-pointer">
+                                            class="shrink-0 inline-flex items-center justify-center min-h-[44px] sm:min-h-0 py-2 px-3 rounded-xl border border-blue-300text-blue-700 bg-white hover:bg-blue-50 font-bold text-[11px] transition cursor-pointer">
                                             Gabungkan
                                         </button>
                                     </div>
@@ -402,7 +402,7 @@
                                             desc: 'Password awal: password',
                                             confirmText: 'Ya, Buat Akun'
                                         })"
-                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-300 text-slate-800 bg-white hover:bg-slate-100 hover:border-slate-400 font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs"
+                                        class="whitespace-nowrap inline-flex items-center justify-center min-h-[44px] sm:min-h-0 py-2.5 px-3 rounded-xl border border-slate-300 text-slate-800 bg-white hover:bg-slate-100 hover:border-slate-400 font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs"
                                         title="Buatkan Akun Admin Kampus">
                                         Buat Akun
                                     </button>
@@ -412,7 +412,7 @@
                                     class="shrink-0 m-0">
                                     @csrf
                                     <button type="submit"
-                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-300 text-slate-800 bg-white hover:bg-slate-100 hover:border-slate-400 font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs"
+                                        class="whitespace-nowrap inline-flex items-center justify-center min-h-[44px] sm:min-h-0 py-2.5 px-3 rounded-xl border border-slate-300 text-slate-800 bg-white hover:bg-slate-100 hover:border-slate-400 font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs"
                                         title="Masuk Sebagai Admin Kampus">
                                         Login As
                                     </button>
@@ -420,7 +420,7 @@
                             @endif
 
                             <a href="{{ route('admin.universities.show', $univ->id) }}"
-                                class="flex-1 min-w-0 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs text-center shadow-xs transition cursor-pointer whitespace-nowrap truncate">
+                                class="flex-1 min-w-0 inline-flex items-center justify-center min-h-[44px] sm:min-h-0 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs text-centershadow-xs transition cursor-pointer whitespace-nowrap truncate">
                                 Kelola Kampus
                             </a>
                         </div>

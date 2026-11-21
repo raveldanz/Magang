@@ -19,8 +19,8 @@
                         <p class="text-xs text-slate-500 mt-1">Pengajuan magang menunggu persetujuan atasan</p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100">
-                        <a href="{{ route('supervisor.applications.index') }}" 
-                           class="w-full inline-flex items-center justify-center py-2 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition">
+                        <a href="{{ route('supervisor.applications.index') }}"
+                           class="min-h-[44px] sm:min-h-0 w-full inline-flex items-center justify-center py-2 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition">
                             Pengajuan
                         </a>
                     </div>
@@ -34,8 +34,8 @@
                         <p class="text-xs text-slate-500 mt-1">Sertifikat selesai magang perlu disahkan</p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100">
-                        <a href="{{ route('supervisor.certificates.index') }}" 
-                           class="w-full inline-flex items-center justify-center py-2 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition">
+                        <a href="{{ route('supervisor.certificates.index') }}"
+                           class="min-h-[44px] sm:min-h-0 w-full inline-flex items-center justify-center py-2 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition">
                             Sertifikat
                         </a>
                     </div>

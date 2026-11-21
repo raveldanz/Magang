@@ -45,7 +45,7 @@
                         </label>
                         <input type="text" name="name" value="{{ old('name') }}" required
                             placeholder="Contoh: Dr. Budi Santoso, M.Kom."
-                            class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -55,7 +55,7 @@
                             </label>
                             <input type="email" name="email" value="{{ old('email') }}" required
                                 placeholder="budi@surabaya.go.id"
-                                class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                                class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                         </div>
 
                         <div>
@@ -63,7 +63,7 @@
                                 Password Awal (Opsional)
                             </label>
                             <input type="text" name="password" placeholder="Kosongkan: dibuat acak otomatis"
-                                class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                                class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                             <p class="mt-1 text-[11px] text-slate-500">Bila dikosongkan, sistem membuat password sementara acak yang ditampilkan sekali setelah disimpan.</p>
                         </div>
                     </div>
@@ -74,7 +74,7 @@
                                 Role Pengguna <span class="text-rose-500">*</span>
                             </label>
                             <select name="role" x-model="selectedRole" required
-                                class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-semibold">
+                                class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-semibold">
                                 <option value="mahasiswa">Peserta Magang Pendaftar</option>
                                 <option value="admin">Admin Instansi Dinas</option>
                                 @if(auth()->user()->isSuperAdmin())
@@ -93,7 +93,7 @@
                                 Status Akun
                             </label>
                             <select name="status"
-                                class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                                class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                                 @foreach(\App\Enums\AccountStatus::cases() as $accountCase)
                                     <option value="{{ $accountCase->value }}" {{ old('status', 'active') === $accountCase->value ? 'selected' : '' }}>{{ $accountCase->label() }}</option>
                                 @endforeach
@@ -132,11 +132,11 @@
 
                     <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
                         <a href="{{ $returnTo ?? request('return_to', route('admin.users.index')) }}"
-                            class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+                            class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
                             Batal
                         </a>
                         <button type="submit"
-                            class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                            class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                             Daftarkan Pengguna
                         </button>
                     </div>
