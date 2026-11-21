@@ -5,20 +5,20 @@
             <a href="/" class="group transition-transform duration-300 hover:scale-105 inline-block focus:outline-none" title="Pemerintah Kota Surabaya">
                 <img src="{{ asset('images/logos/surabaya.png') }}" 
                      alt="Logo Pemkot Surabaya"
-                     class="h-12 w-auto object-contain drop-shadow-2xs transition-all"
-                     style="aspect-ratio: 960/1234; height: 48px; width: auto; object-fit: contain;">
+                     class="h-11 w-auto object-contain drop-shadow-2xs transition-all"
+                     style="aspect-ratio: 960/1234; height: 44px; width: auto; object-fit: contain;">
             </a>
-            <div class="h-7 w-px bg-slate-200"></div>
+            <div class="h-6 w-px bg-slate-200"></div>
             <a href="/" class="group transition-transform duration-300 hover:scale-105 inline-block focus:outline-none" title="Dinas Perpustakaan dan Kearsipan Kota Surabaya">
                 <img src="{{ asset('images/logos/dispusip.png') }}" 
                      alt="Logo Dispusip Surabaya"
-                     class="h-12 w-auto object-contain drop-shadow-2xs transition-all"
-                     style="height: 48px; width: auto; object-fit: contain;">
+                     class="h-11 w-auto object-contain drop-shadow-2xs transition-all"
+                     style="height: 44px; width: auto; object-fit: contain;">
             </a>
         </div>
 
         <!-- Header Text -->
-        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
             Pendaftaran Akun Portal Magang
         </h2>
         <p class="text-[11px] font-bold uppercase tracking-wider text-blue-700 mt-0.5">
@@ -71,11 +71,10 @@
 
             <!-- Tab Switcher: Peserta Magang vs Pembimbing -->
             <div>
-                <label class="block font-bold text-slate-700 text-xs uppercase tracking-wider mb-1.5 text-left">
+                <label class="block font-bold text-slate-700 text-xs uppercase tracking-wider mb-1.5 text-center">
                     Daftar Sebagai:
                 </label>
                 <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200/80">
-                    <!-- Tab 1: Mahasiswa / Siswa -->
                     <button type="button"
                             @click="roleType = 'student'; institutionOpen = false"
                             :class="roleType === 'student' 
@@ -86,7 +85,6 @@
                         <span class="text-[11px] opacity-85 font-normal">Mahasiswa / Siswa PKL</span>
                     </button>
 
-                    <!-- Tab 2: Dosen / Guru Pembimbing -->
                     <button type="button"
                             @click="roleType = 'advisor'"
                             :class="roleType === 'advisor' 
@@ -186,15 +184,12 @@
                 </div>
 
                 <x-input-error :messages="$errors->get('university')" class="mt-1.5" />
-                <p class="mt-1.5 text-xs text-slate-600 leading-relaxed">
-                    Akun Pembimbing langsung bisa dipakai masuk. Peserta magang baru bisa memilih Anda setelah akun disetujui Admin Kampus/Sekolah.
-                </p>
             </div>
 
             <!-- Email Address -->
             <div>
                 <label for="email" class="block font-bold text-slate-700 text-xs uppercase tracking-wider leading-snug">
-                    ALAMAT EMAIL AKTIF
+                    ALAMAT EMAIL INSTITUSI
                 </label>
                 <input id="email" 
                        class="block mt-1.5 w-full min-h-[44px] rounded-xl bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 text-sm shadow-2xs py-2.5 px-3.5 transition"
@@ -209,9 +204,8 @@
                 <x-input-error :messages="$errors->get('email')" class="mt-1.5" />
             </div>
 
-            <!-- Password & Confirm Password (2 Kolom Sejajar di Desktop, 1 Kolom di Mobile) -->
+            <!-- Password & Confirm Password -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <!-- Password -->
                 <div>
                     <label for="password" class="block font-bold text-slate-700 text-xs uppercase tracking-wider leading-snug">
                         KATA SANDI
@@ -246,7 +240,6 @@
                     <x-input-error :messages="$errors->get('password')" class="mt-1.5" />
                 </div>
 
-                <!-- Confirm Password -->
                 <div>
                     <label for="password_confirmation" class="block font-bold text-slate-700 text-xs uppercase tracking-wider leading-snug">
                         KONFIRMASI SANDI

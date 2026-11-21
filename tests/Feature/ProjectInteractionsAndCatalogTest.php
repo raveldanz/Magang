@@ -95,6 +95,41 @@ class ProjectInteractionsAndCatalogTest extends TestCase
         $resp2->assertDontSee('Proyek Rahasia Internal Server Dinas');
     }
 
+    public function test_project_catalog_paginates_when_items_exceed_page_limit()
+    {
+        $base = $this->createSampleProject(true);
+        $placement = $base['placement'];
+
+        // Buat 14 proyek tambahan (total 15 proyek publik)
+        for ($i = 2; $i <= 15; $i++) {
+            InternshipProject::create([
+                'placement_id' => $placement->id,
+                'title' => 'Inovasi Proyek Layanan Ke-'.$i,
+                'category' => 'teknologi',
+                'is_public' => true,
+                'description' => 'Deskripsi proyek pengujian paginasi ke-'.$i,
+                'community_benefit' => 'Manfaat untuk masyarakat ke-'.$i,
+                'photo_path' => 'internship_projects/sample.jpg',
+                'likes_count' => 0,
+                'comments_count' => 0,
+                'views_count' => 0,
+                'created_at' => now()->subDays($i),
+            ]);
+        }
+
+        // Halaman 1 (6 item)
+        $responsePage1 = $this->get(route('public.projects.index', ['page' => 1]));
+        $responsePage1->assertStatus(200);
+        $responsePage1->assertSee('Navigasi Halaman');
+        $responsePage1->assertSee('Menampilkan');
+        $responsePage1->assertSee('6');
+
+        // Halaman 2 (6 item berikutnya)
+        $responsePage2 = $this->get(route('public.projects.index', ['page' => 2]));
+        $responsePage2->assertStatus(200);
+        $responsePage2->assertSee('Navigasi Halaman');
+    }
+
     public function test_guest_can_like_and_unlike_project_via_ajax()
     {
         $data = $this->createSampleProject(true);

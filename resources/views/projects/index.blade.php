@@ -361,6 +361,13 @@
                         </div>
                     @endforeach
                 </div>
+
+                {{-- 4. NAVIGASI PAGINATION ELEGAN --}}
+                @if(isset($projects) && $projects->hasPages())
+                    <div class="pt-6 sm:pt-8">
+                        {{ $projects->links() }}
+                    </div>
+                @endif
             @endif
 
         </div>
