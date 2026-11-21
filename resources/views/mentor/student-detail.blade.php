@@ -35,6 +35,10 @@
         ];
         $firstTask = $nextTasks[0] ?? null;
 
+        // Di HP setiap langkah dilipat; hanya langkah yang perlu dikerjakan yang terbuka.
+        $stepState = collect($checklist)->pluck('state', 'key');
+        $openStep = fn (string $key) => ($stepState[$key] ?? 'waiting') === 'todo';
+
         // Nomor Telepon & Tautan WhatsApp
         $rawPhone = $profile?->phone ?? $student?->phone;
         $waLink = null;
@@ -104,16 +108,16 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                         <h3 id="judul-langkah" class="text-xl font-bold text-slate-900">Tugas Anda untuk Peserta Magang Ini</h3>
-                        <p class="text-base text-slate-700 mt-0.5">Tiga langkah wajib mentor. Langkah berwarna kuning perlu Anda kerjakan.</p>
+                        <p class="hidden sm:block text-base text-slate-700 mt-0.5">Tiga langkah wajib mentor. Langkah berwarna kuning perlu Anda kerjakan.</p>
                     </div>
                     <x-status-badge :status="$appStatus" />
                 </div>
 
-                <ol class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                <ol class="grid grid-cols-1 lg:grid-cols-3 gap-3" x-data>
                     @foreach ($checklist as $i => $step)
                         @php $style = $stepStyles[$step['state']] ?? $stepStyles['waiting']; @endphp
                         <li>
-                            <a href="{{ $step['anchor'] }}" class="block h-full p-4 rounded-xl border-2 {{ $style['box'] }} hover:shadow-sm transition">
+                            <a href="{{ $step['anchor'] }}" @click="$dispatch('buka-langkah', @js($step['key']))" class="block h-full p-3 sm:p-4 rounded-xl border-2 {{ $style['box'] }} hover:shadow-sm transition">
                                 <div class="flex items-center gap-3">
                                     <span class="w-9 h-9 rounded-full {{ $style['icon'] }} text-white font-bold flex items-center justify-center shrink-0" aria-hidden="true">
                                         @if ($step['state'] === 'done')
@@ -127,7 +131,7 @@
                                         <p class="text-sm font-bold {{ $style['labelClass'] }}">{{ $style['label'] }}</p>
                                     </div>
                                 </div>
-                                <p class="text-base text-slate-800 mt-2 leading-relaxed">{{ $step['text'] }}</p>
+                                <p class="{{ $step['state'] === 'todo' ? '' : 'hidden sm:block' }} text-base text-slate-800 mt-2 leading-relaxed">{{ $step['text'] }}</p>
                             </a>
                         </li>
                     @endforeach
@@ -138,10 +142,10 @@
                         <div>
                             <p class="text-sm font-bold text-blue-900">Langkah berikutnya</p>
                             <p class="text-lg font-bold text-slate-900">{{ $firstTask['title'] }}</p>
-                            <p class="text-base text-slate-800">{{ $firstTask['description'] }}</p>
+                            <p class="hidden sm:block text-base text-slate-800">{{ $firstTask['description'] }}</p>
                         </div>
                         <a href="{{ $firstTask['url'] }}"
-                           class="min-h-[52px] inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-base font-bold rounded-xl shadow-xs transition shrink-0">
+                           class="w-full md:w-auto min-h-[52px] inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-base font-bold rounded-xl shadow-xs transition shrink-0">
                             {{ $firstTask['button'] }}
                         </a>
                     </div>
@@ -151,9 +155,14 @@
             </section>
 
             <!-- 2. Data Magang & Penugasan -->
-            <section class="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-xs space-y-4" aria-labelledby="judul-data">
+            <section class="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-xs space-y-4" aria-labelledby="judul-data" x-data="{ buka: false }">
                 <h3 id="judul-data" class="text-xl font-bold text-slate-900">Data Magang &amp; Penugasan</h3>
-                <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 text-base">
+                <button type="button" @click="buka = !buka" :aria-expanded="buka.toString()"
+                        class="sm:hidden w-full min-h-[48px] inline-flex items-center justify-center gap-2 px-4 rounded-xl border-2 border-slate-300 bg-white text-base font-bold text-slate-800">
+                    <span x-text="buka ? 'Sembunyikan' : 'Lihat isi'">Lihat isi</span>
+                    <svg class="w-5 h-5 transition" :class="buka && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <dl :class="{ 'hidden': !buka }" class="hidden sm:!grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 text-base">
                     <div>
                         <dt class="text-sm text-slate-700 font-semibold">Kampus/Sekolah</dt>
                         <dd class="font-semibold text-slate-900 mt-0.5">{{ $profile->universitas ?? '-' }}</dd>
@@ -195,11 +204,11 @@
             </section>
 
             <!-- 3. Logbook Aktivitas Harian -->
-            <section id="bagian-logbook" class="scroll-mt-24 bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-xs space-y-4" aria-labelledby="judul-logbook">
+            <section id="bagian-logbook" class="scroll-mt-24 bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-xs space-y-4" aria-labelledby="judul-logbook" x-data="{ buka: @js($openStep('logbook')) }" x-init="if (location.hash === '#bagian-logbook') buka = true" @buka-langkah.window="if ($event.detail === 'logbook') buka = true">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                         <h3 id="judul-logbook" class="text-xl font-bold text-slate-900">Langkah 1 &mdash; Logbook Kegiatan Harian</h3>
-                        <p class="text-base text-slate-700 mt-0.5">Dikelompokkan per minggu. Periksa minggu yang bertanda kuning.</p>
+                        <p class="hidden sm:block text-base text-slate-700 mt-0.5">Dikelompokkan per minggu. Periksa minggu yang bertanda kuning.</p>
                     </div>
                     @if ($placement->logbooks->count() > 0)
                         <span class="px-3 py-1 bg-slate-100 text-slate-800 text-sm font-bold rounded-full">
@@ -208,6 +217,12 @@
                     @endif
                 </div>
 
+                <button type="button" @click="buka = !buka" :aria-expanded="buka.toString()"
+                        class="sm:hidden w-full min-h-[48px] inline-flex items-center justify-center gap-2 px-4 rounded-xl border-2 border-slate-300 bg-white text-base font-bold text-slate-800">
+                    <span x-text="buka ? 'Sembunyikan' : 'Lihat isi'">Lihat isi</span>
+                    <svg class="w-5 h-5 transition" :class="buka && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div :class="{ 'hidden': !buka }" class="{{ $openStep('logbook') ? '' : 'hidden' }} sm:!block space-y-4">
                 @if ($isUpcoming)
                     <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-base text-slate-800">
                         Masa magang dimulai <strong>{{ $startDate->translatedFormat('d F Y') }}</strong>. Logbook akan muncul di sini setelah peserta magang mulai mengisinya.
@@ -221,11 +236,18 @@
                     :showBulkSelect="false"
                     emptyMessage="Belum ada logbook kegiatan yang diisi peserta magang."
                 />
+                </div>
             </section>
 
             <!-- 4. Laporan Akhir & Proyek Inovasi -->
-            <section id="bagian-laporan" class="scroll-mt-24 space-y-3" aria-label="Langkah 2 Laporan Akhir">
+            <section id="bagian-laporan" class="scroll-mt-24 space-y-3" aria-label="Langkah 2 Laporan Akhir" x-data="{ buka: @js($openStep('report')) }" x-init="if (location.hash === '#bagian-laporan') buka = true" @buka-langkah.window="if ($event.detail === 'report') buka = true">
                 <h3 class="text-xl font-bold text-slate-900 px-1">Langkah 2 &mdash; Laporan Akhir &amp; Proyek</h3>
+                <button type="button" @click="buka = !buka" :aria-expanded="buka.toString()"
+                        class="sm:hidden w-full min-h-[48px] inline-flex items-center justify-center gap-2 px-4 rounded-xl border-2 border-slate-300 bg-white text-base font-bold text-slate-800">
+                    <span x-text="buka ? 'Sembunyikan' : 'Lihat isi'">Lihat isi</span>
+                    <svg class="w-5 h-5 transition" :class="buka && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div :class="{ 'hidden': !buka }" class="{{ $openStep('report') ? '' : 'hidden' }} sm:!block">
                 <x-supervision.report-review
                     :finalReport="$placement->finalreport"
                     :placement="$placement"
@@ -234,14 +256,15 @@
                     role="mentor"
                     :canReview="$canEvaluate ?? true"
                 />
+                </div>
             </section>
 
             <!-- 5. Penilaian Evaluasi Akhir -->
-            <section id="bagian-nilai" class="scroll-mt-24 bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-xs space-y-5" aria-labelledby="judul-nilai">
+            <section id="bagian-nilai" class="scroll-mt-24 bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-xs space-y-5" aria-labelledby="judul-nilai" x-data="{ buka: @js($openStep('evaluation')) }" x-init="if (location.hash === '#bagian-nilai') buka = true" @buka-langkah.window="if ($event.detail === 'evaluation') buka = true">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                         <h3 id="judul-nilai" class="text-xl font-bold text-slate-900">Langkah 3 &mdash; Nilai Akhir</h3>
-                        <p class="text-base text-slate-700 mt-0.5">Nilai dari Anda dan dari pembimbing kampus/sekolah.</p>
+                        <p class="hidden sm:block text-base text-slate-700 mt-0.5">Nilai dari Anda dan dari pembimbing kampus/sekolah.</p>
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
@@ -269,6 +292,12 @@
                     </div>
                 </div>
 
+                <button type="button" @click="buka = !buka" :aria-expanded="buka.toString()"
+                        class="sm:hidden w-full min-h-[48px] inline-flex items-center justify-center gap-2 px-4 rounded-xl border-2 border-slate-300 bg-white text-base font-bold text-slate-800">
+                    <span x-text="buka ? 'Sembunyikan' : 'Lihat isi'">Lihat isi</span>
+                    <svg class="w-5 h-5 transition" :class="buka && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div :class="{ 'hidden': !buka }" class="{{ $openStep('evaluation') ? '' : 'hidden' }} sm:!block space-y-5">
                 @if (! empty($evaluationLockReason) && ($canEvaluate ?? true))
                     <div class="p-4 {{ $isCompleted ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-800' }} border rounded-xl text-base">
                         @if ($isCompleted)
@@ -281,8 +310,11 @@
                     </div>
                 @endif
 
+                @unless ($hasEval)
+                    <p class="sm:hidden p-4 bg-slate-50 border border-slate-200 rounded-xl text-base text-slate-800">Belum ada nilai dari Anda maupun pembimbing kampus/sekolah.</p>
+                @endunless
                 <!-- Perbandingan Nilai -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="{{ $hasEval ? '' : 'hidden sm:grid' }} grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="p-4 sm:p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
                         <span class="text-base font-bold text-slate-900 block">Nilai dari Anda (Mentor Lapangan)</span>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -322,7 +354,7 @@
                     </div>
                 </div>
 
-                <div class="p-4 sm:p-5 bg-white rounded-2xl border border-slate-200 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                <div class="{{ $hasEval ? 'flex' : 'hidden sm:flex' }} p-4 sm:p-5 bg-white rounded-2xl border border-slate-200 flex-col sm:flex-row justify-between sm:items-center gap-4">
                     <div>
                         <span class="text-base text-slate-700 font-semibold block">Nilai Akhir Magang</span>
                         <div class="text-3xl font-black text-slate-900 mt-0.5">
@@ -345,6 +377,7 @@
                         <strong>Catatan evaluasi Anda:</strong> "{{ $eval->catatan }}"
                     </div>
                 @endif
+                </div>
             </section>
 
         </div>

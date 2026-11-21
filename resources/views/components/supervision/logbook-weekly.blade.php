@@ -56,7 +56,7 @@
     {{-- Bar Setujui Banyak Sekaligus (Hanya tampil jika showBulkSelect aktif) --}}
     @if ($showBulkSelect && $selectableValues->count() > 1)
         <form action="{{ $reviewRoute }}" method="POST"
-              class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              class="hidden sm:flex bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-slate-100 flex-col sm:flex-row sm:items-center justify-between gap-3">
             @csrf
             <input type="hidden" name="status" value="approved">
             <template x-for="id in selected.flatMap(v => v.split(','))" :key="id">
@@ -113,16 +113,16 @@
             <div class="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 @if ($showBulkSelect && $isSelectable && $selectableValues->count() > 1)
                     <input type="checkbox" value="{{ implode(',', $pendingIds) }}" x-model="selected"
-                           class="w-6 h-6 rounded border-slate-400 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
+                           class="hidden sm:block w-6 h-6 rounded border-slate-400 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
                            aria-label="Pilih minggu {{ $periodText }} untuk disetujui sekaligus">
                 @endif
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 flex-1 items-center">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 flex-1 items-center">
                     <!-- Mahasiswa -->
                     <div>
-                        <div class="font-bold text-slate-900 text-base">
+                        <div class="font-bold text-slate-900 text-lg sm:text-base">
                             {{ $student->name ?? 'Peserta Magang' }}
                         </div>
-                        <div class="text-sm text-slate-600 mt-0.5">
+                        <div class="hidden sm:block text-sm text-slate-600 mt-0.5">
                             NIM/NIS: {{ $profile->nim ?? '-' }}
                         </div>
                         @if ($role === 'mentor' && !empty($bundle['is_fallback_unit_head']))
@@ -139,14 +139,14 @@
 
                     <!-- Periode -->
                     <div>
-                        <span class="text-sm text-slate-600 block">Minggu</span>
+                        <span class="hidden sm:block text-sm text-slate-600">Minggu</span>
                         <span class="text-base font-semibold text-slate-900">
-                            {{ $periodText }}
+                            <span class="sm:hidden">Minggu </span>{{ $periodText }}
                         </span>
                     </div>
 
-                    <!-- Jumlah Hari -->
-                    <div>
+                    <!-- Jumlah Hari (di HP cukup terlihat di rincian) -->
+                    <div class="hidden sm:block">
                         <span class="text-sm text-slate-600 block">Jumlah Hari</span>
                         <span class="text-base font-semibold text-slate-900">
                             {{ $bundle['entries_count'] }} hari diisi
@@ -158,7 +158,7 @@
 
                     <!-- Status -->
                     <div>
-                        <span class="text-sm text-slate-600 block mb-1">Keadaan</span>
+                        <span class="hidden sm:block text-sm text-slate-600 mb-1">Keadaan</span>
                         @if ($pendingCountInBundle > 0)
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-amber-100 text-amber-900 border border-amber-300">
                                 {{ $pendingCountInBundle }} hari perlu diperiksa
@@ -176,7 +176,7 @@
                 <!-- Tombol Periksa -->
                 <div class="flex items-center justify-end shrink-0">
                     <button type="button" @click="open = !open" :aria-expanded="open.toString()"
-                            class="min-h-[48px] inline-flex items-center justify-center px-5 py-2.5 text-base font-bold rounded-xl transition cursor-pointer {{ $isSelectable ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-800' }}">
+                            class="w-full sm:w-auto min-h-[52px] sm:min-h-[48px] inline-flex items-center justify-center px-5 py-2.5 text-base font-bold rounded-xl transition cursor-pointer {{ $isSelectable ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-800' }}">
                         <span x-text="open ? 'Tutup Rincian' : @js($isSelectable ? 'Periksa Sekarang' : 'Lihat Rincian')">{{ $isSelectable ? 'Periksa Sekarang' : 'Lihat Rincian' }}</span>
                     </button>
                 </div>
@@ -224,9 +224,12 @@
                     Rincian Kegiatan Harian ({{ $periodText }})
                 </h4>
                 @if ($pendingCountInBundle > 0)
-                    <p class="text-sm text-slate-700 mb-4">
+                    <p class="hidden sm:block text-sm text-slate-700 mb-4">
                         Baca kegiatan setiap hari. Bila sudah sesuai, biarkan pilihan <strong>Sesuai</strong>.
                         Bila ada yang kurang, pilih <strong>Perlu Diperbaiki</strong> lalu tulis apa yang harus diperbaiki di bawah.
+                    </p>
+                    <p class="sm:hidden text-base text-slate-800 mb-3">
+                        Sudah benar? Biarkan <strong>Sesuai</strong>. Ada yang kurang? Pilih <strong>Perlu Diperbaiki</strong>.
                     </p>
                 @endif
 
@@ -300,8 +303,8 @@
                             @endif
 
                             @if ($isPendingEntry)
-                                <div class="flex flex-wrap items-center gap-2 pt-1" role="group" aria-label="Keputusan untuk {{ \Carbon\Carbon::parse($entry['date'])->translatedFormat('d F Y') }}">
-                                    <span class="text-sm font-semibold text-slate-700 mr-1">Keputusan:</span>
+                                <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 pt-1" role="group" aria-label="Keputusan untuk {{ \Carbon\Carbon::parse($entry['date'])->translatedFormat('d F Y') }}">
+                                    <span class="hidden sm:inline text-sm font-semibold text-slate-700 mr-1">Keputusan:</span>
                                     <button type="button" @click="toggle({{ $entryId }}, false)"
                                             :aria-pressed="(! revise.includes({{ $entryId }})).toString()"
                                             :class="! revise.includes({{ $entryId }}) ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'"
@@ -340,7 +343,7 @@
                             </label>
 
                             <!-- Contoh catatan siap pakai -->
-                            <div class="flex flex-wrap items-center gap-2 mb-2">
+                            <div class="flex-wrap items-center gap-2 mb-2" :class="revise.length > 0 ? 'flex' : 'hidden sm:flex'">
                                 <span class="text-sm text-slate-600">Contoh cepat:</span>
                                 <template x-if="revise.length > 0">
                                     <span class="contents">
