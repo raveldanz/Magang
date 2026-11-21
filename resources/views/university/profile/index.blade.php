@@ -11,7 +11,7 @@
             </div>
 
             <div>
-                <a href="{{ route('university.dashboard') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                <a href="{{ route('university.dashboard') }}" class="inline-flex items-center gap-2 min-h-[44px] sm:min-h-0 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                      Kembali ke Dashboard
                 </a>
             </div>
@@ -91,7 +91,7 @@
                                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                     Nama Lengkap Kampus/Sekolah <span class="text-rose-500">*</span>
                                 </label>
-                                <input type="text" name="name" value="{{ old('name', $university->name) }}" required placeholder="Contoh: Universitas Dr. Soetomo" class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-semibold">
+                                <input type="text" name="name" value="{{ old('name', $university->name) }}" required placeholder="Contoh: Universitas Dr. Soetomo" class="w-full min-h-[44px] sm:min-h-0 text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-semibold">
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -99,14 +99,14 @@
                                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                         Singkatan / Kode Kampus
                                     </label>
-                                    <input type="text" name="code" value="{{ old('code', $university->code) }}" placeholder="Contoh: UNITOMO" class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono uppercase">
+                                    <input type="text" name="code" value="{{ old('code', $university->code) }}" placeholder="Contoh: UNITOMO" class="w-full min-h-[44px] sm:min-h-0 text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono uppercase">
                                 </div>
 
                                 <div>
                                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                         Email Resmi Kampus / Humas
                                     </label>
-                                    <input type="email" name="email" value="{{ old('email', $university->email) }}" placeholder="info@unitomo.ac.id" class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                                    <input type="email" name="email" value="{{ old('email', $university->email) }}" placeholder="info@unitomo.ac.id" class="w-full min-h-[44px] sm:min-h-0 text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                                 </div>
                             </div>
 
@@ -115,7 +115,7 @@
                                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                         Nomor Telepon / Hotline Kampus
                                     </label>
-                                    <input type="text" name="phone" value="{{ old('phone', $university->phone) }}" placeholder="(031) 5925970" class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                                    <input type="text" name="phone" value="{{ old('phone', $university->phone) }}" placeholder="(031) 5925970" class="w-full min-h-[44px] sm:min-h-0 text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                                 </div>
                             </div>
 
@@ -144,21 +144,21 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Nama Lengkap & Gelar Pejabat
                             </label>
-                            <input type="text" name="pic_name" value="{{ old('pic_name', $university->pic_name) }}" placeholder="Dr. Siti Marwiyah, S.H., M.H." class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="pic_name" value="{{ old('pic_name', $university->pic_name) }}" placeholder="Dr. Siti Marwiyah, S.H., M.H." class="w-full min-h-[44px] sm:min-h-0 text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 NIP / NIDN Pejabat
                             </label>
-                            <input type="text" name="pic_nip" value="{{ old('pic_nip', $university->pic_nip) }}" placeholder="196808281993032001" class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                            <input type="text" name="pic_nip" value="{{ old('pic_nip', $university->pic_nip) }}" placeholder="196808281993032001" class="w-full min-h-[44px] sm:min-h-0 text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Jabatan Penandatangan
                             </label>
-                            <input type="text" name="pic_position" value="{{ old('pic_position', $university->pic_position) }}" placeholder="Rektor Universitas Dr. Soetomo" class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="pic_position" value="{{ old('pic_position', $university->pic_position) }}" placeholder="Rektor Universitas Dr. Soetomo" class="w-full min-h-[44px] sm:min-h-0 text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
                     </div>
                 </div>
@@ -285,7 +285,7 @@
                                     <span class="font-mono font-bold text-blue-700 text-sm" x-text="weightMentor + '%'"></span>
                                 </div>
                                 <input type="range" min="0" max="100" step="5" x-model="weightMentor" @input="updateLecturer()" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
-                                <input type="number" name="weight_mentor" min="0" max="100" x-model="weightMentor" @input="updateLecturer()" class="w-full text-xs border-gray-300 rounded-xl font-mono text-center font-bold">
+                                <input type="number" name="weight_mentor" min="0" max="100" x-model="weightMentor" @input="updateLecturer()" class="w-full min-h-[44px] sm:min-h-0 text-xs border-gray-300 rounded-xl font-mono text-center font-bold">
                                 <p class="text-[11px] text-gray-400">Atur 0% jika evaluasi murni diserahkan 100% ke Pembimbing Kampus/Sekolah.</p>
                             </div>
 
@@ -296,7 +296,7 @@
                                     <span class="font-mono font-bold text-purple-700 text-sm" x-text="weightLecturer + '%'"></span>
                                 </div>
                                 <input type="range" min="0" max="100" step="5" x-model="weightLecturer" @input="updateMentor()" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
-                                <input type="number" name="weight_lecturer" min="0" max="100" x-model="weightLecturer" @input="updateMentor()" class="w-full text-xs border-gray-300 rounded-xl font-mono text-center font-bold">
+                                <input type="number" name="weight_lecturer" min="0" max="100" x-model="weightLecturer" @input="updateMentor()" class="w-full min-h-[44px] sm:min-h-0 text-xs border-gray-300 rounded-xl font-mono text-center font-bold">
                                 <p class="text-[11px] text-gray-400">Atur 100% jika kampus memberlakukan evaluasi tunggal oleh Pembimbing.</p>
                             </div>
 
@@ -344,11 +344,11 @@
                                         <h5 class="text-xs font-bold text-slate-900 uppercase tracking-wide">Komponen Penilaian Dinas (Instansi)</h5>
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <button type="button" @click="addDinas()" class="text-[11px] font-bold text-blue-600 hover:text-blue-800 cursor-pointer">
+                                        <button type="button" @click="addDinas()" class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 text-[11px] font-bold text-blue-600 hover:text-blue-800 cursor-pointer">
                                             + Tambah
                                         </button>
                                         <span class="text-slate-300">|</span>
-                                        <button type="button" @click="resetDinas()" class="text-[11px] font-semibold text-slate-500 hover:text-slate-700 cursor-pointer">
+                                        <button type="button" @click="resetDinas()" class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 text-[11px] font-semibold text-slate-500 hover:text-slate-700 cursor-pointer">
                                             Reset
                                         </button>
                                     </div>
@@ -362,8 +362,8 @@
                                                    x-model="dinasList[idx]" 
                                                    required
                                                    placeholder="Nama aspek kompetensi dinas..."
-                                                   class="w-full text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
-                                            <button type="button" @click="removeDinas(idx)" x-show="dinasList.length > 1" class="p-1 text-slate-400 hover:text-rose-600 transition cursor-pointer" title="Hapus aspek ini">
+                                                   class="w-full min-h-[44px] sm:min-h-0 text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                                            <button type="button" @click="removeDinas(idx)" x-show="dinasList.length > 1" class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 shrink-0 p-1 text-slate-400 hover:text-rose-600 transition cursor-pointer" title="Hapus aspek ini">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                             </button>
                                         </div>
@@ -379,11 +379,11 @@
                                         <h5 class="text-xs font-bold text-slate-900 uppercase tracking-wide">Komponen Penilaian Pembimbing (Kampus/Sekolah)</h5>
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <button type="button" @click="addDpl()" class="text-[11px] font-bold text-purple-600 hover:text-purple-800 cursor-pointer">
+                                        <button type="button" @click="addDpl()" class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 text-[11px] font-bold text-purple-600 hover:text-purple-800 cursor-pointer">
                                             + Tambah
                                         </button>
                                         <span class="text-slate-300">|</span>
-                                        <button type="button" @click="resetDpl()" class="text-[11px] font-semibold text-slate-500 hover:text-slate-700 cursor-pointer">
+                                        <button type="button" @click="resetDpl()" class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 text-[11px] font-semibold text-slate-500 hover:text-slate-700 cursor-pointer">
                                             Reset
                                         </button>
                                     </div>
@@ -397,8 +397,8 @@
                                                    x-model="dplList[idx]" 
                                                    required
                                                    placeholder="Nama aspek kompetensi akademik..."
-                                                   class="w-full text-xs border-gray-300 rounded-xl focus:ring-purple-500 focus:border-purple-500 shadow-2xs font-medium">
-                                            <button type="button" @click="removeDpl(idx)" x-show="dplList.length > 1" class="p-1 text-slate-400 hover:text-rose-600 transition cursor-pointer" title="Hapus aspek ini">
+                                                   class="w-full min-h-[44px] sm:min-h-0 text-xs border-gray-300 rounded-xl focus:ring-purple-500 focus:border-purple-500 shadow-2xs font-medium">
+                                            <button type="button" @click="removeDpl(idx)" x-show="dplList.length > 1" class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 shrink-0 p-1 text-slate-400 hover:text-rose-600 transition cursor-pointer" title="Hapus aspek ini">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                             </button>
                                         </div>
@@ -413,7 +413,7 @@
 
                 <!-- Submit Button -->
                 <div class="flex items-center justify-end gap-3 pt-2">
-                    <button type="submit" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer text-center justify-center flex items-center">
+                    <button type="submit" class="w-full sm:w-auto min-h-[44px] sm:min-h-0 px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer text-center justify-center flex items-center">
                         Simpan Perubahan Profil & Kebijakan Kampus
                     </button>
                 </div>

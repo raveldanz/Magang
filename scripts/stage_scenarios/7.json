@@ -1,0 +1,6 @@
+[
+  { "key": "univ-dashboard", "path": "/university/dashboard", "role": "admin@unesa.ac.id", "probeNav": true },
+  { "key": "univ-student-show", "role": "admin@unesa.ac.id", "follow": { "from": "/university/dashboard", "pattern": "^/university/students/\\d+$" } },
+  { "key": "univ-profile", "path": "/university/profile", "role": "admin@unesa.ac.id" },
+  { "key": "univ-lecturers", "path": "/university/lecturers", "role": "admin@unesa.ac.id" }
+]

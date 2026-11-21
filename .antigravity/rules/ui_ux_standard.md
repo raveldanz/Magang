@@ -95,8 +95,8 @@ Semua badge status wajib lewat `<x-status-badge :status="..." type="application|
   - Halaman detail logbook admin tidak ditautkan dari daftar; diaudit lewat URL langsung. Halaman detail feedback belum teruji (tidak ada tiket di data demo) dan dicakup Tahap 8.
 - [x] **Tahap 4 — Portal Supervisor / Atasan** (`supervisor/dashboard`, `applications`, `reports`, `certificates`) — **Selesai**
   - Halaman persetujuan di HP: tombol pintasan "Ke Panel Keputusan (Setujui / Tolak)" di atas karena panel keputusan berada di bagian bawah halaman; panel keputusan hanya `sticky` di `lg:`.
-- [ ] **Tahap 5 — Portal Mentor Lapangan** (`mentor/dashboard`, `logbooks`, `students`, `evaluations`)
-- [ ] **Tahap 6 — Portal Dosen / Pembimbing Kampus & Sekolah** (`lecturer/dashboard`, `monitoring`, `logbooks`, `evaluations`)
-- [ ] **Tahap 7 — Portal Admin Kampus / Sekolah** (`university/dashboard`, `lecturers`, `students`, `profile`)
+- [x] **Tahap 5 — Portal Mentor Lapangan** (`mentor/dashboard`, `logbooks`, `students`, `evaluations`)
+- [x] **Tahap 6 — Portal Dosen / Pembimbing Kampus & Sekolah** (`lecturer/dashboard`, `monitoring`, `logbooks`, `evaluations`)
+- [x] **Tahap 7 — Portal Admin Kampus / Sekolah** (`university/dashboard`, `lecturers`, `students`, `profile`)
 - [ ] **Tahap 8 — Modul Lintas Peran (Chat, Notifikasi, Profil Akun & Feedback)**
 - [ ] **Tahap 9 — Audit Holistik Akhir, Dokumen Cetak A4/Sertifikat & Regresi 9 Domain**

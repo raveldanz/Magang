@@ -1,0 +1,9 @@
+[
+  { "key": "lecturer-dashboard", "path": "/lecturer/dashboard", "role": "dosen.unesa@unesa.ac.id", "probeNav": true },
+  { "key": "lecturer-student-show", "role": "dosen.unesa@unesa.ac.id", "follow": { "from": "/lecturer/dashboard", "pattern": "^/lecturer/students/\\d+$" } },
+  { "key": "lecturer-monitoring", "path": "/lecturer/monitoring", "role": "dosen.unesa@unesa.ac.id" },
+  { "key": "lecturer-logbooks-index", "path": "/lecturer/logbooks", "role": "dosen.unesa@unesa.ac.id" },
+  { "key": "lecturer-logbooks-show", "path": "/lecturer/logbooks/181", "role": "dosen.unesa@unesa.ac.id" },
+  { "key": "lecturer-evaluation", "role": "dosen.unesa@unesa.ac.id", "follow": { "from": "/lecturer/dashboard", "pattern": "^/lecturer/students/\\d+$", "suffix": "/evaluation" } }
+]
+

@@ -122,7 +122,7 @@
                         @php $hasStudents = $dist['count'] > 0; @endphp
                         <div @if(!$hasStudents) x-show="showAll" x-cloak @endif>
                             <div class="flex items-center justify-between text-xs font-semibold mb-1.5 gap-2">
-                                <span class="text-slate-700 font-medium truncate flex-1 min-w-0">{{ $dist['name'] }}</span>
+                                <span class="text-slate-700 font-medium break-words sm:truncate flex-1 min-w-0" title="{{ $dist['name'] }}">{{ $dist['name'] }}</span>
                                 <span class="text-blue-700 font-bold shrink-0">
                                     {{ $dist['count'] }} Peserta Magang
                                     <span class="text-slate-400 font-normal">({{ $dist['percentage'] }}%)</span>
@@ -144,10 +144,10 @@
                     <div class="flex-1">
                         <input type="text" name="search" value="{{ request('search') }}" 
                             placeholder="Cari nama peserta magang, NIM/NIS, atau jurusan..." 
-                            class="w-full text-xs sm:text-sm border-slate-200 bg-slate-50 focus:bg-white rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-xs">
+                            class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-slate-200 bg-slate-50 focus:bg-white rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-xs">
                     </div>
                     <div class="w-full sm:w-64">
-                        <select name="unit_id" class="w-full text-xs sm:text-sm border-slate-200 bg-slate-50 focus:bg-white rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-xs">
+                        <select name="unit_id" class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-slate-200 bg-slate-50 focus:bg-white rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-xs">
                             <option value="">-- Semua Bidang / Divisi Dispusip --</option>
                             @foreach ($units ?? [] as $u)
                                 <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
@@ -157,11 +157,11 @@
                         </select>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs">
+                        <button type="submit" class="w-full sm:w-auto min-h-[44px] sm:min-h-0 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs">
                             Filter
                         </button>
                         @if (request()->hasAny(['search', 'unit_id', 'agency_id']))
-                            <a href="{{ route('university.dashboard') }}" class="px-3 py-2 text-xs font-bold text-slate-500 hover:text-slate-800">
+                            <a href="{{ route('university.dashboard') }}" class="inline-flex items-center min-h-[44px] sm:min-h-0 px-3 py-2 text-xs font-bold text-slate-500 hover:text-slate-800">
                                 Reset
                             </a>
                         @endif
@@ -182,7 +182,7 @@
         </div>
 
         <a href="{{ route('university.students.export') }}" 
-           class="inline-flex items-center justify-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-xs transition w-full sm:w-auto">
+           class="inline-flex items-center justify-center gap-2 min-h-[44px] sm:min-h-0 px-3.5 py-2 sm:px-4 sm:py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-xs transition w-full sm:w-auto">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
@@ -217,7 +217,7 @@
                 <!-- Aksi Kanan: Tombol Detail Langsung -->
                 <div class="shrink-0">
                     <a href="{{ route('university.students.show', $app->id) }}"
-                       class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 active:bg-blue-200 text-blue-700 text-xs font-semibold rounded-xl border border-blue-100 transition">
+                       class="inline-flex items-center justify-center gap-1 min-h-[44px] sm:min-h-0 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 active:bg-blue-200 text-blue-700 text-xs font-semibold rounded-xl border border-blue-100 transition">
                         Detail
                     </a>
                 </div>

@@ -72,7 +72,7 @@
             <!-- Tombol Komunikasi & Koordinasi Lapangan -->
             <div class="flex flex-wrap items-center gap-2">
                 @if ($student)
-                    <x-chat-button :user="$student" label="Chat Peserta Magang" />
+                    <x-chat-button :user="$student" label="Chat Peserta Magang" class="min-h-[44px] sm:min-h-0" />
                 @endif
 
                 @if ($waLink)
@@ -84,7 +84,7 @@
                     </a>
                 @endif
 
-                <x-chat-group-button :placement="$placement" />
+                <x-chat-group-button :placement="$placement" class="min-h-[44px] sm:min-h-0" />
             </div>
         </div>
     </x-slot>

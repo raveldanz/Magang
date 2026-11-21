@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center gap-2 text-xs sm:text-sm">
             <a href="{{ route('lecturer.monitoring.index') }}" 
-               class="font-semibold text-slate-600 hover:text-slate-900 transition">
+               class="inline-flex items-center min-h-[44px] sm:min-h-0 font-semibold text-slate-600 hover:text-slate-900 transition">
                 Peserta Bimbingan
             </a>
             <span class="text-slate-300">/</span>
@@ -188,7 +188,7 @@
                         @if ($showGroup)
                             <a href="{{ route('chat.placement', $placement->id) }}" 
                                title="Buka Forum Diskusi Bersama"
-                               class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs transition active:scale-95 text-center cursor-pointer">
+                               class="inline-flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-0 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs transition active:scale-95 text-center cursor-pointer">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                                 </svg>
@@ -199,7 +199,7 @@
                         @if ($cleanStudentPhone)
                             <a href="https://wa.me/{{ $cleanStudentPhone }}?text={{ $waMessage }}" target="_blank"
                                title="Hubungi via WhatsApp ({{ $studentPhone }})"
-                               class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/90 text-xs font-semibold rounded-xl shadow-2xs transition active:scale-95 text-center cursor-pointer">
+                               class="inline-flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-0 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/90 text-xs font-semibold rounded-xl shadow-2xs transition active:scale-95 text-center cursor-pointer">
                                 <svg class="w-4 h-4 text-emerald-600 fill-current shrink-0" viewBox="0 0 24 24">
                                     <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.861.174.086.275.072.376-.044.101-.116.433-.506.549-.68.116-.173.231-.145.39-.086s1.011.477 1.184.564.289.13.332.202c.043.073.043.419-.101.824z"/>
                                 </svg>
@@ -213,7 +213,7 @@
                                 <input type="hidden" name="user_id" value="{{ $student->id }}">
                                 <button type="submit" 
                                         title="Kirim pesan langsung ke {{ $student->name }}"
-                                        class="inline-flex items-center justify-center gap-1.5 w-full px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 text-xs font-semibold rounded-xl shadow-2xs transition active:scale-95 text-center cursor-pointer">
+                                        class="inline-flex items-center justify-center gap-1.5 w-full min-h-[44px] sm:min-h-0 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 text-xs font-semibold rounded-xl shadow-2xs transition active:scale-95 text-center cursor-pointer">
                                     <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                                     </svg>
@@ -228,7 +228,7 @@
                                 <input type="hidden" name="user_id" value="{{ $mentor->id }}">
                                 <button type="submit" 
                                         title="Kirim pesan ke Mentor Lapangan"
-                                        class="inline-flex items-center justify-center gap-1.5 w-full px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 text-xs font-semibold rounded-xl shadow-2xs transition active:scale-95 text-center cursor-pointer">
+                                        class="inline-flex items-center justify-center gap-1.5 w-full min-h-[44px] sm:min-h-0 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 text-xs font-semibold rounded-xl shadow-2xs transition active:scale-95 text-center cursor-pointer">
                                     <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                     </svg>
@@ -303,7 +303,7 @@
                     </div>
                     @if ($cleanStudentPhone)
                         <a href="https://wa.me/{{ $cleanStudentPhone }}?text={{ $waMessage }}" target="_blank"
-                           class="inline-flex items-center gap-1.5 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition shadow-xs shrink-0 cursor-pointer active:scale-95">
+                           class="inline-flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-0 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition shadow-xs shrink-0 cursor-pointer active:scale-95">
                             <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
                                 <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.861.174.086.275.072.376-.044.101-.116.433-.506.549-.68.116-.173.231-.145.39-.086s1.011.477 1.184.564.289.13.332.202c.043.073.043.419-.101.824z"/>
                             </svg>
@@ -492,7 +492,7 @@
                                 </a>
                             @else
                                 <a href="{{ route('lecturer.evaluations.create', $placement->id) }}"
-                                   class="inline-flex items-center justify-center w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
+                                   class="inline-flex items-center justify-center w-full sm:w-auto min-h-[44px] sm:min-h-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
                                     {{ $isMentorOnly ? ($eval?->feedback_dosen ? 'Ubah Catatan Bimbingan' : 'Beri Catatan Bimbingan') : ($hasEval ? 'Ubah Nilai Evaluasi' : 'Isi Nilai Evaluasi') }}
                                 </a>
                             @endif
@@ -612,7 +612,7 @@
                         <textarea name="advisor_notes" rows="3" placeholder="Tuliskan catatan internal mengenai progres, kendala khusus, atau poin evaluasi peserta magang ini..."
                                   class="w-full text-xs sm:text-sm bg-slate-50 border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 rounded-xl p-3 shadow-2xs">{{ old('advisor_notes', $placement->advisor_notes) }}</textarea>
                         <div class="flex justify-end">
-                            <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
+                            <button type="submit" class="min-h-[44px] sm:min-h-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
                                 Simpan Catatan Pribadi
                             </button>
                         </div>
