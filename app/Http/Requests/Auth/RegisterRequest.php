@@ -11,6 +11,13 @@ use Illuminate\Validation\Rules;
  */
 class RegisterRequest extends FormRequest
 {
+    /**
+     * Penyedia email pribadi yang ditolak saat daftar mandiri (gmail.com, yahoo.co.id, dst.).
+     * Hanya label pertama setelah "@" yang dicocokkan, sehingga subdomain kampus seperti
+     * mail.ugm.ac.id atau live.undip.ac.id tetap diterima.
+     */
+    private const PERSONAL_EMAIL_DOMAIN = '/@(gmail|googlemail|yahoo|ymail|rocketmail|hotmail|outlook|live|msn|icloud|me|aol|mail|protonmail|proton|yandex|gmx)\.[a-z]{2,}(\.[a-z]{2})?$/i';
+
     public function authorize(): bool
     {
         return true;
@@ -32,7 +39,14 @@ class RegisterRequest extends FormRequest
         return [
             'register_as' => ['nullable', 'in:student,advisor'],
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => [
+                'required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class,
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (is_string($value) && preg_match(self::PERSONAL_EMAIL_DOMAIN, $value)) {
+                        $fail('Wajib menggunakan email resmi kampus (.ac.id), sekolah (.sch.id), atau instansi (.go.id).');
+                    }
+                },
+            ],
             'university' => ['nullable', 'required_if:register_as,advisor', 'string', 'max:255'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ];

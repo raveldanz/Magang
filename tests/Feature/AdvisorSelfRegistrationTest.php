@@ -150,6 +150,27 @@ class AdvisorSelfRegistrationTest extends TestCase
         $this->assertDatabaseMissing('users', ['email' => 'tanpa.institusi@example.test']);
     }
 
+    public function test_personal_email_is_rejected_but_campus_subdomain_is_accepted(): void
+    {
+        foreach (['siswa@gmail.com', 'siswa@yahoo.co.id', 'siswa@outlook.com'] as $email) {
+            $this->post('/register', [
+                'name' => 'Email Pribadi',
+                'email' => $email,
+                'password' => 'RahasiaSiswa123',
+                'password_confirmation' => 'RahasiaSiswa123',
+            ])->assertSessionHasErrors('email');
+            $this->assertDatabaseMissing('users', ['email' => $email]);
+        }
+
+        $this->post('/register', [
+            'name' => 'Mahasiswa UGM',
+            'email' => 'mahasiswa@mail.ugm.ac.id',
+            'password' => 'RahasiaSiswa123',
+            'password_confirmation' => 'RahasiaSiswa123',
+        ])->assertRedirect(route('student.profile.edit'));
+        $this->assertDatabaseHas('users', ['email' => 'mahasiswa@mail.ugm.ac.id', 'role' => 'mahasiswa']);
+    }
+
     public function test_register_page_escapes_role_choice_for_javascript(): void
     {
         $this->get('/register')->assertOk()->assertSee("roleType: 'student'", false);

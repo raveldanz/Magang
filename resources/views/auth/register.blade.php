@@ -184,6 +184,9 @@
                 </div>
 
                 <x-input-error :messages="$errors->get('university')" class="mt-1.5" />
+                <p class="mt-1.5 text-xs text-slate-600 leading-relaxed">
+                    Akun Pembimbing langsung bisa dipakai masuk. Peserta magang baru bisa memilih Anda setelah akun disetujui Admin Kampus/Sekolah.
+                </p>
             </div>
 
             <!-- Email Address -->
