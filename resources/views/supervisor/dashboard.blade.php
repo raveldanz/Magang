@@ -48,7 +48,7 @@
                         <div class="text-3xl sm:text-4xl font-black text-slate-900 mt-2">{{ $totalActiveInterns }}</div>
                         <p class="text-xs text-slate-500 mt-1">Sedang bertugas di unit kerja</p>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-slate-100">
+                    <div class="hidden sm:block mt-4 pt-3 border-t border-slate-100">
                         <span class="text-xs text-slate-500 font-medium">{{ $totalMentors }} Mentor Pembimbing</span>
                     </div>
                 </div>
@@ -60,7 +60,7 @@
                         <div class="text-3xl sm:text-4xl font-black text-slate-900 mt-2">{{ $totalCompletedInterns }}</div>
                         <p class="text-xs text-slate-500 mt-1">Total peserta magang telah tuntas magang</p>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-slate-100">
+                    <div class="hidden sm:block mt-4 pt-3 border-t border-slate-100">
                         <span class="text-xs text-slate-500 font-medium">Telah menyelesaikan program magang</span>
                     </div>
                 </div>
@@ -177,21 +177,21 @@
                             </div>
 
                             {{-- 4 Kotak Metrik Horizontal --}}
-                            <div class="grid grid-cols-4 gap-2 pt-1 border-t border-slate-100" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem;">
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-slate-100" style="display: grid; gap: 0.5rem;">
                                 <div class="bg-slate-50/80 rounded-xl p-2 text-center border border-slate-200/60">
-                                    <div class="text-xs text-slate-600 uppercase font-bold tracking-wider">Kuota</div>
+                                    <div class="text-sm sm:text-xs text-slate-600 uppercase font-bold tracking-wider">Kuota</div>
                                     <div class="text-sm font-extrabold text-slate-800 mt-0.5">{{ $unit->quota }}</div>
                                 </div>
                                 <div class="bg-emerald-50/50 rounded-xl p-2 text-center border border-emerald-100">
-                                    <div class="text-xs text-emerald-700 uppercase font-bold tracking-wider">Peserta Aktif</div>
+                                    <div class="text-sm sm:text-xs text-emerald-700 uppercase font-bold tracking-wider">Peserta Aktif</div>
                                     <div class="text-sm font-extrabold text-emerald-800 mt-0.5">{{ $unitActiveCount }}</div>
                                 </div>
                                 <div class="{{ $unitWaitingCount > 0 ? 'bg-purple-50/60 border-purple-200' : 'bg-slate-50/60 border-slate-200' }} rounded-xl p-2 text-center border">
-                                    <div class="text-xs {{ $unitWaitingCount > 0 ? 'text-purple-700' : 'text-slate-600' }} uppercase font-bold tracking-wider">Menunggu</div>
+                                    <div class="text-xs {{ $unitWaitingCount > 0 ? 'text-purple-700' : 'text-slate-600' }} uppercase font-bold tracking-wider text-sm sm:text-xs">Menunggu</div>
                                     <div class="text-sm font-extrabold {{ $unitWaitingCount > 0 ? 'text-purple-700' : 'text-slate-600' }} mt-0.5">{{ $unitWaitingCount }}</div>
                                 </div>
                                 <div class="bg-blue-50/50 rounded-xl p-2 text-center border border-blue-100">
-                                    <div class="text-xs text-blue-700 uppercase font-bold tracking-wider">Peserta Lulus</div>
+                                    <div class="text-sm sm:text-xs text-blue-700 uppercase font-bold tracking-wider">Peserta Lulus</div>
                                     <div class="text-sm font-extrabold text-blue-800 mt-0.5">{{ $unitCompletedCount }}</div>
                                 </div>
                             </div>

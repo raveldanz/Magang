@@ -1,0 +1,13 @@
+[
+  { "key": "lecturer-dashboard", "path": "/lecturer/dashboard", "role": "dosen.unesa@unesa.ac.id", "probeNav": true },
+  { "key": "lecturer-student-show", "role": "dosen.unesa@unesa.ac.id", "follow": { "from": "/lecturer/dashboard", "pattern": "^/lecturer/students/\\d+$" } },
+  { "key": "lecturer-monitoring", "path": "/lecturer/monitoring", "role": "dosen.unesa@unesa.ac.id" },
+  { "key": "lecturer-logbooks-index", "path": "/lecturer/logbooks", "role": "dosen.unesa@unesa.ac.id" },
+  { "key": "lecturer-evaluation", "role": "dosen.unesa@unesa.ac.id", "follow": { "from": "/lecturer/dashboard", "pattern": "^/lecturer/students/\\d+$", "suffix": "/evaluation" } },
+  { "key": "supervisor-dashboard", "path": "/supervisor/dashboard", "role": "supervisor@dispusip.surabaya.go.id", "probeNav": true },
+  { "key": "supervisor-applications", "path": "/supervisor/applications", "role": "supervisor@dispusip.surabaya.go.id" },
+  { "key": "supervisor-application-show", "role": "supervisor@dispusip.surabaya.go.id", "follow": { "from": "/supervisor/applications", "pattern": "^/supervisor/applications/\\d+$" } },
+  { "key": "supervisor-certificates", "path": "/supervisor/certificates", "role": "supervisor@dispusip.surabaya.go.id" },
+  { "key": "supervisor-reports", "path": "/supervisor/reports", "role": "supervisor@dispusip.surabaya.go.id" },
+  { "key": "supervisor-report-show", "role": "supervisor@dispusip.surabaya.go.id", "follow": { "from": "/supervisor/reports", "pattern": "^/supervisor/reports/\\d+$" } }
+]
