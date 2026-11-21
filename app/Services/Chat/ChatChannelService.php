@@ -7,6 +7,7 @@ use App\Models\ChatConversation;
 use App\Models\ChatParticipant;
 use App\Models\University;
 use App\Models\User;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -27,60 +28,113 @@ class ChatChannelService
             return;
         }
 
-        // 1. Saluran Utama Pemkot Surabaya
-        ChatConversation::updateOrCreate(
-            [
-                'type' => ChatConversation::TYPE_CHANNEL,
-                'scope_type' => ChatConversation::SCOPE_GOVERNMENT,
-                'agency_profile_id' => null,
-                'university_id' => null,
-            ],
-            [
-                'title' => 'Pemerintah Kota Surabaya',
-                'description' => 'Saluran siaran pengumuman resmi program magang Pemerintah Kota Surabaya.',
-                'image_url' => is_file(public_path('images/logos/surabaya.png')) ? 'images/logos/surabaya.png' : 'images/logoPemkotSBY.png',
-                'is_broadcast_only' => true,
-            ]
-        );
+        $this->ensurePemkotChannel();
 
-        // 2. Saluran Pengumuman tiap Dinas Kota
+        // Saluran tiap Dinas Kota
         if (Schema::hasTable('agency_profiles')) {
-            $agencies = AgencyProfile::all();
-            foreach ($agencies as $agency) {
-                ChatConversation::updateOrCreate(
-                    [
-                        'type' => ChatConversation::TYPE_CHANNEL,
-                        'scope_type' => ChatConversation::SCOPE_GOVERNMENT,
-                        'agency_profile_id' => $agency->id,
-                    ],
-                    [
-                        'title' => $agency->agency_name,
-                        'description' => "Saluran siaran pengumuman resmi {$agency->agency_name}.",
-                        'image_url' => $agency->logo ?: (is_file(public_path('images/logos/surabaya.png')) ? 'images/logos/surabaya.png' : 'images/logoPemkotSBY.png'),
-                        'is_broadcast_only' => true,
-                    ]
-                );
-            }
+            $this->syncAgencyChannels(AgencyProfile::query()->get(['id', 'agency_name', 'logo']));
         }
 
-        // 3. Saluran Pengumuman tiap Universitas
+        // Saluran kampus/sekolah hanya untuk institusi yang punya pengguna. Master institusi berisi puluhan ribu
+        // sekolah dari direktori nasional; membuat saluran untuk semuanya memenuhi database dan membuat /chat timeout.
         if (Schema::hasTable('universities')) {
-            $universities = University::all();
-            foreach ($universities as $univ) {
-                ChatConversation::updateOrCreate(
-                    [
-                        'type' => ChatConversation::TYPE_CHANNEL,
-                        'scope_type' => ChatConversation::SCOPE_UNIVERSITY,
-                        'university_id' => $univ->id,
-                    ],
-                    [
-                        'title' => $univ->name,
-                        'description' => "Saluran siaran pengumuman resmi {$univ->name}.",
-                        'image_url' => $univ->logo ?: 'images/default-university.svg',
-                        'is_broadcast_only' => true,
-                    ]
-                );
+            $this->syncUniversityChannels(University::query()
+                ->whereIn('id', User::query()->whereNotNull('university_id')->select('university_id'))
+                ->get(['id', 'name', 'logo']));
+        }
+    }
+
+    private function ensurePemkotChannel(): void
+    {
+        $exists = ChatConversation::where('type', ChatConversation::TYPE_CHANNEL)
+            ->where('scope_type', ChatConversation::SCOPE_GOVERNMENT)
+            ->whereNull('agency_profile_id')
+            ->whereNull('university_id')
+            ->exists();
+        if ($exists) {
+            return;
+        }
+
+        ChatConversation::create([
+            'type' => ChatConversation::TYPE_CHANNEL,
+            'scope_type' => ChatConversation::SCOPE_GOVERNMENT,
+            'agency_profile_id' => null,
+            'university_id' => null,
+            'title' => 'Pemerintah Kota Surabaya',
+            'description' => 'Saluran siaran pengumuman resmi program magang Pemerintah Kota Surabaya.',
+            'image_url' => is_file(public_path('images/logos/surabaya.png')) ? 'images/logos/surabaya.png' : 'images/logoPemkotSBY.png',
+            'is_broadcast_only' => true,
+        ]);
+    }
+
+    /**
+     * Buat saluran yang belum ada dan samakan judulnya dengan nama lembaga (2 kueri + baris yang berubah saja).
+     *
+     * @param  Collection<int, AgencyProfile>  $agencies
+     */
+    private function syncAgencyChannels($agencies): void
+    {
+        if ($agencies->isEmpty()) {
+            return;
+        }
+        $existing = ChatConversation::where('type', ChatConversation::TYPE_CHANNEL)
+            ->where('scope_type', ChatConversation::SCOPE_GOVERNMENT)
+            ->whereIn('agency_profile_id', $agencies->pluck('id'))
+            ->get(['id', 'agency_profile_id', 'title'])
+            ->keyBy('agency_profile_id');
+        $fallbackLogo = is_file(public_path('images/logos/surabaya.png')) ? 'images/logos/surabaya.png' : 'images/logoPemkotSBY.png';
+
+        foreach ($agencies as $agency) {
+            $channel = $existing->get($agency->id);
+            if ($channel) {
+                if ($channel->title !== $agency->agency_name) {
+                    $channel->update(['title' => $agency->agency_name, 'description' => "Saluran siaran pengumuman resmi {$agency->agency_name}."]);
+                }
+
+                continue;
             }
+            ChatConversation::create([
+                'type' => ChatConversation::TYPE_CHANNEL,
+                'scope_type' => ChatConversation::SCOPE_GOVERNMENT,
+                'agency_profile_id' => $agency->id,
+                'title' => $agency->agency_name,
+                'description' => "Saluran siaran pengumuman resmi {$agency->agency_name}.",
+                'image_url' => $agency->logo ?: $fallbackLogo,
+                'is_broadcast_only' => true,
+            ]);
+        }
+    }
+
+    /** @param  Collection<int, University>  $universities */
+    private function syncUniversityChannels($universities): void
+    {
+        if ($universities->isEmpty()) {
+            return;
+        }
+        $existing = ChatConversation::where('type', ChatConversation::TYPE_CHANNEL)
+            ->where('scope_type', ChatConversation::SCOPE_UNIVERSITY)
+            ->whereIn('university_id', $universities->pluck('id'))
+            ->get(['id', 'university_id', 'title'])
+            ->keyBy('university_id');
+
+        foreach ($universities as $univ) {
+            $channel = $existing->get($univ->id);
+            if ($channel) {
+                if ($channel->title !== $univ->name) {
+                    $channel->update(['title' => $univ->name, 'description' => "Saluran siaran pengumuman resmi {$univ->name}."]);
+                }
+
+                continue;
+            }
+            ChatConversation::create([
+                'type' => ChatConversation::TYPE_CHANNEL,
+                'scope_type' => ChatConversation::SCOPE_UNIVERSITY,
+                'university_id' => $univ->id,
+                'title' => $univ->name,
+                'description' => "Saluran siaran pengumuman resmi {$univ->name}.",
+                'image_url' => $univ->logo ?: 'images/default-university.svg',
+                'is_broadcast_only' => true,
+            ]);
         }
     }
 
@@ -97,7 +151,27 @@ class ChatChannelService
             return;
         }
 
-        $this->ensureOfficialChannels();
+        // Super Admin memantau semua saluran: sinkron penuh (sudah hemat kueri). Pengguna lain cukup saluran miliknya.
+        if ($user->isSuperAdmin()) {
+            $this->ensureOfficialChannels();
+        } else {
+            $this->ensurePemkotChannel();
+            if ($user->university_id) {
+                $this->syncUniversityChannels(University::whereKey($user->university_id)->get(['id', 'name', 'logo']));
+            }
+            $agencyIds = collect([$user->agency_profile_id]);
+            if ($user->role === 'mahasiswa') {
+                $agencyIds = $agencyIds->merge(DB::table('applications')
+                    ->join('units', 'units.id', '=', 'applications.unit_id')
+                    ->where('applications.user_id', $user->id)
+                    ->whereIn('applications.status', ['accepted', 'active', 'completed'])
+                    ->pluck('units.agency_profile_id'));
+            }
+            $agencyIds = $agencyIds->filter()->unique();
+            if ($agencyIds->isNotEmpty()) {
+                $this->syncAgencyChannels(AgencyProfile::whereIn('id', $agencyIds)->get(['id', 'agency_name', 'logo']));
+            }
+        }
 
         // Ambil ID saluran yang wajib diikuti user
         $channelIds = collect();

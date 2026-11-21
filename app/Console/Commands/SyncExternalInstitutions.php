@@ -5,8 +5,10 @@ namespace App\Console\Commands;
 use App\Services\Directory\SchoolDirectoryClient;
 use App\Services\MasterUniversityService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class SyncExternalInstitutions extends Command
 {
@@ -16,6 +18,34 @@ class SyncExternalInstitutions extends Command
         {--max-pages=0 : Batas halaman per bentuk (0 = semua), berguna untuk uji coba}';
 
     protected $description = 'Sinkronisasi sekolah (SMA/SMK/MA/SLB) dari direktori nasional NPSN: tambah yang baru, perbarui yang ada, tidak pernah menghapus';
+
+    /** Waktu sinkron penuh terakhir (disk privat 'local'). */
+    public const STAMP_FILE = 'sync/institutions-external-last.txt';
+
+    public static function lastFullSync(): ?Carbon
+    {
+        $disk = Storage::disk('local');
+        if (! $disk->exists(self::STAMP_FILE)) {
+            return null;
+        }
+
+        try {
+            return Carbon::parse(trim((string) $disk->get(self::STAMP_FILE)));
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Sinkron dianggap jatuh tempo bila belum pernah sinkron penuh atau sudah lewat $days hari.
+     * Penjadwal memeriksanya tiap jam, sehingga laptop yang mati pada jadwal mingguan tetap menyusul.
+     */
+    public static function isDue(int $days = 7): bool
+    {
+        $last = self::lastFullSync();
+
+        return $last === null || $last->lte(now()->subDays($days));
+    }
 
     public function handle(SchoolDirectoryClient $client, MasterUniversityService $service): int
     {
@@ -59,8 +89,13 @@ class SyncExternalInstitutions extends Command
             } while ($page <= $lastPage && ($maxPages === 0 || $page <= $maxPages));
         }
 
-        if (! $failed) {
-            Cache::forever('institutions:last-external-sync', now()->toIso8601String());
+        // Hanya sinkron penuh yang dicatat: uji coba --max-pages/--form tidak boleh menunda sinkron mingguan.
+        $isFullRun = $maxPages === 0 && array_diff(SchoolDirectoryClient::FORMS, $forms) === [];
+        if (! $failed && $isFullRun) {
+            $stamp = now()->toIso8601String();
+            Cache::forever('institutions:last-external-sync', $stamp);
+            // Cache dikosongkan setiap demo dimulai (optimize:clear), jadi penanda utama disimpan di berkas.
+            Storage::disk('local')->put(self::STAMP_FILE, $stamp);
         }
 
         $this->info("Selesai: {$totals['created']} baru, {$totals['updated']} diperbarui, {$totals['skipped']} dilewati.");

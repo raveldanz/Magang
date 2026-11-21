@@ -65,6 +65,8 @@ class SchoolDirectoryClient
                 return []; // gagal: jangan di-cache agar percobaan berikutnya tetap ke API
             }
             $rows = array_map(fn (array $row) => $this->normalizeRow($row), $payload['dataSekolah'] ?? []);
+            // Hanya jenjang peserta magang/PKL (SMA/SMK/MA/SMLB), sama dengan cakupan sinkronisasi; SD/SMP diabaikan.
+            $rows = array_values(array_filter($rows, fn (array $row) => in_array($row['form'], self::FORMS, true)));
             Cache::put($key, $rows, now()->addHours(6));
         }
 

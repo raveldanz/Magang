@@ -86,6 +86,8 @@ $excludeDirs = @(
     (Join-Path $root 'php'),
     (Join-Path $root 'public\test-artifacts'), (Join-Path $root 'public\storage'), (Join-Path $root 'public\presentation'),
     (Join-Path $root 'storage\logs'), (Join-Path $root 'storage\app\backups'), (Join-Path $root 'storage\app\private\backups'),
+    # Penanda sinkron sekolah milik database laptop ini; database zip baru harus sinkron sendiri (lihat routes/console.php)
+    (Join-Path $root 'storage\app\private\sync'),
     (Join-Path $root 'database\cadangan'), (Join-Path $root 'database\pgsql'),
     (Join-Path $root 'storage\framework\sessions'), (Join-Path $root 'storage\framework\views'),
     (Join-Path $root 'storage\framework\cache'), (Join-Path $root 'storage\framework\testing'),

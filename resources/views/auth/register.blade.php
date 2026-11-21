@@ -31,7 +31,14 @@
 
     @php
         // Hanya nama institusi yang sudah diverifikasi yang ditawarkan; nama baru tetap boleh diketik.
+        // Master sekolah berisi puluhan ribu sekolah se-Indonesia (direktori NPSN), jadi saran dibatasi ke kampus,
+        // sekolah di Jawa Timur, dan institusi yang sudah punya pengguna. Nama/NPSN lain tetap dicocokkan persis saat daftar.
+        $likeOp = \Illuminate\Support\Facades\DB::getDriverName() === 'pgsql' ? 'ilike' : 'like';
         $institutionNames = \App\Models\University::where('is_verified', true)
+            ->where(fn ($q) => $q->where('institution_type', '!=', \App\Models\University::TYPE_SCHOOL)
+                ->orWhereNull('institution_type')
+                ->orWhere('address', $likeOp, '%Jawa Timur%')
+                ->orWhereIn('id', \App\Models\User::whereNotNull('university_id')->select('university_id')))
             ->orderBy('name')
             ->pluck('name')
             ->values()

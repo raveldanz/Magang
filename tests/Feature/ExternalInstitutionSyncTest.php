@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Console\Commands\SyncExternalInstitutions;
 use App\Models\University;
 use App\Models\User;
 use App\Services\MasterUniversityService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ExternalInstitutionSyncTest extends TestCase
@@ -25,6 +27,7 @@ class ExternalInstitutionSyncTest extends TestCase
     public function test_sync_menambah_sekolah_baru_dan_memperbarui_tanpa_menghapus(): void
     {
         config(['services.school_directory.base_url' => 'https://dir.test', 'services.school_directory.enabled' => true]);
+        Storage::fake('local');
         University::create(['name' => 'Kampus Manual', 'code' => 'KM1', 'institution_type' => University::TYPE_COLLEGE, 'is_verified' => true, 'status' => 'active']);
 
         Http::fake([
@@ -43,6 +46,30 @@ class ExternalInstitutionSyncTest extends TestCase
         $this->assertSame(2, University::where('institution_type', University::TYPE_SCHOOL)->count());
         $this->assertDatabaseHas('universities', ['code' => 'KM1']);
         $this->assertNotNull(Cache::get('institutions:last-external-sync'));
+        $this->assertNotNull(SyncExternalInstitutions::lastFullSync());
+        $this->assertFalse(SyncExternalInstitutions::isDue());
+    }
+
+    public function test_sinkron_uji_coba_tidak_dicatat_dan_jadwal_menyusul_setelah_tujuh_hari(): void
+    {
+        config(['services.school_directory.base_url' => 'https://dir.test', 'services.school_directory.enabled' => true]);
+        Storage::fake('local');
+        Http::fake(['dir.test/*' => Http::response(['status' => 'success', 'total_data' => 1, 'dataSekolah' => [$this->row('90000401', 'SMKN 401 UJI')]])]);
+
+        // Belum pernah sinkron penuh: jatuh tempo.
+        $this->assertTrue(SyncExternalInstitutions::isDue());
+
+        // Uji coba sebagian (--max-pages / --form) tidak boleh menunda sinkron penuh.
+        $this->artisan('institutions:sync-external', ['--max-pages' => 1])->assertSuccessful();
+        $this->artisan('institutions:sync-external', ['--form' => ['SMK']])->assertSuccessful();
+        $this->assertNull(SyncExternalInstitutions::lastFullSync());
+        $this->assertTrue(SyncExternalInstitutions::isDue());
+
+        $this->artisan('institutions:sync-external')->assertSuccessful();
+        $this->assertFalse(SyncExternalInstitutions::isDue());
+
+        $this->travel(8)->days();
+        $this->assertTrue(SyncExternalInstitutions::isDue());
     }
 
     public function test_sync_gagal_api_tidak_merusak_data_lokal(): void
@@ -116,6 +143,24 @@ class ExternalInstitutionSyncTest extends TestCase
         $saved = $this->actingAs($admin)->postJson(route('institutions.resolve'), ['npsn' => '90000123'])->assertOk();
         $this->assertDatabaseHas('universities', ['code' => '90000123', 'name' => 'SMKN 123 ASYNC']);
         $this->assertSame('SMKN 123 ASYNC', $saved->json('data.name'));
+    }
+
+    public function test_saran_direktori_hanya_jenjang_magang_dan_tidak_muncul_saat_mencari_kampus(): void
+    {
+        config(['services.school_directory.base_url' => 'https://dir.test', 'services.school_directory.enabled' => true]);
+        Cache::flush();
+        Http::fake(['dir.test/sekolah/s*' => Http::response(['status' => 'success', 'dataSekolah' => [
+            $this->row('90000301', 'SMP NEGERI 1 JENJANG', 'SMP'),
+            $this->row('90000302', 'SMA NEGERI 1 JENJANG', 'SMA'),
+        ]])]);
+        $user = User::factory()->create(['role' => 'mahasiswa']);
+
+        $ids = collect($this->actingAs($user)->getJson(route('institutions.search', ['q' => 'jenjang']))->assertOk()->json('data'))->pluck('id');
+        $this->assertTrue($ids->contains('npsn:90000302'));
+        $this->assertFalse($ids->contains('npsn:90000301')); // SMP bukan peserta magang/PKL
+
+        $kampus = $this->actingAs($user)->getJson(route('institutions.search', ['q' => 'jenjang', 'type' => University::TYPE_COLLEGE]))->assertOk();
+        $this->assertSame([], $kampus->json('data')); // memilih kampus tidak menampilkan saran sekolah
     }
 
     public function test_upsert_direktori_tidak_menimpa_keputusan_moderasi_admin(): void

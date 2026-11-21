@@ -54,7 +54,8 @@ class InstitutionSearchController extends Controller
         ])->all();
 
         // Hasil lokal sedikit: tambahkan saran dari direktori nasional (maks 5), belum disimpan.
-        if ($q !== '' && mb_strlen($q) >= 3 && count($data) < 8 && $directory->enabled()) {
+        // Saran direktori hanya untuk pencarian sekolah (bukan saat memilih kampus).
+        if ($q !== '' && mb_strlen($q) >= 3 && count($data) < 8 && $type !== University::TYPE_COLLEGE && $directory->enabled()) {
             $known = $rows->pluck('code')->filter()->all();
             $added = 0;
             foreach ($directory->search($q, 10) as $hit) {

@@ -4,7 +4,11 @@ namespace Tests\Feature\Chat;
 
 use App\Models\ChatConversation;
 use App\Models\ChatMessage;
+use App\Models\ChatParticipant;
+use App\Models\University;
+use App\Models\User;
 use App\Services\Chat\ChatChannelService;
+use Illuminate\Support\Facades\DB;
 
 class ChatChannelFeatureTest extends ChatTestCase
 {
@@ -250,6 +254,43 @@ class ChatChannelFeatureTest extends ChatTestCase
 
         $announcement->refresh();
         $this->assertEquals(0, $announcement->comments_count);
+    }
+
+    public function test_sekolah_tanpa_pengguna_tidak_dibuatkan_saluran_dan_chat_tetap_ringan(): void
+    {
+        // Master institusi berisi puluhan ribu sekolah dari direktori nasional; disimulasikan 60 sekolah tanpa pengguna.
+        foreach (range(1, 60) as $i) {
+            University::create(['name' => "SMA Uji Direktori {$i}", 'code' => (string) (90100000 + $i), 'institution_type' => University::TYPE_SCHOOL]);
+        }
+
+        DB::enableQueryLog();
+        $this->actingAs($this->studentA)->get(route('chat.index'))->assertOk();
+        $this->assertLessThan(150, count(DB::getQueryLog()), 'Membuka chat tidak boleh menjalankan kueri per institusi.');
+        DB::disableQueryLog();
+
+        $this->channelService->ensureChannelsForUser($this->superAdmin);
+        $withUsers = User::whereNotNull('university_id')->distinct()->count('university_id');
+        $this->assertSame($withUsers, ChatConversation::where('type', ChatConversation::TYPE_CHANNEL)
+            ->where('scope_type', ChatConversation::SCOPE_UNIVERSITY)->count());
+    }
+
+    public function test_migrasi_pembersih_hanya_menghapus_saluran_institusi_kosong(): void
+    {
+        $this->channelService->ensureChannelsForUser($this->studentA);
+        $unesa = ChatConversation::where('type', ChatConversation::TYPE_CHANNEL)->where('university_id', $this->studentA->university_id)->firstOrFail();
+        $tanpaPengguna = University::create(['name' => 'SMA Tanpa Pengguna', 'code' => '90200001', 'institution_type' => University::TYPE_SCHOOL]);
+        $dipakai = University::create(['name' => 'SMA Pernah Umumkan', 'code' => '90200002', 'institution_type' => University::TYPE_SCHOOL]);
+        $kosong = ChatConversation::create(['type' => ChatConversation::TYPE_CHANNEL, 'scope_type' => ChatConversation::SCOPE_UNIVERSITY, 'university_id' => $tanpaPengguna->id, 'title' => $tanpaPengguna->name, 'is_broadcast_only' => true]);
+        $berpesan = ChatConversation::create(['type' => ChatConversation::TYPE_CHANNEL, 'scope_type' => ChatConversation::SCOPE_UNIVERSITY, 'university_id' => $dipakai->id, 'title' => $dipakai->name, 'is_broadcast_only' => true]);
+        ChatParticipant::create(['conversation_id' => $kosong->id, 'user_id' => $this->superAdmin->id, 'role' => ChatParticipant::ROLE_ADMIN]);
+        ChatMessage::create(['conversation_id' => $berpesan->id, 'user_id' => $this->superAdmin->id, 'body' => 'Pengumuman lama']);
+
+        (require database_path('migrations/2026_11_21_230000_prune_empty_university_chat_channels.php'))->up();
+
+        $this->assertModelMissing($kosong);
+        $this->assertDatabaseMissing('chat_participants', ['conversation_id' => $kosong->id]);
+        $this->assertModelExists($berpesan);
+        $this->assertModelExists($unesa);
     }
 
     public function test_direct_and_group_chats_continue_to_function_normally_without_regression(): void
