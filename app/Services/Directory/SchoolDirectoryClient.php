@@ -66,7 +66,27 @@ class SchoolDirectoryClient
             Cache::put($key, $rows, now()->addHours(6));
         }
 
+        // Simpan tiap baris per NPSN: endpoint resolve hanya boleh memakai data yang benar-benar datang dari API.
+        foreach ($rows as $row) {
+            if ($row['npsn'] !== '') {
+                Cache::put(self::npsnCacheKey($row['npsn']), $row, now()->addDay());
+            }
+        }
+
         return array_slice($rows, 0, $limit);
+    }
+
+    public static function npsnCacheKey(string $npsn): string
+    {
+        return 'school-directory:npsn:'.$npsn;
+    }
+
+    /** Baris sekolah hasil pencarian API terakhir untuk NPSN ini (null bila tidak pernah dikembalikan API). */
+    public function cached(string $npsn): ?array
+    {
+        $row = Cache::get(self::npsnCacheKey($npsn));
+
+        return is_array($row) ? $row : null;
     }
 
     /**
@@ -103,8 +123,13 @@ class SchoolDirectoryClient
             $response = Http::acceptJson()
                 ->when($ca, fn ($http) => $http->withOptions(['verify' => $ca]))
                 ->timeout((int) config('services.school_directory.timeout', 15))
-                ->retry(2, 500, throw: false)
+                ->retry(2, 500, fn ($e) => $e instanceof \Illuminate\Http\Client\ConnectionException || ($e instanceof \Illuminate\Http\Client\RequestException && $e->response->serverError()), throw: false)
                 ->get(rtrim((string) config('services.school_directory.base_url'), '/').$path, $query);
+
+            // API sumber membalas 404 untuk pencarian tanpa hasil: itu hasil kosong, bukan kegagalan.
+            if ($response->status() === 404) {
+                return ['status' => 'success', 'dataSekolah' => [], 'total_data' => 0];
+            }
 
             if (! $response->successful()) {
                 Log::warning('Direktori sekolah: HTTP '.$response->status().' untuk '.$path);

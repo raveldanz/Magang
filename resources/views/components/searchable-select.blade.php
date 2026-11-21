@@ -231,7 +231,24 @@
             if (item) this.select(item);
         },
 
-        select(item) {
+        // Saran direktori nasional (id 'npsn:...') disimpan dulu lewat POST agar punya id database.
+        async select(item) {
+            if (item && item.raw && item.raw.resolve_url && String(item.id).startsWith('npsn:')) {
+                try {
+                    const token = document.querySelector('meta[name=csrf-token]')?.content || '';
+                    const res = await fetch(item.raw.resolve_url, {
+                        method: 'POST', credentials: 'same-origin',
+                        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token, 'X-Requested-With': 'XMLHttpRequest' },
+                        body: JSON.stringify({ npsn: String(item.id).slice(5) }),
+                    });
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    const saved = (await res.json()).data;
+                    item = { id: String(saved.id), name: String(saved.name || ''), acronym: saved.acronym ? String(saved.acronym) : null, meta: saved.meta ? String(saved.meta) : null, keywords: '', raw: saved };
+                } catch (e) {
+                    this.remoteError = true;
+                    return;
+                }
+            }
             this.isCustom = false;
             this.selectedId = item ? String(item.id) : '';
             this.selectedItem = item;

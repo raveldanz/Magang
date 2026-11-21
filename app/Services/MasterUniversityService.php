@@ -177,23 +177,57 @@ class MasterUniversityService
     }
 
     /**
-     * Upsert satu sekolah dari direktori nasional: kunci NPSN, tidak pernah menghapus atau menimpa data manual.
+     * Upsert satu sekolah dari direktori nasional (data pihak ketiga, bukan input moderator).
+     * Kunci hanya NPSN (kolom code): baris yang sudah ada hanya dilengkapi di kolom kosong dan TIDAK PERNAH
+     * diubah is_verified/status/institution_type-nya, sehingga keputusan moderasi admin tidak tertimpa.
+     * Nama yang sama dengan baris lain tanpa NPSN dipakai untuk mengisi NPSN-nya, bukan membuat duplikat.
      *
      * @param  array{npsn: string, name: string, form?: string, address?: string, city?: string, province?: string, status?: string}  $row
-     * @return array{university: University, created: bool}
+     * @return array{university: University|null, created: bool}
      */
     public function upsertDirectorySchool(array $row): array
     {
-        return $this->upsertSchool([
-            'name' => $row['name'],
-            'npsn' => $row['npsn'],
-            'address' => $row['address'] ?? null,
-            'city' => $row['city'] ?? null,
-            'province' => $row['province'] ?? null,
-            'institution_type' => University::TYPE_SCHOOL,
-        ]);
-    }
+        $npsn = trim((string) $row['npsn']);
+        $name = trim((string) $row['name']);
+        if ($npsn === '' || $name === '') {
+            return ['university' => null, 'created' => false];
+        }
+        $address = collect([$row['address'] ?? null, $row['city'] ?? null, $row['province'] ?? null])
+            ->filter(fn ($part) => trim((string) $part) !== '')->implode(', ');
 
+        $existing = University::where('code', $npsn)->first();
+        if (! $existing) {
+            $sameName = University::whereRaw('LOWER(name) = ?', [mb_strtolower($name)])->first();
+            if ($sameName) {
+                if ($sameName->code === null || $sameName->code === '') {
+                    $sameName->update(['code' => $npsn]);
+                }
+
+                return ['university' => $sameName, 'created' => false];
+            }
+        }
+
+        if ($existing) {
+            if (! $existing->address && $address !== '') {
+                $existing->update(['address' => $address]);
+            }
+
+            return ['university' => $existing, 'created' => false];
+        }
+
+        return ['university' => University::create([
+            'name' => $name,
+            'code' => $npsn,
+            'address' => $address ?: null,
+            'is_verified' => true, // NPSN = identitas resmi satuan pendidikan di registri nasional
+            'status' => 'active',
+            'institution_type' => University::TYPE_SCHOOL,
+            'evaluation_scheme' => 'mentor_only',
+            'weight_mentor' => 100,
+            'weight_lecturer' => 0,
+            'require_dpl' => false,
+        ]), 'created' => true];
+    }
     /**
      * Skor kecocokan kata kunci terhadap nama-nama dan kode-kode sebuah entri master (0 = tidak cocok).
      *

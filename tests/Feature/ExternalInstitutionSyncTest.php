@@ -97,7 +97,7 @@ class ExternalInstitutionSyncTest extends TestCase
             ->assertJsonPath('data.0.name', 'Universitas Async Uji');
     }
 
-    public function test_endpoint_menyimpan_sekolah_hasil_api_agar_punya_id(): void
+    public function test_get_pencarian_read_only_dan_resolve_hanya_memakai_data_cache_api(): void
     {
         config(['services.school_directory.base_url' => 'https://dir.test', 'services.school_directory.enabled' => true]);
         Cache::flush();
@@ -105,10 +105,39 @@ class ExternalInstitutionSyncTest extends TestCase
         $admin = \App\Models\User::factory()->create(['role' => 'super_admin']);
 
         $res = $this->actingAs($admin)->getJson(route('institutions.search', ['q' => 'smkn 123 async']))->assertOk();
-        $this->assertSame('SMKN 123 ASYNC', $res->json('data.0.name'));
-        $this->assertDatabaseHas('universities', ['code' => '90000123']);
+        $this->assertSame('npsn:90000123', $res->json('data.0.id'));
+        $this->assertDatabaseMissing('universities', ['code' => '90000123']); // GET tidak menyimpan apa pun
+
+        // NPSN yang tidak pernah dikembalikan API ditolak: pengguna tidak bisa membuat institusi dari isian bebas.
+        $this->actingAs($admin)->postJson(route('institutions.resolve'), ['npsn' => '99999999'])->assertNotFound();
+        $this->assertDatabaseMissing('universities', ['code' => '99999999']);
+
+        $saved = $this->actingAs($admin)->postJson(route('institutions.resolve'), ['npsn' => '90000123'])->assertOk();
+        $this->assertDatabaseHas('universities', ['code' => '90000123', 'name' => 'SMKN 123 ASYNC']);
+        $this->assertSame('SMKN 123 ASYNC', $saved->json('data.name'));
     }
 
+    public function test_upsert_direktori_tidak_menimpa_keputusan_moderasi_admin(): void
+    {
+        // Sekolah yang sengaja dinonaktifkan/diturunkan admin tidak boleh hidup lagi oleh sinkron API.
+        $ditolak = University::create(['name' => 'SMKN 50 DITOLAK', 'code' => '90000050', 'institution_type' => University::TYPE_SCHOOL, 'is_verified' => false, 'status' => 'inactive']);
+        // Kampus manual bernama sama tanpa NPSN: tidak diubah tipe/verifikasinya, hanya diisi NPSN.
+        $manual = University::create(['name' => 'SMK Nama Sama', 'code' => null, 'institution_type' => University::TYPE_COLLEGE, 'is_verified' => false, 'status' => 'pending']);
+
+        $svc = app(MasterUniversityService::class);
+        $svc->upsertDirectorySchool(['npsn' => '90000050', 'name' => 'SMKN 50 DITOLAK', 'address' => 'Jl. Baru']);
+        $svc->upsertDirectorySchool(['npsn' => '90000051', 'name' => 'SMK Nama Sama']);
+
+        $ditolak->refresh();
+        $manual->refresh();
+        $this->assertFalse($ditolak->is_verified);
+        $this->assertSame('inactive', $ditolak->status);
+        $this->assertSame('Jl. Baru', $ditolak->address); // kolom kosong boleh dilengkapi
+        $this->assertSame('90000051', $manual->code);
+        $this->assertFalse($manual->is_verified);
+        $this->assertSame('pending', $manual->status);
+        $this->assertSame(University::TYPE_COLLEGE, $manual->institution_type);
+    }
     public function test_listable_tidak_memuat_sekolah_sinkron_yang_belum_dipakai(): void
     {
         University::create(['name' => 'SMA Tak Terpakai', 'code' => '22222222', 'institution_type' => University::TYPE_SCHOOL, 'is_verified' => true, 'status' => 'active']);

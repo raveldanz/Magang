@@ -196,9 +196,10 @@ Route::middleware('auth')->group(function () {
 Route::get('/universities/master-search', [MasterUniversityApiController::class, 'search'])->name('universities.master-search');
 
 // Pencarian async kampus/sekolah untuk dropdown (hanya pengguna login; melengkapi dari direktori nasional NPSN)
-Route::get('/institutions/search', \App\Http\Controllers\InstitutionSearchController::class)
-    ->middleware(['auth', 'throttle:60,1'])
-    ->name('institutions.search');
+Route::middleware(['auth', 'throttle:60,1'])->group(function () {
+    Route::get('/institutions/search', [\App\Http\Controllers\InstitutionSearchController::class, 'search'])->name('institutions.search');
+    Route::post('/institutions/resolve', [\App\Http\Controllers\InstitutionSearchController::class, 'resolve'])->name('institutions.resolve');
+});
 
 require __DIR__.'/student.php';
 require __DIR__.'/admin.php';
