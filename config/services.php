@@ -35,6 +35,15 @@ return [
         ],
     ],
 
+    // Direktori sekolah nasional (NPSN) untuk sinkronisasi master sekolah dan pencarian langsung.
+    'school_directory' => [
+        'enabled' => env('SCHOOL_DIRECTORY_ENABLED', true),
+        'base_url' => env('SCHOOL_DIRECTORY_URL', 'https://api-sekolah-indonesia.vercel.app'),
+        'timeout' => (int) env('SCHOOL_DIRECTORY_TIMEOUT', 15),
+        // Windows/PHP tanpa curl.cainfo: isi dengan path cacert.pem (jangan matikan verifikasi SSL).
+        'ca_bundle' => env('SCHOOL_DIRECTORY_CA_BUNDLE'),
+    ],
+
     'vapid' => [
         'public_key' => env('VAPID_PUBLIC_KEY', ''),
         'private_key' => env('VAPID_PRIVATE_KEY', ''),

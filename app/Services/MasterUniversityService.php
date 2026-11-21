@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\University;
+use App\Services\Directory\SchoolDirectoryClient;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -19,7 +20,7 @@ class MasterUniversityService
 
     protected ?array $schoolData = null;
 
-    public function __construct(private UniversityResolver $resolver) {}
+    public function __construct(private UniversityResolver $resolver, private SchoolDirectoryClient $directory) {}
 
     /**
      * Path ke dataset Master Perguruan Tinggi Indonesia
@@ -147,7 +148,50 @@ class MasterUniversityService
             }
         }
 
+        // 3. Sekolah dari direktori nasional (API) yang belum ada di database lokal; tersimpan saat dipilih.
+        //    Maksimal 5 slot, mengganti entri lokal berskor terendah agar hasil API tidak tertutup kecocokan longgar.
+        if ($this->directory->enabled()) {
+            $knownNpsn = $results->pluck('npsn')->filter()->all();
+            $fromApi = [];
+            foreach ($this->directory->search($keyword, $limit) as $row) {
+                $cleanKey = $this->normalize($row['name']);
+                if ($row['npsn'] === '' || isset($seenKeys[$cleanKey]) || in_array($row['npsn'], $knownNpsn, true)) {
+                    continue;
+                }
+                $seenKeys[$cleanKey] = true;
+                $fromApi[] = $this->schoolItem([
+                    'name' => $row['name'], 'npsn' => $row['npsn'], 'form' => $row['form'],
+                    'address' => $row['address'], 'city' => $row['city'], 'province' => $row['province'],
+                    'status' => $row['status'],
+                ]);
+                if (count($fromApi) >= 5) {
+                    break;
+                }
+            }
+            if ($fromApi !== []) {
+                $results = $results->take(max(0, $limit - count($fromApi)))->concat($fromApi);
+            }
+        }
+
         return $results->take($limit);
+    }
+
+    /**
+     * Upsert satu sekolah dari direktori nasional: kunci NPSN, tidak pernah menghapus atau menimpa data manual.
+     *
+     * @param  array{npsn: string, name: string, form?: string, address?: string, city?: string, province?: string, status?: string}  $row
+     * @return array{university: University, created: bool}
+     */
+    public function upsertDirectorySchool(array $row): array
+    {
+        return $this->upsertSchool([
+            'name' => $row['name'],
+            'npsn' => $row['npsn'],
+            'address' => $row['address'] ?? null,
+            'city' => $row['city'] ?? null,
+            'province' => $row['province'] ?? null,
+            'institution_type' => University::TYPE_SCHOOL,
+        ]);
     }
 
     /**

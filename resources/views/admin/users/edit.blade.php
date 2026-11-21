@@ -112,6 +112,7 @@
                             name="university_id"
                             placeholder="-- Pilih Kampus/Sekolah --"
                             :items="$universities->map(fn($un) => ['id' => $un->id, 'name' => $un->name, 'acronym' => $un->acronym ?? $un->code, 'meta' => $un->code])"
+                            :remote-url="route('institutions.search')"
                             :selected="old('university_id', $user->university_id)"
                         />
                     </div>

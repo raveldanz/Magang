@@ -14,6 +14,9 @@ Artisan::command('inspire', function () {
 // serta penutupan / pengingat magang yang melewati tanggal selesai). Waktu mengikuti APP_TIMEZONE (WIB).
 Schedule::command('app:sync-internship-status')->dailyAt('00:05')->withoutOverlapping();
 
+// Master sekolah mengikuti direktori nasional (NPSN): sekolah baru otomatis muncul tiap pekan, data manual tidak disentuh.
+Schedule::command('institutions:sync-external')->weeklyOn(0, '02:30')->withoutOverlapping(120)->runInBackground();
+
 // Heartbeat tiap 5 menit: menandai scheduler hidup & mengirim job kecil untuk memastikan queue worker hidup.
 // Statusnya tampil di dasbor Super Admin dan lewat `php artisan app:health`.
 Schedule::call(function () {

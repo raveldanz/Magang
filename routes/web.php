@@ -195,6 +195,11 @@ Route::middleware('auth')->group(function () {
 // API Pencarian Master Perguruan Tinggi Nasional untuk Autocomplete
 Route::get('/universities/master-search', [MasterUniversityApiController::class, 'search'])->name('universities.master-search');
 
+// Pencarian async kampus/sekolah untuk dropdown (hanya pengguna login; melengkapi dari direktori nasional NPSN)
+Route::get('/institutions/search', \App\Http\Controllers\InstitutionSearchController::class)
+    ->middleware(['auth', 'throttle:60,1'])
+    ->name('institutions.search');
+
 require __DIR__.'/student.php';
 require __DIR__.'/admin.php';
 require __DIR__.'/supervisor.php';

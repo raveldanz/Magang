@@ -15,6 +15,8 @@
     'class' => '',
     'eventName' => null,
     'parentListener' => null,
+    // Mode async: bila diisi, daftar dimuat dari endpoint (q, limit) alih-alih disematkan di halaman.
+    'remoteUrl' => null,
 ])
 
 @php
@@ -74,9 +76,17 @@
         placeholder: @js((string) $placeholder),
         allowCustom: {{ $allowCustom ? 'true' : 'false' }},
         activeIndex: -1,
+        remoteUrl: @js($remoteUrl),
+        remoteLoading: false,
+        remoteError: false,
+        remoteSeq: 0,
+        remoteTimer: null,
 
         init() {
             this.syncSelectedItem();
+            if (this.remoteUrl) {
+                this.$watch('search', (value) => this.scheduleRemote(value));
+            }
             if (this.selectedId === 'other' && this.allowCustom) {
                 this.isCustom = true;
             }
@@ -138,7 +148,38 @@
                 .map(r => r.item);
         },
 
+        // Mode async: ambil daftar dari server (debounce 250 ms, abaikan respons usang).
+        scheduleRemote(query) {
+            clearTimeout(this.remoteTimer);
+            this.remoteLoading = true;
+            this.remoteTimer = setTimeout(() => this.fetchRemote(query), 250);
+        },
+
+        async fetchRemote(query) {
+            const seq = ++this.remoteSeq;
+            this.remoteError = false;
+            try {
+                const url = new URL(this.remoteUrl, window.location.origin);
+                url.searchParams.set('q', String(query || '').trim());
+                url.searchParams.set('limit', '25');
+                const res = await fetch(url, { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const json = await res.json();
+                if (seq !== this.remoteSeq) return;
+                this.items = (json.data || []).map((row) => ({
+                    id: String(row.id), name: String(row.name || ''), acronym: row.acronym ? String(row.acronym) : null,
+                    meta: row.meta ? String(row.meta) : null, keywords: '', raw: row,
+                }));
+                this.activeIndex = -1;
+            } catch (e) {
+                if (seq === this.remoteSeq) { this.remoteError = true; this.items = []; }
+            } finally {
+                if (seq === this.remoteSeq) this.remoteLoading = false;
+            }
+        },
+
         get filteredItems() {
+            if (this.remoteUrl) return this.items;
             const q = this.norm(this.search);
             if (!q) return this.items;
 
@@ -166,6 +207,7 @@
             this.open = true;
             this.search = '';
             this.activeIndex = -1;
+            if (this.remoteUrl) this.fetchRemote('');
             this.$nextTick(() => {
                 if (this.$refs.searchInput) {
                     this.$refs.searchInput.focus();
@@ -487,7 +529,14 @@
             </template>
 
             <!-- Empty Search State -->
-            <template x-if="filteredItems.length === 0">
+            <template x-if="remoteUrl && remoteLoading">
+                <p class="py-3 px-3 text-xs text-slate-500 text-center" role="status">Mencari data...</p>
+            </template>
+            <template x-if="remoteUrl && remoteError && !remoteLoading">
+                <p class="py-3 px-3 text-xs text-rose-600 text-center" role="alert">Gagal memuat daftar. Periksa koneksi lalu coba lagi.</p>
+            </template>
+
+            <template x-if="filteredItems.length === 0 && !remoteLoading && !remoteError">
                 <div class="py-3 px-3">
                     <p class="text-xs text-slate-500 text-center">
                         Tidak ditemukan data yang cocok dengan "<span class="font-semibold text-slate-700" x-text="search"></span>".
