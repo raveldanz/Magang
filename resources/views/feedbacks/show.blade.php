@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <a href="{{ route('admin.feedbacks.index') }}" class="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 transition shadow-2xs">
+            <a href="{{ route('admin.feedbacks.index') }}" class="h-11 w-11 sm:h-auto sm:w-auto inline-flex items-center justify-center p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 transition shadow-2xs">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             </a>
             <div>
@@ -173,7 +173,7 @@
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                             Perbarui Status Tiket <span class="text-rose-500">*</span>
                         </label>
-                        <select name="status" required class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                        <select name="status" required class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                             @foreach(\App\Enums\FeedbackStatus::cases() as $feedbackCase)
                                 <option value="{{ $feedbackCase->value }}" {{ $feedback->status == $feedbackCase->value ? 'selected' : '' }}>{{ $feedbackCase->label() }}</option>
                             @endforeach

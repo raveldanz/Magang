@@ -1,0 +1,16 @@
+[
+  { "key": "chat-student", "path": "/chat", "role": "mahasiswa.aktif@unesa.ac.id", "probeNav": true },
+  { "key": "chat-mentor", "path": "/chat", "role": "mentor.dispusip@surabaya.go.id" },
+  { "key": "chat-admin", "path": "/chat", "role": "admin@surabaya.go.id" },
+  { "key": "chat-student-room", "path": "/chat/66", "role": "mahasiswa.aktif@unesa.ac.id", "probeNav": true },
+  { "key": "chat-mentor-room", "path": "/chat/145", "role": "mentor.dispusip@surabaya.go.id" },
+  { "key": "notif-student", "path": "/notifications", "role": "mahasiswa.aktif@unesa.ac.id" },
+  { "key": "notif-mentor", "path": "/notifications", "role": "mentor.dispusip@surabaya.go.id" },
+  { "key": "profile-student", "path": "/profile", "role": "mahasiswa.aktif@unesa.ac.id" },
+  { "key": "profile-mentor", "path": "/profile", "role": "mentor.dispusip@surabaya.go.id" },
+  { "key": "profile-admin", "path": "/profile", "role": "admin@surabaya.go.id" },
+  { "key": "feedback-create", "path": "/feedbacks/create", "role": "mahasiswa.aktif@unesa.ac.id" },
+  { "key": "feedback-my", "path": "/feedbacks/my", "role": "mahasiswa.aktif@unesa.ac.id" },
+  { "key": "feedback-show", "path": "/feedbacks/1", "role": "mahasiswa.aktif@unesa.ac.id" },
+  { "key": "feedback-show-admin", "path": "/feedbacks/1", "role": "admin@surabaya.go.id" }
+]

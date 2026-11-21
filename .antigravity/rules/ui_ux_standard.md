@@ -98,5 +98,5 @@ Semua badge status wajib lewat `<x-status-badge :status="..." type="application|
 - [x] **Tahap 5 — Portal Mentor Lapangan** (`mentor/dashboard`, `logbooks`, `students`, `evaluations`)
 - [x] **Tahap 6 — Portal Dosen / Pembimbing Kampus & Sekolah** (`lecturer/dashboard`, `monitoring`, `logbooks`, `evaluations`)
 - [x] **Tahap 7 — Portal Admin Kampus / Sekolah** (`university/dashboard`, `lecturers`, `students`, `profile`)
-- [ ] **Tahap 8 — Modul Lintas Peran (Chat, Notifikasi, Profil Akun & Feedback)**
+- [x] **Tahap 8 — Modul Lintas Peran (Chat, Notifikasi, Profil Akun & Feedback)**
 - [ ] **Tahap 9 — Audit Holistik Akhir, Dokumen Cetak A4/Sertifikat & Regresi 9 Domain**
