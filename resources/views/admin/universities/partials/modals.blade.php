@@ -17,38 +17,38 @@
                             <p class="text-xs text-slate-500">{{ $university->name }}</p>
                         </div>
                     </div>
-                    <button type="button" @click="showAddDosenModal = false" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+                    <button type="button" @click="showAddDosenModal = false" class="inline-flex items-center justify-center w-11 h-11 sm:w-auto sm:h-auto min-h-[44px] sm:min-h-0 text-slate-400 hover:text-slate-600 text-lg">&times;</button>
                 </div>
 
                 <form method="POST" action="{{ route('admin.universities.dosens.store', $university->id) }}" class="space-y-4">
                     @csrf
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap & Gelar Pembimbing <span class="text-rose-500">*</span></label>
-                        <input type="text" name="name" required placeholder="Contoh: Dr. Budi Santoso, M.Kom." class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2.5">
+                        <input type="text" name="name" required placeholder="Contoh: Dr. Budi Santoso, M.Kom." class="w-full min-h-[44px] sm:min-h-0 text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2.5">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Email Resmi Pembimbing <span class="text-rose-500">*</span></label>
-                        <input type="email" name="email" required placeholder="budi@kampus.ac.id" class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2.5">
+                        <input type="email" name="email" required placeholder="budi@kampus.ac.id" class="w-full min-h-[44px] sm:min-h-0 text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2.5">
                         <p class="text-xs text-slate-400 mt-1">Digunakan untuk login ke Portal Pembimbing dengan password default: 'password'</p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">NIDN (Opsional)</label>
-                            <input type="text" name="nidn" placeholder="0012345678" class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2.5">
+                            <input type="text" name="nidn" placeholder="0012345678" class="w-full min-h-[44px] sm:min-h-0 text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2.5">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Telepon/WA</label>
-                            <input type="text" name="phone" placeholder="08123456789" class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2.5">
+                            <input type="text" name="phone" placeholder="08123456789" class="w-full min-h-[44px] sm:min-h-0 text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2.5">
                         </div>
                     </div>
 
                     <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
-                        <button type="button" @click="showAddDosenModal = false" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+                        <button type="button" @click="showAddDosenModal = false" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
                             Batal
                         </button>
-                        <button type="submit" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs">
+                        <button type="submit" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs">
                             Simpan Pembimbing
                         </button>
                     </div>
@@ -74,7 +74,7 @@
                             <p class="text-xs text-slate-500" x-text="'Peserta Magang: ' + selectedStudentName"></p>
                         </div>
                     </div>
-                    <button type="button" @click="showAssignAdvisorModal = false" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+                    <button type="button" @click="showAssignAdvisorModal = false" class="inline-flex items-center justify-center w-11 h-11 sm:w-auto sm:h-auto min-h-[44px] sm:min-h-0 text-slate-400 hover:text-slate-600 text-lg">&times;</button>
                 </div>
 
                 <form method="POST" action="{{ route('admin.universities.assign_advisor', $university->id) }}" class="space-y-4">
@@ -83,7 +83,7 @@
 
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Pembimbing <span class="text-rose-500">*</span></label>
-                        <select name="academic_advisor_id" required class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2.5">
+                        <select name="academic_advisor_id" required class="w-full min-h-[44px] sm:min-h-0 text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2.5">
                             <option value="">-- Pilih Pembimbing dari {{ $university->name }} --</option>
                             @foreach($dosens as $dsn)
                                 <option value="{{ $dsn->id }}">{{ $dsn->name }} ({{ $dsn->email }})</option>
@@ -93,10 +93,10 @@
                     </div>
 
                     <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
-                        <button type="button" @click="showAssignAdvisorModal = false" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+                        <button type="button" @click="showAssignAdvisorModal = false" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
                             Batal
                         </button>
-                        <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-xs">
+                        <button type="submit" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-xs">
                             Tugaskan Pembimbing
                         </button>
                     </div>

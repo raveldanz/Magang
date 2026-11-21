@@ -118,8 +118,8 @@
                 <template x-if="item.m.failed">
                     <div class="mt-1.5 pt-1.5 border-t border-white/25 flex items-center gap-3 text-xs font-semibold">
                         <span class="text-rose-100">Gagal terkirim</span>
-                        <button type="button" @click="deliver(item.m.id)" class="underline">Coba lagi</button>
-                        <button type="button" @click="discard(item.m.id)" class="underline">Batalkan</button>
+                        <button type="button" @click="deliver(item.m.id)" class="inline-flex items-center min-h-[44px] sm:min-h-0 underline">Coba lagi</button>
+                        <button type="button" @click="discard(item.m.id)" class="inline-flex items-center min-h-[44px] sm:min-h-0 underline">Batalkan</button>
                     </div>
                 </template>
             </div>
@@ -138,7 +138,7 @@
         </div>
 
         <button type="button" x-show="!item.m.pending && !item.m.deleted && typeof item.m.id === 'number'" @click.stop="openMenu($event, item.m)"
-                class="shrink-0 w-8 h-8 rounded-full text-slate-400 hover:text-slate-700 hover:bg-white flex items-center justify-center opacity-0 group-hover/msg:opacity-100 focus:opacity-100 [@media(pointer:coarse)]:opacity-70 transition"
+                class="shrink-0 h-11 w-11 sm:h-8 sm:w-8 rounded-full text-slate-400 hover:text-slate-700 hover:bg-white inline-flex items-center justify-center opacity-0 group-hover/msg:opacity-100 focus:opacity-100 [@media(pointer:coarse)]:opacity-70 transition"
                 aria-label="Aksi pesan" title="Balas, salin, hapus, laporkan">
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 10a2 2 0 110 4 2 2 0 010-4zm6 0a2 2 0 110 4 2 2 0 010-4zm6 0a2 2 0 110 4 2 2 0 010-4z"/></svg>
         </button>

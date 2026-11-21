@@ -40,7 +40,7 @@
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                                     Kategori Laporan <span class="text-rose-500">*</span>
                                 </label>
-                                <select name="category" required class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                                <select name="category" required class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                                     <option value="error_bug" {{ old('category') == 'error_bug' ? 'selected' : '' }}>Kendala / Error / Bug Sistem</option>
                                     <option value="saran_fitur" {{ old('category') == 'saran_fitur' ? 'selected' : '' }}>Usulan / Saran Perbaikan Fitur</option>
                                     <option value="pertanyaan" {{ old('category') == 'pertanyaan' ? 'selected' : '' }}>Pertanyaan Seputar Alur Magang</option>
@@ -53,7 +53,7 @@
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                                     Ditujukan Kepada <span class="text-rose-500">*</span>
                                 </label>
-                                <select name="target_role" x-model="targetRole" class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                                <select name="target_role" x-model="targetRole" class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                                     <option value="super_admin">Super Admin Dispusip (Pengelola IT Sistem)</option>
                                     <option value="admin_dinas">Admin Instansi Kedinasan</option>
                                     <option value="universitas">Pihak Kampus/Sekolah</option>
@@ -103,6 +103,7 @@
                                     name="target_university_id"
                                     placeholder="-- Cari atau Pilih Kampus/Sekolah --"
                                     :items="$universities->map(fn($u) => ['id' => $u->id, 'name' => $u->name, 'acronym' => $u->acronym ?? $u->code, 'meta' => $u->code])"
+                                    :remote-url="route('institutions.search')"
                                     :selected="old('target_university_id')"
                                 />
                             </div>
@@ -112,7 +113,7 @@
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                                     Tingkat Prioritas
                                 </label>
-                                <select name="priority" class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                                <select name="priority" class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                                     <option value="low" {{ old('priority') == 'low' ? 'selected' : '' }}>Rendah (Informasi umum)</option>
                                     <option value="medium" {{ old('priority', 'medium') == 'medium' ? 'selected' : '' }}>Sedang (Pertanyaan standar)</option>
                                     <option value="high" {{ old('priority') == 'high' ? 'selected' : '' }}>Tinggi (Menghambat aktivitas)</option>
@@ -128,8 +129,8 @@
                             Judul / Subjek Laporan <span class="text-rose-500">*</span>
                         </label>
                         <input type="text" name="subject" value="{{ old('subject') }}" required 
-                               placeholder="Contoh: Terjadi kendala saat upload logbook / Usulan penambahan fitur unduh nilai" 
-                               class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                               placeholder="Contoh: Terjadi kendala saat upload logbook / Usulan penambahan fitur unduh nilai"
+                               class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                     </div>
 
                     <!-- Isi Pesan -->
@@ -181,7 +182,7 @@
 
                 <!-- Submit Button -->
                 <div class="flex items-center justify-between">
-                    <a href="{{ route('feedbacks.my') }}" class="text-xs font-bold text-slate-500 hover:text-slate-800">
+                    <a href="{{ route('feedbacks.my') }}" class="inline-flex items-center min-h-[44px] sm:min-h-0 text-xs font-bold text-slate-500 hover:text-slate-800">
                          Lihat Riwayat Laporan Saya
                     </a>
 

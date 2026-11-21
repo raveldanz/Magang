@@ -19,7 +19,7 @@
                 @endphp
                 @if (in_array($rawStatus, ['accepted', 'active', 'completed']))
                     <a href="{{ route('university.students.letter', $application->id) }}" target="_blank"
-                       class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-xs transition">
+                       class="inline-flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-0 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-xs transition">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
@@ -27,10 +27,10 @@
                     </a>
                 @endif
 
-                <x-chat-button :user="$student" label="Chat Peserta Magang" />
+                <x-chat-button :user="$student" label="Chat Peserta Magang" class="min-h-[44px] sm:min-h-0" />
 
                 <a href="{{ route('university.dashboard') }}"
-                   class="inline-flex items-center justify-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition text-center">
+                   class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition text-center">
                      Kembali ke Dashboard
                 </a>
             </div>
@@ -129,7 +129,7 @@
                         @if (! in_array($application->statusValue(), ['rejected', 'resigned', 'draft'], true))
                         <button type="button"
                                 @click="showAssignModal = true"
-                                class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-lg transition shrink-0">
+                                class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-lg transition shrink-0">
                             {{ $dosen ? 'Ganti' : '+ Pembimbing' }}
                         </button>
                         @endif
@@ -244,7 +244,7 @@
                             <h5 class="font-bold text-xs sm:text-sm text-slate-900 truncate">{{ $finalReport->title ?? 'Laporan Akhir Magang' }}</h5>
                             <p class="text-[11px] text-slate-400 mt-0.5">Status: <span class="font-bold uppercase text-emerald-700">{{ $finalReport->status ?? 'Submitted' }}</span></p>
                         </div>
-                        <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank" class="w-full sm:w-auto text-center px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition">
+                        <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 w-full sm:w-auto text-center px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition">
                             Unduh Laporan (PDF)
                         </a>
                     </div>
@@ -401,7 +401,7 @@
                         <h3 class="font-bold text-base text-slate-900">Penugasan Pembimbing</h3>
                         <p class="text-xs text-slate-400 mt-0.5">Untuk Peserta Magang: <strong class="text-slate-700">{{ $student->name }}</strong></p>
                     </div>
-                    <button type="button" @click="showAssignModal = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+                    <button type="button" @click="showAssignModal = false" class="inline-flex items-center justify-center h-11 w-11 sm:h-auto sm:w-auto text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
                 </div>
 
                 <form method="POST" action="{{ route('university.students.assign_advisor', $application->id) }}" class="space-y-4">
@@ -410,7 +410,7 @@
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                             Pilih Pembimbing <span class="text-rose-500">*</span>
                         </label>
-                        <select name="academic_advisor_id" required class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                        <select name="academic_advisor_id" required class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                             <option value="">-- Pilih Pembimbing Kampus/Sekolah --</option>
                             @foreach ($availableDosens as $d)
                                 <option value="{{ $d->id }}" {{ $dosen?->id == $d->id ? 'selected' : '' }}>
@@ -422,10 +422,10 @@
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-                        <button type="button" @click="showAssignModal = false" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">
+                        <button type="button" @click="showAssignModal = false" class="min-h-[44px] sm:min-h-0 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">
                             Batal
                         </button>
-                        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
+                        <button type="submit" class="min-h-[44px] sm:min-h-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
                             Simpan Penugasan Pembimbing
                         </button>
                     </div>

@@ -56,37 +56,37 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <x-input-label for="government_name" value="Nama Pemerintah / Kota / Provinsi" class="text-xs font-bold text-slate-700 uppercase" />
-                            <x-text-input id="government_name" name="government_name" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                            <x-text-input id="government_name" name="government_name" type="text" class="min-h-[44px] sm:min-h-0 mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
                                 value="{{ old('government_name', $agencyProfile->government_name ?? $profile->government_name) }}" required />
                         </div>
 
                         <div>
                             <x-input-label for="agency_name" value="Nama Dinas / Instansi Kerja" class="text-xs font-bold text-slate-700 uppercase" />
-                            <x-text-input id="agency_name" name="agency_name" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                            <x-text-input id="agency_name" name="agency_name" type="text" class="min-h-[44px] sm:min-h-0 mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
                                 value="{{ old('agency_name', $agencyProfile->agency_name ?? $profile->agency_name) }}" required />
                         </div>
 
                         <div>
                             <x-input-label for="city" value="Kota Tempat Penerbitan Surat" class="text-xs font-bold text-slate-700 uppercase" />
-                            <x-text-input id="city" name="city" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                            <x-text-input id="city" name="city" type="text" class="min-h-[44px] sm:min-h-0 mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
                                 value="{{ old('city', $agencyProfile->city ?? $profile->city ?? 'Surabaya') }}" required />
                         </div>
 
                         <div>
                             <x-input-label for="phone" value="No. Telepon Instansi" class="text-xs font-bold text-slate-700 uppercase" />
-                            <x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                            <x-text-input id="phone" name="phone" type="text" class="min-h-[44px] sm:min-h-0 mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
                                 value="{{ old('phone', $agencyProfile->phone ?? $profile->phone) }}" />
                         </div>
 
                         <div>
                             <x-input-label for="email" value="Email Resmi Instansi" class="text-xs font-bold text-slate-700 uppercase" />
-                            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                            <x-text-input id="email" name="email" type="email" class="min-h-[44px] sm:min-h-0 mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
                                 value="{{ old('email', $agencyProfile->email ?? $profile->email) }}" />
                         </div>
 
                         <div>
                             <x-input-label for="website" value="Website Resmi" class="text-xs font-bold text-slate-700 uppercase" />
-                            <x-text-input id="website" name="website" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                            <x-text-input id="website" name="website" type="text" class="min-h-[44px] sm:min-h-0 mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
                                 value="{{ old('website', $agencyProfile->website ?? $profile->website) }}" />
                         </div>
                     </div>
@@ -137,19 +137,19 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <x-input-label for="signee_name" value="Nama Pejabat (Lengkap Gelar)" class="text-xs font-bold text-slate-700 uppercase" />
-                            <x-text-input id="signee_name" name="signee_name" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                            <x-text-input id="signee_name" name="signee_name" type="text" class="min-h-[44px] sm:min-h-0 mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
                                 value="{{ old('signee_name', $agencyProfile->signee_name ?? $profile->signee_name) }}" required />
                         </div>
 
                         <div>
                             <x-input-label for="signee_nip" value="NIP Pejabat" class="text-xs font-bold text-slate-700 uppercase" />
-                            <x-text-input id="signee_nip" name="signee_nip" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                            <x-text-input id="signee_nip" name="signee_nip" type="text" class="min-h-[44px] sm:min-h-0 mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
                                 value="{{ old('signee_nip', $agencyProfile->signee_nip ?? $profile->signee_nip) }}" />
                         </div>
 
                         <div>
                             <x-input-label for="signee_position" value="Jabatan Resmi Pejabat" class="text-xs font-bold text-slate-700 uppercase" />
-                            <x-text-input id="signee_position" name="signee_position" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                            <x-text-input id="signee_position" name="signee_position" type="text" class="min-h-[44px] sm:min-h-0 mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
                                 value="{{ old('signee_position', $agencyProfile->signee_position ?? $profile->signee_position) }}" required />
                         </div>
                     </div>

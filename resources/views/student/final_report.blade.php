@@ -159,6 +159,8 @@
             {{-- KONDISI 2: JIKA SUDAH MEMILIKI PENEMPATAN AKTIF (BISA UNGGAH / LIHAT STATUS LAPORAN) --}}
             @else
 
+                <a href="#naskah-laporan-akhir" class="btn-primary w-full min-h-[44px] justify-center sm:hidden">Ke Naskah Laporan Akhir</a>
+
                 <!-- Informational Banner: Panduan & Ketentuan Laporan Akhir -->
                 <div class="p-4 sm:p-5 bg-gradient-to-r from-blue-50/90 via-indigo-50/40 to-blue-50/90 border border-blue-200/90 rounded-2xl shadow-2xs space-y-3">
                     <div class="flex items-start gap-3">
@@ -369,7 +371,7 @@
                 <!-- ========================================================================= -->
                 <!-- BAGIAN 2: NASKAH LAPORAN AKHIR -->
                 <!-- ========================================================================= -->
-                <div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs">
+                <div id="naskah-laporan-akhir" class="scroll-mt-20 bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs">
                     <div>
                         <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block">Bagian 2</span>
                         <h3 class="font-bold text-base sm:text-lg text-slate-900 mt-0.5">
@@ -450,7 +452,7 @@
 
                             <div>
                                 <div class="flex items-center justify-between mb-1.5 gap-2">
-                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider truncate">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider break-words sm:truncate">
                                         Tautan Repositori Proyek / Luaran Kerja (Opsional)
                                     </label>
                                     <span id="repoUrlBadge" class="hidden text-[10px] sm:text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 shrink-0">
@@ -487,7 +489,7 @@
                                     <div class="p-2 sm:p-2.5 bg-white border border-slate-200 rounded-xl space-y-1">
                                         <div class="flex items-center gap-1.5 font-mono text-[11px] sm:text-xs font-bold text-blue-700">
                                             <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                            <span class="truncate">Format: Laporan_Akhir_[NIM/NIS]_[Nama].[ext]</span>
+                                            <span class="min-w-0 break-words sm:truncate">Format: Laporan_Akhir_[NIM/NIS]_[Nama].[ext]</span>
                                         </div>
                                         <div class="text-[10px] sm:text-[11px] text-slate-500 break-all leading-normal">
                                             Contoh: <strong class="text-slate-800 font-mono">Laporan_Akhir_{{ preg_replace('/[^A-Za-z0-9]/', '', Auth::user()->studentProfile->nim ?? '22051204001') }}_{{ \Illuminate\Support\Str::slug(Auth::user()->name, '_') }}.pdf</strong>
@@ -499,7 +501,7 @@
                             <!-- Interactive Drag & Drop Dropzone -->
                             <div>
                                 <div class="flex items-center justify-between mb-1.5 gap-2">
-                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider truncate">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider break-words sm:truncate">
                                         Unggah File Naskah Laporan (PDF) 
                                         @if(!$finalReport || !$finalReport->file_path)
                                             <span class="text-rose-500">*</span>
@@ -538,22 +540,22 @@
                                     </div>
                                 </div>
                                 <!-- Selected File Preview Feedback Card -->
-                                <div id="reportFileBox" class="hidden mt-3 p-3.5 sm:p-4 bg-blue-50/70 border border-blue-200 rounded-2xl items-center justify-between gap-3 shadow-2xs">
+                                <div id="reportFileBox" class="hidden mt-3 p-3.5 sm:p-4 bg-blue-50/70 border border-blue-200 rounded-2xl flex-col items-stretch sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
                                     <div class="flex items-center gap-3 min-w-0">
                                         <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs uppercase" id="reportFileIcon">
                                             PDF
                                         </div>
                                         <div class="min-w-0 flex-1">
-                                            <p id="reportFileName" class="text-xs sm:text-sm font-bold text-slate-800 truncate"></p>
+                                            <p id="reportFileName" class="text-xs sm:text-sm font-bold text-slate-800 break-words sm:truncate"></p>
                                             <p id="reportFileSize" class="text-[10px] sm:text-xs text-slate-500 font-mono"></p>
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2 shrink-0">
-                                        <a id="reportViewFileBtn" href="#" target="_blank" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white border border-blue-600 rounded-xl text-xs font-bold transition shadow-2xs inline-flex items-center gap-1.5">
+                                        <a id="reportViewFileBtn" href="#" target="_blank" class="min-h-[44px] sm:min-h-0 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white border border-blue-600 rounded-xl text-xs font-bold transition shadow-2xs inline-flex items-center gap-1.5">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                             <span>Lihat Berkas</span>
                                         </a>
-                                        <button type="button" onclick="document.getElementById('file_laporan').click()" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition shadow-2xs">
+                                        <button type="button" onclick="document.getElementById('file_laporan').click()" class="min-h-[44px] sm:min-h-0 px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition shadow-2xs">
                                             Ganti Berkas
                                         </button>
                                     </div>

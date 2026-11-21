@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\University;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Satu-satunya tempat mencocokkan "nama kampus" → record universities.
@@ -83,7 +85,11 @@ class UniversityResolver
             return null;
         }
 
-        $matches = University::query()
+        // Prafilter SQL: baris yang hasil normalisasinya sama persis pasti memuat token terpanjang needle.
+        $tokens = explode(' ', $needle);
+        usort($tokens, fn ($a, $b) => mb_strlen($b) <=> mb_strlen($a));
+
+        $matches = $this->candidates([$tokens[0]])
             ->get(['id', 'name', 'acronym', 'code', 'slug', 'is_verified'])
             ->filter(function (University $u) use ($needle) {
                 return in_array($needle, [
@@ -156,14 +162,55 @@ class UniversityResolver
             return collect();
         }
 
-        return University::query()
+        // Master institusi bisa berisi puluhan ribu sekolah (direktori NPSN): skor kemiripan hanya dihitung untuk
+        // kandidat yang memuat potongan awal (4 huruf) salah satu kata inti, cukup longgar untuk salah ketik.
+        $fragments = collect(explode(' ', $inputCore !== '' ? $inputCore : $input))
+            ->filter(fn ($w) => mb_strlen($w) >= 2)
+            ->map(fn ($w) => mb_substr($w, 0, 4))
+            ->unique()
+            ->values()
+            ->all();
+
+        $ranked = $this->candidates($fragments)
             ->when($verifiedOnly, fn ($q) => $q->where('is_verified', true))
-            ->get()
-            ->map(fn (University $u) => ['university' => $u, 'score' => $this->score($input, $inputCore, $u)])
+            ->get(['id', 'name', 'acronym', 'code', 'slug', 'is_verified'])
+            ->map(fn (University $u) => ['id' => $u->id, 'score' => $this->score($input, $inputCore, $u)])
             ->filter(fn ($row) => $row['score'] >= self::SUGGEST_THRESHOLD)
             ->sortByDesc('score')
             ->take($limit)
             ->values();
+
+        $models = University::whereIn('id', $ranked->pluck('id'))->get()->keyBy('id');
+
+        return $ranked
+            ->filter(fn ($row) => $models->has($row['id']))
+            ->map(fn ($row) => ['university' => $models[$row['id']], 'score' => $row['score']])
+            ->values();
+    }
+
+    /**
+     * Institusi yang nama/akronim/kode/slug-nya memuat salah satu potongan teks (tidak peka huruf besar-kecil).
+     *
+     * @param  array<int, string>  $fragments
+     */
+    private function candidates(array $fragments): Builder
+    {
+        $like = DB::getDriverName() === 'pgsql' ? 'ilike' : 'like';
+        $fragments = array_values(array_filter($fragments, fn ($f) => $f !== ''));
+
+        return University::query()->where(function ($q) use ($fragments, $like) {
+            if ($fragments === []) {
+                $q->whereRaw('1 = 0');
+
+                return;
+            }
+            foreach ($fragments as $fragment) {
+                $pattern = '%'.addcslashes($fragment, '%_\\').'%';
+                foreach (['name', 'acronym', 'code', 'slug'] as $column) {
+                    $q->orWhere($column, $like, $pattern);
+                }
+            }
+        });
     }
 
     private function score(string $input, string $inputCore, University $u): float

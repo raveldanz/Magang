@@ -33,18 +33,19 @@
         }
     @endphp
 
-    <div class="py-10 max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-xl rounded-2xl p-6 border-t-8 {{ $isCompleted ? 'border-emerald-600' : ($isResigned ? 'border-rose-600' : 'border-amber-500') }}">
+    <div class="py-2 sm:py-4 w-full">
+        <div class="bg-white overflow-hidden shadow-xl shadow-slate-200/60 rounded-3xl p-5 sm:p-6 border border-slate-200/80 border-t-8 {{ $isCompleted ? 'border-t-emerald-600' : ($isResigned ? 'border-t-rose-600' : 'border-t-amber-500') }}">
             
             <!-- Header Logo / Instansi -->
-            <div class="text-center pb-4 border-b">
+            <div class="text-center pb-4 border-b border-slate-100">
                 <div class="flex items-center justify-center gap-3 mb-2.5">
                     <img src="{{ asset('images/certificates/logo_surabaya.png') }}" alt="Surabaya" class="h-12 w-auto object-contain" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
+                    <div class="h-7 w-px bg-slate-200"></div>
                     <img src="{{ asset('images/certificates/logo_dispusip.png') }}" alt="Dispusip" class="h-12 w-auto object-contain" onerror="this.onerror=null; this.src='{{ asset('images/logos/dispusip.png') }}';">
                 </div>
-                <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest">{{ $govName }}</h2>
-                <h1 class="text-lg font-black text-slate-900 uppercase tracking-wide">{{ $agencyName }}</h1>
-                <p class="text-[11px] text-gray-500 mt-0.5">Sistem Informasi Pendaftaran &amp; Sertifikasi Magang Resmi</p>
+                <h2 class="text-xs font-bold text-slate-600 uppercase tracking-widest">{{ $govName }}</h2>
+                <h1 class="text-lg font-black text-slate-900 uppercase tracking-wide mt-0.5">{{ $agencyName }}</h1>
+                <p class="text-xs text-slate-500 mt-1">Sistem Informasi Pendaftaran &amp; Sertifikasi Magang Resmi</p>
             </div>
 
             <!-- Badge Status Verifikasi Sah / Peringatan -->
@@ -171,9 +172,14 @@
             </div>
 
             <!-- Footer Keamanan -->
-            <div class="mt-8 pt-4 border-t text-center text-xs text-gray-400">
+            <div class="mt-8 pt-4 border-t border-slate-100 text-center text-xs text-slate-500 space-y-2">
                 <p>Dokumen ini telah divalidasi secara elektronik menggunakan Tanda Tangan Elektronik Balai Sertifikasi Elektronik (BSrE).</p>
-                <p class="mt-1 font-semibold text-gray-500">© {{ date('Y') }} {{ $agencyName }} {{ $govName }}</p>
+                <p class="font-semibold text-slate-600">© {{ date('Y') }} {{ $agencyName }} {{ $govName }}</p>
+                <div class="pt-1">
+                    <a href="{{ url('/') }}" class="inline-flex items-center justify-center min-h-[40px] px-3 text-xs font-bold text-blue-600 hover:text-blue-800 rounded-xl hover:bg-blue-50/70 transition">
+                        Kembali ke Beranda Portal Magang
+                    </a>
+                </div>
             </div>
 
         </div>

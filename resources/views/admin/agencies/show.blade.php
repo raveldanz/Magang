@@ -15,11 +15,11 @@
 
             <!-- Header Quick Actions -->
             <div class="cc-head-actions flex items-center flex-wrap gap-2">
-                <a href="{{ route('admin.certificates.index') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl border border-indigo-200/80 shadow-2xs transition active:scale-95 cursor-pointer" title="Kelola Penerbitan & Desain Sertifikat Magang">
+                <a href="{{ route('admin.certificates.index') }}" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 gap-1.5 px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl border border-indigo-200/80 shadow-2xs transition active:scale-95 cursor-pointer" title="Kelola Penerbitan & Desain Sertifikat Magang">
                     <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     <span>Kelola Sertifikat</span>
                 </a>
-                <a href="{{ route('admin.agencies.edit', $agency->id) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
+                <a href="{{ route('admin.agencies.edit', $agency->id) }}" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                     <span>Edit Profil Dinas</span>
                 </a>
@@ -126,7 +126,7 @@
                                                 @csrf
                                                 <input type="hidden" name="return_to" value="{{ url()->current() }}">
                                                 <button type="submit"
-                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 transition-all shadow-2xs cursor-pointer group"
+                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 min-h-[44px] sm:min-h-0 rounded-lg text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 transition-all shadow-2xs cursor-pointer group"
                                                         title="Masuk ke Akun {{ $firstAdmin->name }} (Admin Dispusip)">
                                                     <svg class="w-3.5 h-3.5 text-blue-600 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
                                                     <span>Masuk Sebagai Admin</span>
@@ -153,7 +153,7 @@
                                     <div class="mt-2.5">
                                         @if($agency->website)
                                             <a href="{{ $agency->website }}" target="_blank" rel="noopener"
-                                               class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80 transition-all shadow-2xs group"
+                                               class="inline-flex items-center gap-1.5 px-2.5 py-1 min-h-[44px] sm:min-h-0 rounded-lg text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80 transition-all shadow-2xs group"
                                                title="Buka portal web resmi dinas">
                                                 <span>Kunjungi Portal</span>
                                                 <svg class="w-3 h-3 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
@@ -185,7 +185,7 @@
                         <!-- Shortcut ke Pengaturan TTE & Tema Sertifikat -->
                         <div class="pt-2 border-t border-slate-200/80">
                             <a href="{{ route('admin.certificates.index', ['tab' => 'settings']) }}" 
-                               class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 shadow-2xs transition group"
+                               class="w-full inline-flex items-center justify-center min-h-[44px] sm:min-h-0 gap-1.5 px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 shadow-2xs transition group"
                                title="Kelola Desain & Pejabat Penandatangan TTE Sertifikat Resmi">
                                 <svg class="w-3.5 h-3.5 text-purple-600 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 <span>Atur TTE & Tema Sertifikat</span>
@@ -205,7 +205,7 @@
                                     @csrf
                                     <input type="hidden" name="return_to" value="{{ url()->current() }}">
                                     <button type="submit"
-                                            class="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-4 py-2.5 rounded-lg shadow-xs transition-colors cursor-pointer"
+                                            class="w-full min-h-[44px] sm:min-h-0 inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-4 py-2.5 rounded-lg shadow-xs transition-colors cursor-pointer"
                                             title="Masuk ke Akun {{ $supervisorUser->name }} (Atasan / Pejabat Penandatangan)">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
                                         <span>Masuk Sebagai Supervisor</span>
@@ -268,18 +268,18 @@
                 <nav class="cc-tabs flex flex-nowrap space-x-2 sm:space-x-4 overflow-x-auto pb-px scrollbar-none" aria-label="Tabs">
                     <!-- Tab 1: Personil & Akun Kedinasan -->
                     <button type="button" 
-                            @click="activeTab = 'users'" 
+                            @click="activeTab = 'users'"
                             :class="activeTab === 'users' ? 'cc-active border-blue-600 text-blue-600 font-black' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold'"
-                            class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
+                            class="cc-tab min-h-[44px] sm:min-h-0 whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                         <span>Personil & Akun Kedinasan</span>
                     </button>
 
                     <!-- Tab 2: Unit Bidang & Kuota Magang -->
                     <button type="button" 
-                            @click="activeTab = 'units'" 
+                            @click="activeTab = 'units'"
                             :class="activeTab === 'units' ? 'cc-active border-blue-600 text-blue-600 font-black' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold'"
-                            class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
+                            class="cc-tab min-h-[44px] sm:min-h-0 whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                         <span>Unit Bidang & Kuota</span>
                     </button>
@@ -323,20 +323,21 @@
                     </div>
                     <div class="cc-head-actions flex items-center gap-2">
                         <a href="{{ route('admin.users.create', ['agency_id' => $agency->id, 'role' => 'admin', 'return_to' => url()->current()]) }}"
-                           class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
+                           class="inline-flex items-center min-h-[44px] sm:min-h-0 gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                             <span>Tambah Akun Baru</span>
                         </a>
                         <a href="{{ route('admin.users.index', ['agency_id' => $agency->id]) }}" 
-                           class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
+                           class="inline-flex items-center min-h-[44px] sm:min-h-0 gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
                             <span>Tabel Pengguna</span>
                         </a>
                     </div>
                 </div>
 
-                    <div class="d-only overflow-x-auto rounded-2xl border border-slate-100">
+                    {{-- Daftar bisa puluhan akun: dibatasi tinggi dan digulir di dalam panel, header tetap terlihat. --}}
+                    <div class="d-only overflow-x-auto max-h-[640px] overflow-y-auto rounded-2xl border border-slate-100">
                         <table class="rtable min-w-full divide-y divide-slate-100 text-left text-[13px]">
-                            <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-xs whitespace-nowrap">
+                            <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-xs whitespace-nowrap sticky top-0 z-[1]">
                                 <tr>
                                     <th class="py-3 px-4">Nama Personil</th>
                                     <th class="py-3 px-4">Email / Login</th>
@@ -433,10 +434,10 @@
                     </div>
 
                     <!-- Versi HP: kartu personel -->
-                    <div class="m-only mlist rounded-2xl">
+                    <div class="m-only mlist rounded-2xl" x-data="{ showAll: false }">
                         @forelse($agency->users as $u)
                             @php $isAdminRole = $u->role === 'admin'; @endphp
-                            <div class="mcard">
+                            <div class="mcard" @if($loop->index >= 8) x-show="showAll" x-cloak @endif>
                                 <div class="mcard-head">
                                     <div class="mavatar {{ $isAdminRole ? '' : 'mavatar-indigo' }}">{{ strtoupper(substr($u->name, 0, 2)) }}</div>
                                     <div class="mcard-main">
@@ -490,6 +491,14 @@
                         @empty
                             <div class="mempty">Belum ada akun personel yang terdaftar di dinas ini.</div>
                         @endforelse
+                        @if($agency->users->count() > 8)
+                            <div class="p-3 text-center">
+                                <button type="button" @click="showAll = !showAll"
+                                        class="inline-flex items-center justify-center w-full min-h-[44px] px-4 py-2 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl transition cursor-pointer">
+                                    <span x-text="showAll ? 'Tampilkan lebih sedikit' : 'Tampilkan semua ({{ $agency->users->count() }} akun)'"></span>
+                                </button>
+                            </div>
+                        @endif
                     </div>
                 </div>
 

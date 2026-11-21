@@ -18,7 +18,7 @@
             </div>
 
             @if(Auth::user()->isSuperAdmin() || (Auth::user()->role === 'admin' && is_null(Auth::user()->unit_id)))
-                <a href="{{ route('admin.units.create', request('agency_id') ? ['agency_id' => request('agency_id')] : []) }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
+                <a href="{{ route('admin.units.create', request('agency_id') ? ['agency_id' => request('agency_id')] : []) }}" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                     </svg>
@@ -123,10 +123,10 @@
                             </svg>
                         </div>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama unit bidang..." 
-                               class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
+                               class="w-full min-h-[44px] sm:min-h-0 text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
                                style="padding-left: 2.5rem !important; padding-right: 0.75rem !important; padding-top: 0.55rem !important; padding-bottom: 0.55rem !important;">
                     </div>
-                    <button type="submit" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0 cursor-pointer">
+                    <button type="submit" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0 cursor-pointer">
                         Cari
                     </button>
                 </form>

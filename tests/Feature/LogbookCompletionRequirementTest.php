@@ -127,6 +127,30 @@ class LogbookCompletionRequirementTest extends TestCase
     /**
      * 1. Mahasiswa yang belum mengisi logbook: can_complete bernilai FALSE
      */
+    public function test_csv_export_respects_the_student_scope_and_admin_filters(): void
+    {
+        $this->placement->logbooks()->create([
+            'date' => today(), 'activity' => '=uji ekspor, harian', 'status' => 'approved',
+        ]);
+
+        $studentCsv = $this->actingAs($this->student)
+            ->get(route('student.logbook.index', ['export' => 'csv']))
+            ->assertOk()->streamedContent();
+        $this->assertStringContainsString("'=uji ekspor, harian", $studentCsv);
+
+        $adminCsv = $this->actingAs($this->superAdmin)
+            ->get(route('admin.logbooks.index', ['export' => 'csv', 'unit_id' => $this->unit->id]))
+            ->assertOk()->streamedContent();
+        $this->assertStringContainsString("'=uji ekspor, harian", $adminCsv);
+
+        $otherAgency = AgencyProfile::create(['agency_name' => 'Instansi lain', 'quota' => 1]);
+        $otherAdmin = User::factory()->create(['role' => 'admin', 'agency_profile_id' => $otherAgency->id]);
+        $otherCsv = $this->actingAs($otherAdmin)
+            ->get(route('admin.logbooks.index', ['export' => 'csv', 'placement_id' => $this->placement->id]))
+            ->assertOk()->streamedContent();
+        $this->assertStringNotContainsString('uji ekspor', $otherCsv);
+    }
+
     public function test_student_without_logbook_cannot_complete_internship(): void
     {
         $app = $this->application->fresh();

@@ -35,6 +35,17 @@ return [
         ],
     ],
 
+    // Direktori sekolah nasional (NPSN) untuk sinkronisasi master sekolah dan pencarian langsung.
+    'school_directory' => [
+        'enabled' => env('SCHOOL_DIRECTORY_ENABLED', true),
+        'base_url' => env('SCHOOL_DIRECTORY_URL', 'https://api-sekolah-indonesia.vercel.app'),
+        'timeout' => (int) env('SCHOOL_DIRECTORY_TIMEOUT', 15),
+        // PHP Windows sering tanpa curl.cainfo. Bawaan: bundel sertifikat Mozilla yang ikut proyek
+        // (resources/certs/cacert.pem), sehingga zip demo di PC mana pun tetap bisa memverifikasi SSL.
+        // Isi SCHOOL_DIRECTORY_CA_BUNDLE hanya bila jaringan kantor memakai sertifikat proxy sendiri.
+        'ca_bundle' => env('SCHOOL_DIRECTORY_CA_BUNDLE') ?: resource_path('certs/cacert.pem'),
+    ],
+
     'vapid' => [
         'public_key' => env('VAPID_PUBLIC_KEY', ''),
         'private_key' => env('VAPID_PRIVATE_KEY', ''),

@@ -1,0 +1,16 @@
+[
+  { "key": "dashboard-superadmin", "path": "/admin/dashboard", "role": "admin@surabaya.go.id", "probeNav": true },
+  { "key": "dashboard-dinas", "path": "/admin/dashboard", "role": "admin.dispusip@surabaya.go.id" },
+  { "key": "applications-index", "path": "/admin/applications", "role": "admin.dispusip@surabaya.go.id" },
+  { "key": "applications-filter-pending", "path": "/admin/applications?status=pending", "role": "admin.dispusip@surabaya.go.id" },
+  { "key": "applications-show", "role": "admin.dispusip@surabaya.go.id", "follow": { "from": "/admin/applications", "pattern": "^/admin/applications/\\d+$" } },
+  { "key": "units-index", "path": "/admin/units", "role": "admin.dispusip@surabaya.go.id" },
+  { "key": "units-create", "path": "/admin/units/create", "role": "admin.dispusip@surabaya.go.id" },
+  { "key": "units-show", "role": "admin.dispusip@surabaya.go.id", "follow": { "from": "/admin/units", "pattern": "^/admin/units/\\d+$" } },
+  { "key": "units-edit", "role": "admin.dispusip@surabaya.go.id", "follow": { "from": "/admin/units", "pattern": "^/admin/units/\\d+$", "suffix": "/edit" } },
+  { "key": "agencies-index", "path": "/admin/agencies", "role": "admin@surabaya.go.id" },
+  { "key": "agencies-create", "path": "/admin/agencies/create", "role": "admin@surabaya.go.id" },
+  { "key": "agencies-show", "role": "admin@surabaya.go.id", "follow": { "from": "/admin/agencies", "pattern": "^/admin/agencies/\\d+$" } },
+  { "key": "agencies-edit", "role": "admin@surabaya.go.id", "follow": { "from": "/admin/agencies", "pattern": "^/admin/agencies/\\d+/edit$" } },
+  { "key": "agency-profile", "path": "/admin/agency-profile", "role": "admin.dispusip@surabaya.go.id" }
+]

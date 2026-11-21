@@ -225,7 +225,7 @@
                     </div>
                 </div>
                 <a href="{{ route('admin.universities.index') }}"
-                    class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
+                    class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
                     Kelola Kampus & Buat Akun
                 </a>
             </div>
@@ -250,7 +250,7 @@
                     </div>
                 </div>
                 <a href="{{ route('admin.agencies.index') }}"
-                    class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
+                    class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
                     Kelola Instansi & Buat Akun 
                 </a>
             </div>
@@ -301,7 +301,7 @@
                     </div>
                     <div class="text-2xl font-black text-slate-800">{{ $stats['total_pending'] ?? 0 }}</div>
                 </div>
-                <div class="text-[10px] text-slate-500 mt-2 leading-tight truncate">PENDING dan MENUNGGU ACC</div>
+                <div class="text-[10px] text-slate-500 mt-2 leading-tight break-words">PENDING dan MENUNGGU ACC</div>
             </div>
 
             {{-- Diterima --}}
@@ -561,7 +561,7 @@
                         <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-3">
                             <div class="flex items-start justify-between gap-2.5">
                                 <a href="{{ route('admin.units.show', $dUnit->id) }}"
-                                   class="font-bold text-slate-900 text-sm hover:text-blue-600 transition inline-flex items-center gap-1.5 flex-1 pr-2">
+                                   class="font-bold text-slate-900 text-sm hover:text-blue-600 transition inline-flex items-center gap-1.5 flex-1 pr-2 min-h-[44px] sm:min-h-0">
                                     <span class="leading-snug">{{ $dUnit->name }}</span>
                                     <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                                 </a>
@@ -618,7 +618,7 @@
                             <p class="text-xs text-slate-400 mt-0.5">Pengajuan berkas peserta magang terkini yang masuk ke bidang ini</p>
                         </div>
                         <a href="{{ route('admin.applications.index') }}"
-                            class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 shadow-2xs">
+                            class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 min-h-[44px] sm:min-h-0 rounded-xl transition border border-blue-200 shadow-2xs">
                             <span>Lihat Semua</span>
                         </a>
                     </div>
@@ -667,7 +667,7 @@
                             <p class="text-xs text-slate-400 mt-0.5">Sebaran peserta magang di unit/bidang {{ $currentAgency->agency_name ?? 'Dispusip Surabaya' }}</p>
                         </div>
                         <a href="{{ route('admin.units.index') }}"
-                            class="self-start sm:self-auto shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 shadow-2xs">
+                            class="self-start sm:self-auto shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 min-h-[44px] sm:min-h-0 rounded-xl transition border border-blue-200 shadow-2xs">
                             <span>Kelola Unit</span>
                         </a>
                     </div>
@@ -686,11 +686,11 @@
                                 $itemQuota = is_array($item) ? ($item['quota'] ?? 0) : ($item->quota ?? 0);
                             @endphp
                             <div @if($loop->index >= 10) x-show="expanded" x-cloak @endif>
-                                <div class="flex items-center justify-between text-xs font-semibold mb-1.5 gap-2">
-                                    <span class="text-slate-700 font-medium truncate flex-1 min-w-0">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between text-xs font-semibold mb-1.5 gap-0.5 sm:gap-2">
+                                    <span class="text-slate-700 font-medium sm:truncate sm:flex-1 min-w-0" title="{{ $itemName }}">
                                         {{ $itemName }}
                                     </span>
-                                    <span class="text-blue-700 font-bold shrink-0">
+                                    <span class="text-blue-700 font-bold sm:shrink-0">
                                         {{ $itemCount }} Peserta Magang
                                         @if($itemQuota > 0)
                                             <span class="text-slate-400 font-normal">/ Kuota {{ $itemQuota }}</span>
@@ -736,7 +736,7 @@
                     </div>
                     @if($isSuperAdmin)
                         <a href="{{ route('admin.universities.index') }}"
-                            class="self-start sm:self-auto shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-sky-700 hover:text-sky-900 bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-xl transition border border-sky-200 shadow-2xs">
+                            class="self-start sm:self-auto shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-sky-700 hover:text-sky-900 bg-sky-50 hover:bg-sky-100 px-3 py-1.5 min-h-[44px] sm:min-h-0 rounded-xl transition border border-sky-200 shadow-2xs">
                             <span>Kelola Kampus & Sekolah</span>
                         </a>
                     @endif
@@ -756,9 +756,9 @@
                             $campPercentage = is_array($campus) ? $campus['percentage'] : ($campus->percentage ?? 0);
                         @endphp
                         <div @if($loop->index >= 10) x-show="expanded" x-cloak @endif>
-                            <div class="flex items-center justify-between text-xs font-semibold mb-1.5">
-                                <span class="text-slate-700 font-medium truncate max-w-[240px]">{{ $campName }}</span>
-                                <span class="text-sky-700 font-bold shrink-0">{{ $campCount }} Peserta Magang <span
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between text-xs font-semibold mb-1.5 gap-0.5 sm:gap-2">
+                                <span class="text-slate-700 font-medium min-w-0 sm:truncate sm:max-w-[240px]" title="{{ $campName }}">{{ $campName }}</span>
+                                <span class="text-sky-700 font-bold sm:shrink-0">{{ $campCount }} Peserta Magang <span
                                         class="text-slate-400 font-normal">({{ $campPercentage }}%)</span></span>
                             </div>
                             <div class="w-full rounded-full overflow-hidden mt-1.5"

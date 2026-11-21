@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <a href="{{ route('admin.universities.index') }}" class="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 transition flex items-center justify-center shadow-xs" title="Kembali">
+            <a href="{{ route('admin.universities.index') }}" class="w-11 h-11 sm:w-auto sm:h-auto p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 transition flex items-center justify-center shadow-xs" title="Kembali">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
@@ -28,14 +28,14 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Nama Resmi Kampus/Sekolah <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" name="name" value="{{ old('name', $university->name) }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="name" value="{{ old('name', $university->name) }}" required class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Kode / Singkatan <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" name="code" value="{{ old('code', $university->code) }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono uppercase">
+                            <input type="text" name="code" value="{{ old('code', $university->code) }}" required class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono uppercase">
                         </div>
                     </div>
 
@@ -44,14 +44,14 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Email Resmi Kampus
                             </label>
-                            <input type="email" name="email" value="{{ old('email', $university->email) }}" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                            <input type="email" name="email" value="{{ old('email', $university->email) }}" class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Nomor Telepon / Fax
                             </label>
-                            <input type="text" name="phone" value="{{ old('phone', $university->phone) }}" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="phone" value="{{ old('phone', $university->phone) }}" class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
                     </div>
 
@@ -67,21 +67,21 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Nama Rektor / Pimpinan (PIC)
                             </label>
-                            <input type="text" name="pic_name" value="{{ old('pic_name', $university->pic_name) }}" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="pic_name" value="{{ old('pic_name', $university->pic_name) }}" class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 NIP / NIDN Rektor
                             </label>
-                            <input type="text" name="pic_nip" value="{{ old('pic_nip', $university->pic_nip) }}" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                            <input type="text" name="pic_nip" value="{{ old('pic_nip', $university->pic_nip) }}" class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Jabatan Penandatangan
                             </label>
-                            <input type="text" name="pic_position" value="{{ old('pic_position', $university->pic_position) }}" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="pic_position" value="{{ old('pic_position', $university->pic_position) }}" class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
                     </div>
 
@@ -157,7 +157,7 @@
                                         <span class="font-mono text-blue-600 font-bold" x-text="weightMentor + '%'"></span>
                                     </div>
                                     <input type="range" min="0" max="100" step="5" x-model="weightMentor" @input="updateLecturer()" class="w-full h-2 bg-gray-200 rounded-lg accent-blue-600">
-                                    <input type="number" name="weight_mentor" min="0" max="100" x-model="weightMentor" @input="updateLecturer()" class="w-full text-xs border-gray-300 rounded-xl font-mono text-center font-bold">
+                                    <input type="number" name="weight_mentor" min="0" max="100" x-model="weightMentor" @input="updateLecturer()" class="w-full min-h-[44px] sm:min-h-0 text-xs border-gray-300 rounded-xl font-mono text-center font-bold">
                                 </div>
 
                                 <div class="space-y-1">
@@ -166,7 +166,7 @@
                                         <span class="font-mono text-purple-600 font-bold" x-text="weightLecturer + '%'"></span>
                                     </div>
                                     <input type="range" min="0" max="100" step="5" x-model="weightLecturer" @input="updateMentor()" class="w-full h-2 bg-gray-200 rounded-lg accent-purple-600">
-                                    <input type="number" name="weight_lecturer" min="0" max="100" x-model="weightLecturer" @input="updateMentor()" class="w-full text-xs border-gray-300 rounded-xl font-mono text-center font-bold">
+                                    <input type="number" name="weight_lecturer" min="0" max="100" x-model="weightLecturer" @input="updateMentor()" class="w-full min-h-[44px] sm:min-h-0 text-xs border-gray-300 rounded-xl font-mono text-center font-bold">
                                 </div>
                             </div>
 
@@ -192,19 +192,19 @@
                                 <div class="p-3.5 rounded-xl bg-white border border-slate-200 space-y-2.5">
                                     <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
                                         <span class="font-bold text-blue-900 uppercase text-[10px]">Aspek Dinas</span>
-                                        <button type="button" @click="resetDinas()" class="text-[10px] font-semibold text-blue-600 hover:underline">Reset</button>
+                                        <button type="button" @click="resetDinas()" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-4 sm:px-0 text-[10px] font-semibold text-blue-600 hover:underline">Reset</button>
                                     </div>
                                     <div>
                                         <label class="block text-[10px] text-slate-500 mb-0.5">Aspek 1 (Disiplin)</label>
-                                        <input type="text" name="dinas_components[1]" x-model="dinas1" class="w-full text-xs border-gray-300 rounded-lg" placeholder="Disiplin, Kehadiran, & Ketaatan Tata Tertib Kedinasan">
+                                        <input type="text" name="dinas_components[1]" x-model="dinas1" class="w-full min-h-[44px] sm:min-h-0 text-xs border-gray-300 rounded-lg" placeholder="Disiplin, Kehadiran, & Ketaatan Tata Tertib Kedinasan">
                                     </div>
                                     <div>
                                         <label class="block text-[10px] text-slate-500 mb-0.5">Aspek 2 (Kinerja)</label>
-                                        <input type="text" name="dinas_components[2]" x-model="dinas2" class="w-full text-xs border-gray-300 rounded-lg" placeholder="Kinerja Teknis, Kualitas Output Proyek, & Tanggung Jawab Kerja">
+                                        <input type="text" name="dinas_components[2]" x-model="dinas2" class="w-full min-h-[44px] sm:min-h-0 text-xs border-gray-300 rounded-lg" placeholder="Kinerja Teknis, Kualitas Output Proyek, & Tanggung Jawab Kerja">
                                     </div>
                                     <div>
                                         <label class="block text-[10px] text-slate-500 mb-0.5">Aspek 3 (Laporan/Inisiatif)</label>
-                                        <input type="text" name="dinas_components[3]" x-model="dinas3" class="w-full text-xs border-gray-300 rounded-lg" placeholder="Inisiatif, Komunikasi Lapangan, & Penyusunan Laporan Dinas">
+                                        <input type="text" name="dinas_components[3]" x-model="dinas3" class="w-full min-h-[44px] sm:min-h-0 text-xs border-gray-300 rounded-lg" placeholder="Inisiatif, Komunikasi Lapangan, & Penyusunan Laporan Dinas">
                                     </div>
                                 </div>
 
@@ -212,19 +212,19 @@
                                 <div class="p-3.5 rounded-xl bg-white border border-slate-200 space-y-2.5">
                                     <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
                                         <span class="font-bold text-purple-900 uppercase text-[10px]">Aspek Pembimbing Kampus/Sekolah</span>
-                                        <button type="button" @click="resetDpl()" class="text-[10px] font-semibold text-purple-600 hover:underline">Reset</button>
+                                        <button type="button" @click="resetDpl()" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-4 sm:px-0 text-[10px] font-semibold text-purple-600 hover:underline">Reset</button>
                                     </div>
                                     <div>
                                         <label class="block text-[10px] text-slate-500 mb-0.5">Aspek 1 (Materi & Teori)</label>
-                                        <input type="text" name="dpl_components[1]" x-model="dpl1" class="w-full text-xs border-gray-300 rounded-lg" placeholder="Penguasaan Materi, Teori Ilmiah, & Solusi Teknis Magang">
+                                        <input type="text" name="dpl_components[1]" x-model="dpl1" class="w-full min-h-[44px] sm:min-h-0 text-xs border-gray-300 rounded-lg" placeholder="Penguasaan Materi, Teori Ilmiah, & Solusi Teknis Magang">
                                     </div>
                                     <div>
                                         <label class="block text-[10px] text-slate-500 mb-0.5">Aspek 2 (Kualitas Laporan)</label>
-                                        <input type="text" name="dpl_components[2]" x-model="dpl2" class="w-full text-xs border-gray-300 rounded-lg" placeholder="Kualitas, Sistematika Penulisan, & Ketajaman Analisis Laporan Akhir">
+                                        <input type="text" name="dpl_components[2]" x-model="dpl2" class="w-full min-h-[44px] sm:min-h-0 text-xs border-gray-300 rounded-lg" placeholder="Kualitas, Sistematika Penulisan, & Ketajaman Analisis Laporan Akhir">
                                     </div>
                                     <div>
                                         <label class="block text-[10px] text-slate-500 mb-0.5">Aspek 3 (Sikap & Etika)</label>
-                                        <input type="text" name="dpl_components[3]" x-model="dpl3" class="w-full text-xs border-gray-300 rounded-lg" placeholder="Sikap, Komunikasi, & Keaktifan Konsultasi Bimbingan">
+                                        <input type="text" name="dpl_components[3]" x-model="dpl3" class="w-full min-h-[44px] sm:min-h-0 text-xs border-gray-300 rounded-lg" placeholder="Sikap, Komunikasi, & Keaktifan Konsultasi Bimbingan">
                                     </div>
                                 </div>
                             </div>
@@ -287,10 +287,10 @@
                     </div>
 
                     <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3 pt-6 border-t border-gray-100">
-                        <a href="{{ route('admin.universities.index') }}" class="w-full sm:w-auto px-5 py-3 sm:py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition text-center justify-center flex items-center">
+                        <a href="{{ route('admin.universities.index') }}" class="w-full sm:w-auto min-h-[44px] sm:min-h-0 px-5 py-3 sm:py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition text-center justify-center flex items-center">
                             Batal
                         </a>
-                        <button type="submit" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer text-center justify-center flex items-center">
+                        <button type="submit" class="w-full sm:w-auto min-h-[44px] sm:min-h-0 px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer text-center justify-center flex items-center">
                             Simpan Perubahan
                         </button>
                     </div>

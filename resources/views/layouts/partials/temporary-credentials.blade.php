@@ -1,13 +1,15 @@
 {{-- Password sementara hasil buat/reset akun oleh staf. Hanya tampil sekali (session flash). --}}
 @if (session('temporary_credentials'))
     <aside aria-label="Password Sementara" class="bg-sky-50 border-b border-sky-300 w-full" x-data="{ open: true }" x-show="open">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 space-y-2">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 space-y-2">
             <div class="flex items-start justify-between gap-3">
-                <p class="text-xs sm:text-sm text-sky-900">
+                <p class="text-xs sm:text-sm text-sky-900 leading-relaxed">
                     <strong>Password sementara</strong> — catat dan serahkan langsung kepada pemilik akun.
                     Password ini hanya ditampilkan <strong>sekali</strong> dan wajib diganti pemilik saat login pertama.
                 </p>
-                <button type="button" @click="open = false" class="text-sky-700 hover:text-sky-900 text-sm px-1" aria-label="Tutup">✕</button>
+                <button type="button" @click="open = false" class="shrink-0 min-w-[44px] min-h-[44px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-xl text-sky-700 hover:text-sky-900 hover:bg-sky-100 transition cursor-pointer" aria-label="Tutup">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-xs">

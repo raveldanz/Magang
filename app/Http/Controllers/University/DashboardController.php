@@ -15,6 +15,7 @@ use App\Services\UniversityResolver;
 use App\Support\CsvSafe;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -71,12 +72,13 @@ class DashboardController extends Controller
 
         // Filter Search & Agency
         if ($request->filled('search')) {
-            $search = strtolower($request->search);
-            $applicationsQuery->whereHas('user', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhereHas('studentProfile', function ($sp) use ($search) {
-                        $sp->where('nim', 'like', "%{$search}%")
-                            ->orWhere('jurusan', 'like', "%{$search}%");
+            $search = trim((string) $request->search);
+            $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+            $applicationsQuery->whereHas('user', function ($q) use ($search, $like) {
+                $q->where('name', $like, "%{$search}%")
+                    ->orWhereHas('studentProfile', function ($sp) use ($search, $like) {
+                        $sp->where('nim', $like, "%{$search}%")
+                            ->orWhere('jurusan', $like, "%{$search}%");
                     });
             });
         }

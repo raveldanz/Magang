@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <a href="{{ route('admin.users.index') }}" class="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 transition flex items-center justify-center shadow-xs" title="Kembali">
+            <a href="{{ route('admin.users.index') }}" class="w-11 h-11 sm:w-auto sm:h-auto p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 transition flex items-center justify-center shadow-xs" title="Kembali">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
@@ -39,7 +39,7 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Nama Lengkap & Gelar <span class="text-rose-500">*</span>
                         </label>
-                        <input type="text" name="name" value="{{ old('name', $user->name) }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                        <input type="text" name="name" value="{{ old('name', $user->name) }}" required class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -47,14 +47,14 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Email Resmi / Akun Login <span class="text-rose-500">*</span>
                             </label>
-                            <input type="email" name="email" value="{{ old('email', $user->email) }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                            <input type="email" name="email" value="{{ old('email', $user->email) }}" required class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Ganti Password (Opsional)
                             </label>
-                            <input type="password" name="password" placeholder="Biarkan kosong jika tidak diubah" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                            <input type="password" name="password" placeholder="Biarkan kosong jika tidak diubah" class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                         </div>
                     </div>
 
@@ -63,7 +63,7 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Role Pengguna <span class="text-rose-500">*</span>
                             </label>
-                            <select name="role" x-model="selectedRole" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-semibold">
+                            <select name="role" x-model="selectedRole" required class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-semibold">
                                 <option value="mahasiswa">Peserta Magang Pendaftar</option>
                                 <option value="admin">Admin Instansi Dinas / Superadmin</option>
                                 @if(auth()->user()->isSuperAdmin())
@@ -81,7 +81,7 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Status Keaktifan Akun
                             </label>
-                            <select name="status" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                            <select name="status" class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                                 @foreach(\App\Enums\AccountStatus::cases() as $accountCase)
                                     <option value="{{ $accountCase->value }}" {{ old('status', $user->status ?? 'active') === $accountCase->value ? 'selected' : '' }}>{{ $accountCase->label() }}</option>
                                 @endforeach
@@ -112,15 +112,16 @@
                             name="university_id"
                             placeholder="-- Pilih Kampus/Sekolah --"
                             :items="$universities->map(fn($un) => ['id' => $un->id, 'name' => $un->name, 'acronym' => $un->acronym ?? $un->code, 'meta' => $un->code])"
+                            :remote-url="route('institutions.search')"
                             :selected="old('university_id', $user->university_id)"
                         />
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
-                        <a href="{{ route('admin.users.index') }}" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                        <a href="{{ route('admin.users.index') }}" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                             Batal
                         </a>
-                        <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                        <button type="submit" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                             Simpan Perubahan
                         </button>
                     </div>

@@ -70,7 +70,7 @@ class AgencyProfile extends Model
             return (int) $configured;
         }
 
-        $id = static::where('agency_name', 'like', '%Perpustakaan%')->orderBy('id')->value('id');
+        $id = static::whereRaw('LOWER(agency_name) LIKE ?', ['%perpustakaan%'])->orderBy('id')->value('id');
 
         return $id !== null ? (int) $id : null;
     }

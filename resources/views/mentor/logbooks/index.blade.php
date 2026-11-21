@@ -10,7 +10,7 @@
                 <h2 class="font-bold text-2xl text-slate-900 leading-tight">
                     Periksa Logbook Peserta Magang
                 </h2>
-                <p class="text-base text-slate-700 mt-0.5">
+                <p class="hidden sm:block text-base text-slate-700 mt-0.5">
                     Logbook dikelompokkan per minggu. Buka minggu yang bertanda kuning, putuskan setiap hari, lalu simpan.
                 </p>
             </div>
@@ -36,7 +36,7 @@
                     <p class="text-lg font-bold text-amber-900">
                         Ada {{ $pendingCount }} hari kegiatan ({{ $pendingWeeks }} minggu) yang menunggu pemeriksaan Anda.
                     </p>
-                    <p class="text-base text-amber-900 mt-0.5">Mulai dari minggu paling atas. Minggu pertama sudah dibuka otomatis.</p>
+                    <p class="hidden sm:block text-base text-amber-900 mt-0.5">Mulai dari minggu paling atas. Minggu pertama sudah dibuka otomatis.</p>
                 @else
                     <p class="text-lg font-bold text-emerald-900">Semua logbook sudah Anda periksa. Tidak ada yang menunggu.</p>
                 @endif
@@ -56,9 +56,16 @@
                 </nav>
             </div>
 
-            <!-- Cari mahasiswa -->
-            <div class="bg-white rounded-2xl p-4 border border-slate-200">
-                <form method="GET" action="{{ route('mentor.logbooks.index') }}" class="grid grid-cols-1 lg:grid-cols-3 gap-3 items-end">
+            <!-- Cari mahasiswa (di HP dilipat agar halaman langsung menampilkan logbook) -->
+            @php $hasLogbookFilter = request()->filled('search') || request()->filled('placement_id'); @endphp
+            <div class="bg-white rounded-2xl p-4 border border-slate-200" x-data="{ cari: @js($hasLogbookFilter) }">
+                <button type="button" @click="cari = !cari" :aria-expanded="cari.toString()"
+                        class="sm:hidden w-full min-h-[48px] inline-flex items-center justify-between gap-2 text-base font-bold text-slate-900">
+                    <span>Cari peserta magang</span>
+                    <svg class="w-5 h-5 transition" :class="cari && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <form method="GET" action="{{ route('mentor.logbooks.index') }}" :class="{ 'hidden': !cari }"
+                      class="{{ $hasLogbookFilter ? '' : 'hidden' }} sm:!grid grid grid-cols-1 lg:grid-cols-3 gap-3 items-end mt-3 sm:mt-0">
                     <input type="hidden" name="status" value="{{ $statusFilter }}">
                     <div>
                         <label for="pilih-mahasiswa" class="block text-base font-semibold text-slate-900 mb-1">Peserta Magang</label>

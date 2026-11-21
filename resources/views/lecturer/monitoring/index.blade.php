@@ -41,8 +41,10 @@
             </div>
 
             <!-- Filter & Search Bar (Clean Minimalist Form) -->
-            <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-slate-200/80">
-                <form method="GET" action="{{ route('lecturer.monitoring.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
+            @php $filterAktif = request()->filled('search') || request()->filled('unit_id'); @endphp
+            <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-slate-200/80" x-data="{ buka: {{ $filterAktif ? 'true' : 'false' }} }">
+                <button type="button" @click="buka = !buka" :aria-expanded="buka.toString()" class="sm:hidden w-full min-h-[48px] inline-flex items-center justify-between gap-2 text-base font-bold text-slate-900"><span>Cari atau saring peserta</span><svg class="w-5 h-5 transition" :class="buka && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg></button>
+                <form method="GET" action="{{ route('lecturer.monitoring.index') }}" :class="{ 'hidden': !buka }" class="{{ $filterAktif ? '' : 'hidden' }} sm:!flex mt-3 sm:mt-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
                     <input type="hidden" name="tab" value="{{ $tab ?? 'active' }}">
 
                     <div class="relative flex-1 min-w-0">
@@ -94,17 +96,7 @@
                             $hasEval = ($eval?->nilai_akademik ?? 0) > 0 || ($eval?->nilai_dosen ?? 0) > 0;
                             $appStatus = $placement->application?->status;
 
-                            $univ = $eval?->getUniversity();
-                            if (!$univ && $student) {
-                                if ($student->university_id) {
-                                    $univ = \App\Models\University::find($student->university_id);
-                                } else {
-                                    $name = $student->university ?? ($profile?->universitas ?? null);
-                                    if ($name) {
-                                        $univ = \App\Models\University::where('name', 'like', "%{$name}%")->orWhere('code', 'like', "%{$name}%")->first();
-                                    }
-                                }
-                            }
+                            $univ = $eval?->getUniversity() ?? ($student ? app(\App\Services\UniversityResolver::class)->forUser($student) : null);
                             $scheme = $univ->evaluation_scheme ?? 'mentor_only';
                             $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
                             $isMentorOnly = ($scheme === 'mentor_only' || $weightLecturer === 0);
@@ -121,7 +113,7 @@
                                         {{ strtoupper(substr($student->name ?? 'M', 0, 2)) }}
                                     </div>
                                     <div class="min-w-0">
-                                        <p class="font-bold text-sm text-slate-900 leading-snug truncate">{{ $student->name ?? '-' }}</p>
+                                        <p class="font-bold text-base sm:text-sm text-slate-900 leading-snug break-words sm:truncate" title="{{ $student->name ?? '-' }}">{{ $student->name ?? '-' }}</p>
                                         @if($placement->application?->group_id && $placement->application?->group)
                                             <div class="mt-0.5">
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
@@ -129,7 +121,7 @@
                                                 </span>
                                             </div>
                                         @endif
-                                        <p class="text-xs text-slate-500 mt-0.5 truncate">{{ $profile->nim ?? '-' }} &bull; {{ $profile->major ?? $profile->jurusan ?? '-' }}</p>
+                                        <p class="text-sm sm:text-xs text-slate-500 mt-0.5 break-words sm:truncate" title="{{ $profile->nim ?? '-' }} &bull; {{ $profile->major ?? $profile->jurusan ?? '-' }}">{{ $profile->nim ?? '-' }} &bull; {{ $profile->major ?? $profile->jurusan ?? '-' }}</p>
                                     </div>
                                 </div>
                                 <div class="shrink-0">
@@ -137,15 +129,15 @@
                                 </div>
                             </div>
 
-                            <div class="bg-slate-50 p-3.5 rounded-xl text-xs space-y-2">
-                                <div class="text-slate-600">
+                            <div class="bg-slate-50 p-3.5 rounded-xl text-sm sm:text-xs space-y-2">
+                                <div class="hidden sm:block text-slate-600">
                                     <span class="text-slate-600 font-medium">Instansi:</span>
                                     <span class="font-semibold text-slate-800">{{ $agency->agency_name ?? '-' }} ({{ $unit->name ?? '-' }})</span>
                                 </div>
-                                <div class="flex items-center justify-between text-xs">
+                                <div class="flex items-center justify-between text-sm sm:text-xs">
                                     <div>
                                         <span class="text-slate-500">Logbook: <strong class="text-slate-800">{{ $approvedLog }} / {{ $totalLog }} ACC</strong></span>
-                                        <div class="text-xs mt-0.5">
+                                        <div class="text-sm sm:text-xs mt-0.5">
                                             @if ($latestLog)
                                                 @if ($daysAgo <= 0)
                                                     <span class="text-emerald-700 font-medium">● Aktif hari ini</span>
@@ -169,10 +161,10 @@
                                         @endif
                                     </span>
                                 </div>
-                                <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
+                                <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between text-sm sm:text-xs">
                                     <span class="text-slate-500 font-medium">Evaluasi Nilai:</span>
                                     @if ($isMentorOnly)
-                                        <span class="text-slate-600 text-xs">100% Nilai Dinas ({{ $nilaiDinas > 0 ? $nilaiDinas : 'Menunggu' }})</span>
+                                        <span class="text-slate-600 text-sm sm:text-xs">100% Nilai Dinas ({{ $nilaiDinas > 0 ? $nilaiDinas : 'Menunggu' }})</span>
                                     @else
                                         @if ($hasEval)
                                             <span class="text-blue-700 font-bold bg-blue-50 px-2.5 py-0.5 rounded-md">{{ $nilaiDpl }}/100</span>
@@ -185,12 +177,12 @@
 
                             <div class="grid {{ !$isMentorOnly ? 'grid-cols-2' : 'grid-cols-1' }} gap-2 pt-1">
                                 <a href="{{ route('lecturer.students.show', $placement->id) }}" 
-                                   class="inline-flex items-center justify-center py-2.5 px-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-bold transition text-center min-h-[44px]">
+                                   class="inline-flex items-center justify-center py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white sm:bg-blue-50 sm:hover:bg-blue-100 sm:text-blue-700 rounded-xl text-base sm:text-xs font-bold transition text-center min-h-[52px] sm:min-h-[44px]">
                                     Detail
                                 </a>
                                 @if (!$isMentorOnly)
                                     <a href="{{ route('lecturer.evaluations.create', $placement->id) }}"
-                                       class="inline-flex items-center justify-center py-2.5 px-3 {{ $hasEval ? 'bg-amber-600 hover:bg-amber-700' : 'bg-blue-600 hover:bg-blue-700' }} text-white rounded-xl text-xs font-bold transition text-center min-h-[44px]">
+                                       class="inline-flex items-center justify-center py-2.5 px-3 {{ $hasEval ? 'bg-amber-600 hover:bg-amber-700' : 'bg-blue-600 hover:bg-blue-700' }} text-white rounded-xl text-base sm:text-xs font-bold transition text-center min-h-[52px] sm:min-h-[44px]">
                                         {{ $hasEval ? 'Ubah Nilai' : 'Input Nilai' }}
                                     </a>
                                 @endif
@@ -231,17 +223,7 @@
                                     $hasEval = ($eval?->nilai_akademik ?? 0) > 0 || ($eval?->nilai_dosen ?? 0) > 0;
                                     $appStatus = $placement->application?->status;
 
-                                    $univ = $eval?->getUniversity();
-                                    if (!$univ && $student) {
-                                        if ($student->university_id) {
-                                            $univ = \App\Models\University::find($student->university_id);
-                                        } else {
-                                            $name = $student->university ?? ($profile?->universitas ?? null);
-                                            if ($name) {
-                                                $univ = \App\Models\University::where('name', 'like', "%{$name}%")->orWhere('code', 'like', "%{$name}%")->first();
-                                            }
-                                        }
-                                    }
+                                    $univ = $eval?->getUniversity() ?? ($student ? app(\App\Services\UniversityResolver::class)->forUser($student) : null);
                                     $scheme = $univ->evaluation_scheme ?? 'mentor_only';
                                     $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
                                     $isMentorOnly = ($scheme === 'mentor_only' || $weightLecturer === 0);

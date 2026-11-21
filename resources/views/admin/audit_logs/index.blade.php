@@ -27,12 +27,12 @@
                             </svg>
                         </div>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama pengguna, target data, detail aksi, atau IP address..." 
-                               class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
+                               class="w-full min-h-[44px] sm:min-h-0 text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
                                style="padding-left: 2.75rem !important; padding-right: 1rem !important; padding-top: 0.6rem !important; padding-bottom: 0.6rem !important;">
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <select name="action" class="w-full py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                        <select name="action" class="w-full min-h-[44px] sm:min-h-0 py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                             <option value="">Semua Jenis Aksi</option>
                             @foreach($actions as $act)
                                 <option value="{{ $act }}" {{ request('action') === $act ? 'selected' : '' }}>
@@ -41,12 +41,12 @@
                             @endforeach
                         </select>
 
-                        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition shrink-0 cursor-pointer">
+                        <button type="submit" class="min-h-[44px] sm:min-h-0 inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition shrink-0 cursor-pointer">
                             Filter
                         </button>
 
                         @if(request()->hasAny(['search', 'action', 'user_id']))
-                            <a href="{{ route('admin.audit_logs.index') }}" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold rounded-xl transition shrink-0">
+                            <a href="{{ route('admin.audit_logs.index') }}" class="min-h-[44px] sm:min-h-0 inline-flex items-center justify-center px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold rounded-xl transition shrink-0">
                                 Reset
                             </a>
                         @endif

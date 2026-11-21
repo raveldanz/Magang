@@ -1,0 +1,8 @@
+[
+  { "key": "mentor-dashboard", "path": "/mentor/dashboard", "role": "mentor.dispusip@surabaya.go.id", "probeNav": true },
+  { "key": "mentor-student-show", "role": "mentor.dispusip@surabaya.go.id", "follow": { "from": "/mentor/dashboard", "pattern": "^/mentor/students/\\d+$" } },
+  { "key": "mentor-logbooks-index", "path": "/mentor/logbooks", "role": "mentor.dispusip@surabaya.go.id" },
+  { "key": "mentor-logbooks-show", "path": "/mentor/logbooks/185", "role": "mentor.dispusip@surabaya.go.id" },
+  { "key": "mentor-evaluation", "role": "mentor.dispusip@surabaya.go.id", "follow": { "from": "/mentor/dashboard", "pattern": "^/mentor/students/\\d+$", "suffix": "/evaluation" } }
+]
+

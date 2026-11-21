@@ -59,8 +59,10 @@
                 </div>
 
                 <!-- Filter Controls: Mahasiswa & Search -->
-                <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-slate-200/80">
-                    <form method="GET" action="{{ route('lecturer.logbooks.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
+                @php $filterAktif = request()->filled('search') || request()->filled('placement_id'); @endphp
+                <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-slate-200/80" x-data="{ buka: {{ $filterAktif ? 'true' : 'false' }} }">
+                    <button type="button" @click="buka = !buka" :aria-expanded="buka.toString()" class="sm:hidden w-full min-h-[48px] inline-flex items-center justify-between gap-2 text-base font-bold text-slate-900"><span>Cari peserta magang</span><svg class="w-5 h-5 transition" :class="buka && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg></button>
+                    <form method="GET" action="{{ route('lecturer.logbooks.index') }}" :class="{ 'hidden': !buka }" class="{{ $filterAktif ? '' : 'hidden' }} sm:!flex mt-3 sm:mt-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
                         @if(request('status'))
                             <input type="hidden" name="status" value="{{ request('status') }}">
                         @endif
@@ -108,23 +110,23 @@
             <!-- One-Click Quick Approval Banner (Jika ada logbook yang telah di-ACC Mentor Lapangan) -->
             @if (($mentorApprovedPendingCount ?? 0) > 0)
                 <div class="bg-gradient-to-r from-emerald-50/90 via-teal-50/70 to-emerald-50/90 border border-emerald-200/90 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 shadow-2xs">
-                    <div class="flex items-center gap-3 min-w-0">
+                    <div class="flex items-start sm:items-center gap-3 min-w-0">
                         <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
                         <div class="min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
-                                <h4 class="text-xs sm:text-sm font-bold text-emerald-950">Validasi Sekali Klik (One-Click Approval)</h4>
-                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-200/80 text-emerald-900">
+                                <h4 class="text-base sm:text-sm font-bold text-emerald-950">Validasi Sekali Klik (One-Click Approval)</h4>
+                                <span class="px-2.5 py-0.5 rounded-full text-sm sm:text-xs font-bold bg-emerald-200/80 text-emerald-900">
                                     {{ $mentorApprovedPendingCount }} Logbook Telah Di-ACC Mentor
                                 </span>
                             </div>
-                            <p class="text-xs text-emerald-900 mt-1">
+                            <p class="hidden sm:block text-xs text-emerald-900 mt-1">
                                 Seluruh entri ini telah diverifikasi oleh Mentor Instansi terkait dan menunggu validasi Pembimbing kampus. Anda dapat menyetujui seluruhnya secara instan.
                             </p>
                         </div>
                     </div>
-                    <form method="POST" action="{{ route('lecturer.logbooks.approve_all_mentor_reviewed') }}">
+                    <form method="POST" action="{{ route('lecturer.logbooks.approve_all_mentor_reviewed') }}" class="w-full sm:w-auto">
                         @csrf
                         @if (request()->filled('placement_id'))
                             <input type="hidden" name="placement_id" value="{{ request('placement_id') }}">
@@ -139,7 +141,7 @@
                                     confirmText: 'Ya, Setujui Semua',
                                     tone: 'emerald'
                                 })"
-                                class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs shrink-0 cursor-pointer active:scale-95">
+                                class="inline-flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto min-h-[52px] sm:min-h-[44px] px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-base sm:text-xs font-bold transition shadow-xs shrink-0 cursor-pointer active:scale-95">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                             <span>Setujui Semua yang Di-ACC Mentor ({{ $mentorApprovedPendingCount }})</span>
                         </button>

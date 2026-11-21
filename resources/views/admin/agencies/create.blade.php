@@ -27,14 +27,14 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Nama Entitas Pemerintah <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" name="government_name" value="{{ old('government_name', 'Pemerintah Kota Surabaya') }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="government_name" value="{{ old('government_name', 'Pemerintah Kota Surabaya') }}" required class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Nama Resmi Dinas / OPD <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" name="agency_name" value="{{ old('agency_name') }}" required placeholder="Contoh: Dinas Kesehatan" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="agency_name" value="{{ old('agency_name') }}" required placeholder="Contoh: Dinas Kesehatan" class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
                     </div>
 
@@ -43,14 +43,14 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Email Resmi Dinas <span class="text-rose-500">*</span>
                             </label>
-                            <input type="email" name="email" value="{{ old('email') }}" required placeholder="dispusip@surabaya.go.id" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                            <input type="email" name="email" value="{{ old('email') }}" required placeholder="dispusip@surabaya.go.id" class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Nomor Telepon / Fax
                             </label>
-                            <input type="text" name="phone" value="{{ old('phone') }}" placeholder="(031) 8707682" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="phone" value="{{ old('phone') }}" placeholder="(031) 8707682" class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
                     </div>
 
@@ -66,21 +66,21 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Nama Kepala Dinas (Penandatangan)
                             </label>
-                            <input type="text" name="signee_name" value="{{ old('signee_name') }}" placeholder="Mia Santi Dewi, S.H., M.Si." class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="signee_name" value="{{ old('signee_name') }}" placeholder="Mia Santi Dewi, S.H., M.Si." class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 NIP Kepala Dinas
                             </label>
-                            <input type="text" name="signee_nip" value="{{ old('signee_nip') }}" placeholder="19720315 199803 2 004" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                            <input type="text" name="signee_nip" value="{{ old('signee_nip') }}" placeholder="19720315 199803 2 004" class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Jabatan Resmi
                             </label>
-                            <input type="text" name="signee_position" value="{{ old('signee_position', 'Kepala Dinas') }}" placeholder="Kepala Dinas Perpustakaan dan Kearsipan" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="signee_position" value="{{ old('signee_position', 'Kepala Dinas') }}" placeholder="Kepala Dinas Perpustakaan dan Kearsipan" class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
                     </div>
 
@@ -89,14 +89,14 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Website Dinas
                             </label>
-                            <input type="url" name="website" value="{{ old('website') }}" placeholder="https://dispusip.surabaya.go.id" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="url" name="website" value="{{ old('website') }}" placeholder="https://dispusip.surabaya.go.id" class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Kota <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" name="city" value="{{ old('city', 'Surabaya') }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="city" value="{{ old('city', 'Surabaya') }}" required class="min-h-[44px] sm:min-h-0 w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
                     </div>
 

@@ -27,6 +27,18 @@
                 </div>
             @endif
 
+            {{-- Pintasan HP: panel keputusan berada di bagian bawah halaman, jadi sediakan lompatan satu ketukan. --}}
+            @php
+                $svStatusValue = $application->status instanceof \BackedEnum ? $application->status->value : $application->status;
+            @endphp
+            @if (in_array($svStatusValue, ['waiting_approval', 'pending'], true))
+                <a href="#panel-keputusan"
+                   class="lg:hidden flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-xs transition">
+                    Ke Panel Keputusan (Setujui / Tolak)
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </a>
+            @endif
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 {{-- KOLOM KIRI (2 KOLOM): DETAIL MAHASISWA, PENEMPATAN, & BERKAS --}}
@@ -40,7 +52,7 @@
                                     {{ strtoupper(substr($application->user?->name ?? 'M', 0, 1)) }}
                                 </div>
                                 <div class="min-w-0">
-                                    <h2 class="text-lg sm:text-xl font-black text-slate-900 truncate">{{ $application->user?->name }}</h2>
+                                    <h2 class="text-lg sm:text-xl font-black text-slate-900 break-words sm:truncate">{{ $application->user?->name }}</h2>
                                     <p class="text-xs text-slate-500">NIM/NIS: <strong class="text-slate-800">{{ $application->user?->studentProfile?->nim ?? '-' }}</strong></p>
                                 </div>
                             </div>
@@ -52,21 +64,41 @@
                         @if($application->group_id && $application->group)
                             <div class="p-4 bg-gradient-to-r from-indigo-50/90 via-blue-50/40 to-white border border-indigo-200 rounded-2xl space-y-2.5 mb-3">
                                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                    <div class="flex items-center gap-2">
+                                    <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
                                         <span class="px-2 py-0.5 rounded bg-indigo-600 text-white font-extrabold text-xs uppercase tracking-wider">Kelompok Magang</span>
                                         <span class="font-extrabold text-sm text-slate-900">{{ $application->group->name }}</span>
                                         <span class="text-xs text-indigo-700 font-bold font-mono">&bull; Kode: {{ $application->group->code }}</span>
                                     </div>
-                                    <div class="flex items-center gap-2">
+                                    <div class="flex flex-wrap items-center gap-2">
                                         <span class="text-xs font-bold text-slate-700">
                                             Posisi: <strong class="text-indigo-800">{{ $application->role_in_group === 'leader' ? 'Ketua Kelompok' : 'Anggota Tim' }}</strong>
                                         </span>
                                         @if($application->group->proposal_letter_path)
-                                            <a href="{{ route('documents.group.proposal', $application->group->id) }}" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-2xs transition">
+                                            <a href="{{ route('documents.group.proposal', $application->group->id) }}" target="_blank" class="inline-flex items-center justify-center gap-1 px-2.5 py-1 min-h-[44px] sm:min-h-0 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-2xs transition">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                                <span>Lihat Proposal</span>
+                                                <span>Lihat Surat Pengantar</span>
                                             </a>
                                         @endif
+                                    </div>
+                                </div>
+                                <!-- Berkas seluruh anggota digabung jadi satu PDF (dibuat di peramban, resources/js/group-documents.js) -->
+                                <div class="pt-2 border-t border-indigo-100 space-y-2">
+                                    <p class="text-sm sm:text-xs font-bold text-slate-700">Periksa berkas seluruh anggota sekaligus (satu PDF):</p>
+                                    <div class="flex flex-col sm:flex-row flex-wrap gap-2">
+                                        <div>
+                                            <a href="{{ route('admin.groups.documents', [$application->group_id, 'cv']) }}" data-group-bundle
+                                               class="w-full sm:w-auto min-h-[48px] sm:min-h-[36px] inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-base sm:text-xs font-bold rounded-xl sm:rounded-lg transition shadow-2xs">
+                                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                                <span>Unduh CV seluruh anggota (PDF)</span>
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <a href="{{ route('admin.groups.documents', [$application->group_id, 'identitas']) }}" data-group-bundle
+                                               class="w-full sm:w-auto min-h-[48px] sm:min-h-[36px] inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-white hover:bg-indigo-50 border-2 border-indigo-600 text-indigo-800 text-base sm:text-xs font-bold rounded-xl sm:rounded-lg transition">
+                                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                                <span>Unduh KTP/KTM seluruh anggota (PDF)</span>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="pt-2 border-t border-indigo-100 text-xs">
@@ -89,34 +121,38 @@
                             </div>
                         @endif
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        <div x-data="{ buka: false }">
+                        <button type="button" @click="buka = !buka" :aria-expanded="buka.toString()" class="sm:hidden w-full min-h-[48px] inline-flex items-center justify-between gap-2 text-base font-bold text-slate-900"><span>Lihat data peserta</span><svg class="w-5 h-5 transition" :class="buka && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg></button>
+
+                        <div class="hidden sm:!grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm mt-3 sm:mt-0" :class="{ 'hidden': !buka }">
                             <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-                                <span class="text-xs text-slate-500 font-bold uppercase block">Asal Kampus/Sekolah</span>
-                                <span class="font-black text-slate-900 text-sm mt-0.5 block">
+                                <span class="text-sm sm:text-xs text-slate-500 font-bold uppercase block">Asal Kampus/Sekolah</span>
+                                <span class="font-black text-slate-900 text-base sm:text-sm mt-0.5 block">
                                     {{ $application->user?->studentProfile?->universitas ?? $application->user?->university ?? '-' }}
                                 </span>
                             </div>
 
                             <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-                                <span class="text-xs text-slate-500 font-bold uppercase block">Program Studi / Jurusan</span>
-                                <span class="font-black text-slate-900 text-sm mt-0.5 block">
+                                <span class="text-sm sm:text-xs text-slate-500 font-bold uppercase block">Program Studi / Jurusan</span>
+                                <span class="font-black text-slate-900 text-base sm:text-sm mt-0.5 block">
                                     {{ $application->user?->studentProfile?->jurusan ?? '-' }}
                                 </span>
                             </div>
 
                             <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-                                <span class="text-xs text-slate-500 font-bold uppercase block">Kontak Telepon / WhatsApp</span>
-                                <span class="font-bold text-slate-800 text-sm mt-0.5 block">
+                                <span class="text-sm sm:text-xs text-slate-500 font-bold uppercase block">Kontak Telepon / WhatsApp</span>
+                                <span class="font-bold text-slate-800 text-base sm:text-sm mt-0.5 block">
                                     {{ $application->user?->studentProfile?->phone ?? $application->user?->phone ?? '-' }}
                                 </span>
                             </div>
 
                             <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-                                <span class="text-xs text-slate-500 font-bold uppercase block">Alamat Email Peserta Magang</span>
-                                <span class="font-bold text-slate-800 text-sm mt-0.5 block truncate">
+                                <span class="text-sm sm:text-xs text-slate-500 font-bold uppercase block">Alamat Email Peserta Magang</span>
+                                <span class="font-bold text-slate-800 text-base sm:text-sm mt-0.5 block truncate">
                                     {{ $application->user?->email }}
                                 </span>
                             </div>
+                        </div>
                         </div>
                     </div>
 
@@ -153,8 +189,8 @@
                         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
                             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between text-xs gap-2">
                                 <div>
-                                    <span class="text-slate-500 font-bold uppercase">Rencana Periode Magang:</span>
-                                    <strong class="text-slate-800 text-sm ml-1">
+                                    <span class="text-slate-500 font-bold uppercase block sm:inline">Rencana Periode Magang:</span>
+                                    <strong class="text-slate-800 text-sm sm:ml-1 block sm:inline mt-0.5 sm:mt-0">
                                         {{ $application->start_date ? \Carbon\Carbon::parse($application->start_date)->isoFormat('D MMMM Y') : '-' }}
                                         s/d 
                                         {{ $application->end_date ? \Carbon\Carbon::parse($application->end_date)->isoFormat('D MMMM Y') : '-' }}
@@ -175,25 +211,25 @@
 
                         <div class="space-y-3">
                             @forelse($application->documents ?? [] as $doc)
-                                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div class="p-2.5 sm:p-3.5 min-h-[44px] sm:min-h-0 rounded-2xl bg-slate-50 border border-slate-200 flex flex-row items-center justify-between gap-3">
                                     <div class="flex items-center gap-3 min-w-0">
-                                        <div class="w-9 h-9 rounded-xl bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs shrink-0">
+                                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs shrink-0">
                                              PDF
                                         </div>
                                         <div class="min-w-0">
-                                            <div class="text-sm font-bold text-slate-900 truncate">{{ $doc->name ?? $doc->type ?? 'Dokumen Pengajuan' }}</div>
-                                            <div class="text-xs text-slate-500">{{ $doc->created_at ? $doc->created_at->diffForHumans() : '' }}</div>
+                                            <div class="text-base sm:text-sm font-bold text-slate-900 break-words sm:truncate" title="{{ $doc->document_type ?? 'Dokumen Pengajuan' }}">{{ $doc->document_type ?? 'Dokumen Pengajuan' }}</div>
+                                            <div class="hidden sm:block text-xs text-slate-500">{{ $doc->created_at ? $doc->created_at->diffForHumans() : '' }}</div>
                                         </div>
                                     </div>
                                     @if($doc->file_path)
-                                        <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" 
-                                           class="w-full sm:w-auto text-center px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-blue-700 font-bold text-xs border border-slate-300 shadow-2xs transition min-h-[38px] flex items-center justify-center">
-                                            Buka Dokumen &rarr;
+                                        <a href="{{ route('documents.application', $doc->id) }}" target="_blank"
+                                           class="shrink-0 sm:shrink w-auto text-center px-5 sm:px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-blue-700 font-bold text-base sm:text-xs border border-slate-300 shadow-2xs transition min-h-[44px] sm:min-h-[38px] flex items-center justify-center">
+                                            <span class="sm:hidden">Buka</span><span class="hidden sm:inline">Buka Dokumen &rarr;</span>
                                         </a>
                                     @endif
                                 </div>
                             @empty
-                                <div class="py-4 text-center text-xs text-slate-600">
+                                <div class="py-4 text-center text-sm sm:text-xs text-slate-600">
                                     Tidak ada lampiran dokumen digital tambahan.
                                 </div>
                             @endforelse
@@ -213,7 +249,7 @@
                     @endphp
 
                     @if($isWaiting)
-                        <div class="bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-xs space-y-5 sticky top-24"
+                        <div id="panel-keputusan" class="bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-xs space-y-5 lg:sticky lg:top-24 scroll-mt-24"
                              x-data="{ openReject: false }">
                             <div class="border-b border-slate-200 pb-3">
                                 <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Tindakan Eksekutif Atasan</span>

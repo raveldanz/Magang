@@ -13,8 +13,8 @@
 @endphp
 
 <div class="space-y-6">
-    <!-- 1. BAGIAN PROYEK INOVASI MAGANG -->
-    <div class="bg-white rounded-2xl p-6 sm:p-7 shadow-xs space-y-4">
+    <!-- 1. BAGIAN PROYEK INOVASI MAGANG (di HP disembunyikan bila belum ada proyek) -->
+    <div class="{{ $projectList->isEmpty() ? 'hidden sm:block' : '' }} bg-white rounded-2xl p-6 sm:p-7 shadow-xs space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
             <div>
                 <h3 class="font-bold text-base text-slate-900">
@@ -225,7 +225,7 @@
                     @method($method)
                 @endif
 
-                <ol class="list-decimal list-inside text-base text-slate-800 space-y-1">
+                <ol class="hidden sm:block list-decimal list-inside text-base text-slate-800 space-y-1">
                     <li>Klik <strong>Buka Naskah Laporan</strong> di atas dan baca isinya.</li>
                     <li>Bila sudah layak, klik <strong>Setujui Laporan</strong>.</li>
                     <li>Bila ada yang kurang, tulis catatan perbaikan lalu klik <strong>Kembalikan untuk Diperbaiki</strong>.</li>

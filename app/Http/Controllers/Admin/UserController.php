@@ -215,7 +215,7 @@ class UserController extends Controller
 
         $users = $query->latest()->paginate(15)->withQueryString();
         $agencies = AgencyProfile::all();
-        $universities = University::all();
+        $universities = University::listable()->get();
         $units = Unit::all();
 
         return view('admin.users.index', compact(
@@ -237,7 +237,7 @@ class UserController extends Controller
     public function create(Request $request)
     {
         $agencies = AgencyProfile::all();
-        $universities = University::all();
+        $universities = University::whereKey($request->query('university_id'))->get();
         $returnTo = $this->safeReturnTo($request->query('return_to', url()->previous())) ?? route('admin.users.index');
 
         return view('admin.users.create', compact('agencies', 'universities', 'returnTo'));
@@ -330,7 +330,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $this->authorizeManageUser($user);
         $agencies = AgencyProfile::all();
-        $universities = University::all();
+        $universities = University::whereKey(old('university_id', $user->university_id))->get();
         $returnTo = $this->safeReturnTo($request->query('return_to', url()->previous())) ?? route('admin.users.index');
 
         return view('admin.users.edit', compact('user', 'agencies', 'universities', 'returnTo'));

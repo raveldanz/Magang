@@ -23,15 +23,10 @@ class ProfileController extends Controller
         $profile = $user->studentProfile ?? new StudentProfile;
         $currentUniversityId = $profile->university_id ?? $user->university_id;
 
-        // Dropdown: kampus terverifikasi + kampus milik mahasiswa ini sendiri (meski masih menunggu verifikasi)
+        // Dropdown memakai pencarian async (institutions.search); halaman hanya memuat pilihan saat ini
+        // (termasuk kampus milik mahasiswa yang masih menunggu verifikasi).
         $universities = University::query()
-            ->where(function ($q) use ($currentUniversityId) {
-                $q->where('is_verified', true);
-                if ($currentUniversityId) {
-                    $q->orWhere('id', $currentUniversityId);
-                }
-            })
-            ->where(fn ($q) => $q->whereNull('code')->orWhere('code', '!=', 'LAINNYA'))
+            ->where('id', $currentUniversityId ?: 0)
             ->orderBy('name', 'asc')
             ->get(['id', 'name', 'code', 'acronym', 'slug', 'is_verified', 'institution_type'])
             // Keterangan kecil di daftar pilihan agar sekolah dan kampus mudah dibedakan
@@ -114,7 +109,14 @@ class ProfileController extends Controller
         $user = Auth::user();
         $isSchool = $this->educationLevel($request) === University::TYPE_SCHOOL;
 
-        // 2. Tambahkan validasi untuk photo
+        // Normalisasi hanya teks yang diketik peserta. Nilai pilihan dan pengenal dipertahankan.
+        foreach (['name', 'faculty', 'fakultas', 'jurusan', 'major', 'alamat', 'address', 'emergency_contact_name'] as $field) {
+            $value = $request->input($field);
+            if (is_string($value)) {
+                $request->merge([$field => mb_strtoupper($value)]);
+            }
+        }
+
         $request->validate([
             'education_level' => 'nullable|in:perguruan_tinggi,sekolah',
             'name' => 'required|string|max:255',
@@ -141,7 +143,6 @@ class ProfileController extends Controller
             'emergency_contact_phone' => 'nullable|string|max:30',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'cv' => 'nullable|mimes:pdf|max:2048',
-            'transkrip' => 'nullable|mimes:pdf|max:2048',
             'id_card' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
         ], [
             'university_id.required' => $isSchool ? 'Silakan pilih sekolah Anda.' : 'Silakan pilih kampus/sekolah Anda.',
@@ -153,10 +154,8 @@ class ProfileController extends Controller
             'custom_university_name.required_if' => 'Nama kampus/sekolah wajib diisi jika memilih "Lainnya".',
             'cv.mimes' => 'File CV harus berformat PDF.',
             'cv.max' => 'Ukuran file CV maksimal 2MB.',
-            'transkrip.mimes' => 'File Transkrip Nilai harus berformat PDF.',
-            'transkrip.max' => 'Ukuran file Transkrip Nilai maksimal 2MB.',
-            'id_card.mimes' => 'File KTM / Kartu Pelajar harus berformat PDF, JPG, JPEG, atau PNG.',
-            'id_card.max' => 'Ukuran file KTM / Kartu Pelajar maksimal 2MB.',
+            'id_card.mimes' => 'File KTP / KTM / Kartu Pelajar harus berformat PDF, JPG, JPEG, atau PNG.',
+            'id_card.max' => 'Ukuran file KTP / KTM / Kartu Pelajar maksimal 2MB.',
         ]);
 
         $university = DB::transaction(fn () => $this->resolveUniversity($request));
@@ -177,7 +176,6 @@ class ProfileController extends Controller
         $currentProfile = $user->studentProfile;
         $photoPath = $currentProfile?->photo;
         $cvPath = $currentProfile?->cv_path;
-        $transcriptPath = $currentProfile?->transcript_path;
         $idCardPath = $currentProfile?->id_card_path;
 
         $storage = app(PrivateDocumentStorage::class);
@@ -194,11 +192,6 @@ class ProfileController extends Controller
         if ($request->hasFile('cv')) {
             $replacedPaths[] = $cvPath;
             $cvPath = $storage->store($request->file('cv'), 'documents/student-profiles');
-        }
-
-        if ($request->hasFile('transkrip')) {
-            $replacedPaths[] = $transcriptPath;
-            $transcriptPath = $storage->store($request->file('transkrip'), 'documents/student-profiles');
         }
 
         if ($request->hasFile('id_card')) {
@@ -225,13 +218,12 @@ class ProfileController extends Controller
                 'emergency_contact_phone' => $request->emergency_contact_phone,
                 'photo' => $photoPath,
                 'cv_path' => $cvPath,
-                'transcript_path' => $transcriptPath,
                 'id_card_path' => $idCardPath,
             ]
         );
 
         // Sinkronkan path berkas personal terbaru ke pengajuan yang sedang berjalan atau menunggu perbaikan
-        if ($request->hasFile('cv') || $request->hasFile('transkrip') || $request->hasFile('id_card')) {
+        if ($request->hasFile('cv') || $request->hasFile('id_card')) {
             $syncableApps = Application::where('user_id', $user->id)
                 ->whereIn('status', ['draft', 'pending', 'waiting_approval', 'rejected'])
                 ->get();
@@ -239,7 +231,6 @@ class ProfileController extends Controller
             foreach ($syncableApps as $app) {
                 $app->update([
                     'cv_path' => $cvPath,
-                    'transcript_path' => $transcriptPath,
                     'id_card_path' => $idCardPath,
                 ]);
 
@@ -247,12 +238,6 @@ class ProfileController extends Controller
                     ApplicationDocument::updateOrCreate(
                         ['application_id' => $app->id, 'document_type' => 'CV'],
                         ['file_path' => $cvPath]
-                    );
-                }
-                if ($transcriptPath) {
-                    ApplicationDocument::updateOrCreate(
-                        ['application_id' => $app->id, 'document_type' => 'Transkrip Nilai'],
-                        ['file_path' => $transcriptPath]
                     );
                 }
                 if ($idCardPath) {

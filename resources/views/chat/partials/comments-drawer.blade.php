@@ -37,7 +37,7 @@
                     </div>
                 </div>
                 <button type="button" @click="closeComments()"
-                        class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 flex items-center justify-center transition"
+                        class="h-11 w-11 sm:h-8 sm:w-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 inline-flex items-center justify-center transition"
                         aria-label="Tutup utas komentar">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
@@ -98,10 +98,10 @@
                           @keydown.enter.exact.prevent="submitComment()"
                           placeholder="Tulis komentar atau tanggapan…"
                           aria-label="Tulis komentar"
-                          class="flex-1 min-w-0 resize-none rounded-xl border-slate-200 text-xs leading-relaxed py-2.5 px-3 max-h-32 focus:border-blue-500 focus:ring-blue-500"></textarea>
+                          class="flex-1 min-w-0 min-h-[44px] sm:min-h-0 resize-none rounded-xl border-slate-200 text-xs leading-relaxed py-2.5 px-3 max-h-32 focus:border-blue-500 focus:ring-blue-500"></textarea>
                 <button type="submit"
                         :disabled="commentsDrawer.sending || !commentsDrawer.draft.trim()"
-                        class="h-10 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                        class="h-11 sm:h-10 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
                         aria-label="Kirim komentar">
                     <span x-show="!commentsDrawer.sending">Kirim</span>
                     <span x-show="commentsDrawer.sending" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>

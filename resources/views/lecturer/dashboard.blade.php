@@ -47,22 +47,22 @@
                 <div class="bg-white rounded-2xl p-5 shadow-xs space-y-4">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-2">
                         <div class="flex items-center gap-2">
-                            <h3 class="text-sm font-bold text-slate-900">Perlu Tindakan Pembimbing <span class="sr-only">Smart Action Center</span></h3>
+                            <h3 class="text-lg sm:text-sm font-bold text-slate-900">Perlu Tindakan Pembimbing <span class="sr-only">Smart Action Center</span></h3>
                             <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800">Prioritas</span>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <!-- Alert 1: Laporan Akhir Pending -->
-                        <div class="p-4 rounded-xl bg-slate-50 flex flex-col justify-between">
+                        <div class="p-4 rounded-xl bg-slate-50 {{ $actionAlerts['pending_reports']->count() > 0 ? 'flex' : 'hidden sm:flex' }} flex-col justify-between">
                             <div>
-                                <div class="flex items-center justify-between text-xs font-semibold text-slate-700">
+                                <div class="flex items-center justify-between gap-2 text-base sm:text-xs font-bold sm:font-semibold text-slate-800 sm:text-slate-700">
                                     <span>Naskah Laporan Akhir</span>
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $actionAlerts['pending_reports']->count() > 0 ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-600' }}">
                                         {{ $actionAlerts['pending_reports']->count() }} Menunggu
                                     </span>
                                 </div>
-                                <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                                <p class="text-base sm:text-xs text-slate-700 sm:text-slate-600 mt-2 leading-relaxed">
                                     @if ($actionAlerts['pending_reports']->count() === 1)
                                         Naskah laporan akhir dari {{ $actionAlerts['pending_reports']->first()->application->user->name ?? 'Peserta Magang' }} menunggu persetujuan Anda.
                                     @elseif ($actionAlerts['pending_reports']->count() > 1)
@@ -73,7 +73,7 @@
                                 </p>
                             </div>
                             @if ($actionAlerts['pending_reports']->count() > 0)
-                                <a href="{{ route('lecturer.students.show', $actionAlerts['pending_reports']->first()->id) }}" class="mt-4 inline-flex items-center justify-center py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition text-center shadow-xs">
+                                <a href="{{ route('lecturer.students.show', $actionAlerts['pending_reports']->first()->id) }}" class="mt-4 min-h-[52px] sm:min-h-0 inline-flex items-center justify-center py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-base sm:text-xs font-bold rounded-xl sm:rounded-lg transition text-center shadow-xs">
                                     {{ $actionAlerts['pending_reports']->count() === 1 ? 'Review Laporan' : 'Review ' . $actionAlerts['pending_reports']->count() . ' Laporan' }}
                                 </a>
                             @else
@@ -85,15 +85,15 @@
                         </div>
 
                         <!-- Alert 2: Mahasiswa Mendekati Akhir Magang & Belum Dinilai -->
-                        <div class="p-4 rounded-xl bg-slate-50 flex flex-col justify-between">
+                        <div class="p-4 rounded-xl bg-slate-50 {{ $actionAlerts['urgent_ending']->count() > 0 ? 'flex' : 'hidden sm:flex' }} flex-col justify-between">
                             <div>
-                                <div class="flex items-center justify-between text-xs font-semibold text-slate-700">
+                                <div class="flex items-center justify-between gap-2 text-base sm:text-xs font-bold sm:font-semibold text-slate-800 sm:text-slate-700">
                                     <span>Evaluasi Akhir</span>
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $actionAlerts['urgent_ending']->count() > 0 ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-600' }}">
                                         {{ $actionAlerts['urgent_ending']->count() }} Belum Lengkap
                                     </span>
                                 </div>
-                                <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                                <p class="text-base sm:text-xs text-slate-700 sm:text-slate-600 mt-2 leading-relaxed">
                                     @if ($actionAlerts['urgent_ending']->count() === 1)
                                         Peserta Magang mendekati akhir magang ({{ $actionAlerts['urgent_ending']->first()->application->user->name ?? 'Peserta Magang' }}), lembar evaluasi belum lengkap untuk penerbitan sertifikat.
                                     @elseif ($actionAlerts['urgent_ending']->count() > 1)
@@ -104,7 +104,7 @@
                                 </p>
                             </div>
                             @if ($actionAlerts['urgent_ending']->count() > 0)
-                                <a href="{{ $actionAlerts['urgent_ending']->count() === 1 ? route('lecturer.students.show', $actionAlerts['urgent_ending']->first()->id) : route('lecturer.monitoring.index', ['tab' => 'active']) }}" class="mt-4 inline-flex items-center justify-center py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition text-center shadow-xs">
+                                <a href="{{ $actionAlerts['urgent_ending']->count() === 1 ? route('lecturer.students.show', $actionAlerts['urgent_ending']->first()->id) : route('lecturer.monitoring.index', ['tab' => 'active']) }}" class="mt-4 min-h-[52px] sm:min-h-0 inline-flex items-center justify-center py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-base sm:text-xs font-bold rounded-xl sm:rounded-lg transition text-center shadow-xs">
                                     {{ $actionAlerts['urgent_ending']->count() === 1 ? 'Tinjau Progres' : 'Tinjau ' . $actionAlerts['urgent_ending']->count() . ' Peserta Magang' }}
                                 </a>
                             @else
@@ -116,15 +116,15 @@
                         </div>
 
                         <!-- Alert 3: Logbook Perlu Review DPL -->
-                        <div class="p-4 rounded-xl bg-slate-50 flex flex-col justify-between">
+                        <div class="p-4 rounded-xl bg-slate-50 {{ $actionAlerts['pending_logbooks_count'] > 0 ? 'flex' : 'hidden sm:flex' }} flex-col justify-between">
                             <div>
-                                <div class="flex items-center justify-between text-xs font-semibold text-slate-700">
+                                <div class="flex items-center justify-between gap-2 text-base sm:text-xs font-bold sm:font-semibold text-slate-800 sm:text-slate-700">
                                     <span>Logbook Harian</span>
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $actionAlerts['pending_logbooks_count'] > 0 ? 'bg-blue-100 text-blue-800' : 'bg-slate-200 text-slate-600' }}">
                                         {{ $actionAlerts['pending_logbooks_count'] }} Menunggu
                                     </span>
                                 </div>
-                                <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                                <p class="text-base sm:text-xs text-slate-700 sm:text-slate-600 mt-2 leading-relaxed">
                                     @if ($actionAlerts['pending_logbooks_count'] > 0)
                                         Catatan aktivitas harian peserta magang menunggu verifikasi Anda.
                                     @else
@@ -133,7 +133,7 @@
                                 </p>
                             </div>
                             @if ($actionAlerts['pending_logbooks_count'] > 0)
-                                <a href="{{ route('lecturer.logbooks.index') }}" class="mt-4 inline-flex items-center justify-center py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition text-center shadow-xs">
+                                <a href="{{ route('lecturer.logbooks.index') }}" class="mt-4 min-h-[52px] sm:min-h-0 inline-flex items-center justify-center py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-base sm:text-xs font-bold rounded-xl sm:rounded-lg transition text-center shadow-xs">
                                     Tinjau Logbook
                                 </a>
                             @else
@@ -151,46 +151,52 @@
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 
                 <!-- Total Mahasiswa Bimbingan -->
-                <div class="bg-white p-5 rounded-2xl shadow-xs flex flex-col justify-between">
+                <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-xs flex flex-col justify-between">
                     <div>
-                        <span class="text-xs font-medium text-slate-500 uppercase tracking-wider block">Total Bimbingan</span>
+                        <span class="text-sm sm:text-xs font-semibold sm:font-medium text-slate-700 sm:text-slate-500 sm:uppercase sm:tracking-wider block">Total Bimbingan</span>
                         <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{{ $stats['total_students'] }}</div>
                     </div>
-                    <span class="text-xs text-slate-400 mt-2 block">Peserta Magang aktif</span>
+                    <span class="hidden sm:block text-xs text-slate-400 mt-2">Peserta Magang aktif</span>
                 </div>
 
                 <!-- Evaluasi Selesai -->
-                <div class="bg-white p-5 rounded-2xl shadow-xs flex flex-col justify-between">
+                <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-xs flex flex-col justify-between">
                     <div>
-                        <span class="text-xs font-medium text-slate-500 uppercase tracking-wider block">Sudah Dinilai</span>
+                        <span class="text-sm sm:text-xs font-semibold sm:font-medium text-slate-700 sm:text-slate-500 sm:uppercase sm:tracking-wider block">Sudah Dinilai</span>
                         <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{{ $stats['total_evaluated'] }}</div>
                     </div>
-                    <span class="text-xs text-slate-400 mt-2 block">Evaluasi tersimpan</span>
+                    <span class="hidden sm:block text-xs text-slate-400 mt-2">Evaluasi tersimpan</span>
                 </div>
 
                 <!-- Laporan Akhir Masuk / Pending -->
-                <div class="bg-white p-5 rounded-2xl shadow-xs flex flex-col justify-between">
+                <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-xs flex flex-col justify-between">
                     <div>
-                        <span class="text-xs font-medium text-slate-500 uppercase tracking-wider block">Laporan ACC</span>
+                        <span class="text-sm sm:text-xs font-semibold sm:font-medium text-slate-700 sm:text-slate-500 sm:uppercase sm:tracking-wider block">Laporan ACC</span>
                         <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{{ $stats['total_reports_approved'] }}</div>
                     </div>
-                    <span class="text-xs text-slate-600 mt-2 block">Disetujui Mentor atau Pembimbing</span>
+                    <span class="hidden sm:block text-xs text-slate-600 mt-2">Disetujui Mentor atau Pembimbing</span>
                 </div>
 
                 <!-- Belum Dinilai -->
-                <div class="bg-white p-5 rounded-2xl shadow-xs flex flex-col justify-between">
+                <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-xs flex flex-col justify-between">
                     <div>
-                        <span class="text-xs font-medium text-slate-500 uppercase tracking-wider block">Belum Dinilai</span>
+                        <span class="text-sm sm:text-xs font-semibold sm:font-medium text-slate-700 sm:text-slate-500 sm:uppercase sm:tracking-wider block">Belum Dinilai</span>
                         <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{{ $stats['total_pending_eval'] }}</div>
                     </div>
-                    <span class="text-xs text-slate-400 mt-2 block">Menunggu evaluasi</span>
+                    <span class="hidden sm:block text-xs text-slate-400 mt-2">Menunggu evaluasi</span>
                 </div>
 
             </div>
 
             <!-- 2. FILTER & SEARCH (Clean Minimalist Form) -->
-            <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs">
-                <form method="GET" action="{{ route('lecturer.dashboard') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
+            @php $hasDashFilter = request()->hasAny(['search', 'unit_id', 'agency_id', 'report_status']); @endphp
+            <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs" x-data="{ cari: @js($hasDashFilter) }">
+                <button type="button" @click="cari = !cari" :aria-expanded="cari.toString()"
+                        class="sm:hidden w-full min-h-[48px] inline-flex items-center justify-between gap-2 text-base font-bold text-slate-900">
+                    <span>Cari atau saring peserta</span>
+                    <svg class="w-5 h-5 transition" :class="cari && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <form method="GET" action="{{ route('lecturer.dashboard') }}" :class="{ 'hidden': !cari }" class="{{ $hasDashFilter ? '' : 'hidden' }} sm:!flex mt-3 sm:mt-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
                     <div class="relative flex-1 w-full">
                         <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400 pl-3.5">
                             <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -198,11 +204,11 @@
                             </svg>
                         </div>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama peserta magang, NIM/NIS, atau program studi..." 
-                               class="w-full text-xs sm:text-sm bg-white border border-slate-200 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl pl-10 pr-3.5 py-2.5 transition shadow-2xs">
+                               class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm bg-white border border-slate-200 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl pl-10 pr-3.5 py-2.5 transition shadow-2xs">
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
-                        <select name="report_status" class="py-2.5 px-3.5 text-xs sm:text-sm bg-white border border-slate-200 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl font-medium w-full sm:w-48 sm:max-w-xs truncate transition shadow-2xs">
+                        <select name="report_status" class="min-h-[44px] sm:min-h-0 py-2.5 px-3.5 text-xs sm:text-sm bg-white border border-slate-200 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl font-medium w-full sm:w-48 sm:max-w-xs truncate transition shadow-2xs">
                             <option value="">Semua Status Laporan</option>
                             <option value="pending" {{ request('report_status') == 'pending' ? 'selected' : '' }}>Menunggu Review (Pending)</option>
                             <option value="revision" {{ request('report_status') == 'revision' ? 'selected' : '' }}>Perlu Revisi</option>
@@ -210,7 +216,7 @@
                             <option value="none" {{ request('report_status') == 'none' ? 'selected' : '' }}>Belum Unggah Laporan</option>
                         </select>
 
-                        <select name="unit_id" class="py-2.5 px-3.5 text-xs sm:text-sm bg-white border border-slate-200 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl font-medium w-full sm:w-48 sm:max-w-xs truncate transition shadow-2xs">
+                        <select name="unit_id" class="min-h-[44px] sm:min-h-0 py-2.5 px-3.5 text-xs sm:text-sm bg-white border border-slate-200 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl font-medium w-full sm:w-48 sm:max-w-xs truncate transition shadow-2xs">
                             <option value="">Semua Bidang / Divisi</option>
                             @foreach($units ?? [] as $u)
                                 <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
@@ -220,12 +226,12 @@
                         </select>
 
                         <div class="flex items-center gap-2 col-span-1 sm:col-span-2 sm:flex-initial shrink-0">
-                            <button type="submit" class="flex-1 sm:flex-initial px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition cursor-pointer shrink-0">
+                            <button type="submit" class="flex-1 sm:flex-initial min-h-[44px] sm:min-h-0 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition cursor-pointer shrink-0">
                                 Filter
                             </button>
 
                             @if(request()->hasAny(['search', 'unit_id', 'agency_id', 'report_status']))
-                                <a href="{{ route('lecturer.dashboard') }}" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition text-center shrink-0">
+                                <a href="{{ route('lecturer.dashboard') }}" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition text-center shrink-0">
                                     Reset
                                 </a>
                             @endif
@@ -256,17 +262,7 @@
                             $finalReport = $p->finalreport;
                             $logbooksCount = $p->logbooks->count();
 
-                            $univ = $eval?->getUniversity();
-                            if (!$univ && $student) {
-                                if ($student->university_id) {
-                                    $univ = \App\Models\University::find($student->university_id);
-                                } else {
-                                    $name = $student->university ?? ($profile?->universitas ?? null);
-                                    if ($name) {
-                                        $univ = \App\Models\University::where('name', 'like', "%{$name}%")->orWhere('code', 'like', "%{$name}%")->first();
-                                    }
-                                }
-                            }
+                            $univ = $eval?->getUniversity() ?? ($student ? app(\App\Services\UniversityResolver::class)->forUser($student) : null);
                             $scheme = $univ->evaluation_scheme ?? 'mentor_only';
                             $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
                             $isMentorOnly = ($scheme === 'mentor_only' || $weightLecturer === 0);
@@ -281,7 +277,7 @@
                                         {{ strtoupper(substr($student->name ?? 'M', 0, 2)) }}
                                     </div>
                                     <div class="min-w-0">
-                                        <p class="font-bold text-sm text-slate-900 leading-snug truncate">{{ $student->name ?? '-' }}</p>
+                                        <p class="font-bold text-base sm:text-sm text-slate-900 leading-snug break-words sm:truncate" title="{{ $student->name ?? '-' }}">{{ $student->name ?? '-' }}</p>
                                         @if($p->application?->group_id && $p->application?->group)
                                             <div class="mt-0.5">
                                                 <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
@@ -289,7 +285,7 @@
                                                 </span>
                                             </div>
                                         @endif
-                                        <p class="text-xs text-slate-500 mt-0.5">{{ $profile?->nim ?? '-' }} &bull; {{ $profile?->jurusan ?? '-' }}</p>
+                                        <p class="text-sm sm:text-xs text-slate-600 sm:text-slate-500 mt-0.5">{{ $profile?->nim ?? '-' }}<span class="hidden sm:inline"> &bull; {{ $profile?->jurusan ?? '-' }}</span></p>
                                     </div>
                                 </div>
                                 <div class="shrink-0">
@@ -299,16 +295,16 @@
                                 </div>
                             </div>
 
-                            <div class="bg-slate-50 p-3.5 rounded-xl text-xs space-y-2">
-                                <div class="text-slate-600">
+                            <div class="bg-slate-50 p-3.5 rounded-xl text-sm sm:text-xs space-y-2">
+                                <div class="hidden sm:block text-slate-600">
                                     <span class="text-slate-500 font-medium">Instansi:</span> 
                                     <span class="font-semibold text-slate-800">{{ $agency->agency_name ?? '-' }} ({{ $unit->name ?? '-' }})</span>
                                 </div>
-                                <div class="text-slate-600">
+                                <div class="hidden sm:block text-slate-600">
                                     <span class="text-slate-500 font-medium">Mentor:</span> 
                                     <span class="font-semibold text-slate-800">{{ $mentor->name ?? 'Belum Ditugaskan' }}</span>
                                 </div>
-                                <div class="flex items-center justify-between pt-2 border-t border-slate-200/60 text-xs">
+                                <div class="flex flex-wrap items-center justify-between gap-2 sm:pt-2 sm:border-t border-slate-200/60 text-sm sm:text-xs">
                                     <span class="text-slate-500">Laporan: 
                                         @if(!$finalReport)
                                             <span class="text-slate-400 italic">Belum Unggah</span>
@@ -336,7 +332,7 @@
 
                             <div>
                                 <a href="{{ route('lecturer.students.show', $p->id) }}" 
-                                   class="inline-flex items-center justify-center w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs text-center min-h-[38px]">
+                                   class="inline-flex items-center justify-center w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-base sm:text-xs font-bold rounded-xl transition shadow-xs text-center min-h-[52px] sm:min-h-[38px]">
                                     {{ $isMentorOnly ? 'Detail Peserta Magang' : 'Detail & Nilai' }}
                                 </a>
                             </div>
@@ -375,17 +371,7 @@
                                     $finalReport = $p->finalreport;
                                     $logbooksCount = $p->logbooks->count();
 
-                                    $univ = $eval?->getUniversity();
-                                    if (!$univ && $student) {
-                                        if ($student->university_id) {
-                                            $univ = \App\Models\University::find($student->university_id);
-                                        } else {
-                                            $name = $student->university ?? ($profile?->universitas ?? null);
-                                            if ($name) {
-                                                $univ = \App\Models\University::where('name', 'like', "%{$name}%")->orWhere('code', 'like', "%{$name}%")->first();
-                                            }
-                                        }
-                                    }
+                                    $univ = $eval?->getUniversity() ?? ($student ? app(\App\Services\UniversityResolver::class)->forUser($student) : null);
                                     $scheme = $univ->evaluation_scheme ?? 'mentor_only';
                                     $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
                                     $isMentorOnly = ($scheme === 'mentor_only' || $weightLecturer === 0);

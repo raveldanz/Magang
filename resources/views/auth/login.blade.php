@@ -27,9 +27,9 @@
         </p>
     </div>
 
-    <div class="bg-white py-8 px-6 shadow-xl shadow-slate-200/60 rounded-3xl border border-slate-100 sm:px-10">
+    <div class="bg-white py-7 px-5 sm:py-8 sm:px-9 shadow-xl shadow-slate-200/60 rounded-3xl border border-slate-200/80">
         <!-- Session Status -->
-        <x-auth-session-status class="mb-4" :status="session('status')" />
+        <x-auth-session-status class="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 px-3.5 py-2.5 text-emerald-800" :status="session('status')" />
 
         <form method="POST" action="{{ route('login') }}" class="space-y-4">
             @csrf
@@ -39,28 +39,28 @@
                 <x-input-label for="email" value="{{ __('Email Resmi / Akun') }}"
                     class="font-bold text-slate-700 text-xs uppercase tracking-wider" />
                 <input id="email"
-                    class="block mt-1.5 w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm shadow-2xs py-2.5 px-3.5 transition"
+                    class="block mt-1.5 w-full min-h-[44px] rounded-xl bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 text-sm shadow-2xs py-2.5 px-3.5 transition"
                     type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username"
-                    placeholder="nama@surabaya.go.id / email pendaftar" />
+                    placeholder="nama@surabaya.go.id / email akun" />
                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
 
             <!-- Password -->
             <div>
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between gap-2">
                     <x-input-label for="password" value="{{ __('Kata Sandi') }}"
                         class="font-bold text-slate-700 text-xs uppercase tracking-wider" />
                     @if (Route::has('password.request'))
-                        <a class="text-xs text-blue-600 hover:text-blue-800 font-semibold transition"
+                        <a class="inline-flex items-center min-h-[44px] sm:min-h-[28px] px-1 -mr-1 text-xs text-blue-600 hover:text-blue-800 font-semibold transition"
                             href="{{ route('password.request') }}">
                             {{ __('Lupa password?') }}
                         </a>
                     @endif
                 </div>
 
-                <div class="relative mt-1.5" x-data="{ show: false }">
+                <div class="relative mt-1" x-data="{ show: false }">
                     <input id="password"
-                        class="block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm shadow-2xs py-2.5 pl-3.5 pr-10 transition"
+                        class="block w-full min-h-[44px] rounded-xl bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 text-sm shadow-2xs py-2.5 pl-3.5 pr-11 transition"
                         :type="show ? 'text' : 'password'"
                         type="password"
                         name="password"
@@ -69,7 +69,7 @@
                         placeholder="••••••••" />
                     <button type="button"
                         @click="show = !show"
-                        class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none transition cursor-pointer"
+                        class="absolute inset-y-0 right-0 w-11 flex items-center justify-center text-slate-500 hover:text-slate-700 focus:outline-none transition cursor-pointer"
                         :aria-label="show ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'"
                         :title="show ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'"
                         tabindex="-1">
@@ -85,20 +85,20 @@
                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
             </div>
             <!-- Remember Me Block -->
-            <div class="flex items-center mt-4">
-                <label for="remember_me" class="inline-flex items-center cursor-pointer select-none">
+            <div class="flex items-center mt-2">
+                <label for="remember_me" class="inline-flex items-center min-h-[44px] sm:min-h-[38px] cursor-pointer select-none">
                     <input id="remember_me" type="checkbox" name="remember"
                         class="w-4 h-4 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 focus:ring-2 transition cursor-pointer">
-                    <span class="ms-2 text-xs text-slate-600 font-medium">
+                    <span class="ms-2.5 text-xs sm:text-sm text-slate-600 font-medium">
                         Ingat saya di perangkat ini
                     </span>
                 </label>
             </div>
 
             <!-- Submit Button -->
-            <div class="pt-2">
+            <div class="pt-1">
                 <button type="submit"
-                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-md shadow-blue-600/20 text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out uppercase tracking-wider cursor-pointer">
+                    class="w-full min-h-[46px] sm:min-h-[44px] flex items-center justify-center py-3 px-4 border border-transparent rounded-xl shadow-md shadow-blue-600/20 text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out uppercase tracking-wider cursor-pointer">
                     {{ __('Masuk ke Portal') }}
                 </button>
             </div>
@@ -106,7 +106,7 @@
 
         @if (Route::has('register'))
             <div class="mt-6 pt-5 border-t border-slate-100 text-center">
-                <p class="text-xs text-slate-500">
+                <p class="text-xs sm:text-sm text-slate-600">
                     Belum punya akun?
                     <a href="{{ route('register') }}" class="font-bold text-blue-600 hover:text-blue-800 ml-1">
                         Daftar sekarang
@@ -117,7 +117,7 @@
     </div>
 
     <!-- Footer Tagline -->
-    <p class="text-center text-xs text-slate-400 mt-6">
+    <p class="text-center text-xs text-slate-500 mt-6">
         &copy; {{ date('Y') }} Dinas Perpustakaan dan Kearsipan Kota Surabaya. Hak Cipta Dilindungi.
     </p>
 </x-guest-layout>

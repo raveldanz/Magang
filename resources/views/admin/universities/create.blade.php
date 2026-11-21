@@ -1,7 +1,7 @@
 ﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <a href="{{ route('admin.universities.index') }}" class="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 transition flex items-center justify-center shadow-xs" title="Kembali">
+            <a href="{{ route('admin.universities.index') }}" class="w-11 h-11 sm:w-auto sm:h-auto p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 transition flex items-center justify-center shadow-xs" title="Kembali">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
@@ -72,7 +72,7 @@
                                x-model="searchQuery"
                                @input.debounce.300ms="searchMaster()"
                                placeholder="Ketik nama kampus atau singkatan di sini..."
-                               class="w-full text-xs sm:text-sm border-blue-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-white shadow-2xs placeholder-slate-400">
+                               class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-blue-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-white shadow-2xs placeholder-slate-400">
                         <div x-show="loading" class="absolute right-3 top-2.5 text-xs text-blue-600 font-medium">
                             Mencari...
                         </div>
@@ -84,7 +84,7 @@
                             <template x-for="item in searchResults" :key="item.name">
                                 <button type="button"
                                         @click="pickCampus(item)"
-                                        class="w-full text-left px-4 py-2.5 hover:bg-blue-50 transition flex items-center justify-between gap-3 text-xs cursor-pointer">
+                                        class="w-full min-h-[44px] sm:min-h-0 text-left px-4 py-2.5 hover:bg-blue-50 transition flex items-center justify-between gap-3 text-xs cursor-pointer">
                                     <div class="min-w-0">
                                         <div class="font-bold text-slate-800" x-text="item.name"></div>
                                         <div class="text-[11px] text-slate-500" x-text="`${item.city || '-'} • ${item.province || '-'}`"></div>
@@ -98,7 +98,7 @@
                     <template x-if="selectedMaster">
                         <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-center justify-between">
                             <span class="font-medium">Data terisi otomatis dari: <strong x-text="selectedMaster.name"></strong></span>
-                            <button type="button" @click="selectedMaster = null" class="text-emerald-700 hover:text-emerald-900 font-bold text-[11px]">Batal</button>
+                            <button type="button" @click="selectedMaster = null" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-3 sm:px-0 text-emerald-700 hover:text-emerald-900 font-bold text-[11px]">Batal</button>
                         </div>
                     </template>
                 </div>
@@ -111,14 +111,14 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Nama Resmi Kampus/Sekolah <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" name="name" x-model="name" required placeholder="Contoh: Universitas Airlangga" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="name" x-model="name" required placeholder="Contoh: Universitas Airlangga" class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Kode / Singkatan <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" name="code" x-model="code" required placeholder="UNAIR" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono uppercase">
+                            <input type="text" name="code" x-model="code" required placeholder="UNAIR" class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono uppercase">
                         </div>
                     </div>
 
@@ -127,14 +127,14 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Email Resmi Kampus
                             </label>
-                            <input type="email" name="email" value="{{ old('email') }}" placeholder="humas@unair.ac.id" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                            <input type="email" name="email" value="{{ old('email') }}" placeholder="humas@unair.ac.id" class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Nomor Telepon / Fax
                             </label>
-                            <input type="text" name="phone" value="{{ old('phone') }}" placeholder="(031) 5914042" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="phone" value="{{ old('phone') }}" placeholder="(031) 5914042" class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
                     </div>
 
@@ -150,21 +150,21 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Nama Rektor / Pimpinan (PIC)
                             </label>
-                            <input type="text" name="pic_name" value="{{ old('pic_name') }}" placeholder="Prof. Dr. Moh. Nasih, SE., MT., Ak" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="pic_name" value="{{ old('pic_name') }}" placeholder="Prof. Dr. Moh. Nasih, SE., MT., Ak" class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 NIP / NIDN Rektor
                             </label>
-                            <input type="text" name="pic_nip" value="{{ old('pic_nip') }}" placeholder="19650806 199203 1 002" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                            <input type="text" name="pic_nip" value="{{ old('pic_nip') }}" placeholder="19650806 199203 1 002" class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Jabatan Penandatangan
                             </label>
-                            <input type="text" name="pic_position" value="{{ old('pic_position', 'Rektor') }}" placeholder="Rektor..." class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <input type="text" name="pic_position" value="{{ old('pic_position', 'Rektor') }}" placeholder="Rektor..." class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
                     </div>
 
@@ -193,10 +193,10 @@
                     </div>
 
                     <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3 pt-6 border-t border-gray-100">
-                        <a href="{{ route('admin.universities.index') }}" class="w-full sm:w-auto px-5 py-3 sm:py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition text-center justify-center flex items-center">
+                        <a href="{{ route('admin.universities.index') }}" class="w-full sm:w-auto min-h-[44px] sm:min-h-0 px-5 py-3 sm:py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition text-center justify-center flex items-center">
                             Batal
                         </a>
-                        <button type="submit" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer text-center justify-center flex items-center">
+                        <button type="submit" class="w-full sm:w-auto min-h-[44px] sm:min-h-0 px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer text-center justify-center flex items-center">
                             Daftarkan Institusi
                         </button>
                     </div>

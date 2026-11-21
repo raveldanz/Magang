@@ -62,7 +62,7 @@ x-cloak>
              x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
              x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
              @click.outside="closeFromOutside()"
-             class="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-md w-full overflow-hidden p-6 sm:p-7 space-y-5 text-left relative">
+             class="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-100 max-w-[calc(100vw-1.5rem)] sm:max-w-md w-full max-h-[90vh] overflow-y-auto p-5 sm:p-7 space-y-5 text-left relative">
             
             <!-- Hidden Form to execute POST reset -->
             <form x-ref="resetForm" :action="action" method="POST" class="hidden">
@@ -82,7 +82,7 @@ x-cloak>
                         Tindakan ini mengganti kata sandi akun dengan kata sandi sementara acak. Pemilik akun wajib menggantinya saat masuk.
                     </p>
                 </div>
-                <button type="button" @click="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg transition" title="Tutup">
+                <button type="button" @click="closeModal()" class="text-slate-400 hover:text-slate-700 hover:bg-slate-100 min-w-[44px] min-h-[44px] sm:min-w-[36px] sm:min-h-[36px] flex items-center justify-center rounded-xl transition cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
@@ -116,13 +116,13 @@ x-cloak>
                 <button type="button" 
                         x-ref="cancelBtn"
                         @click="closeModal()" 
-                        class="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition text-center cursor-pointer">
+                        class="w-full sm:w-auto min-h-[44px] sm:min-h-[40px] px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold rounded-xl transition text-center cursor-pointer">
                     Batal
                 </button>
                 <button type="button" 
                         :disabled="!confirmed" 
                         @click="submitReset()" 
-                        class="w-full sm:w-auto px-6 py-2.5 text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-sm"
+                        class="w-full sm:w-auto min-h-[44px] sm:min-h-[40px] px-6 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-xs"
                         :class="confirmed 
                             ? 'bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white cursor-pointer shadow-amber-500/20' 
                             : 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300/60'">

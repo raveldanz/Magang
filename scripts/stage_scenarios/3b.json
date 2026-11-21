@@ -1,0 +1,21 @@
+﻿[
+  { "key": "universities-index", "path": "/admin/universities", "role": "admin@surabaya.go.id" },
+  { "key": "universities-create", "path": "/admin/universities/create", "role": "admin@surabaya.go.id" },
+  { "key": "universities-show", "role": "admin@surabaya.go.id", "follow": { "from": "/admin/universities", "pattern": "^/admin/universities/\\d+$" } },
+  { "key": "universities-edit", "role": "admin@surabaya.go.id", "follow": { "from": "/admin/universities", "pattern": "^/admin/universities/\\d+$", "suffix": "/edit" } },
+  { "key": "users-index", "path": "/admin/users", "role": "admin@surabaya.go.id" },
+  { "key": "users-create", "path": "/admin/users/create", "role": "admin@surabaya.go.id" },
+  { "key": "users-edit", "role": "admin@surabaya.go.id", "follow": { "from": "/admin/users", "pattern": "^/admin/users/\\d+/edit" } },
+  { "key": "mentors-index", "path": "/admin/mentors", "role": "admin.dispusip@surabaya.go.id" },
+  { "key": "mentors-create", "path": "/admin/mentors/create", "role": "admin.dispusip@surabaya.go.id" },
+  { "key": "mentors-edit", "role": "admin.dispusip@surabaya.go.id", "follow": { "from": "/admin/mentors", "pattern": "^/admin/mentors/\\d+/edit" } },
+  { "key": "logbooks-index", "path": "/admin/logbooks", "role": "admin.dispusip@surabaya.go.id" },
+  { "key": "logbooks-show", "path": "/admin/logbooks/66", "role": "admin.dispusip@surabaya.go.id" },
+  { "key": "certificates-index", "path": "/admin/certificates", "role": "admin.dispusip@surabaya.go.id" },
+  { "key": "certificates-revision", "role": "admin.dispusip@surabaya.go.id", "follow": { "from": "/admin/certificates", "pattern": "^/admin/certificates/\\d+/revision$" } },
+  { "key": "feedbacks-index", "path": "/admin/feedbacks", "role": "admin@surabaya.go.id" },
+  { "key": "feedbacks-show", "role": "admin@surabaya.go.id", "follow": { "from": "/admin/feedbacks", "pattern": "^/admin/feedbacks/\\d+$" } },
+  { "key": "audit-logs", "path": "/admin/audit-logs", "role": "admin@surabaya.go.id" },
+  { "key": "notifications", "path": "/admin/notifications", "role": "admin@surabaya.go.id" }
+]
+

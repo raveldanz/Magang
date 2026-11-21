@@ -439,13 +439,13 @@
 
                         @if($project->source_code_path)
                             <!-- Kartu File ZIP yang sudah terunggah -->
-                            <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-xl flex items-center justify-between gap-3 text-xs mb-1">
+                            <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-xl flex flex-col items-stretch sm:flex-row sm:items-center justify-between gap-3 text-xs mb-1">
                                 <div class="flex items-center gap-2.5 min-w-0">
                                     <div class="p-2 bg-amber-100 text-amber-800 rounded-lg shrink-0">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
                                     </div>
                                     <div class="min-w-0">
-                                        <span class="font-bold text-slate-900 block truncate">{{ $project->source_code_name ?? 'Berkas_Sumber_Proyek.zip' }}</span>
+                                        <span class="font-bold text-slate-900 block break-words sm:truncate">{{ $project->source_code_name ?? 'Berkas_Sumber_Proyek.zip' }}</span>
                                         <span class="text-[11px] text-slate-500">{{ $project->source_code_size ?? 'Tersedia' }} &bull; Sudah terunggah</span>
                                     </div>
                                 </div>
@@ -460,7 +460,7 @@
                         @endif
 
                         <input type="file" data-max-kb="51200" name="source_code" accept=".zip,.rar,.7z,.tar,.gz"
-                               class="w-full text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-dashed border-slate-300 rounded-xl p-2 bg-white">
+                               class="w-full min-w-0 text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-dashed border-slate-300 rounded-xl p-2 bg-white">
                     </div>
                 </div>
 
@@ -485,7 +485,7 @@
                         </p>
                         <input type="file" data-max-kb="4096" name="photo" id="coverPhotoInput" accept="image/jpeg,image/png,image/jpg,image/webp" 
                                onchange="previewCoverImage(this)"
-                               class="w-full text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                               class="w-full min-w-0 text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
 
                         <!-- Preview Container Proporsional & Terkendali -->
                         <div class="mt-3 w-full aspect-video max-h-72 rounded-2xl bg-slate-950/5 border border-slate-200 overflow-hidden flex items-center justify-center p-2 relative">
@@ -521,7 +521,7 @@
                             Unggah berkas tangkapan layar baru jika ingin memperbarui / menambah koleksi (Maksimal 5 gambar, format JPG, PNG, WebP).
                         </p>
                         <input type="file" data-max-kb="4096" name="screenshots[]" multiple accept="image/jpeg,image/png,image/jpg,image/webp" 
-                               class="w-full text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-200 file:text-slate-800 hover:file:bg-slate-300">
+                               class="w-full min-w-0 text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-200 file:text-slate-800 hover:file:bg-slate-300">
                     </div>
                 </div>
 
@@ -572,7 +572,7 @@
                             Unggah foto kegiatan baru untuk memperbarui dokumentasi di lapangan (Maksimal 5 foto, masing-masing maks 4 MB).
                         </p>
                         <input type="file" data-max-kb="4096" name="community_photos[]" multiple accept="image/jpeg,image/png,image/jpg,image/webp" 
-                               class="w-full text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-100 file:text-emerald-800 hover:file:bg-emerald-200">
+                               class="w-full min-w-0 text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-100 file:text-emerald-800 hover:file:bg-emerald-200">
                     </div>
 
                     <!-- Tautan Video Dokumentasi YouTube / Drive -->
@@ -633,7 +633,7 @@
                             Lampirkan buku panduan teknis (*manual book*), SOP penggunaan sistem, atau laporan teknis inovasi (Format: PDF, DOC, DOCX. Maksimal 10 berkas, masing-masing maks 10 MB).
                         </p>
                         <input type="file" data-max-kb="10240" name="documents[]" multiple accept=".pdf,.doc,.docx,application/pdf" 
-                               class="w-full text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-800 hover:file:bg-blue-200">
+                               class="w-full min-w-0 text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-800 hover:file:bg-blue-200">
                     </div>
                 </div>
 

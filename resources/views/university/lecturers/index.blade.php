@@ -12,7 +12,7 @@
 
             <button type="button" 
                     @click="$dispatch('open-create-lecturer-modal')"
-                    class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
+                    class="w-full sm:w-auto min-h-[44px] sm:min-h-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                 </svg>
@@ -60,15 +60,15 @@
                         </span>
                         <input type="text" name="search" value="{{ request('search') }}" 
                                placeholder="Cari nama atau email pembimbing..."
-                               class="w-full pl-9 pr-3 py-2 text-xs sm:text-sm border-slate-200 bg-slate-50 focus:bg-white rounded-xl focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full min-h-[44px] sm:min-h-0 pl-9 pr-3 py-2 text-xs sm:text-sm border-slate-200 bg-slate-50 focus:bg-white rounded-xl focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
                     <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <button type="submit" class="flex-1 sm:flex-initial px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
+                        <button type="submit" class="flex-1 sm:flex-initial min-h-[44px] sm:min-h-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
                             Cari
                         </button>
                         @if(request('search'))
-                            <a href="{{ route('university.lecturers.index') }}" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition text-center cursor-pointer">
+                            <a href="{{ route('university.lecturers.index') }}" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition text-center cursor-pointer">
                                 Reset
                             </a>
                         @endif
@@ -134,13 +134,13 @@
                             <!-- Baris 1: Nama, NIDN, Email, Status -->
                             <div class="flex items-start justify-between gap-2">
                                 <div class="min-w-0 flex-1">
-                                    <p class="font-bold text-xs text-slate-900 truncate leading-snug">
+                                    <p class="font-bold text-xs text-slate-900 break-words sm:truncate leading-snug" title="{{ $l->name }}">
                                         {{ $l->name }}
                                     </p>
                                     <p class="text-[10px] text-slate-400 font-mono mt-0.5">
                                         NIDN: {{ $l->studentProfile?->nim ?? ($l->nidn ?? '-') }}
                                     </p>
-                                    <p class="text-[10px] text-slate-400 font-mono truncate">
+                                    <p class="text-[10px] text-slate-400 font-mono break-all sm:truncate" title="{{ $l->email }}">
                                         {{ $l->email }}
                                     </p>
                                 </div>
@@ -168,7 +168,7 @@
                                                 nidn: @js((string) ($l->studentProfile?->nim ?? ($l->nidn ?? ''))), 
                                                 status: '{{ $l->status ?? 'active' }}' 
                                             }; showEditModal = true"
-                                            class="inline-flex items-center justify-center h-6 px-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-[10px] rounded-lg transition">
+                                            class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 h-6 px-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-[10px] rounded-lg transition">
                                         Edit
                                     </button>
 
@@ -179,7 +179,7 @@
                                                 email: @js($l->email),
                                                 role: 'Pembimbing'
                                             })"
-                                                class="inline-flex items-center justify-center h-6 px-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-[10px] rounded-lg transition">
+                                                class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 h-6 px-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-[10px] rounded-lg transition">
                                             Reset
                                         </button>
 
@@ -190,7 +190,7 @@
                                                 name: @js((string) ($l->name)),
                                                 desc: 'NIDN/NIP: {{ $l->nidn ?? '-' }} &bull; Email: {{ $l->email }}'
                                             })"
-                                            class="inline-flex items-center justify-center h-6 px-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-[10px] rounded-lg transition cursor-pointer">
+                                            class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 h-6 px-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-[10px] rounded-lg transition cursor-pointer">
                                         Hapus
                                     </button>
                                 </div>
@@ -306,7 +306,7 @@
                         <h3 class="font-bold text-sm sm:text-base text-slate-900">Tambah Pembimbing Baru</h3>
                         <p class="text-[11px] text-slate-400">Daftarkan pembimbing kampus</p>
                     </div>
-                    <button type="button" @click="showCreateModal = false" class="text-slate-400 hover:text-slate-600 text-sm font-bold">✕</button>
+                    <button type="button" @click="showCreateModal = false" class="inline-flex items-center justify-center h-11 w-11 sm:h-auto sm:w-auto text-slate-400 hover:text-slate-600 text-sm font-bold">✕</button>
                 </div>
 
                 <form method="POST" action="{{ route('university.lecturers.store') }}" class="space-y-3.5">
@@ -315,29 +315,29 @@
                         <label class="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
                             Nama Lengkap & Gelar Pembimbing <span class="text-rose-500">*</span>
                         </label>
-                        <input type="text" name="name" value="{{ old('name') }}" required placeholder="Contoh: Dr. Ir. Ahmad Sudrajat, M.Kom." class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500">
+                        <input type="text" name="name" value="{{ old('name') }}" required placeholder="Contoh: Dr. Ir. Ahmad Sudrajat, M.Kom." class="w-full min-h-[44px] sm:min-h-0 text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
                     <div>
                         <label class="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
                             NIDN / NIP (Opsional)
                         </label>
-                        <input type="text" name="nidn" value="{{ old('nidn') }}" placeholder="Contoh: 0712058401" class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 font-mono">
+                        <input type="text" name="nidn" value="{{ old('nidn') }}" placeholder="Contoh: 0712058401" class="w-full min-h-[44px] sm:min-h-0 text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 font-mono">
                     </div>
 
                     <div>
                         <label class="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
                             Email Resmi Kampus / Akun Login <span class="text-rose-500">*</span>
                         </label>
-                        <input type="email" name="email" value="{{ old('email') }}" required placeholder="Contoh: ahmad.sudrajat@kampus.ac.id" class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 font-mono">
+                        <input type="email" name="email" value="{{ old('email') }}" required placeholder="Contoh: ahmad.sudrajat@kampus.ac.id" class="w-full min-h-[44px] sm:min-h-0 text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 font-mono">
                         <p class="text-[10px] text-slate-400 mt-1">Password bawaan akun: <code class="bg-slate-100 px-1 py-0.5 rounded text-blue-600 font-bold font-mono">password</code></p>
                     </div>
 
                     <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
-                        <button type="button" @click="showCreateModal = false" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">
+                        <button type="button" @click="showCreateModal = false" class="min-h-[44px] sm:min-h-0 px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">
                             Batal
                         </button>
-                        <button type="submit" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition shadow-xs">
+                        <button type="submit" class="min-h-[44px] sm:min-h-0 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition shadow-xs">
                             Simpan
                         </button>
                     </div>
@@ -365,7 +365,7 @@
                         <h3 class="font-bold text-sm sm:text-base text-slate-900">Edit Data & Status Pembimbing</h3>
                         <p class="text-[11px] text-slate-400">Perbarui identitas atau status keaktifan pembimbing</p>
                     </div>
-                    <button type="button" @click="showEditModal = false" class="text-slate-400 hover:text-slate-600 text-sm font-bold">✕</button>
+                    <button type="button" @click="showEditModal = false" class="inline-flex items-center justify-center h-11 w-11 sm:h-auto sm:w-auto text-slate-400 hover:text-slate-600 text-sm font-bold">✕</button>
                 </div>
 
                 <form method="POST" :action="'/university/lecturers/' + editLecturer.id" class="space-y-3.5">
@@ -376,21 +376,21 @@
                         <label class="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
                             Nama Lengkap & Gelar Pembimbing <span class="text-rose-500">*</span>
                         </label>
-                        <input type="text" name="name" x-model="editLecturer.name" required class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500">
+                        <input type="text" name="name" x-model="editLecturer.name" required class="w-full min-h-[44px] sm:min-h-0 text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
                     <div>
                         <label class="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
                             Email Resmi Kampus / Login <span class="text-rose-500">*</span>
                         </label>
-                        <input type="email" name="email" x-model="editLecturer.email" required class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 font-mono">
+                        <input type="email" name="email" x-model="editLecturer.email" required class="w-full min-h-[44px] sm:min-h-0 text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 font-mono">
                     </div>
 
                     <div>
                         <label class="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
                             Status Keaktifan Pembimbing <span class="text-rose-500">*</span>
                         </label>
-                        <select name="status" x-model="editLecturer.status" required class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500">
+                        <select name="status" x-model="editLecturer.status" required class="w-full min-h-[44px] sm:min-h-0 text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             @foreach(\App\Enums\AccountStatus::cases() as $accountCase)
                                 <option value="{{ $accountCase->value }}">{{ $accountCase->label() }}</option>
                             @endforeach
@@ -399,10 +399,10 @@
                     </div>
 
                     <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
-                        <button type="button" @click="showEditModal = false" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-xl transition">
+                        <button type="button" @click="showEditModal = false" class="min-h-[44px] sm:min-h-0 px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-xl transition">
                             Batal
                         </button>
-                        <button type="submit" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition shadow-xs">
+                        <button type="submit" class="min-h-[44px] sm:min-h-0 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition shadow-xs">
                             Simpan Perubahan
                         </button>
                     </div>

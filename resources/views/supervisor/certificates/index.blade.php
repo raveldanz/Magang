@@ -5,7 +5,7 @@
             description="Validasi nilai evaluasi akhir peserta magang dan berikan pengesahan resmi agar sertifikat dapat diunduh oleh peserta magang.">
             <x-slot name="actions">
                 <a href="{{ route('supervisor.dashboard') }}" 
-                   class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200 transition">
+                   class="min-h-[44px] sm:min-h-0 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200 transition">
                     &larr; Pemantauan Bidang
                 </a>
             </x-slot>
@@ -29,24 +29,24 @@
 
             {{-- TABS FILTER --}}
             <div class="flex overflow-x-auto pb-2 scrollbar-none gap-2 border-b-2 border-slate-200">
-                <a href="{{ route('supervisor.certificates.index', ['status' => 'waiting_approval']) }}" 
-                   class="whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 shrink-0 {{ $statusFilter === 'waiting_approval' ? 'bg-blue-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
+                <a href="{{ route('supervisor.certificates.index', ['status' => 'waiting_approval']) }}"
+                   class="min-h-[44px] sm:min-h-0 whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 shrink-0 {{ $statusFilter === 'waiting_approval' ? 'bg-blue-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
                     <span>Menunggu Pengesahan</span>
                     <span class="px-2 py-0.5 rounded-full text-xs {{ $statusFilter === 'waiting_approval' ? 'bg-white text-blue-700' : 'bg-blue-100 text-blue-800' }}">
                         {{ $waitingCount }}
                     </span>
                 </a>
 
-                <a href="{{ route('supervisor.certificates.index', ['status' => 'approved']) }}" 
-                   class="whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 shrink-0 {{ $statusFilter === 'approved' ? 'bg-emerald-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
+                <a href="{{ route('supervisor.certificates.index', ['status' => 'approved']) }}"
+                   class="min-h-[44px] sm:min-h-0 whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 shrink-0 {{ $statusFilter === 'approved' ? 'bg-emerald-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
                     <span>Telah Disahkan</span>
                     <span class="px-2 py-0.5 rounded-full text-xs {{ $statusFilter === 'approved' ? 'bg-white text-emerald-700' : 'bg-emerald-100 text-emerald-800' }}">
                         {{ $approvedCount }}
                     </span>
                 </a>
 
-                <a href="{{ route('supervisor.certificates.index', ['status' => 'revision']) }}" 
-                   class="whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 shrink-0 {{ $statusFilter === 'revision' ? 'bg-amber-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
+                <a href="{{ route('supervisor.certificates.index', ['status' => 'revision']) }}"
+                   class="min-h-[44px] sm:min-h-0 whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 shrink-0 {{ $statusFilter === 'revision' ? 'bg-amber-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
                     <span>Perlu Revisi</span>
                     <span class="px-2 py-0.5 rounded-full text-xs {{ $statusFilter === 'revision' ? 'bg-white text-amber-700' : 'bg-amber-100 text-amber-800' }}">
                         {{ $revisionCount ?? 0 }}
@@ -290,7 +290,7 @@
                             {{-- Tombol Aksi Mobile --}}
                             <div class="pt-1 flex flex-col gap-2">
                                 <a href="{{ route('supervisor.certificates.show', $cert->placement_id) }}" target="_blank"
-                                   class="w-full min-h-[40px] inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs border border-slate-300 shadow-2xs transition">
+                                   class="w-full min-h-[44px] sm:min-h-[40px] inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs border border-slate-300 shadow-2xs transition">
                                     <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     <span>Pratinjau Draf Sertifikat</span>
                                 </a>
@@ -338,10 +338,10 @@
                                                     Setelah disahkan, peserta magang dapat mengunduh E-Sertifikat resmi Dispusip.
                                                 </p>
                                                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                                                    <button type="button" @click="showApproveCertModalMobile = false" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl">
+                                                    <button type="button" @click="showApproveCertModalMobile = false" class="min-h-[44px] sm:min-h-0 inline-flex items-center justify-center px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl">
                                                         Batal
                                                     </button>
-                                                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md">
+                                                    <button type="submit" class="min-h-[44px] sm:min-h-0 inline-flex items-center justify-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md">
                                                         Ya, Sahkan
                                                     </button>
                                                 </div>

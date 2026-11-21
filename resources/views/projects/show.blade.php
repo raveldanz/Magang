@@ -1,18 +1,19 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div class="flex items-center gap-3">
+            <div class="flex items-start sm:items-center gap-3 min-w-0">
                 <a href="{{ $backUrl }}" 
-                   class="p-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition shadow-2xs" 
+                   class="min-w-[44px] min-h-[44px] sm:min-w-[40px] sm:min-h-[40px] inline-flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition shadow-2xs shrink-0"
+                   aria-label="Kembali ke Halaman Sebelumnya"
                    title="Kembali ke Halaman Sebelumnya">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 </a>
-                <div>
+                <div class="min-w-0">
                     <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                        <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200 uppercase tracking-wider">
+                        <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200 uppercase tracking-wider shrink-0">
                             Karya Inovasi Magang
                         </span>
-                        <span class="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold border {{ $project->category_badge_class }}"
+                        <span class="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold border shrink-0 {{ $project->category_badge_class }}"
                               style="background-color: {{ $project->category_bg_color }} !important; color: {{ $project->category_text_color }} !important; border-color: {{ $project->category_border_color }} !important; opacity: 1 !important;">
                             {{ $project->category_label }}
                         </span>
@@ -21,13 +22,13 @@
                             {{ $placement?->application?->unit?->name ?? 'Dinas Perpustakaan dan Kearsipan' }}
                         </span>
                     </div>
-                    <h2 class="font-bold text-xl sm:text-2xl text-slate-900 leading-tight mt-1">
+                    <h2 class="font-bold text-lg sm:text-2xl text-slate-900 leading-snug sm:leading-tight mt-1.5 sm:mt-1 break-words">
                         {{ $project->title }}
                     </h2>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2 shrink-0">
                 @php
                     $isManagerRole = Auth::check() && (Auth::user()->isSuperAdmin() || in_array(Auth::user()->role, ['super_admin', 'superadmin', 'supervisor']));
                     $isOwner = $isOwner ?? (Auth::check() && $student && Auth::id() === $student->id);
@@ -35,14 +36,14 @@
 
                 @if($isManagerRole)
                     {{-- KHUSUS SUPER ADMIN & SUPERVISOR: Tombol 'Kelola Proyek' Elegan dengan Dropdown Lengkap --}}
-                    <div x-data="{ menuOpen: false, copied: false }" class="relative" @click.outside="menuOpen = false">
+                    <div x-data="{ menuOpen: false, copied: false }" class="relative w-full sm:w-auto" @click.outside="menuOpen = false" @keydown.escape.window="menuOpen = false">
                         <button @click="menuOpen = !menuOpen" 
                                 type="button" 
-                                class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 transition cursor-pointer active:scale-95"
+                                class="w-full sm:w-auto min-h-[44px] sm:min-h-[40px] inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 transition cursor-pointer active:scale-95"
                                 title="Kelola dan Moderasi Proyek Inovasi">
-                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                             <span>Kelola Proyek</span>
-                            <svg class="w-3.5 h-3.5 text-blue-200 transition-transform duration-200" :class="{ 'rotate-180': menuOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            <svg class="w-3.5 h-3.5 text-blue-200 transition-transform duration-200 shrink-0" :class="{ 'rotate-180': menuOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
 
                         <div x-show="menuOpen" 
@@ -53,13 +54,13 @@
                              x-transition:leave="transition ease-in duration-75"
                              x-transition:leave-start="opacity-100 scale-100"
                              x-transition:leave-end="opacity-0 scale-95"
-                             class="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 text-xs divide-y divide-slate-100">
+                             class="absolute left-0 sm:left-auto sm:right-0 top-full mt-2 w-full sm:w-64 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 text-xs divide-y divide-slate-100">
                             
                             {{-- 1. Pilihan Akses Tautan / Aplikasi Proyek (Jika Tersedia) --}}
                             @if($project->demo_url)
                                 <div class="py-1">
                                     <a href="{{ $project->demo_url }}" target="_blank" rel="noopener noreferrer" 
-                                       class="w-full text-left px-4 py-2.5 hover:bg-blue-50 flex items-center gap-2.5 text-blue-700 font-bold transition">
+                                       class="w-full min-h-[44px] sm:min-h-[38px] text-left px-4 py-2.5 hover:bg-blue-50 flex items-center gap-2.5 text-blue-700 font-bold transition">
                                         <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                         <span class="truncate">Akses Tautan / Aplikasi Proyek</span>
                                     </a>
@@ -70,18 +71,18 @@
                             <div class="py-1">
                                 <form action="{{ route('projects.toggle_visibility', $project->id) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center gap-2.5 text-slate-700 font-semibold cursor-pointer transition">
+                                    <button type="submit" class="w-full min-h-[44px] sm:min-h-[38px] text-left px-4 py-2.5 hover:bg-slate-50 flex items-center gap-2.5 text-slate-700 font-semibold cursor-pointer transition">
                                         @if($project->is_public)
                                             <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
                                             <div>
                                                 <div class="font-bold text-slate-800">Sembunyikan Proyek</div>
-                                                <div class="text-[10px] text-slate-400">Jadikan privat (hanya pengelola)</div>
+                                                <div class="text-[11px] text-slate-500">Jadikan privat (hanya pengelola)</div>
                                             </div>
                                         @else
                                             <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                             <div>
                                                 <div class="font-bold text-slate-800">Tampilkan ke Publik</div>
-                                                <div class="text-[10px] text-slate-400">Dapat dilihat semua pengunjung</div>
+                                                <div class="text-[11px] text-slate-500">Dapat dilihat semua pengunjung</div>
                                             </div>
                                         @endif
                                     </button>
@@ -92,11 +93,11 @@
                             <div class="py-1">
                                 <button type="button" 
                                         @click="navigator.clipboard.writeText(window.location.href); copied = true; setTimeout(() => copied = false, 2500);" 
-                                        class="w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center gap-2.5 text-slate-700 font-semibold cursor-pointer transition">
+                                        class="w-full min-h-[44px] sm:min-h-[38px] text-left px-4 py-2.5 hover:bg-slate-50 flex items-center gap-2.5 text-slate-700 font-semibold cursor-pointer transition">
                                     <svg class="w-4 h-4 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                     <div>
                                         <div class="font-bold text-slate-800" x-text="copied ? 'Tautan Berhasil Disalin!' : 'Salin Tautan Proyek'"></div>
-                                        <div class="text-[10px]" :class="copied ? 'text-emerald-600 font-semibold' : 'text-slate-400'" x-text="copied ? 'Tersalin ke papan klip' : 'Salin link halaman ini'"></div>
+                                        <div class="text-[11px]" :class="copied ? 'text-emerald-600 font-semibold' : 'text-slate-500'" x-text="copied ? 'Tersalin ke papan klip' : 'Salin link halaman ini'"></div>
                                     </div>
                                 </button>
                             </div>
@@ -107,11 +108,11 @@
                                     <form action="{{ route('projects.destroy', $project->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus proyek inovasi ini secara permanen?');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="w-full text-left px-4 py-2.5 hover:bg-rose-50 flex items-center gap-2.5 text-rose-600 font-semibold cursor-pointer transition">
+                                        <button type="submit" class="w-full min-h-[44px] sm:min-h-[38px] text-left px-4 py-2.5 hover:bg-rose-50 flex items-center gap-2.5 text-rose-600 font-semibold cursor-pointer transition">
                                             <svg class="w-4 h-4 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                             <div>
                                                 <div class="font-bold text-rose-600">Hapus Proyek</div>
-                                                <div class="text-[10px] text-rose-400">Hapus karya ini permanen</div>
+                                                <div class="text-[11px] text-rose-500">Hapus karya ini permanen</div>
                                             </div>
                                         </button>
                                     </form>
@@ -124,8 +125,8 @@
                     {{-- UNTUK PEMILIK / KETUA TIM: Tombol Ubah Proyek --}}
                     @if(Auth::check() && ($isOwner || $project->members->where('is_leader', true)->contains(fn($m) => $m->placement?->application?->user_id === Auth::id())))
                         <a href="{{ route('student.projects.edit', $project->id) }}" 
-                           class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold shadow-xs transition">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                           class="w-full sm:w-auto min-h-[44px] sm:min-h-[40px] inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold shadow-xs transition">
+                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             <span>Ubah Proyek</span>
                         </a>
                     @endif
@@ -133,8 +134,8 @@
                     {{-- UNTUK USER LAIN (Mahasiswa, Dosen, Tamu / Publik): Tampilkan tombol Akses Tautan biasa jika tersedia demo_url --}}
                     @if($project->demo_url)
                         <a href="{{ $project->demo_url }}" target="_blank" rel="noopener noreferrer"
-                           class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                           class="w-full sm:w-auto min-h-[44px] sm:min-h-[40px] inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                             <span>Akses Tautan / Aplikasi Proyek</span>
                         </a>
                     @endif
@@ -341,9 +342,9 @@
 
                     {{-- Daftar Anggota Tim Pengembang --}}
                     <div class="pt-3 border-t border-slate-100 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-slate-400 font-semibold uppercase text-[10px] tracking-wider block">Tim Pengembang Proyek ({{ $projectMembers->count() }} Anggota)</span>
-                            <span class="px-2.5 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-md border border-blue-200">Karya Kolaboratif Tim</span>
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span class="text-slate-500 font-semibold uppercase text-[11px] tracking-wider block">Tim Pengembang Proyek ({{ $projectMembers->count() }} Anggota)</span>
+                            <span class="px-2.5 py-0.5 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-md border border-blue-200 shrink-0 whitespace-nowrap">Karya Kolaboratif Tim</span>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
@@ -413,9 +414,9 @@
             @endif
 
             <!-- 2. Galeri Tangkapan Layar & Mockup Proyek (Multi-Screenshot Showcase) -->
-            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-7 shadow-xs space-y-5">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
-                    <div>
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-7 shadow-xs space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                    <div class="min-w-0">
                         <h3 class="font-bold text-base sm:text-lg text-slate-900">
                             Galeri Tangkapan Layar & Dokumentasi Visual Proyek
                         </h3>
@@ -423,15 +424,15 @@
                             Koleksi antarmuka aplikasi, alur kerja sistem, dan hasil visual yang dirancang peserta magang
                         </p>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2 shrink-0">
                         @if(count($allScreenshots) > 1)
-                            <span class="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-xl border border-blue-200">
+                            <span class="px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-bold rounded-xl border border-blue-200 whitespace-nowrap shrink-0">
                                 {{ count($allScreenshots) }} Gambar Tersedia
                             </span>
                         @endif
                         <a :href="activePhoto" target="_blank" rel="noopener noreferrer" 
-                           class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                           class="inline-flex items-center justify-center gap-1.5 min-h-[42px] sm:min-h-[36px] px-3.5 py-2 sm:py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer whitespace-nowrap shrink-0">
+                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                             <span>Buka Resolusi Penuh</span>
                         </a>
                     </div>
@@ -440,23 +441,23 @@
                 @if(!empty($allScreenshots))
                     <!-- Display Layar Utama (Viewport Penuh, Anti-Pecah & Proporsional) -->
                     <div class="space-y-3">
-                        <div class="w-full rounded-2xl border border-slate-700 overflow-hidden flex items-center justify-center relative p-3 sm:p-4 min-h-[300px] max-h-[580px] shadow-inner"
+                        <div class="w-full rounded-2xl border border-slate-700 overflow-hidden flex items-center justify-center relative p-3 sm:p-4 min-h-[240px] sm:min-h-[300px] max-h-[580px] shadow-inner"
                              style="background-color: #0f172a;">
                             <img :src="activePhoto" :alt="activeTitle" 
-                                 class="max-h-[540px] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-300"
+                                 class="max-h-[440px] sm:max-h-[540px] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-300"
                                  x-on:error="$el.src = '{{ asset('images/logo.png') }}'">
                             
                             <!-- Overlay Tombol Buka Tab Baru (Vibrant Blue, Jelas & Mudah Dilihat) -->
                             <a :href="activePhoto" target="_blank" rel="noopener noreferrer" 
-                               class="absolute bottom-4 right-4 px-4 py-2.5 text-white text-xs font-bold rounded-xl shadow-xl flex items-center gap-2 border border-blue-400/40 hover:brightness-110 active:scale-95 transition cursor-pointer z-20"
+                               class="hidden sm:inline-flex absolute bottom-4 right-4 px-4 py-2.5 text-white text-xs font-bold rounded-xl shadow-xl items-center gap-2 border border-blue-400/40 hover:brightness-110 active:scale-95 transition cursor-pointer z-20"
                                style="background-color: #2563eb; color: #ffffff;"
                                title="Buka foto / tangkapan layar dalam resolusi asli di tab baru">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                 <span>Buka Resolusi Penuh</span>
                             </a>
 
                             <div x-show="activeTitle && activeTitle.trim() !== ''"
-                                 class="absolute top-4 left-4 px-3 py-1.5 text-white text-[11px] font-bold rounded-lg shadow-md border border-slate-700/80 pointer-events-none z-10" 
+                                 class="absolute top-3 left-3 sm:top-4 sm:left-4 px-3 py-1.5 text-white text-[11px] font-bold rounded-lg shadow-md border border-slate-700/80 pointer-events-none z-10 max-w-[calc(100%-1.5rem)] truncate"
                                  style="background-color: rgba(15, 23, 42, 0.85);"
                                  x-text="activeTitle"></div>
                         </div>
@@ -504,18 +505,18 @@
             </div>
 
             <!-- 4. PUSAT AKSES & BERKAS PROYEK (SPACE BESAR KHUSUS AKSES PROYEK) -->
-            <div class="bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/40 rounded-2xl border-2 border-blue-200/90 p-6 sm:p-8 shadow-xs space-y-6">
+            <div class="bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/40 rounded-2xl border-2 border-blue-200/90 p-5 sm:p-8 shadow-xs space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-blue-100">
                     <div>
-                        <div class="flex items-center gap-2">
-                            <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-blue-600 text-white uppercase tracking-wider">
+                        <div class="flex flex-col items-start sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                            <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-blue-600 text-white uppercase tracking-wider shrink-0 whitespace-nowrap">
                                 Pusat Akses Proyek
                             </span>
-                            <h3 class="font-bold text-lg sm:text-xl text-slate-900">
+                            <h3 class="font-bold text-base sm:text-xl text-slate-900 leading-snug">
                                 Akses Sistem, Repositori & Berkas Inovasi
                             </h3>
                         </div>
-                        <p class="text-xs sm:text-sm text-slate-600 mt-1">
+                        <p class="text-xs sm:text-sm text-slate-600 mt-1.5 sm:mt-1">
                             Tautan langsung untuk mencoba sistem, memeriksa repositori kode sumber, atau mengunduh paket berkas aplikasi
                         </p>
                     </div>
@@ -530,7 +531,7 @@
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
                             </div>
                             <div>
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 block">Akses Aplikasi</span>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600 block">Akses Aplikasi</span>
                                 <h4 class="font-bold text-sm sm:text-base text-slate-900 mt-0.5">Website / Live Demo</h4>
                                 <p class="text-xs text-slate-500 mt-1 line-clamp-2">
                                     {{ $project->demo_url ? 'Kunjungi sistem aplikasi daring yang sedang beroperasi.' : 'Tautan demo daring belum dilampirkan.' }}
@@ -540,12 +541,12 @@
 
                         @if($project->demo_url)
                             <a href="{{ $project->demo_url }}" target="_blank" rel="noopener noreferrer" 
-                               class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
+                               class="w-full min-h-[44px] sm:min-h-[40px] inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
                                 <span>Buka Website Sistem</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                             </a>
                         @else
-                            <button type="button" disabled class="w-full px-4 py-2.5 bg-slate-100 text-slate-400 text-xs font-semibold rounded-xl cursor-not-allowed">
+                            <button type="button" disabled class="w-full min-h-[44px] sm:min-h-[40px] px-4 py-2.5 bg-slate-100 text-slate-500 text-xs font-semibold rounded-xl cursor-not-allowed">
                                 Tautan Tidak Tersedia
                             </button>
                         @endif
@@ -574,7 +575,7 @@
                                 @endif
                             </div>
                             <div>
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">{{ $repoCategory }}</span>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600 block">{{ $repoCategory }}</span>
                                 <h4 class="font-bold text-sm sm:text-base text-slate-900 mt-0.5">{{ $repoTitle }}</h4>
                                 <p class="text-xs text-slate-500 mt-1 line-clamp-2">
                                     {{ $repoDesc }}
@@ -584,12 +585,12 @@
 
                         @if($project->repository_url)
                             <a href="{{ $project->repository_url }}" target="_blank" rel="noopener noreferrer" 
-                               class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-xs transition">
+                               class="w-full min-h-[44px] sm:min-h-[40px] inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-xs transition">
                                 <span>{{ $repoButton }}</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                             </a>
                         @else
-                            <button type="button" disabled class="w-full px-4 py-2.5 bg-slate-100 text-slate-400 text-xs font-semibold rounded-xl cursor-not-allowed">
+                            <button type="button" disabled class="w-full min-h-[44px] sm:min-h-[40px] px-4 py-2.5 bg-slate-100 text-slate-500 text-xs font-semibold rounded-xl cursor-not-allowed">
                                 Repositori Belum Ada
                             </button>
                         @endif
@@ -602,9 +603,9 @@
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
                             </div>
                             <div>
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 block">Paket Arsip</span>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-amber-700 block">Paket Arsip</span>
                                 <h4 class="font-bold text-sm sm:text-base text-slate-900 mt-0.5">Berkas ZIP / Web Proyek</h4>
-                                <p class="text-xs text-slate-500 mt-1 line-clamp-2">
+                                <p class="text-xs text-slate-500 mt-1 line-clamp-2 break-words">
                                     @if($project->source_code_path)
                                         {{ $project->source_code_name ?? 'Berkas_Proyek.zip' }} ({{ $project->source_code_size ?? 'Tersedia' }})
                                     @else
@@ -616,12 +617,12 @@
 
                         @if($project->source_code_path)
                             <a href="{{ $project->source_code_url }}" download 
-                               class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
+                               class="w-full min-h-[44px] sm:min-h-[40px] inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
                                 <span>Unduh Berkas ZIP Proyek</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                             </a>
                         @else
-                            <button type="button" disabled class="w-full px-4 py-2.5 bg-slate-100 text-slate-400 text-xs font-semibold rounded-xl cursor-not-allowed">
+                            <button type="button" disabled class="w-full min-h-[44px] sm:min-h-[40px] px-4 py-2.5 bg-slate-100 text-slate-500 text-xs font-semibold rounded-xl cursor-not-allowed">
                                 Berkas ZIP Belum Ada
                             </button>
                         @endif
@@ -630,25 +631,25 @@
             </div>
 
             <!-- 4. Bagian Khusus: Manfaat untuk Masyarakat & Dokumentasi Kegiatan Lapangan -->
-            <div class="bg-gradient-to-br from-emerald-50/60 via-white to-teal-50/30 rounded-2xl border border-emerald-200/80 p-6 sm:p-7 shadow-xs space-y-6">
+            <div class="bg-gradient-to-br from-emerald-50/60 via-white to-teal-50/30 rounded-2xl border border-emerald-200/80 p-5 sm:p-7 shadow-xs space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-emerald-100">
                     <div>
-                        <div class="flex items-center gap-2">
-                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white uppercase tracking-wider">
+                        <div class="flex flex-col items-start sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-600 text-white uppercase tracking-wider shrink-0 whitespace-nowrap">
                                 Dampak Sosial
                             </span>
-                            <h3 class="font-bold text-base sm:text-lg text-emerald-950">
+                            <h3 class="font-bold text-base sm:text-lg text-emerald-950 leading-snug">
                                 Manfaat Nyata untuk Masyarakat
                             </h3>
                         </div>
-                        <p class="text-xs text-emerald-800 mt-1">
+                        <p class="text-xs text-emerald-800 mt-1.5 sm:mt-1">
                             Dampak positif yang dirasakan langsung oleh masyarakat, warga binaan, atau pengguna layanan dinas
                         </p>
                     </div>
                 </div>
 
                 <!-- Narasi Manfaat Nyata -->
-                <div class="p-5 bg-white rounded-2xl border border-emerald-100 shadow-2xs space-y-2">
+                <div class="p-4 sm:p-5 bg-white rounded-2xl border border-emerald-100 shadow-2xs space-y-2">
                     <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-wider block">
                         Uraian Manfaat & Kontribusi Langsung:
                     </span>
@@ -660,11 +661,11 @@
                 <!-- Sub-bagian 4A: Foto Dokumentasi Sosialisasi Lapangan / Desa -->
                 @if(!empty($communityPhotoUrls))
                     <div class="space-y-3 pt-2">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
                             <span class="text-xs font-bold text-emerald-900 uppercase tracking-wider block">
                                 Foto Dokumentasi Sosialisasi / Presentasi Lapangan ({{ count($communityPhotoUrls) }} Foto)
                             </span>
-                            <span class="text-[11px] text-slate-500">Klik untuk memperbesar gambar</span>
+                            <span class="text-[11px] text-slate-500 shrink-0">Klik untuk memperbesar gambar</span>
                         </div>
 
                         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -688,13 +689,13 @@
                 <!-- Sub-bagian 4B: Video Dokumentasi (YouTube / Drive Embed Player) -->
                 @if($project->video_url)
                     <div class="space-y-3 pt-2">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2">
                             <span class="text-xs font-bold text-emerald-900 uppercase tracking-wider block">
                                 Video Dokumentasi Kegiatan / Presentasi
                             </span>
-                            <a href="{{ $project->video_url }}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-blue-600 hover:text-blue-800 underline flex items-center gap-1">
+                            <a href="{{ $project->video_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 min-h-[44px] sm:min-h-0 text-xs font-bold text-blue-600 hover:text-blue-800 underline shrink-0 whitespace-nowrap self-start sm:self-auto">
                                 <span>Buka Tautan Sumber</span>
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                             </a>
                         </div>
 
@@ -711,17 +712,17 @@
                             </div>
                         @else
                             <!-- Tautan Video Non-YouTube (Google Drive, dll) -->
-                            <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                <div class="flex items-center gap-3">
+                            <div class="p-4 sm:p-5 bg-white rounded-2xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div class="flex items-center gap-3 min-w-0">
                                     <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                     </div>
-                                    <div>
+                                    <div class="min-w-0">
                                         <h4 class="font-bold text-sm text-slate-900">Rekaman Video Dokumentasi</h4>
                                         <p class="text-xs text-slate-500 font-mono break-all mt-0.5">{{ $project->video_url }}</p>
                                     </div>
                                 </div>
-                                <a href="{{ $project->video_url }}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs shrink-0 text-center">
+                                <a href="{{ $project->video_url }}" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto min-h-[44px] sm:min-h-[40px] inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs shrink-0 text-center">
                                     Tonton Video di Tab Baru
                                 </a>
                             </div>
@@ -731,18 +732,18 @@
             </div>
 
             <!-- 5. Dokumen Pendukung & Buku Panduan Teknis (PDF / Manual Book) -->
-            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-7 shadow-xs space-y-4">
-                <div class="pb-3 border-b border-slate-100 flex items-center justify-between">
-                    <div>
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-7 shadow-xs space-y-4">
+                <div class="pb-3 border-b border-slate-100 flex items-start sm:items-center justify-between gap-3">
+                    <div class="min-w-0">
                         <h3 class="font-bold text-base sm:text-lg text-slate-900">
                             Dokumen Pendukung & Berkas Lampiran Proyek
                         </h3>
                         <p class="text-xs text-slate-500 mt-0.5">
-                            Buku panduan (*manual book*), laporan teknis, atau proposal luaran magang peserta
+                            Buku panduan (<em>manual book</em>), laporan teknis, atau proposal luaran magang peserta
                         </p>
                     </div>
                     @if(!empty($documents))
-                        <span class="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">
+                        <span class="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full shrink-0 whitespace-nowrap">
                             {{ count($documents) }} Berkas
                         </span>
                     @endif
@@ -757,9 +758,9 @@
                                 $docSize = is_array($doc) ? ($doc['size'] ?? null) : null;
                                 $docExt = strtoupper(pathinfo($docName, PATHINFO_EXTENSION) ?: 'PDF');
                             @endphp
-                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-blue-300 transition flex items-start justify-between gap-3 shadow-2xs">
-                                <div class="flex items-start gap-3 min-w-0">
-                                    <div class="w-9 h-9 rounded-lg bg-red-100 text-red-700 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                            <div class="p-3.5 sm:p-4 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-blue-300 transition flex items-center justify-between gap-3 shadow-2xs">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="w-9 h-9 rounded-lg bg-red-100 text-red-700 flex items-center justify-center font-bold text-xs shrink-0">
                                         {{ $docExt }}
                                     </div>
                                     <div class="min-w-0">
@@ -767,12 +768,13 @@
                                             {{ $docName }}
                                         </div>
                                         @if($docSize)
-                                            <span class="text-[10px] text-slate-500 font-mono block mt-0.5">{{ $docSize }}</span>
+                                            <span class="text-[11px] text-slate-500 font-mono block mt-0.5">{{ $docSize }}</span>
                                         @endif
                                     </div>
                                 </div>
                                 <a href="{{ $project->normalizeMediaUrl($docPath) }}" target="_blank" download="{{ $docName }}"
-                                   class="p-2 rounded-lg bg-white border border-slate-200 text-blue-600 hover:bg-blue-50 transition shrink-0 shadow-2xs"
+                                   class="min-w-[44px] min-h-[44px] sm:min-w-[36px] sm:min-h-[36px] inline-flex items-center justify-center rounded-xl bg-white border border-slate-200 text-blue-600 hover:bg-blue-50 transition shrink-0 shadow-2xs"
+                                   aria-label="Unduh {{ $docName }}"
                                    title="Unduh Berkas">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                 </a>
@@ -780,43 +782,43 @@
                         @endforeach
                     </div>
                 @else
-                    <div class="p-6 bg-slate-50 rounded-xl text-center text-slate-400 text-xs">
+                    <div class="p-6 bg-slate-50 rounded-xl text-center text-slate-500 text-xs">
                         Tidak ada dokumen pendukung atau buku petunjuk yang dilampirkan pada proyek ini.
                     </div>
                 @endif
             </div>
 
             {{-- 4. INTERAKSI PROYEK: LIKE & SHARE RESMI --}}
-            <div class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-3 w-full sm:w-auto">
+            <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+                <div class="flex flex-wrap items-center justify-between sm:justify-start gap-2.5 sm:gap-3 w-full sm:w-auto">
                     {{-- Tombol Suka (Like) --}}
                     <button type="button" 
                             @click="toggleProjectLike()" 
                             :disabled="likeLoading"
-                            class="inline-flex items-center justify-center gap-2.5 px-5 py-3 rounded-2xl font-bold text-xs sm:text-sm transition-all duration-200 cursor-pointer shadow-2xs active:scale-95 border"
+                            class="min-h-[44px] inline-flex items-center justify-center gap-2.5 px-4 sm:px-5 py-2.5 rounded-2xl font-bold text-xs sm:text-sm transition-all duration-200 cursor-pointer shadow-2xs active:scale-95 border"
                             :class="isLiked ? 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'">
-                        <svg class="w-5 h-5 transition-transform" :class="isLiked ? 'fill-rose-500 text-rose-500 scale-110' : 'text-slate-400 group-hover:text-rose-500'" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 transition-transform shrink-0" :class="isLiked ? 'fill-rose-500 text-rose-500 scale-110' : 'text-slate-400 group-hover:text-rose-500'" viewBox="0 0 24 24">
                             <path :fill="isLiked ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                         </svg>
                         <span x-text="isLiked ? 'Disukai' : 'Suka Proyek Ini'"></span>
                         <span class="px-2 py-0.5 rounded-full text-xs" :class="isLiked ? 'bg-rose-100 text-rose-700' : 'bg-white text-slate-600 border border-slate-200'" x-text="likesCount"></span>
                     </button>
 
-                    <div class="h-6 w-px bg-slate-200 hidden min-[380px]:block"></div>
+                    <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
 
                     {{-- Indikator Jumlah Diskusi --}}
-                    <div class="hidden min-[380px]:flex items-center gap-1.5 sm:gap-2 text-xs font-semibold text-slate-500">
+                    <div class="flex items-center gap-1.5 sm:gap-2 text-xs font-semibold text-slate-600">
                         <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
                         <span><span x-text="commentsCount">{{ $project->comments->count() }}</span> <span class="hidden sm:inline">Komentar Masukan</span><span class="sm:hidden">Ulasan</span></span>
                     </div>
                 </div>
 
                 {{-- Opsi Bagikan (Share) --}}
-                <div class="flex items-center gap-2 w-full sm:w-auto justify-end relative" x-data="{ shareDropdown: false }">
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-end relative" x-data="{ shareDropdown: false }" @keydown.escape.window="shareDropdown = false">
                     <button type="button" 
                             @click="shareDropdown = !shareDropdown"
-                            class="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs sm:text-sm font-bold text-slate-700 transition cursor-pointer shadow-2xs">
-                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                            class="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs sm:text-sm font-bold text-slate-700 transition cursor-pointer shadow-2xs">
+                        <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                         <span>Bagikan</span>
                     </button>
 
@@ -828,32 +830,34 @@
                          x-transition:enter-end="opacity-100 scale-100"
                          x-transition:leave="transition ease-in duration-100"
                          x-cloak
-                         class="absolute right-0 bottom-full mb-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 space-y-1 z-30">
+                         class="absolute right-0 bottom-full mb-2 w-full sm:w-56 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-xl border border-slate-200/80 p-2 space-y-1 z-30">
                         <button type="button" 
                                 @click="copyShareLink(); shareDropdown = false;" 
-                                class="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition text-left cursor-pointer">
-                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                class="w-full min-h-[44px] sm:min-h-[38px] flex items-center gap-2.5 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition text-left cursor-pointer">
+                            <span class="w-6 h-6 rounded-lg bg-slate-100 text-slate-600 inline-flex items-center justify-center shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            </span>
                             <span>Salin Tautan</span>
                         </button>
                         <a href="https://api.whatsapp.com/send?text={{ urlencode('Simak karya inovasi magang: ' . $project->title . ' - ' . url()->current()) }}" 
                            target="_blank" 
                            rel="noopener noreferrer" 
-                           class="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition text-left">
-                            <span class="w-4 h-4 text-emerald-500 font-bold text-center">W</span>
+                           class="w-full min-h-[44px] sm:min-h-[38px] flex items-center gap-2.5 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition text-left">
+                            <span class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 font-extrabold text-[11px] inline-flex items-center justify-center shrink-0">W</span>
                             <span>WhatsApp</span>
                         </a>
                         <a href="https://t.me/share/url?url={{ urlencode(url()->current()) }}&text={{ urlencode($project->title) }}" 
                            target="_blank" 
                            rel="noopener noreferrer" 
-                           class="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-600 rounded-xl transition text-left">
-                            <span class="w-4 h-4 text-sky-500 font-bold text-center">T</span>
+                           class="w-full min-h-[44px] sm:min-h-[38px] flex items-center gap-2.5 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-600 rounded-xl transition text-left">
+                            <span class="w-6 h-6 rounded-lg bg-sky-50 text-sky-600 font-extrabold text-[11px] inline-flex items-center justify-center shrink-0">T</span>
                             <span>Telegram</span>
                         </a>
                         <a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode('Karya Inovasi Magang Dispusip: ' . $project->title) }}" 
                            target="_blank" 
                            rel="noopener noreferrer" 
-                           class="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 rounded-xl transition text-left">
-                            <span class="w-4 h-4 text-slate-900 font-bold text-center">X</span>
+                           class="w-full min-h-[44px] sm:min-h-[38px] flex items-center gap-2.5 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 rounded-xl transition text-left">
+                            <span class="w-6 h-6 rounded-lg bg-slate-100 text-slate-800 font-extrabold text-[11px] inline-flex items-center justify-center shrink-0">X</span>
                             <span>Twitter / X</span>
                         </a>
                     </div>
@@ -862,7 +866,7 @@
                     <div x-show="shareToast" 
                          x-transition 
                          x-cloak 
-                         class="absolute right-0 -top-10 px-3 py-1.5 bg-slate-900 text-white text-[11px] font-bold rounded-lg shadow-md whitespace-nowrap">
+                         class="absolute right-0 -top-11 max-w-[calc(100vw-3rem)] truncate px-3 py-1.5 bg-slate-900 text-white text-[11px] font-bold rounded-lg shadow-md">
                         Tautan berhasil disalin ke papan klip!
                     </div>
                 </div>
@@ -874,12 +878,12 @@
             </div>
 
             {{-- 5. RUANG DISKUSI & ULASAN KOMENTAR --}}
-            <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+            <div class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-8 shadow-sm space-y-6">
                 <div class="flex items-center justify-between pb-4 border-b border-slate-100">
                     <div>
-                        <h3 class="text-base sm:text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
+                        <h3 class="text-base sm:text-lg font-black text-slate-900 tracking-tight flex items-center gap-2 flex-wrap">
                             <span>Ulasan & Diskusi Karya</span>
-                            <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800" x-text="commentsCount"></span>
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800" x-text="commentsCount"></span>
                         </h3>
                         <p class="text-xs text-slate-500 mt-0.5">
                             Sampaikan apresiasi, pertanyaan, atau masukan membangun untuk penyempurnaan karya peserta magang ini.
@@ -894,37 +898,37 @@
                     @guest
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap Anda <span class="text-rose-500">*</span></label>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Nama Lengkap Anda <span class="text-rose-500">*</span></label>
                                 <input type="text" 
                                        name="author_name" 
                                        x-model="authorNameInput"
                                        @input="validateCommentLive()"
                                        placeholder="Contoh: Budi Santoso (Masyarakat / Praktisi)" 
                                        required
-                                       class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                                       class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition">
                             </div>
                         </div>
                     @else
-                        <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs">
-                            <span class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-[10px]">
+                        <div class="flex flex-wrap items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+                            <span class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-[11px] shrink-0">
                                 {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                             </span>
                             <span class="font-bold text-slate-800">{{ Auth::user()->name }}</span>
-                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-700">
+                            <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-blue-100 text-blue-700">
                                 {{ Auth::user()->roleLabel() }}
                             </span>
                         </div>
                     @endguest
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Isi Komentar / Masukan <span class="text-rose-500">*</span></label>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">Isi Komentar / Masukan <span class="text-rose-500">*</span></label>
                         <textarea name="comment" 
                                   rows="3" 
                                   x-model="commentInput"
                                   @input="validateCommentLive()"
                                   required 
                                   placeholder="Tuliskan ulasan positif, pertanyaan, atau saran konstruktif Anda di sini..."
-                                  class="w-full p-3.5 rounded-2xl border border-slate-300 text-xs sm:text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition leading-relaxed"></textarea>
+                                  class="w-full p-3.5 rounded-2xl border border-slate-300 bg-white text-slate-900 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition leading-relaxed"></textarea>
                     </div>
 
                     {{-- Peringatan Sensor Kata Kasar Real-Time --}}
@@ -933,13 +937,13 @@
                         <span x-text="profanityAlert"></span>
                     </div>
 
-                    <div class="flex items-center justify-between pt-1">
-                        <span class="text-[11px] text-slate-400">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                        <span class="text-xs text-slate-500 leading-relaxed">
                             Sistem menerapkan filter otomatis untuk menjaga ruang diskusi tetap sopan dan edukatif.
                         </span>
                         <button type="submit" 
                                 :disabled="Boolean(profanityAlert) || commentInput.trim().length < 2"
-                                class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-sm transition active:scale-95 cursor-pointer">
+                                class="w-full sm:w-auto min-h-[44px] sm:min-h-[40px] px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm transition active:scale-95 cursor-pointer shrink-0 whitespace-nowrap">
                             Kirim Komentar
                         </button>
                     </div>
@@ -955,18 +959,18 @@
                             csrfToken: @js(csrf_token()),
                         })" class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-slate-300 transition space-y-2.5">
                             <div class="flex items-start justify-between gap-2">
-                                <div class="flex items-center gap-2.5">
+                                <div class="flex items-center gap-2.5 min-w-0">
                                     <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">
                                         {{ strtoupper(substr($comment->author_name, 0, 1)) }}
                                     </div>
-                                    <div>
-                                        <div class="flex items-center gap-2 flex-wrap">
-                                            <span class="font-extrabold text-xs sm:text-sm text-slate-900">{{ $comment->author_name }}</span>
-                                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold {{ $comment->is_guest ? 'bg-slate-200 text-slate-700' : 'bg-blue-100 text-blue-800' }}">
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                                            <span class="font-extrabold text-xs sm:text-sm text-slate-900 break-words">{{ $comment->author_name }}</span>
+                                            <span class="px-2 py-0.5 rounded-md text-[11px] font-bold shrink-0 {{ $comment->is_guest ? 'bg-slate-200 text-slate-700' : 'bg-blue-100 text-blue-800' }}">
                                                 {{ $comment->author_role ?: 'Pengunjung' }}
                                             </span>
                                         </div>
-                                        <div class="text-[10px] text-slate-400 mt-0.5">
+                                        <div class="text-[11px] text-slate-500 mt-0.5">
                                             {{ $comment->created_at ? $comment->created_at->diffForHumans() : 'Baru saja' }}
                                         </div>
                                     </div>
@@ -975,31 +979,33 @@
                                 {{-- Aksi Hapus Komentar (Khusus Super Admin & Admin Dinas) --}}
                                 @if($canModerate || (Auth::check() && Auth::id() === $comment->user_id))
                                     <form method="POST" action="{{ route('projects.comments.destroy', $comment->id) }}" 
-                                          onsubmit="return confirm('Apakah Anda yakin ingin menghapus komentar ini?');">
+                                          onsubmit="return confirm('Apakah Anda yakin ingin menghapus komentar ini?');"
+                                          class="shrink-0">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" 
+                                                aria-label="Hapus Komentar"
                                                 title="Hapus Komentar (Moderasi)" 
-                                                class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer">
+                                                class="min-w-[44px] min-h-[44px] sm:min-w-[32px] sm:min-h-[32px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                         </button>
                                     </form>
                                 @endif
                             </div>
 
-                            <p class="text-xs sm:text-sm text-slate-700 leading-relaxed pl-10 whitespace-pre-line">
+                            <p class="text-xs sm:text-sm text-slate-700 leading-relaxed pl-0 sm:pl-10 whitespace-pre-line break-words">
                                 {{ $comment->comment }}
                             </p>
 
                             {{-- Tombol Suka Komentar --}}
-                            <div class="flex items-center justify-between pl-10 pt-1">
+                            <div class="flex items-center justify-between pl-0 sm:pl-10 pt-1">
                                 <button type="button" 
                                         @click="toggleCommentLike()" 
                                         :disabled="commentLikeLoading"
                                         title="Suka komentar ini"
-                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer active:scale-95"
-                                        :class="commentLiked ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-white text-slate-500 hover:text-rose-600 border border-slate-200'">
-                                    <svg class="w-3.5 h-3.5 transition-transform" :class="commentLiked ? 'fill-rose-500 text-rose-500 scale-110' : 'text-slate-400'" viewBox="0 0 24 24">
+                                        class="min-h-[44px] sm:min-h-[32px] inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold transition cursor-pointer active:scale-95"
+                                        :class="commentLiked ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-white text-slate-600 hover:text-rose-600 border border-slate-200'">
+                                    <svg class="w-3.5 h-3.5 transition-transform shrink-0" :class="commentLiked ? 'fill-rose-500 text-rose-500 scale-110' : 'text-slate-400'" viewBox="0 0 24 24">
                                         <path :fill="commentLiked ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                     </svg>
                                     <span x-text="commentLikesCount > 0 ? commentLikesCount : 'Suka'"></span>
@@ -1007,7 +1013,7 @@
                             </div>
                         </div>
                     @empty
-                        <div class="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400 text-xs">
+                        <div class="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-500 text-xs">
                             Belum ada ulasan atau diskusi untuk proyek ini. Jadilah yang pertama memberikan masukan!
                         </div>
                     @endforelse
@@ -1016,17 +1022,17 @@
             </div>
 
             <!-- Footer Navigasi Bawah -->
-            <div class="flex items-center justify-between pt-2">
-                <a href="{{ $backUrl }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-4 pt-2">
+                <a href="{{ $backUrl }}" class="w-full sm:w-auto min-h-[44px] sm:min-h-[40px] inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                     <span>Kembali ke Halaman Sebelumnya</span>
                 </a>
 
                 @if($project->demo_url)
                     <a href="{{ $project->demo_url }}" target="_blank" rel="noopener noreferrer"
-                       class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition">
+                       class="w-full sm:w-auto min-h-[44px] sm:min-h-[40px] inline-flex items-center justify-center gap-1.5 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition">
                         <span>Kunjungi Tautan Proyek</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </a>
                 @endif
             </div>

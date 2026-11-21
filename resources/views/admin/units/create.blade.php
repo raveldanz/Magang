@@ -88,12 +88,12 @@
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="pt-4 border-t border-gray-100 flex justify-end gap-3">
-                        <a href="{{ $backRoute }}" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                    <div class="pt-4 border-t border-gray-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+                        <a href="{{ $backRoute }}" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 w-full sm:w-auto px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                             Batal
                         </a>
                         <button type="submit"
-                            class="px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
+                            class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 w-full sm:w-auto px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
                             Simpan & Buka Lowongan
                         </button>
                     </div>

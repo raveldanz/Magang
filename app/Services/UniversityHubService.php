@@ -7,6 +7,7 @@ use App\Models\Application;
 use App\Models\University;
 use App\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Data "Pusat Kendali Perguruan Tinggi" (Admin\UniversityController@show):
@@ -109,11 +110,12 @@ class UniversityHubService
 
         // Search Mahasiswa
         if ($search !== null && trim($search) !== '') {
-            $sSearch = strtolower($search);
-            $studentsQuery->where(function ($q) use ($sSearch) {
-                $q->where('name', 'like', "%{$sSearch}%")
-                    ->orWhere('email', 'like', "%{$sSearch}%")
-                    ->orWhereHas('studentProfile', fn ($sp) => $sp->where('nim', 'like', "%{$sSearch}%")->orWhere('jurusan', 'like', "%{$sSearch}%"));
+            $sSearch = trim($search);
+            $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+            $studentsQuery->where(function ($q) use ($sSearch, $like) {
+                $q->where('name', $like, "%{$sSearch}%")
+                    ->orWhere('email', $like, "%{$sSearch}%")
+                    ->orWhereHas('studentProfile', fn ($sp) => $sp->where('nim', $like, "%{$sSearch}%")->orWhere('jurusan', $like, "%{$sSearch}%"));
             });
         }
 

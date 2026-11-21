@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-8 bg-[#F5F8FC] min-h-screen text-slate-900 font-sans">
+    <div data-student-fields class="py-8 bg-[#F5F8FC] min-h-screen text-slate-900 font-sans">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <!-- Flash Success Message -->
@@ -21,11 +21,11 @@
 
             <!-- Error Validasi Input -->
             @if ($errors->any())
-                <div class="p-4 bg-red-50 border border-red-200 text-red-800 rounded-2xl text-xs space-y-1 shadow-sm">
+                <div data-field-summary class="p-4 bg-red-50 border border-red-200 text-red-800 rounded-2xl text-xs space-y-1 shadow-sm">
                     <p class="font-bold">Pengajuan Gagal Dikirim:</p>
                     <ul class="list-disc list-inside">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
+                        @foreach ($errors->getMessages() as $field => $messages)
+                            <li data-field-message="{{ $field }}">{{ implode(' ', $messages) }}</li>
                         @endforeach
                     </ul>
                 </div>
@@ -63,7 +63,6 @@
                     $otherRejectedCount = $rejMembers->where('id', '!=', $rejectedGroupApplication->id)->filter(fn($a) => $a->statusValue() === 'rejected')->count();
                     $activeSiblingsCount = $rejMembers->where('id', '!=', $rejectedGroupApplication->id)->reject(fn($a) => in_array($a->statusValue(), ['rejected', 'resigned'], true))->count();
                     $isRejLeader = $rejectedGroupApplication->role_in_group === 'leader' || (int) $rejGroup->leader_user_id === (int) Auth::id();
-                    $studentProf = Auth::user()->studentProfile;
                 @endphp
                 <div class="bg-white rounded-2xl border-2 border-indigo-200 shadow-sm p-6 sm:p-7 space-y-5">
                     <div
@@ -137,73 +136,8 @@
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <!-- 1. CV -->
-                            <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
-                                <div class="flex items-center justify-between">
-                                    <label for="resubmit_cv" class="text-xs font-bold text-slate-800">1. Curriculum Vitae
-                                        (CV) - PDF</label>
-                                    @if(!empty($studentProf?->cv_path))
-                                        <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'cv']) }}"
-                                            target="_blank"
-                                            class="text-[11px] font-semibold text-blue-600 hover:underline">Lihat Saat Ini</a>
-                                    @endif
-                                </div>
-                                <input type="file" data-max-kb="{{ \App\Support\UploadRules::MAX_DOCUMENT_KB }}"
-                                    id="resubmit_cv" name="cv" accept=".pdf"
-                                    @change="if($event.target.files.length && $event.target.files[0].size > 2 * 1024 * 1024) { window.notify('Ukuran berkas CV maksimal 2MB.'); $event.target.value = ''; }"
-                                    class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer bg-white border border-slate-200 rounded-lg p-1" />
-                            </div>
-
-                            <!-- 2. Transkrip Nilai -->
-                            <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
-                                <div class="flex items-center justify-between">
-                                    <label for="resubmit_transkrip" class="text-xs font-bold text-slate-800">2. Transkrip
-                                        Nilai / Rapor - PDF</label>
-                                    @if(!empty($studentProf?->transcript_path))
-                                        <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'transkrip']) }}"
-                                            target="_blank"
-                                            class="text-[11px] font-semibold text-blue-600 hover:underline">Lihat Saat Ini</a>
-                                    @endif
-                                </div>
-                                <input type="file" data-max-kb="{{ \App\Support\UploadRules::MAX_DOCUMENT_KB }}"
-                                    id="resubmit_transkrip" name="transkrip" accept=".pdf"
-                                    @change="if($event.target.files.length && $event.target.files[0].size > 2 * 1024 * 1024) { window.notify('Ukuran berkas Transkrip Nilai / Rapor maksimal 2MB.'); $event.target.value = ''; }"
-                                    class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer bg-white border border-slate-200 rounded-lg p-1" />
-                            </div>
-
-                            <!-- 3. KTM -->
-                            <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
-                                <div class="flex items-center justify-between">
-                                    <label for="resubmit_id_card" class="text-xs font-bold text-slate-800">3. KTM / Kartu
-                                        Pelajar (PDF/JPG/PNG)</label>
-                                    @if(!empty($studentProf?->id_card_path))
-                                        <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'id_card']) }}"
-                                            target="_blank"
-                                            class="text-[11px] font-semibold text-blue-600 hover:underline">Lihat Saat Ini</a>
-                                    @endif
-                                </div>
-                                <input type="file" data-max-kb="{{ \App\Support\UploadRules::MAX_DOCUMENT_KB }}"
-                                    id="resubmit_id_card" name="id_card" accept=".pdf,.jpg,.jpeg,.png"
-                                    @change="if($event.target.files.length && $event.target.files[0].size > 2 * 1024 * 1024) { window.notify('Ukuran berkas KTM / Kartu Pelajar maksimal 2MB.'); $event.target.value = ''; }"
-                                    class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer bg-white border border-slate-200 rounded-lg p-1" />
-                            </div>
-
-                            <!-- 4. Surat Pengantar Kampus (Opsional) -->
-                            <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
-                                <div class="flex items-center justify-between">
-                                    <label for="resubmit_surat_pengantar" class="text-xs font-bold text-slate-800">4. Surat
-                                        Pengantar / Proposal (Opsional - PDF)</label>
-                                    @if(!empty($rejGroup->proposal_letter_path))
-                                        <a href="{{ route('documents.group.proposal', $rejGroup->id) }}" target="_blank"
-                                            class="text-[11px] font-semibold text-blue-600 hover:underline">Lihat Proposal
-                                            Tim</a>
-                                    @endif
-                                </div>
-                                <input type="file" data-max-kb="{{ \App\Support\UploadRules::MAX_DOCUMENT_KB }}"
-                                    id="resubmit_surat_pengantar" name="surat_pengantar" accept=".pdf"
-                                    @change="if($event.target.files.length && $event.target.files[0].size > 2 * 1024 * 1024) { window.notify('Ukuran Surat Pengantar / Proposal maksimal 2MB.'); $event.target.value = ''; }"
-                                    class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer bg-white border border-slate-200 rounded-lg p-1" />
-                            </div>
+                            <a class="sm:col-span-2 text-sm text-blue-700 underline" href="{{ route('student.profile.edit') }}">Perbarui CV dan KTM/KTP di Profil Saya</a>
+                            @include('student.application.campus-documents', ['scope' => 'revisi', 'required' => false])
                         </div>
 
                         @if($isRejLeader && $otherRejectedCount > 0)
@@ -521,29 +455,11 @@
                                         <span>Kirim Berkas Pengajuan Kelompok ke Admin Dinas</span>
                                     </h4>
 
-                                    @if($memberCount >= 2)
-                                        <form action="{{ route('student.group.submit') }}"
-                                            data-autosave="kirim-kelompok-{{ auth()->id() }}" method="POST"
-                                            enctype="multipart/form-data" class="space-y-4"
-                                            x-data="{ groupFileName: '', groupFileUrl: null }">
-                                            @csrf
-                                            <div class="space-y-2">
-                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                                    Surat Pengantar / Proposal Kelompok dari Kampus/Sekolah <span
-                                                        class="text-red-500">*</span>
-                                                </label>
-                                                <input type="file" data-max-kb="{{ \App\Support\UploadRules::MAX_DOCUMENT_KB }}"
-                                                    name="surat_pengantar" accept=".pdf" required @change="if($event.target.files.length) {
-                                                                       const f = $event.target.files[0];
-                                                                       if (f.size > 2 * 1024 * 1024) {
-                                                                           window.notify('Ukuran Surat Pengantar Kelompok melebihi batas maksimal (Maksimal 2 MB). Silakan pilih berkas yang lebih kecil.');
-                                                                           $event.target.value = '';
-                                                                       }
-                                                                   }"
-                                                    class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition bg-white border border-slate-200 rounded-xl p-1.5" />
-                                                <p class="text-[11px] text-slate-400">Format: Dokumen PDF resmi bertandatangan Dekan
-                                                    atau Kaprodi memuat seluruh nama anggota dengan ukuran maksimal 2MB.</p>
-                                            </div>
+                                @if($memberCount >= 2)
+                                    <form action="{{ route('student.group.submit') }}" data-autosave="kirim-kelompok-{{ auth()->id() }}" method="POST" enctype="multipart/form-data" class="space-y-4"
+                                          x-data="{ groupFileName: '', groupFileUrl: null }">
+                                        @csrf
+                                        @include('student.application.campus-documents', ['scope' => 'kelompok', 'required' => true])
 
                                             <div
                                                 class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
@@ -563,46 +479,383 @@
                                                 </button>
                                             </div>
                                         </form>
-
-                                        <form id="cancel-group-form" action="{{ route('student.group.cancel') }}" method="POST"
-                                            class="hidden">
-                                            @csrf
-                                        </form>
-                                    @else
-                                        <div
-                                            class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1">
-                                            <p class="font-bold">Menunggu Anggota Tambahan:</p>
-                                            <p>Kelompok magang minimal memiliki 2 anggota, yaitu Ketua dan minimal 1 Anggota. Berikan
-                                                Kode Gabung <strong
-                                                    class="font-mono text-indigo-700 bg-white px-2 py-0.5 rounded border border-amber-200">{{ $draftGroup->code }}</strong>
-                                                kepada rekan Anda agar mereka dapat bergabung.</p>
-                                        </div>
-                                        <div class="pt-2">
-                                            <form action="{{ route('student.group.cancel') }}" method="POST"
-                                                onsubmit="return confirm('Batalkan dan hapus kelompok ini?');">
-                                                @csrf
-                                                <button type="submit"
-                                                    class="px-4 py-2 text-red-600 hover:text-red-800 text-xs font-semibold rounded-xl transition cursor-pointer">
-                                                    Batalkan Kelompok
-                                                </button>
-                                            </form>
-                                        </div>
-                                    @endif
-                                </div>
-                            @else
-                                <div
-                                    class="p-4 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-900 flex items-center gap-3">
-                                    <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <div>
-                                        <p class="font-bold">Anda Terdaftar Sebagai Anggota</p>
-                                        <p class="text-blue-800 mt-0.5">Mohon tunggu Ketua Kelompok yaitu
-                                            <strong>{{ $draftGroup->leader->name }}</strong> mengunggah Surat Pengantar
-                                            Kampus/Sekolah dan mengirimkan berkas pengajuan ini ke Admin Dinas.</p>
                                     </div>
+                                @endif
+                            </div>
+                        @else
+                            <div class="p-4 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-900 flex items-center gap-3">
+                                <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <div>
+                                    <p class="font-bold">Anda Terdaftar Sebagai Anggota</p>
+                                    <p class="text-blue-800 mt-0.5">Mohon tunggu Ketua Kelompok yaitu <strong>{{ $draftGroup->leader->name }}</strong> mengunggah Proposal Kampus dan Surat Pengantar dan mengirimkan berkas pengajuan ini ke Admin Dinas.</p>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                @else
+                    <div x-data="{
+                        regMode: '{{ old('_application_mode') === 'group' || old('group_code') || old('name') || request('mode') === 'group' ? 'group' : (old('_application_mode') === 'individual' || old('unit_id') || request('mode') === 'individual' ? 'individual' : '') }}'
+                    }" class="space-y-6">
+
+                        <!-- Tampilan Awal: Pilihan 2 Card Besar Moda Pendaftaran -->
+                        <div x-show="!regMode" x-cloak class="space-y-6">
+                            <div class="text-center max-w-2xl mx-auto space-y-2 pt-2 pb-2">
+                                <span class="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
+                                    Tahap Awal Pendaftaran
+                                </span>
+                                <h3 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                                    Pilih Jalur Pendaftaran Magang
+                                </h3>
+                                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                                    Tentukan metode pendaftaran magang yang akan diajukan. Silakan pelajari ketentuan masing-masing jalur di bawah ini sebelum melanjutkan ke pengisian formulir.
+                                </p>
+                            </div>
+
+                            <!-- Grid 2 Card Besar -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                                <!-- Card 1: Pendaftaran Individu -->
+                                <div @click="regMode = 'individual'"
+                                     class="group relative rounded-3xl p-6 sm:p-8 bg-white hover:bg-blue-50/20 border-2 border-slate-200 hover:border-blue-500 shadow-sm hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-6">
+                                    <div class="space-y-5">
+                                        <div class="flex items-start justify-between gap-4">
+                                            <div class="w-14 h-14 rounded-2xl bg-blue-100 text-blue-700 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-all duration-200 shadow-xs shrink-0">
+                                                <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                </svg>
+                                            </div>
+                                            <span class="px-3.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
+                                                Jalur Mandiri
+                                            </span>
+                                        </div>
+
+                                        <div>
+                                            <h4 class="text-lg sm:text-xl font-black text-slate-900 group-hover:text-blue-700 transition-colors">
+                                                Pendaftaran Individu
+                                            </h4>
+                                            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                                                Pengajuan magang perorangan bagi peserta magang yang mendaftar secara mandiri.
+                                            </p>
+                                        </div>
+
+                                        <!-- Rincian Ketentuan Jalur Individu -->
+                                        <div class="space-y-2.5 pt-4 border-t border-slate-100">
+                                            <div class="flex items-start gap-2.5 text-xs text-slate-600">
+                                                <div class="w-4 h-4 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
+                                                    <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                                </div>
+                                                <span>Pendaftaran mandiri satu peserta magang perorangan.</span>
+                                            </div>
+                                            <div class="flex items-start gap-2.5 text-xs text-slate-600">
+                                                <div class="w-4 h-4 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
+                                                    <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                                </div>
+                                                <span>Surat pengantar dan surat penerimaan atas nama perorangan.</span>
+                                            </div>
+                                            <div class="flex items-start gap-2.5 text-xs text-slate-600">
+                                                <div class="w-4 h-4 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
+                                                    <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                                </div>
+                                                <span>Logbook, bimbingan, dan evaluasi dikelola mandiri.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="pt-4 border-t border-slate-100">
+                                        <button type="button"
+                                                class="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-2xl text-xs font-bold uppercase tracking-wider transition-all duration-150 flex items-center justify-center gap-2 shadow-sm hover:shadow-md cursor-pointer">
+                                            <span>Pilih Pendaftaran Individu</span>
+                                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Card 2: Pendaftaran Kelompok -->
+                                <div @click="regMode = 'group'"
+                                     class="group relative rounded-3xl p-6 sm:p-8 bg-white hover:bg-indigo-50/20 border-2 border-slate-200 hover:border-indigo-500 shadow-sm hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-6">
+                                    <div class="space-y-5">
+                                        <div class="flex items-start justify-between gap-4">
+                                            <div class="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-700 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center transition-all duration-200 shadow-xs shrink-0">
+                                                <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                </svg>
+                                            </div>
+                                            <span class="px-3.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                Jalur Tim Kampus/Sekolah
+                                            </span>
+                                        </div>
+
+                                        <div>
+                                            <h4 class="text-lg sm:text-xl font-black text-slate-900 group-hover:text-indigo-700 transition-colors">
+                                                Pendaftaran Kelompok
+                                            </h4>
+                                            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                                                Pengajuan magang bersama rekan satu kampus/sekolah pada satu unit kerja dinas.
+                                            </p>
+                                        </div>
+
+                                        <!-- Rincian Ketentuan Jalur Kelompok -->
+                                        <div class="space-y-2.5 pt-4 border-t border-slate-100">
+                                            <div class="flex items-start gap-2.5 text-xs text-slate-600">
+                                                <div class="w-4 h-4 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0 mt-0.5">
+                                                    <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                                </div>
+                                                <span>Pendaftaran bersama rekan satu kampus/sekolah.</span>
+                                            </div>
+                                            <div class="flex items-start gap-2.5 text-xs text-slate-600">
+                                                <div class="w-4 h-4 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0 mt-0.5">
+                                                    <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                                </div>
+                                                <span>Ketua tim mengunggah berkas bersama dan membagikan kode tim.</span>
+                                            </div>
+                                            <div class="flex items-start gap-2.5 text-xs text-slate-600">
+                                                <div class="w-4 h-4 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0 mt-0.5">
+                                                    <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                                </div>
+                                                <span>Diterbitkan surat penerimaan terpadu untuk seluruh anggota.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="pt-4 border-t border-slate-100">
+                                        <button type="button"
+                                                class="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-2xl text-xs font-bold uppercase tracking-wider transition-all duration-150 flex items-center justify-center gap-2 shadow-sm hover:shadow-md cursor-pointer">
+                                            <span>Pilih Pendaftaran Kelompok</span>
+                                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Moda 1: Pendaftaran Individu -->
+                        <div x-show="regMode === 'individual'" x-cloak class="space-y-6">
+                            <!-- Navigasi Kembali ke Pilihan Jalur -->
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                                <div class="space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <button type="button"
+                                                @click="regMode = ''"
+                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                                            <span>Ganti Jalur Pendaftaran</span>
+                                        </button>
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
+                                            Pendaftaran Individu
+                                        </span>
+                                    </div>
+                                    <h3 class="text-base sm:text-lg font-bold text-slate-900 mt-2">Formulir Pengajuan Magang Mandiri</h3>
+                                    <p class="text-xs text-slate-500">Lengkapi pilihan unit kerja, tanggal periode magang, dan dokumen pengantar dari kampus/sekolah Anda.</p>
+                                </div>
+                            </div>
+
+                            <form action="{{ route('student.application.store') }}" data-autosave="daftar-individu-{{ auth()->id() }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                                @csrf
+                                <input type="hidden" name="_application_mode" value="individual">
+
+                                <!-- Bagian A: Pilihan Instansi & Unit Kerja / Divisi Magang Dispusip -->
+                                @php
+                                    $selectedUnitId = old('unit_id', '');
+                                    $selectedUnit = $units->firstWhere('id', (int) $selectedUnitId);
+                                    $defaultAgency = $agencies->first();
+                                    $selectedAgencyId = old('agency_profile_id', $selectedUnit?->agency_profile_id ?? ($defaultAgency?->id ?? ''));
+
+                                    $agencyItems = $agencies->map(function ($a) {
+                                        return [
+                                            'id' => $a->id,
+                                            'name' => $a->agency_name,
+                                            'acronym' => $a->acronym,
+                                            'meta' => $a->address ?? 'Dinas Perpustakaan dan Kearsipan Kota Surabaya',
+                                        ];
+                                    })->values()->all();
+
+                                    $unitItems = $units->map(function ($u) {
+                                        $agencyName = $u->agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan';
+                                        $rem = $u->remaining_quota;
+                                        return [
+                                            'id' => $u->id,
+                                            'agency_profile_id' => $u->agency_profile_id,
+                                            'name' => $u->name,
+                                            'acronym' => $u->agencyProfile?->acronym,
+                                            'meta' => ($rem > 0 ? "Sisa Kuota: {$rem} orang" : "Kuota Penuh") . " • {$agencyName}",
+                                            'remaining_quota' => $rem,
+                                            'disabled' => $rem <= 0,
+                                        ];
+                                    })->values()->all();
+                                @endphp
+
+                                <!-- 1. Instansi Penempatan Tunggal Resmi -->
+                                <input type="hidden" name="agency_profile_id" value="{{ $selectedAgencyId }}">
+
+                                <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-white border border-blue-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div class="flex items-center gap-3.5 min-w-0">
+                                        <div class="w-12 h-12 rounded-xl bg-white border border-blue-100 p-1.5 flex items-center justify-center shrink-0 shadow-2xs">
+                                            <img src="{{ asset('images/logos/dispusip.png') }}" alt="Dispusip Surabaya" class="max-h-full max-w-full object-contain">
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-600 text-white uppercase tracking-wider">
+                                                    Instansi Tunggal Resmi
+                                                </span>
+                                                <span class="text-xs text-slate-500 font-medium hidden sm:inline">&bull; Pemkot Surabaya</span>
+                                            </div>
+                                            <h4 class="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight mt-0.5 truncate">
+                                                Dinas Perpustakaan dan Kearsipan Kota Surabaya
+                                            </h4>
+                                            <p class="text-[11px] text-slate-500 truncate mt-0.5">
+                                                Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Surabaya 60293
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="shrink-0 flex items-center gap-1.5 self-start sm:self-auto px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold">
+                                        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span>Mitra Resmi Terpilih</span>
+                                    </div>
+                                </div>
+
+                                <!-- 2. Pemilihan Bidang Resmi Dispusip -->
+                                <div>
+                                    <x-searchable-select
+                                        name="unit_id"
+                                        :items="$unitItems"
+                                        :selected="$selectedUnitId"
+                                        label="Pilihan Bidang / Divisi Resmi Dispusip Surabaya"
+                                        placeholder="-- Cari atau Pilih Bidang Resmi Dispusip Surabaya --"
+                                        :required="true"
+                                        :show-asterisk="true"
+                                    />
+                                    @error('unit_id')
+                                        <p data-inline-for="unit_id" class="text-xs text-red-600 font-semibold mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- Bagian B: Periode Magang -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-internship-period>
+
+                                    <!-- Tanggal Mulai -->
+                                    <div class="space-y-1.5">
+                                        <x-input-label for="start_date" value="Tanggal Mulai Magang" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                        <x-text-input id="start_date"
+                                                      name="start_date"
+                                                      type="date"
+                                                      class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-500 p-2.5"
+                                                      :value="old('start_date')"
+                                                      required />
+                                        <x-input-error data-inline-for="start_date" :messages="$errors->get('start_date')" class="mt-1" />
+                                    </div>
+
+                                    <!-- Tanggal Selesai -->
+                                    <div class="space-y-1.5">
+                                        <x-input-label for="end_date" value="Tanggal Selesai Magang" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                        <x-text-input id="end_date"
+                                                      name="end_date"
+                                                      type="date"
+                                                      class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-500 p-2.5"
+                                                      :value="old('end_date')"
+                                                      required />
+                                        <p class="text-xs text-slate-500">Durasi magang minimal satu bulan sejak tanggal mulai.</p>
+                                        <x-input-error data-inline-for="end_date" :messages="$errors->get('end_date')" class="mt-1" />
+                                    </div>
+                                </div>
+
+                                <hr class="border-slate-100">
+
+                                <!-- Upload Dokumen Persyaratan Magang -->
+                                <div class="space-y-5">
+                                    <div>
+                                        <h3 class="text-sm font-bold text-slate-900">Dokumen Persyaratan Magang</h3>
+                                        <p class="text-xs text-slate-500 mt-0.5">Unggah proposal kampus dan surat pengantar sebagai dua PDF terpisah. CV dan KTM/KTP diambil dari Profil Saya.</p>
+                                    </div>
+
+                                    @include('student.application.campus-documents', ['scope' => 'perorangan', 'required' => true])
+
+                                    <!-- Panel Dokumen Personal Otomatis dari Profil (Gaya Bersih Seragam Profil) -->
+@php
+    $studentProfile = Auth::user()->studentProfile;
+    $hasCv = !empty($studentProfile?->cv_path);
+    $hasIdCard = !empty($studentProfile?->id_card_path);
+    $allComplete = $hasCv && $hasIdCard;
+
+    $cvDisplayName = $hasCv ? ('CV_' . ($studentProfile?->nim ?? 'Peserta Magang') . '.pdf') : '';
+    $idCardExt = $hasIdCard ? pathinfo($studentProfile->id_card_path, PATHINFO_EXTENSION) : 'pdf';
+    $idCardDisplayName = $hasIdCard ? ('KTM_' . ($studentProfile?->nim ?? 'Peserta Magang') . '.' . $idCardExt) : '';
+@endphp
+
+<div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-3">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-full {{ $allComplete ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }} flex items-center justify-center font-bold text-xs">
+                @if($allComplete)
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                @else
+                    !
+                @endif
+            </div>
+            <h4 class="text-xs sm:text-sm font-bold text-slate-900">
+                Dokumen Personal Terhubung Otomatis dari Profil
+            </h4>
+        </div>
+
+        <a href="{{ route('student.profile.edit') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 hover:underline inline-flex items-center gap-1 self-start sm:self-auto">
+            <span>Perbarui di Profil Saya</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+    </div>
+
+    <p class="text-[11px] text-slate-500">
+        Anda tidak perlu mengunggah ulang berkas identitas pribadi. Dokumen di bawah ini ditarik langsung dari profil peserta magang Anda:
+    </p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+        <!-- 1. CV -->
+        <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-2">
+            <span class="block text-xs font-bold text-slate-800">1. Curriculum Vitae</span>
+            <div class="min-w-0">
+                @if($hasCv)
+                    <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'cv']) }}"
+                       target="_blank"
+                       class="text-blue-600 hover:text-blue-800 hover:underline font-semibold text-xs truncate block cursor-pointer"
+                       title="Buka CV">
+                        {{ $cvDisplayName }}
+                    </a>
+                @else
+                    <span class="text-xs text-rose-500 italic block">Belum diunggah di profil</span>
+                @endif
+            </div>
+        </div>
+
+        <!-- 2. KTM -->
+        <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-2">
+            <span class="block text-xs font-bold text-slate-800">2. KTM/KTP atau Kartu Pelajar</span>
+            <div class="min-w-0">
+                @if($hasIdCard)
+                    <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'id_card']) }}"
+                       target="_blank"
+                       class="text-blue-600 hover:text-blue-800 hover:underline font-semibold text-xs truncate block cursor-pointer"
+                       title="Buka KTM">
+                        {{ $idCardDisplayName }}
+                    </a>
+                @else
+                    <span class="text-xs text-rose-500 italic block">Belum diunggah di profil</span>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    @if(!$allComplete)
+        <div class="p-3 rounded-xl bg-amber-100/70 border border-amber-200 text-amber-900 text-xs flex items-center justify-between gap-2 mt-2">
+            <span>Berkas personal Anda belum lengkap. Silakan lengkapi pada menu Profil Saya sebelum mengirim pengajuan.</span>
+            <a href="{{ route('student.profile.edit') }}" class="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold text-[11px] shrink-0 transition">
+                Lengkapi Profil
+            </a>
+        </div>
+    @endif
+</div>
                                 </div>
                             @endif
                         </div>
@@ -611,20 +864,55 @@
                                             regMode: '{{ old('group_code') || old('name') || request('mode') === 'group' ? 'group' : (old('unit_id') || request('mode') === 'individual' ? 'individual' : '') }}'
                                         }" class="space-y-6">
 
-                                        <!-- Tampilan Awal: Pilihan 2 Card Besar Moda Pendaftaran -->
-                                        <div x-show="!regMode" x-cloak class="space-y-6">
-                                            <div class="text-center max-w-2xl mx-auto space-y-2 pt-2 pb-2">
-                                                <span
-                                                    class="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
-                                                    Tahap Awal Pendaftaran
-                                                </span>
-                                                <h3 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                                                    Pilih Jalur Pendaftaran Magang
-                                                </h3>
-                                                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                                                    Tentukan metode pendaftaran magang yang akan diajukan. Silakan pelajari ketentuan
-                                                    masing-masing jalur di bawah ini sebelum melanjutkan ke pengisian formulir.
-                                                </p>
+                        <!-- Moda 2: Pendaftaran Kelompok -->
+                        <div x-show="regMode === 'group'" x-cloak class="space-y-6">
+                            <!-- Navigasi Kembali ke Pilihan Jalur -->
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                                <div class="space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <button type="button"
+                                                @click="regMode = ''"
+                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                                            <span>Ganti Jalur Pendaftaran</span>
+                                        </button>
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                            Pendaftaran Kelompok
+                                        </span>
+                                    </div>
+                                    <h3 class="text-base sm:text-lg font-bold text-slate-900 mt-2">Pendaftaran Magang Bersama Tim</h3>
+                                    <p class="text-xs text-slate-500">Buat kelompok baru sebagai ketua tim atau bergabung ke kelompok rekan kampus/sekolah menggunakan kode undangan.</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <!-- Card A: Buat Kelompok Baru -->
+                                <div class="p-6 rounded-2xl bg-gradient-to-b from-blue-50/60 to-white border border-blue-200/80 shadow-xs flex flex-col justify-between space-y-5">
+                                    <div class="space-y-3">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-xs">
+                                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                                            </div>
+                                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 border border-blue-200">
+                                                Khusus Ketua Tim
+                                            </span>
+                                        </div>
+                                        <h4 class="text-base font-extrabold text-slate-900">Buat Kelompok Baru</h4>
+                                        <p class="text-xs text-slate-500">
+                                            Tentukan bidang dan rentang tanggal untuk membuat tim baru dan mendapatkan kode undangan.
+                                        </p>
+
+                                        <form action="{{ route('student.group.create') }}" data-autosave="buat-kelompok-{{ auth()->id() }}" method="POST" class="space-y-4 pt-2"
+                                              x-data="{
+                                                  selectedUnit: @js((string) old('unit_id', '')),
+                                                  unitsData: @js($units->mapWithKeys(fn($u) => [$u->id => ['name' => $u->name, 'quota' => $u->quota, 'remaining' => $u->remaining_quota]])),
+                                                  get currentUnit() { return this.unitsData[this.selectedUnit] || null; }
+                                              }">
+                                            @csrf
+                                <input type="hidden" name="_application_mode" value="group">
+                                            <div>
+                                                <x-input-label for="group_name" value="Nama Kelompok - Opsional" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                                <x-text-input id="group_name" name="name" type="text" :value="old('name')" placeholder="Contoh: Tim Digitalisasi Arsip" class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-white mt-1 p-2.5" />
                                             </div>
 
                                             <!-- Grid 2 Card Besar -->
@@ -789,33 +1077,49 @@
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" data-internship-period>
+                                                <div>
+                                                    <x-input-label for="group_start_date" value="Tanggal Mulai" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                                    <x-text-input id="group_start_date" name="start_date" type="date" :value="old('start_date')" required class="block w-full text-xs rounded-xl border-slate-200 bg-white mt-1 p-2" />
+                                                    <x-input-error data-inline-for="start_date" :messages="$errors->get('start_date')" class="mt-1" />
+                                                </div>
+                                                <div>
+                                                    <x-input-label for="group_end_date" value="Tanggal Selesai" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                                    <x-text-input id="group_end_date" name="end_date" type="date" :value="old('end_date')" required class="block w-full text-xs rounded-xl border-slate-200 bg-white mt-1 p-2" />
+                                                    <p class="text-xs text-slate-500">Durasi magang minimal satu bulan sejak tanggal mulai.</p>
+                                                    <x-input-error data-inline-for="end_date" :messages="$errors->get('end_date')" class="mt-1" />
+                                                </div>
+                                            </div>
+
+                                            <button type="submit" class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition flex items-center justify-center gap-2 cursor-pointer">
+                                                <span>Buat Kelompok & Dapatkan Kode</span>
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Card B: Gabung Kelompok Rekan -->
+                                <div class="p-6 rounded-2xl bg-gradient-to-b from-indigo-50/60 to-white border border-indigo-200/80 shadow-xs flex flex-col justify-between space-y-5">
+                                    <div class="space-y-3">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold shadow-xs">
+                                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+                                            </div>
+                                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-100 text-indigo-800 border border-indigo-200">
+                                                Khusus Anggota Tim
+                                            </span>
                                         </div>
 
-                                        <!-- Moda 1: Pendaftaran Individu -->
-                                        <div x-show="regMode === 'individual'" x-cloak class="space-y-6">
-                                            <!-- Navigasi Kembali ke Pilihan Jalur -->
-                                            <div
-                                                class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-                                                <div class="space-y-1">
-                                                    <div class="flex items-center gap-2">
-                                                        <button type="button" @click="regMode = ''"
-                                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
-                                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                                                            </svg>
-                                                            <span>Ganti Jalur Pendaftaran</span>
-                                                        </button>
-                                                        <span
-                                                            class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
-                                                            Pendaftaran Individu
-                                                        </span>
-                                                    </div>
-                                                    <h3 class="text-base sm:text-lg font-bold text-slate-900 mt-2">Formulir Pengajuan Magang
-                                                        Mandiri</h3>
-                                                    <p class="text-xs text-slate-500">Lengkapi pilihan unit kerja, tanggal periode magang,
-                                                        dan dokumen pengantar dari kampus/sekolah Anda.</p>
-                                                </div>
+                                        <form action="{{ route('student.group.join') }}" method="POST" class="space-y-4 pt-2">
+                                            @csrf
+                                <input type="hidden" name="_application_mode" value="group">
+                                            <div>
+                                                <x-input-label for="group_code" value="Kode Undangan Kelompok" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                                <x-text-input id="group_code" name="group_code" type="text" :value="old('group_code')" placeholder="Contoh: GRP-8K2A1P" required
+                                                              class="block w-full text-sm font-mono uppercase tracking-widest text-center font-bold rounded-xl border-slate-200 bg-white mt-1 p-2.5" />
+                                                <p class="text-[11px] text-slate-400 mt-1">Kode terdiri dari 6-10 karakter yang diberikan oleh Ketua Kelompok Anda.</p>
                                             </div>
 
                                             <form action="{{ route('student.application.store') }}"
@@ -1372,6 +1676,7 @@
                                         <div class="text-[11px] text-slate-400 mt-0.5 break-words">
                                             {{ $app->unit->agencyProfile->agency_name ?? '-' }}
                                         </div>
+                                        @include('student.application.campus-links', ['application' => $app])
                                     </td>
                                     <td class="py-4 px-4 text-xs text-slate-700 leading-relaxed">
                                         {{ \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M Y') }} s/d
@@ -1423,7 +1728,7 @@
                         @php $st = $app->statusValue(); @endphp
                         <div class="p-5 space-y-3 hover:bg-slate-50/70 transition-colors duration-150">
                             <!-- Header: Tanggal & Status -->
-                            <div class="flex items-center justify-between gap-2">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
                                 <div class="text-xs text-slate-400 font-mono">
                                     {{ $app->created_at->translatedFormat('d M Y, H:i') }}
                                 </div>
@@ -1432,8 +1737,7 @@
 
                             <!-- Body: Unit -->
                             <div>
-                                <div class="font-bold text-slate-900 text-sm leading-snug">{{ $app->unit->name ?? '-' }}
-                                </div>
+                                <div class="break-words font-bold text-slate-900 text-sm leading-snug">{{ $app->unit->name ?? '-' }}</div>
                                 @if($app->group_id && $app->group)
                                     <div class="mt-1">
                                         <span
@@ -1447,14 +1751,11 @@
                                     {{ $app->unit->agencyProfile->agency_name ?? '-' }}</div>
                             </div>
 
+                            @include('student.application.campus-links', ['application' => $app])
                             <!-- Body: Periode Magang -->
-                            <div
-                                class="text-xs text-slate-600 bg-slate-50/80 px-3 py-2 rounded-xl border border-slate-100 flex items-center justify-between">
-                                <span
-                                    class="text-slate-400 text-[11px] font-semibold uppercase tracking-wider">Periode</span>
-                                <span
-                                    class="font-medium text-slate-700">{{ \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M Y') }}
-                                    - {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}</span>
+                            <div class="text-xs text-slate-600 bg-slate-50/80 px-3 py-2 rounded-xl border border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                                <span class="text-slate-400 text-[11px] font-semibold uppercase tracking-wider">Periode</span>
+                                <span class="font-medium text-slate-700">{{ \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M Y') }} - {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}</span>
                             </div>
 
                             <!-- Footer: Catatan & Surat -->
@@ -1471,11 +1772,8 @@
                             @if (in_array($st, ['accepted', 'active', 'completed']))
                                 <div class="pt-1">
                                     <a href="{{ route('student.application.letter', $app->id) }}" target="_blank"
-                                        class="inline-flex w-full justify-center items-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 rounded-xl text-xs font-semibold transition">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
+                                       class="inline-flex min-h-[44px] w-full justify-center items-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 rounded-xl text-xs font-semibold transition">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                                         <span>Unduh Surat PDF</span>
                                     </a>
                                 </div>
@@ -1491,4 +1789,26 @@
 
         </div>
     </div>
+    <script>
+        document.querySelectorAll('[data-internship-period]').forEach(period => {
+            const start = period.querySelector('[name="start_date"]');
+            const end = period.querySelector('[name="end_date"]');
+
+            function updateMinimumEndDate() {
+                const date = start.valueAsDate;
+                if (!date) {
+                    end.removeAttribute('min');
+                    return;
+                }
+
+                const startDay = date.getUTCDate();
+                date.setUTCMonth(date.getUTCMonth() + 2, 0);
+                date.setUTCDate(Math.min(startDay, date.getUTCDate()));
+                end.min = date.toISOString().slice(0, 10);
+            }
+
+            start.addEventListener('input', updateMinimumEndDate);
+            updateMinimumEndDate();
+        });
+    </script>
 </x-app-layout>

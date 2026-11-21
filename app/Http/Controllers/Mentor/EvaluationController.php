@@ -192,9 +192,9 @@ class EvaluationController extends Controller
             $evaluation->nilai_kinerja = (int) round($scores[1] ?? $avg);
             $evaluation->nilai_laporan = (int) round($scores[2] ?? $avg);
         } else {
-            $evaluation->nilai_disiplin = $request->nilai_disiplin;
-            $evaluation->nilai_kinerja = $request->nilai_kinerja;
-            $evaluation->nilai_laporan = $request->nilai_laporan;
+            $evaluation->nilai_disiplin = (int) round((float) $request->nilai_disiplin);
+            $evaluation->nilai_kinerja = (int) round((float) $request->nilai_kinerja);
+            $evaluation->nilai_laporan = (int) round((float) $request->nilai_laporan);
             $univ = $placement->application?->user ? app(UniversityResolver::class)->forUser($placement->application->user) : null;
             $evaluation->mentor_aspects = [
                 ['name' => $univ ? $univ->getDinasComponent(1) : 'Kedisiplinan & Tata Tertib Kerja', 'score' => (float) $request->nilai_disiplin],

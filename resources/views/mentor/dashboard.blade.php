@@ -1,4 +1,40 @@
 <x-app-layout>
+    <style>
+        .mentor-phone-only { display: none; }
+        .mentor-extra-filters { display: contents; }
+
+        @media (max-width: 639px) {
+            .mentor-desktop-only { display: none; }
+            .mentor-phone-only { display: block; }
+            .mentor-shortcuts {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: .5rem;
+            }
+            .mentor-shortcuts a {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                min-height: 4rem;
+                padding: .65rem;
+                border: 1px solid #cbd5e1;
+                border-radius: .75rem;
+                background: white;
+                color: #1e3a8a;
+                font-weight: 600;
+                overflow-wrap: anywhere;
+            }
+            .mentor-shortcuts strong { font-size: 1.25rem; }
+            .mentor-extra-filters { display: grid; gap: .5rem; }
+            .mentor-filters-collapsed .mentor-extra-filters { display: none; }
+            .mentor-task-list:not(.mentor-task-list-expanded) li:nth-child(n+4) { display: none; }
+            .mentor-task-desc { display: none; }
+            .mentor-card-extra { display: none; }
+            .mentor-facts-quiet { display: none; } /* peserta tanpa tugas: cukup nama, status, dan tombol detail */
+            .mentor-card-facts { padding: .65rem; font-size: .875rem; }
+            .mentor-card-title { overflow-wrap: anywhere; }
+        }
+    </style>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
@@ -37,12 +73,18 @@
     <div class="py-6 sm:py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
+            <nav class="mentor-phone-only mentor-shortcuts" aria-label="Ringkasan bimbingan">
+                <a href="#judul-tugas"><strong>{{ $tasks->count() }}</strong>Tugas</a>
+                <a href="{{ route('mentor.logbooks.index') }}"><strong>{{ $stats['pending_logbooks'] }}</strong>Logbook tertunda</a>
+                <a href="#peserta-bimbingan"><strong>{{ $stats['total_students'] }}</strong>Peserta</a>
+            </nav>
+
             {{-- 1. DAFTAR TUGAS: satu daftar urut dari yang paling mendesak --}}
             <section class="bg-white rounded-2xl border border-slate-200 shadow-xs" aria-labelledby="judul-tugas" x-data="{ showAll: false }">
                 <div class="p-5 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                         <h3 id="judul-tugas" class="text-xl font-bold text-slate-900">Daftar Tugas Anda</h3>
-                        <p class="text-base text-slate-700 mt-0.5">
+                        <p class="hidden sm:block text-base text-slate-700 mt-0.5">
                             @if ($tasks->isNotEmpty())
                                 Perlu Tindakan Segera: kerjakan dari atas ke bawah. Klik tombol biru di setiap baris.
                             @else
@@ -61,7 +103,7 @@
                         <p class="text-lg font-semibold">Tidak ada tugas yang menunggu. Semua pekerjaan bimbingan sudah Anda selesaikan.</p>
                     </div>
                 @else
-                    <ol class="divide-y divide-slate-100">
+                    <ol class="mentor-task-list divide-y divide-slate-100" :class="{ 'mentor-task-list-expanded': showAll }">
                         @foreach ($tasks as $index => $task)
                             <li class="p-4 sm:p-5 flex flex-col md:flex-row md:items-center gap-4 {{ $task['urgent'] ? 'bg-rose-50/60' : '' }}"
                                 @if ($index >= $visibleTaskCount) x-show="showAll" x-cloak @endif>
@@ -79,7 +121,7 @@
                                             @endif
                                         </div>
                                         <p class="text-lg font-bold text-slate-900 leading-snug">{{ $task['title'] }}</p>
-                                        <p class="text-base text-slate-700 leading-relaxed">{{ $task['description'] }}</p>
+                                        <p class="mentor-task-desc sm:!block text-base text-slate-700 leading-relaxed">{{ $task['description'] }}</p>
                                     </div>
                                 </div>
                                 <a href="{{ $task['url'] }}"
@@ -90,9 +132,9 @@
                             </li>
                         @endforeach
                     </ol>
-                    @if ($tasks->count() > $visibleTaskCount)
-                        <div class="p-4 border-t border-slate-100 text-center">
-                            <button type="button" @click="showAll = !showAll"
+                    @if ($tasks->count() > 1)
+                        <div class="{{ $tasks->count() <= $visibleTaskCount ? ($tasks->count() > 3 ? 'mentor-phone-only' : 'hidden') : '' }} p-4 border-t border-slate-100 text-center">
+                            <button type="button" @click="showAll = !showAll" :aria-expanded="showAll"
                                     class="min-h-[48px] px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-900 text-base font-bold rounded-xl transition cursor-pointer">
                                 <span x-text="showAll ? 'Tampilkan lebih sedikit' : 'Tampilkan semua {{ $tasks->count() }} tugas'"></span>
                             </button>
@@ -103,8 +145,8 @@
 
             {{-- 2. PANDUAN SINGKAT: apa saja tugas mentor dan urutannya --}}
             <details class="bg-white rounded-2xl border border-slate-200 shadow-xs group">
-                <summary class="p-5 sm:p-6 cursor-pointer list-none flex items-center justify-between gap-3 min-h-[56px]">
-                    <span class="text-lg font-bold text-slate-900">Panduan singkat: apa saja tugas mentor?</span>
+                <summary class="px-4 py-3 sm:p-6 cursor-pointer list-none flex items-center justify-between gap-3 min-h-[48px] sm:min-h-[56px]">
+                    <span class="text-base sm:text-lg font-bold text-slate-900">Panduan tugas mentor</span>
                     <span class="text-base font-semibold text-blue-700 group-open:hidden">Buka panduan</span>
                     <span class="text-base font-semibold text-blue-700 hidden group-open:inline">Tutup</span>
                 </summary>
@@ -128,7 +170,7 @@
             </details>
 
             {{-- 3. RINGKASAN ANGKA (dihitung dari sumber yang sama dengan Daftar Tugas) --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div class="mentor-desktop-only grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
                     <span class="text-base font-semibold text-slate-700 block">Peserta Bimbingan</span>
                     <div class="text-3xl font-black text-slate-900 mt-1">{{ $stats['total_students'] }}</div>
@@ -186,8 +228,8 @@
                         'completed' => [\App\Enums\ApplicationStatus::COMPLETED->localizedLabel('mentor'), $stats['completed_students']],
                     ];
                 @endphp
-                <h3 class="text-xl font-bold text-slate-900">Daftar Peserta Bimbingan Magang</h3>
-                <div class="border-b border-slate-200 overflow-x-auto">
+                <h3 id="peserta-bimbingan" class="text-xl font-bold text-slate-900">Daftar Peserta Bimbingan Magang</h3>
+                <div class="mentor-desktop-only border-b border-slate-200 overflow-x-auto">
                     <nav class="flex gap-6 min-w-max" aria-label="Filter Status Peserta Magang">
                         @foreach ($tabs as $tabKey => [$tabLabel, $tabCount])
                             <a href="{{ route('mentor.dashboard', array_merge($tabBaseQuery, ['tab' => $tabKey])) }}"
@@ -202,9 +244,14 @@
 
                 <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
                     <form method="GET" action="{{ route('mentor.dashboard') }}" class="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
-                        @if(request('tab'))
-                            <input type="hidden" name="tab" value="{{ request('tab') }}">
-                        @endif
+                        <label class="sr-only" for="mentor-status">
+                            Status peserta
+                        </label>
+                        <select id="mentor-status" class="mentor-phone-only w-full min-h-[48px] rounded-xl border-slate-300" name="tab" onchange="this.form.requestSubmit()">
+                            @foreach ($tabs as $tabKey => [$tabLabel, $tabCount])
+                                <option value="{{ $tabKey }}" @selected($activeTab === $tabKey)>{{ $tabLabel }} ({{ $tabCount }})</option>
+                            @endforeach
+                        </select>
                         <div class="relative flex-1">
                             <label for="cari-mahasiswa" class="sr-only">Cari peserta magang</label>
                             <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-3.5 text-slate-500">
@@ -217,7 +264,11 @@
                                    class="w-full min-h-[48px] text-base border-slate-300 rounded-xl pl-11 pr-4 py-2.5 focus:ring-blue-600 focus:border-blue-600 shadow-2xs">
                         </div>
 
-                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0">
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0" x-data="{ filtersOpen: @js(request()->filled('university_id') || request()->filled('report_status')) }"
+                             :class="{ 'mentor-filters-collapsed': !filtersOpen }">
+                            <button type="button" class="mentor-phone-only min-h-[48px] bg-slate-100 rounded-xl font-semibold"
+                                    aria-controls="mentor-extra-filters" :aria-expanded="filtersOpen" @click="filtersOpen = !filtersOpen">Filter lanjutan</button>
+                            <div id="mentor-extra-filters" class="mentor-extra-filters">
                             <select name="report_status" onchange="this.form.submit()"
                                     aria-label="Filter status laporan akhir"
                                     class="min-h-[48px] py-2.5 pl-3.5 pr-9 text-base border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600 shadow-2xs bg-white">
@@ -242,6 +293,7 @@
                                 </select>
                             @endif
 
+                            </div>
                             <div class="flex items-center gap-2">
                                 <button type="submit" class="min-h-[48px] flex-1 sm:flex-initial px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-base font-bold rounded-xl shadow-xs transition cursor-pointer">
                                     Cari
@@ -262,7 +314,7 @@
             {{-- 5. DAFTAR MAHASISWA BIMBINGAN MENTOR --}}
             <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
                 <div class="p-5 border-b border-slate-100 flex items-center justify-between gap-2">
-                    <p class="text-base text-slate-700">Klik <strong>Buka</strong> untuk melihat logbook, laporan, dan nilai seorang peserta magang.</p>
+                    <p class="hidden sm:block text-base text-slate-700">Klik <strong>Buka</strong> untuk melihat logbook, laporan, dan nilai seorang peserta magang.</p>
                     <span class="text-sm text-slate-800 font-bold bg-slate-100 px-3 py-1 rounded-full shrink-0">
                         {{ $placements->total() }} Peserta Magang
                     </span>
@@ -296,18 +348,18 @@
                 {{-- Tampilan kartu untuk layar di bawah 1280px (ponsel, tablet, laptop dengan zoom besar) --}}
                 <div class="block xl:hidden divide-y divide-slate-100">
                     @forelse($rows as $row)
-                        <div class="p-4 sm:p-5 space-y-3">
+                        <div class="p-4 sm:p-5 space-y-2.5 sm:space-y-3">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="min-w-0">
-                                    <p class="font-bold text-lg text-slate-900 leading-snug">{{ $row['student']->name ?? '-' }}</p>
+                                    <p class="mentor-card-title font-bold text-lg text-slate-900 leading-snug">{{ $row['student']->name ?? '-' }}</p>
                                     <p class="text-sm text-slate-700 mt-0.5">NIM/NIS: {{ $row['profile']?->nim ?? '-' }}</p>
                                 </div>
                                 <x-status-badge :status="$row['status']" />
                             </div>
 
-                            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-base bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <dl class="mentor-card-facts {{ $row['taskCount'] > 0 ? '' : 'mentor-facts-quiet sm:!grid' }} grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-base bg-slate-50 p-4 rounded-xl border border-slate-200">
                                 <div><dt class="inline font-semibold text-slate-900">Kampus:</dt> <dd class="inline text-slate-800">{{ $row['univ'] }}</dd></div>
-                                <div><dt class="inline font-semibold text-slate-900">Unit:</dt> <dd class="inline text-slate-800">{{ $row['unit']->name ?? '-' }}</dd></div>
+                                <div class="mentor-card-extra sm:!block"><dt class="inline font-semibold text-slate-900">Unit:</dt> <dd class="inline text-slate-800">{{ $row['unit']->name ?? '-' }}</dd></div>
                                 <div>
                                     <dt class="inline font-semibold text-slate-900">Logbook:</dt>
                                     <dd class="inline {{ $row['logPending'] > 0 ? 'text-amber-800 font-bold' : 'text-slate-800' }}">
@@ -333,8 +385,8 @@
                             </dl>
 
                             <a href="{{ route('mentor.students.show', $row['p']->id) }}"
-                               class="w-full min-h-[52px] inline-flex items-center justify-center gap-2 py-3 px-4 {{ $row['taskCount'] > 0 ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-white border-2 border-slate-300 hover:bg-slate-50 text-slate-900' }} text-base font-bold rounded-xl transition">
-                                {{ $row['taskCount'] > 0 ? 'Buka ('.$row['taskCount'].' tugas)' : 'Buka' }}
+                               class="w-full min-h-[48px] sm:min-h-[52px] inline-flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 {{ $row['taskCount'] > 0 ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-white border-2 border-slate-300 hover:bg-slate-50 text-slate-900' }} text-base font-bold rounded-xl transition">
+                                {{ $row['taskCount'] > 0 ? 'Buka '.$row['taskCount'].' tugas peserta' : 'Buka detail peserta' }}
                             </a>
                         </div>
                     @empty

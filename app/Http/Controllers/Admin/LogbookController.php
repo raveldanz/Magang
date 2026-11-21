@@ -8,6 +8,7 @@ use App\Models\Logbook;
 use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\University;
+use App\Services\LogbookCsv;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -103,6 +104,15 @@ class LogbookController extends Controller
             }
         }
 
+        if ($request->query('export') === 'csv') {
+            $visiblePlacements = $query->select('placements.id');
+            if ($request->filled('placement_id')) {
+                $visiblePlacements->whereKey($request->integer('placement_id'));
+            }
+
+            return LogbookCsv::download(Logbook::whereIn('placement_id', $visiblePlacements));
+        }
+
         $placements = $query->latest()->paginate(15)->withQueryString();
 
         // Data Unit untuk Dropdown Filter
@@ -113,7 +123,7 @@ class LogbookController extends Controller
             $unitsQuery->where('agency_profile_id', $user->agency_profile_id);
         }
         $units = $unitsQuery->orderBy('name')->get();
-        $universities = University::orderBy('name')->get();
+        $universities = University::listable()->orderBy('name')->get();
 
         // Statistik Agregat Keseluruhan untuk Kartu Ringkasan
         $statsQuery = Logbook::query();

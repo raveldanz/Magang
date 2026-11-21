@@ -169,7 +169,7 @@ class ApplicationController extends Controller
         }
 
         $agencies = AgencyProfile::all();
-        $universities = University::orderBy('name')->get();
+        $universities = University::listable()->orderBy('name')->get();
 
         // Query Pembimbing Lapangan untuk modal aksi
         $pembimbingQuery = User::whereIn('role', ['mentor', 'pembimbing'])->with('unit');

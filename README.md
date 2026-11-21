@@ -103,6 +103,8 @@ composer install
 npm install
 ```
 
+Untuk instalasi dengan aset frontend yang sudah dibangun, jalankan `npm ci --omit=dev` untuk memasang `pdf-lib`. PHP memanggil `node` dari PATH server untuk menggabungkan dokumen kelompok.
+
 ### 3. Konfigurasi Environment (`.env`)
 Salin file template `.env.example` menjadi `.env`:
 ```bash
