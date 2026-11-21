@@ -5,20 +5,20 @@
             <a href="/" class="group transition-transform duration-300 hover:scale-105 inline-block focus:outline-none" title="Pemerintah Kota Surabaya">
                 <img src="{{ asset('images/logos/surabaya.png') }}" 
                      alt="Logo Pemkot Surabaya"
-                     class="h-12 w-auto object-contain drop-shadow-2xs transition-all"
-                     style="aspect-ratio: 960/1234; height: 48px; width: auto; object-fit: contain;">
+                     class="h-11 w-auto object-contain drop-shadow-2xs transition-all"
+                     style="aspect-ratio: 960/1234; height: 44px; width: auto; object-fit: contain;">
             </a>
-            <div class="h-7 w-px bg-slate-200"></div>
+            <div class="h-6 w-px bg-slate-200"></div>
             <a href="/" class="group transition-transform duration-300 hover:scale-105 inline-block focus:outline-none" title="Dinas Perpustakaan dan Kearsipan Kota Surabaya">
                 <img src="{{ asset('images/logos/dispusip.png') }}" 
                      alt="Logo Dispusip Surabaya"
-                     class="h-12 w-auto object-contain drop-shadow-2xs transition-all"
-                     style="height: 48px; width: auto; object-fit: contain;">
+                     class="h-11 w-auto object-contain drop-shadow-2xs transition-all"
+                     style="height: 44px; width: auto; object-fit: contain;">
             </a>
         </div>
 
         <!-- Header Text -->
-        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
             Pendaftaran Akun Portal Magang
         </h2>
         <p class="text-[11px] font-bold uppercase tracking-wider text-blue-700 mt-0.5">
@@ -30,14 +30,40 @@
     </div>
 
     @php
-        // Hanya nama institusi yang sudah diverifikasi yang ditawarkan; nama baru tetap boleh diketik.
-        $institutionNames = \App\Models\University::where('is_verified', true)->orderBy('name')->pluck('name');
+        $universities = \App\Models\University::orderBy('name')->get();
     @endphp
 
     <div class="bg-white pt-3.5 pb-5 px-5 sm:px-8 shadow-xl shadow-slate-200/60 rounded-3xl border border-slate-100"
-         x-data="{ roleType: @js(old('register_as') === 'advisor' ? 'advisor' : 'student') }">
+         x-data="{ 
+            roleType: '{{ old('register_as', 'student') }}',
+            email: '{{ old('email') }}',
+            isBlockedEmail(val) {
+                const v = val.trim().toLowerCase();
+                if (!v || !v.includes('@')) return false;
+                return /@(gmail|yahoo|ymail|hotmail|outlook|live|icloud|aol|mail|protonmail|yandex)\./i.test(v);
+            },
+            checkEmailValidity(el) {
+                const v = el.value.trim().toLowerCase();
+                if (!v) {
+                    el.setCustomValidity('Harap isi alamat email institusi Anda.');
+                } else if (el.validity.typeMismatch) {
+                    el.setCustomValidity('Masukkan format alamat email yang valid.');
+                } else if (this.isBlockedEmail(v)) {
+                    el.setCustomValidity('Gunakan email resmi kampus (.ac.id), sekolah (.sch.id), atau instansi (.go.id). Email pribadi (@gmail.com, dll) tidak diperbolehkan.');
+                } else {
+                    el.setCustomValidity('');
+                }
+            },
+            handleFormSubmit(e) {
+                if (this.isBlockedEmail(this.email)) {
+                    e.preventDefault();
+                    alert('Peringatan: Harap gunakan alamat email resmi institusi pendidikan (.ac.id / .sch.id) atau kedinasan (.go.id). Email pribadi seperti @gmail.com tidak diizinkan.');
+                    document.getElementById('email').focus();
+                }
+            }
+         }">
 
-        <form method="POST" action="{{ route('register') }}" class="space-y-3.5">
+        <form method="POST" action="{{ route('register') }}" @submit="handleFormSubmit($event)" class="space-y-3">
             @csrf
 
             <!-- Input Hidden Penentu Role -->
@@ -45,11 +71,10 @@
 
             <!-- Tab Switcher: Peserta Magang vs Pembimbing -->
             <div>
-                <label class="block font-bold text-slate-700 text-xs uppercase tracking-wider mb-1.5 text-left">
+                <label class="block font-bold text-slate-700 text-xs uppercase tracking-wider mb-1.5 text-center">
                     Daftar Sebagai:
                 </label>
                 <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200/80">
-                    <!-- Tab 1: Mahasiswa / Siswa -->
                     <button type="button"
                             @click="roleType = 'student'"
                             :class="roleType === 'student' 
@@ -60,7 +85,6 @@
                         <span class="text-[9.5px] opacity-85 font-normal">Mahasiswa / Siswa PKL</span>
                     </button>
 
-                    <!-- Tab 2: Dosen / Guru Pembimbing -->
                     <button type="button"
                             @click="roleType = 'advisor'"
                             :class="roleType === 'advisor' 
@@ -109,37 +133,42 @@
                        oninput="this.setCustomValidity('')"
                        class="block mt-1.5 w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm shadow-2xs py-2.5 px-3.5 transition" />
                 <datalist id="institution-list">
-                    @foreach($institutionNames as $institutionName)
-                        <option value="{{ $institutionName }}"></option>
+                    @foreach($universities as $univ)
+                        <option value="{{ $univ->name }}"></option>
                     @endforeach
                 </datalist>
                 <x-input-error :messages="$errors->get('university')" class="mt-1.5" />
-                <p class="mt-1.5 text-xs text-slate-600 leading-relaxed">
-                    Akun Pembimbing langsung bisa dipakai masuk. Peserta magang baru bisa memilih Anda setelah akun disetujui Admin Kampus/Sekolah.
-                </p>
             </div>
 
             <!-- Email Address -->
             <div>
                 <label for="email" class="block font-bold text-slate-700 text-xs uppercase tracking-wider leading-snug">
-                    ALAMAT EMAIL AKTIF
+                    ALAMAT EMAIL INSTITUSI
                 </label>
                 <input id="email" 
+                       x-model="email"
                        class="block mt-1.5 w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm shadow-2xs py-2.5 px-3.5 transition" 
                        type="email" 
                        name="email" 
                        value="{{ old('email') }}" 
                        required 
                        autocomplete="username" 
-                       :placeholder="roleType === 'advisor' ? 'email@kampus.ac.id / email@sekolah.sch.id / email aktif' : 'nama@email.com atau email institusi'"
-                       oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Harap isi alamat email Anda.')}else if(this.validity.typeMismatch){this.setCustomValidity('Masukkan format alamat email yang valid.')}"
-                       oninput="this.setCustomValidity('')" />
+                       :placeholder="roleType === 'advisor' ? 'nama@kampus.ac.id atau nama@sekolah.sch.id' : 'nim@student.kampus.ac.id atau siswa@sekolah.sch.id'"
+                       @invalid="checkEmailValidity($event.target)"
+                       @input="checkEmailValidity($event.target)" />
+
+                <template x-if="isBlockedEmail(email)">
+                    <div class="mt-1.5 p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-[11px] font-semibold flex items-start gap-1.5">
+                        <span class="shrink-0">⚠️</span>
+                        <span>Email pribadi tidak diizinkan. Gunakan email resmi kampus (<strong>.ac.id</strong>) atau sekolah (<strong>.sch.id</strong>).</span>
+                    </div>
+                </template>
+
                 <x-input-error :messages="$errors->get('email')" class="mt-1.5" />
             </div>
 
-            <!-- Password & Confirm Password (2 Kolom Sejajar di Desktop, 1 Kolom di Mobile) -->
+            <!-- Password & Confirm Password -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <!-- Password -->
                 <div>
                     <label for="password" class="block font-bold text-slate-700 text-xs uppercase tracking-wider leading-snug">
                         KATA SANDI
@@ -172,7 +201,6 @@
                     <x-input-error :messages="$errors->get('password')" class="mt-1.5" />
                 </div>
 
-                <!-- Confirm Password -->
                 <div>
                     <label for="password_confirmation" class="block font-bold text-slate-700 text-xs uppercase tracking-wider leading-snug">
                         KONFIRMASI SANDI

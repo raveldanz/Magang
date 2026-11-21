@@ -25,9 +25,11 @@ class ApplicationController extends Controller
     public function create()
     {
         $units = Unit::with('agencyProfile')
-            ->withCount(['applications as occupied_count_db' => function ($query) {
-                $query->occupyingQuota();
-            }])->get();
+            ->withCount([
+                'applications as occupied_count_db' => function ($query) {
+                    $query->occupyingQuota();
+                }
+            ])->get();
         $groupedUnits = $units->groupBy(function ($unit) {
             return $unit->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya';
         });
@@ -35,7 +37,7 @@ class ApplicationController extends Controller
         $user = Auth::user();
 
         // 1. Cek apakah mahasiswa sudah punya profil
-        if (! $user->studentProfile) {
+        if (!$user->studentProfile) {
             return redirect()->route('student.profile.edit')
                 ->with('error', 'Silakan lengkapi profil Anda terlebih dahulu sebelum mengajukan magang.');
         }
@@ -55,7 +57,7 @@ class ApplicationController extends Controller
         // 2b. Cek apakah mahasiswa sedang tergabung dalam kelompok berstatus draft
         $draftGroup = InternshipGroup::with(['leader.studentProfile', 'unit.agencyProfile', 'applications.user.studentProfile'])
             ->where('status', 'draft')
-            ->whereHas('applications', fn ($q) => $q->where('user_id', $user->id))
+            ->whereHas('applications', fn($q) => $q->where('user_id', $user->id))
             ->first();
 
         // 3. Ambil seluruh riwayat pengajuan mahasiswa
@@ -66,7 +68,7 @@ class ApplicationController extends Controller
 
         // 3b. Cek apakah pengajuan terakhir mahasiswa adalah anggota kelompok yang ditolak (perlu perbaikan berkas untuk kembali ke kelompoknya)
         $latestApp = $applicationHistory->first();
-        $rejectedGroupApplication = (! $activeApplication && ! $draftGroup && $latestApp && $latestApp->statusValue() === 'rejected' && $latestApp->group_id && $latestApp->group)
+        $rejectedGroupApplication = (!$activeApplication && !$draftGroup && $latestApp && $latestApp->statusValue() === 'rejected' && $latestApp->group_id && $latestApp->group)
             ? $latestApp
             : null;
 
@@ -83,7 +85,7 @@ class ApplicationController extends Controller
         $user = Auth::user();
 
         // 1. Cek kelengkapan profil mahasiswa
-        if (! $user->studentProfile) {
+        if (!$user->studentProfile) {
             return redirect()->route('student.profile.edit')
                 ->with('error', 'Silakan lengkapi profil Anda terlebih dahulu sebelum mengajukan magang.');
         }
@@ -108,23 +110,22 @@ class ApplicationController extends Controller
         $hasProfileDocs = $user->studentProfile->hasCompletePersonalDocuments();
         $hasUploadedAll = $request->hasFile('cv') && $request->hasFile('transkrip') && $request->hasFile('id_card');
 
-        if (! $hasProfileDocs && ! $hasUploadedAll) {
+        if (!$hasProfileDocs && !$hasUploadedAll) {
             return redirect()->route('student.profile.edit')
                 ->with('error', 'Silakan lengkapi berkas personal Anda yaitu CV, Transkrip Nilai, dan KTM pada menu Profil Saya terlebih dahulu.');
         }
 
         $request->validate([
             'unit_id' => 'required|exists:units,id',
-            'start_date' => 'required|date|after_or_equal:today',
+            'start_date' => 'required|date',
             'end_date' => ['required', 'date', 'after_or_equal:start_date', $this->maxInternshipEndRule($request)],
-            'surat_pengantar' => 'required|'.UploadRules::APPLICATION_DOCUMENT,
-            'cv' => 'nullable|'.UploadRules::APPLICATION_DOCUMENT,
-            'transkrip' => 'nullable|'.UploadRules::APPLICATION_DOCUMENT,
-            'id_card' => 'nullable|'.UploadRules::APPLICATION_ID_CARD,
+            'surat_pengantar' => 'required|' . UploadRules::APPLICATION_DOCUMENT,
+            'cv' => 'nullable|' . UploadRules::APPLICATION_DOCUMENT,
+            'transkrip' => 'nullable|' . UploadRules::APPLICATION_DOCUMENT,
+            'id_card' => 'nullable|' . UploadRules::APPLICATION_ID_CARD,
         ], [
             'start_date.required' => 'Tanggal mulai magang wajib diisi.',
             'start_date.date' => 'Tanggal mulai magang tidak valid.',
-            'start_date.after_or_equal' => 'Tanggal mulai magang tidak boleh sebelum hari ini.',
             'end_date.required' => 'Tanggal selesai magang wajib diisi.',
             'end_date.after_or_equal' => 'Tanggal selesai magang harus setelah atau sama dengan tanggal mulai.',
             'surat_pengantar.required' => 'Surat Pengantar dari kampus/sekolah wajib diunggah.',
@@ -172,21 +173,21 @@ class ApplicationController extends Controller
         }
 
         // Pastikan seluruh berkas prasyarat wajib telah terpenuhi sebelum membuat pengajuan
-        if (! $cvPath || ! $transcriptPath || ! $idCardPath) {
+        if (!$cvPath || !$transcriptPath || !$idCardPath) {
             $missingDocs = [];
-            if (! $cvPath) {
+            if (!$cvPath) {
                 $missingDocs[] = 'CV';
             }
-            if (! $transcriptPath) {
+            if (!$transcriptPath) {
                 $missingDocs[] = 'Transkrip Nilai / Rapor';
             }
-            if (! $idCardPath) {
+            if (!$idCardPath) {
                 $missingDocs[] = 'KTM / Kartu Pelajar';
             }
 
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Pengajuan magang belum dapat dikirim karena berkas prasyarat ('.implode(', ', $missingDocs).') belum lengkap. Silakan lengkapi berkas pada menu Profil Saya terlebih dahulu.');
+                ->with('error', 'Pengajuan magang belum dapat dikirim karena berkas prasyarat (' . implode(', ', $missingDocs) . ') belum lengkap. Silakan lengkapi berkas pada menu Profil Saya terlebih dahulu.');
         }
 
         // Simpan Data Pengajuan dalam transaksi + kunci baris user, supaya klik ganda /
@@ -212,7 +213,7 @@ class ApplicationController extends Controller
             return $this->createApplicationRecords($request, $proposalPath, $cvPath, $transcriptPath, $idCardPath);
         });
 
-        if (! $application) {
+        if (!$application) {
             // Pengajuan ganda dibatalkan: hapus hanya berkas baru yang diunggah pada request ini (jangan hapus berkas profil!)
             $storage->discard($newlyUploadedPaths);
 
@@ -300,12 +301,12 @@ class ApplicationController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->studentProfile) {
+        if (!$user->studentProfile) {
             return redirect()->route('student.profile.edit')
                 ->with('error', 'Silakan lengkapi profil Anda terlebih dahulu sebelum membuat kelompok.');
         }
 
-        if (! $user->studentProfile->hasCompletePersonalDocuments()) {
+        if (!$user->studentProfile->hasCompletePersonalDocuments()) {
             return redirect()->route('student.profile.edit')
                 ->with('error', 'Silakan lengkapi berkas personal Anda yaitu CV, Transkrip Nilai, dan KTM pada menu Profil Saya terlebih dahulu sebelum membuat kelompok.');
         }
@@ -319,11 +320,12 @@ class ApplicationController extends Controller
 
         $request->validate([
             'unit_id' => 'required|exists:units,id',
-            'start_date' => 'required|date|after_or_equal:today',
+            'start_date' => 'required|date',
             'end_date' => ['required', 'date', 'after_or_equal:start_date', $this->maxInternshipEndRule($request)],
             'name' => 'nullable|string|max:100',
         ], [
-            'start_date.after_or_equal' => 'Tanggal mulai magang tidak boleh sebelum hari ini.',
+            'start_date.required' => 'Tanggal mulai magang wajib diisi.',
+            'start_date.date' => 'Tanggal mulai magang tidak valid.',
             'end_date.after_or_equal' => 'Tanggal selesai magang harus setelah atau sama dengan tanggal mulai.',
         ]);
 
@@ -335,7 +337,7 @@ class ApplicationController extends Controller
         DB::transaction(function () use ($user, $request) {
             $group = InternshipGroup::create([
                 'code' => InternshipGroup::generateUniqueCode(),
-                'name' => $request->name ?: ('Kelompok '.$user->name),
+                'name' => $request->name ?: ('Kelompok ' . $user->name),
                 'leader_user_id' => $user->id,
                 'unit_id' => $request->unit_id,
                 'start_date' => $request->start_date,
@@ -368,12 +370,12 @@ class ApplicationController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->studentProfile) {
+        if (!$user->studentProfile) {
             return redirect()->route('student.profile.edit')
                 ->with('error', 'Silakan lengkapi profil Anda terlebih dahulu sebelum bergabung ke kelompok.');
         }
 
-        if (! $user->studentProfile->hasCompletePersonalDocuments()) {
+        if (!$user->studentProfile->hasCompletePersonalDocuments()) {
             return redirect()->route('student.profile.edit')
                 ->with('error', 'Silakan lengkapi berkas personal Anda yaitu CV, Transkrip Nilai, dan KTM pada menu Profil Saya terlebih dahulu sebelum bergabung ke kelompok.');
         }
@@ -392,7 +394,7 @@ class ApplicationController extends Controller
         $code = strtoupper(trim($request->group_code));
         $group = InternshipGroup::with(['leader.studentProfile', 'unit'])->where('code', $code)->where('status', 'draft')->first();
 
-        if (! $group) {
+        if (!$group) {
             $existingGroup = InternshipGroup::with(['leader.studentProfile', 'unit'])->where('code', $code)->first();
             if ($existingGroup) {
                 $rejectedMemberApp = Application::where('group_id', $existingGroup->id)
@@ -412,7 +414,7 @@ class ApplicationController extends Controller
         $leaderUnivId = $group->leader?->university_id;
         $userUnivId = $user->university_id;
         if ($leaderUnivId && $userUnivId && $leaderUnivId !== $userUnivId) {
-            return redirect()->back()->with('error', 'Anda tidak dapat bergabung karena kelompok ini dikhususkan untuk peserta magang dari '.($group->leader->university ?? 'kampus lain').'.');
+            return redirect()->back()->with('error', 'Anda tidak dapat bergabung karena kelompok ini dikhususkan untuk peserta magang dari ' . ($group->leader->university ?? 'kampus lain') . '.');
         }
 
         // Validasi batas maksimal aman anggota kelompok standar 100 orang
@@ -521,7 +523,7 @@ class ApplicationController extends Controller
             ->where('status', 'draft')
             ->first();
 
-        if (! $group) {
+        if (!$group) {
             return redirect()->back()->with('error', 'Kelompok tidak ditemukan.');
         }
 
@@ -542,7 +544,7 @@ class ApplicationController extends Controller
             ->where('status', 'draft')
             ->first();
 
-        if (! $group) {
+        if (!$group) {
             return redirect()->back()->with('error', 'Kelompok tidak ditemukan atau sudah diajukan.');
         }
 
@@ -551,7 +553,7 @@ class ApplicationController extends Controller
         }
 
         $request->validate([
-            'surat_pengantar' => 'required|'.UploadRules::APPLICATION_DOCUMENT,
+            'surat_pengantar' => 'required|' . UploadRules::APPLICATION_DOCUMENT,
         ], [
             'surat_pengantar.required' => 'Surat Pengantar / Proposal magang kelompok wajib diunggah.',
             'surat_pengantar.mimes' => 'File Surat Pengantar harus berformat PDF.',
@@ -614,7 +616,7 @@ class ApplicationController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->studentProfile) {
+        if (!$user->studentProfile) {
             return redirect()->route('student.profile.edit')
                 ->with('error', 'Silakan lengkapi profil Anda terlebih dahulu.');
         }
@@ -634,16 +636,16 @@ class ApplicationController extends Controller
             ->latest()
             ->first();
 
-        if (! $application || ! $application->group) {
+        if (!$application || !$application->group) {
             return redirect()->route('student.application.create')
                 ->with('error', 'Data pengajuan kelompok yang perlu diperbaiki tidak ditemukan.');
         }
 
         $request->validate([
-            'cv' => 'nullable|'.UploadRules::APPLICATION_DOCUMENT,
-            'transkrip' => 'nullable|'.UploadRules::APPLICATION_DOCUMENT,
-            'id_card' => 'nullable|'.UploadRules::APPLICATION_ID_CARD,
-            'surat_pengantar' => 'nullable|'.UploadRules::APPLICATION_DOCUMENT,
+            'cv' => 'nullable|' . UploadRules::APPLICATION_DOCUMENT,
+            'transkrip' => 'nullable|' . UploadRules::APPLICATION_DOCUMENT,
+            'id_card' => 'nullable|' . UploadRules::APPLICATION_ID_CARD,
+            'surat_pengantar' => 'nullable|' . UploadRules::APPLICATION_DOCUMENT,
         ], [
             'cv.mimes' => 'File CV harus berformat PDF.',
             'cv.max' => 'Ukuran file CV maksimal 2MB (2048 KB).',
