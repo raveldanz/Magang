@@ -11,6 +11,7 @@ use App\Services\AdvisorApprovalService;
 use App\Services\UniversityResolver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -40,10 +41,11 @@ class LecturerController extends Controller
             ->with(['academicPlacements.application.user', 'academicPlacements.finalreport', 'academicPlacements.evaluation']);
 
         if ($request->filled('search')) {
-            $search = strtolower($request->search);
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+            $search = trim((string) $request->search);
+            $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+            $query->where(function ($q) use ($search, $like) {
+                $q->where('name', $like, "%{$search}%")
+                    ->orWhere('email', $like, "%{$search}%");
             });
         }
 

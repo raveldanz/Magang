@@ -2,6 +2,8 @@
 
 namespace App\Services\Directory;
 
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -123,7 +125,7 @@ class SchoolDirectoryClient
             $response = Http::acceptJson()
                 ->when($ca, fn ($http) => $http->withOptions(['verify' => $ca]))
                 ->timeout((int) config('services.school_directory.timeout', 15))
-                ->retry(2, 500, fn ($e) => $e instanceof \Illuminate\Http\Client\ConnectionException || ($e instanceof \Illuminate\Http\Client\RequestException && $e->response->serverError()), throw: false)
+                ->retry(2, 500, fn ($e) => $e instanceof ConnectionException || ($e instanceof RequestException && $e->response->serverError()), throw: false)
                 ->get(rtrim((string) config('services.school_directory.base_url'), '/').$path, $query);
 
             // API sumber membalas 404 untuk pencarian tanpa hasil: itu hasil kosong, bukan kegagalan.

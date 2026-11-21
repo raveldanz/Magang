@@ -9,6 +9,7 @@ use App\Http\Controllers\Chat\ChatModerationController;
 use App\Http\Controllers\Chat\ChatPageController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\InstitutionSearchController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PrivateFileController;
 use App\Http\Controllers\ProfileController;
@@ -197,8 +198,8 @@ Route::get('/universities/master-search', [MasterUniversityApiController::class,
 
 // Pencarian async kampus/sekolah untuk dropdown (hanya pengguna login; melengkapi dari direktori nasional NPSN)
 Route::middleware(['auth', 'throttle:60,1'])->group(function () {
-    Route::get('/institutions/search', [\App\Http\Controllers\InstitutionSearchController::class, 'search'])->name('institutions.search');
-    Route::post('/institutions/resolve', [\App\Http\Controllers\InstitutionSearchController::class, 'resolve'])->name('institutions.resolve');
+    Route::get('/institutions/search', [InstitutionSearchController::class, 'search'])->name('institutions.search');
+    Route::post('/institutions/resolve', [InstitutionSearchController::class, 'resolve'])->name('institutions.resolve');
 });
 
 require __DIR__.'/student.php';

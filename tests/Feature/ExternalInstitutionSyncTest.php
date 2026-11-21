@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\University;
+use App\Models\User;
 use App\Services\MasterUniversityService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -90,7 +91,7 @@ class ExternalInstitutionSyncTest extends TestCase
 
         $this->getJson(route('institutions.search', ['q' => 'async']))->assertRedirect(); // tamu dialihkan ke halaman login
 
-        $user = \App\Models\User::factory()->create(['role' => 'mahasiswa']);
+        $user = User::factory()->create(['role' => 'mahasiswa']);
         $this->actingAs($user)->getJson(route('institutions.search', ['q' => 'async']))
             ->assertOk()
             ->assertJsonPath('data.0.id', $univ->id)
@@ -102,7 +103,7 @@ class ExternalInstitutionSyncTest extends TestCase
         config(['services.school_directory.base_url' => 'https://dir.test', 'services.school_directory.enabled' => true]);
         Cache::flush();
         Http::fake(['dir.test/sekolah/s*' => Http::response(['status' => 'success', 'dataSekolah' => [$this->row('90000123', 'SMKN 123 ASYNC')]])]);
-        $admin = \App\Models\User::factory()->create(['role' => 'super_admin']);
+        $admin = User::factory()->create(['role' => 'super_admin']);
 
         $res = $this->actingAs($admin)->getJson(route('institutions.search', ['q' => 'smkn 123 async']))->assertOk();
         $this->assertSame('npsn:90000123', $res->json('data.0.id'));
@@ -138,15 +139,17 @@ class ExternalInstitutionSyncTest extends TestCase
         $this->assertSame('pending', $manual->status);
         $this->assertSame(University::TYPE_COLLEGE, $manual->institution_type);
     }
+
     public function test_listable_tidak_memuat_sekolah_sinkron_yang_belum_dipakai(): void
     {
         University::create(['name' => 'SMA Tak Terpakai', 'code' => '22222222', 'institution_type' => University::TYPE_SCHOOL, 'is_verified' => true, 'status' => 'active']);
         $used = University::create(['name' => 'SMA Terpakai', 'code' => '33333333', 'institution_type' => University::TYPE_SCHOOL, 'is_verified' => true, 'status' => 'active']);
-        \App\Models\User::factory()->create(['role' => 'mahasiswa', 'university_id' => $used->id]);
+        User::factory()->create(['role' => 'mahasiswa', 'university_id' => $used->id]);
         University::create(['name' => 'Kampus Daftar', 'code' => 'KD1', 'institution_type' => University::TYPE_COLLEGE, 'is_verified' => true, 'status' => 'active']);
 
         $names = University::listable()->pluck('name');
         $this->assertTrue($names->contains('SMA Terpakai'));
         $this->assertTrue($names->contains('Kampus Daftar'));
         $this->assertFalse($names->contains('SMA Tak Terpakai'));
-    }}
+    }
+}

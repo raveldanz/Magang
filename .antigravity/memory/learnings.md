@@ -177,6 +177,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-157** | 2026-11-16 | Revisi Istilah & Peserta dari Sekolah | "Mahasiswa"/"Dosen"/"DPL" diganti "Peserta Magang"/"Pembimbing" di seluruh tampilan; profil peserta mendapat pilihan Sekolah (NIS, kelas) | RESOLVED |
 | **LRN-158** | 2026-11-16 | Master Sekolah & Surat untuk Peserta Sekolah | Pilihan sekolah di profil kosong tanpa data master; surat penerimaan/pengantar menulis "Universitas Saudara", "Dekan", "MBKM", NIM & semester untuk siswa SMK | RESOLVED |
 | **LRN-159** | 2026-11-16 | Pemeriksaan Siap Demo: Label Peserta Sekolah di Semua Peran | Label kampus ("Universitas / Prodi", "Smt", "Admin Universitas", MBKM) tampil untuk siswa; form feedback menampilkan kode peran mentah; `@php(...)` sebaris membuat form profil galat | RESOLVED |
+| **LRN-163** | 2026-11-20 | Audit Migrasi PostgreSQL 16: Regresi `strtolower()+LIKE`, Strict Integer & Transaksi `25P02` | 4 fitur pencarian gagal di PostgreSQL akibat `strtolower()` + `'like'` case-sensitive, nilai desimal mentor melanggar kolom `integer` (`22P02`), `ChatService::unreadTotalForNavbar()` memicu transaksi aborted (`25P02`) | RESOLVED |
 ---
 
 ## 3. Catatan Masalah & Solusi (Knowledge Base)
@@ -3814,12 +3815,6 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
      - Judul halaman dan sub-teks pada formulir pembuatan bidang (`resources/views/admin/units/create.blade.php`).
      - Matriks tabel rekapitulasi pada dashboard admin dinas (`resources/views/admin/dashboard.blade.php`).
      - Opsi dropdown dan kolom tabel laporan mahasiswa supervisor (`resources/views/supervisor/reports/index.blade.php`).
-  3. Memvalidasi visual secara otomatis menggunakan Playwright runner (Google Chrome channel) dengan tangkapan layar `admin_bidang_kelola_bidang.png` dan `admin_dispusip_unit_bidang.png`, serta memastikan test suite feature lulus 100% (26 tests, 143 assertions, Strict Exit Code 0).
-- **Prevention Rule**:
-  Gunakan istilah baku "Unit Bidang" untuk seluruh entitas subdivisi dinas Dispusip dan "Kelola Bidang" untuk ruang kerja personal admin bidang. Jangan menggunakan istilah tidak baku seperti "Devisi" pada teks antarmuka publik maupun kedinasan.
-
----
-
 ### [LRN-120] Tombol 'Preview Proyek', Ekspansi Kata Kunci Cerdas Kategori Inovasi & Algoritma Pembobotan Skor Cerdas
 - **Tanggal**: 2026-11-02
 - **Komponen**: `resources/views/student/projects/edit.blade.php`, `resources/views/student/projects/create.blade.php`, `app/Models/InternshipProject.php`, `tests/Feature/InternshipProjectAndSupervisorReportTest.php`, `scripts/verify_preview_proyek_and_smart_keywords.mjs`
@@ -4613,3 +4608,24 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   2. Kolom yang menyimpan kode (peran, status) tidak boleh ditampilkan mentah; sediakan method label di model.
   3. Saat aturan berubah (password sementara, istilah universal, tidak ada presensi), cari teks petunjuk/placeholder lama dengan grep di seluruh `resources/views` dan seeder.
   4. Di uji browser, hindari `form_input` pada `<select>` bawaan lalu klik mouse: pop-up bawaan bisa menahan klik berikutnya; isi `<select>` lewat skrip atau buka tab baru.
+
+### [LRN-163] Audit Migrasi PostgreSQL 16: Regresi Pencarian `strtolower()+LIKE`, Strict Integer Evaluasi & Transaksi Aborted `25P02`
+- **Date:** 2026-11-20
+- **Problem / Symptom:** Audit penuh migrasi ke PostgreSQL 16.15 dan eksekusi seluruh 578 tes PHPUnit langsung pada driver `pgsql` mengungkap: (1) 4 fitur pencarian runtime (`FeedbackController`, `University\DashboardController`, `University\LecturerController`, `UniversityHubService`) mengembalikan 0 hasil saat mencari nama/subjek berhuruf kapital karena memanggil `strtolower()` lalu mencocokkannya dengan operator `'like'` yang case-sensitive di PostgreSQL; (2) 4 query fallback `University::where('name', 'like', ...)` di Blade dosen dan 5 query `AgencyProfile::where('agency_name', 'like', '%Perpustakaan%')` bersifat case-sensitive; (3) cabang standar `Mentor\EvaluationController::store()` menulis input `numeric` mentah (berpotensi float seperti `88.5`) langsung ke kolom `integer` (`nilai_disiplin`, `nilai_kinerja`, `nilai_laporan`) sehingga berisiko `SQLSTATE[22P02]`; (4) `ChatService::unreadTotalForNavbar()` hanya mengandalkan `try/catch (QueryException)` tanpa cek `Schema::hasTable()`, sehingga ketika dipanggil di dalam transaksi PostgreSQL (`BEGIN` / `RefreshDatabase`) saat tabel chat belum ada, seluruh transaksi masuk status aborted (`SQLSTATE[25P02]`); (5) `config/queue.php` masih memakai default fallback `'sqlite'`, serta 2 tes (`LecturerUniversityQcFlowTest:154` menulis float `85.17` ke `nilai_akademik` integer dan `MasterUniversityAndFileValidationQcTest:207` hanya memeriksa header SQLite) gagal pada driver `pgsql`.
+- **Root Cause:** Pengujian otomatis standar sebelumnya hanya dijalankan pada SQLite `:memory:` (`phpunit.xml`), yang memiliki `LIKE` case-insensitive untuk ASCII, dynamic typing (menerima float pada kolom `INTEGER`), serta tidak membatalkan transaksi saat satu query gagal di dalam `try/catch`.
+- **Fix Applied:** Mengganti seluruh 4 pencarian runtime `strtolower() + 'like'` menjadi operator driver-aware `$like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';`; mengganti 4 query Blade dosen ke `UniversityResolver::forUser($student)` dan 5 lookup Dispusip ke `whereRaw('LOWER(agency_name) LIKE ?', ['%perpustakaan%'])`; menambahkan `(int) round((float) ...)` pada cabang standar `Mentor\EvaluationController::store()`; menambahkan guard `Schema::hasTable('chat_messages') && Schema::hasTable('chat_participants')` pada `ChatService::unreadTotalForNavbar()`; menyelaraskan default `config/queue.php` ke `'pgsql'`; menyesuaikan 2 tes dual-driver; serta menambahkan `tests/Feature/PostgresCompatibilityRegressionTest.php`. Seluruh 578 tes lulus 100% pada PostgreSQL 16.15 maupun SQLite `:memory:`.
+- **Prevention Rule:**
+  1. Dilarang menggabungkan `strtolower()` dengan operator `'like'` biasa di Eloquent/Query Builder; selalu gunakan `$like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';` atau `whereRaw('LOWER(col) LIKE ?', [...])`.
+  2. Selalu lakukan `(int) round((float) ...)` sebelum menulis input validasi `numeric` ke kolom bertipe `integer` di PostgreSQL.
+  3. Untuk guard tabel opsional (seperti `unreadTotalForNavbar()`), selalu periksa `Schema::hasTable(...)` sebelum mengeksekusi query agar tidak memicu `SQLSTATE[25P02]` saat berjalan di dalam transaksi PostgreSQL.
+  4. Jalankan suite PHPUnit juga pada database PostgreSQL audit terisolasi setelah perubahan query, model, atau migrasi agar ketidaksesuaian ketat PostgreSQL langsung tertangkap.
+
+### [LRN-164] Gabung PDF Kelompok Bergantung Node.js di Server; Supervisor Ditolak di Laporan Akhir
+- **Date:** 2026-11-21
+- **Problem / Symptom:** (1) Fitur "Unduh CV / KTP-KTM seluruh anggota (PDF)" menjalankan `node resources/js/server/merge-group-documents.mjs` (pdf-lib) lewat `Symfony\Process`. Paket demo (`scripts/make_demo_zip.ps1`) tidak menyertakan `node_modules` dan komputer kantor belum tentu memiliki Node.js, sehingga fitur pasti gagal saat demo. Aturan unit (`$admin->unit_id !== $group->unit_id`) juga menolak Supervisor yang tercatat di bidang lain. (2) Crawler semua role menemukan Supervisor mendapat 403 pada `/final-reports/{id}/file` dari halaman revisi sertifikat karena `FinalReportController::showFile()` hanya mengizinkan role `admin`.
+- **Root Cause:** Ketergantungan runtime server pada alat build (Node) dan pemeriksaan hak akses yang tidak membedakan Supervisor (cakupan instansi) dari admin bidang (cakupan bidang).
+- **Fix Applied:** `GroupDocumentBundleController` kini mengirim manifest JSON + route `admin.groups.documents.file` (izin admin/super_admin/supervisor, Supervisor dibatasi instansi saja); penggabungan dilakukan di peramban (`resources/js/group-documents.js`, `import('pdf-lib')` dibundel Vite). `showFile()` mengizinkan `supervisor` instansi yang sama. Tes di `InternshipGroupWorkflowTest` dan `SecurityAuthorizationTest`; uji nyata `node scripts/verify_group_bundle.mjs`; crawler `node scripts/crawl_roles.mjs`.
+- **Prevention Rule:**
+  1. Kode aplikasi di server tidak boleh memanggil Node/npm saat runtime; pekerjaan seperti olah PDF/gambar dilakukan di PHP atau di peramban dengan pustaka yang dibundel Vite.
+  2. Pemeriksaan `unit_id` hanya untuk admin bidang; Supervisor (Kepala Dinas) dicek per instansi (`ensureSupervisorAgencyScope`).
+  3. Setelah menambah halaman/tautan baru, jalankan `node scripts/crawl_roles.mjs`: tautan yang tampil di UI tetapi menghasilkan 403/404/500 dihitung sebagai bug.

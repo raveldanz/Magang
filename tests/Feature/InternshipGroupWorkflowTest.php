@@ -10,6 +10,7 @@ use App\Models\StudentProfile;
 use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -1331,7 +1332,7 @@ class InternshipGroupWorkflowTest extends TestCase
                 'start_date' => '2026-01-01', 'end_date' => '2026-02-01', 'status' => 'pending',
             ]);
         }
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML('<p>Halaman 1</p><div style="page-break-before: always">Halaman 2</div>')->output();
+        $pdf = Pdf::loadHTML('<p>Halaman 1</p><div style="page-break-before: always">Halaman 2</div>')->output();
         Storage::disk('local')->put($this->leader->studentProfile->cv_path, $pdf);
         Storage::disk('public')->put($this->member->studentProfile->cv_path, $pdf);
         $image = UploadedFile::fake()->image('ktp.png', 60, 40);
@@ -1361,7 +1362,7 @@ class InternshipGroupWorkflowTest extends TestCase
         }
 
         // Supervisor (Kepala Dinas) instansi yang sama boleh, meskipun tercatat di bidang lain; admin bidang lain tidak.
-        $otherUnit = \App\Models\Unit::create(['agency_profile_id' => $this->unit->agency_profile_id, 'name' => 'Bidang Lain', 'quota' => 5]);
+        $otherUnit = Unit::create(['agency_profile_id' => $this->unit->agency_profile_id, 'name' => 'Bidang Lain', 'quota' => 5]);
         $supervisor = User::factory()->create(['role' => 'supervisor', 'agency_profile_id' => $this->unit->agency_profile_id, 'unit_id' => $otherUnit->id]);
         $this->actingAs($supervisor)->getJson($cv)->assertOk()->assertJsonCount(2, 'files');
         $unitAdmin = User::factory()->create(['role' => 'admin', 'agency_profile_id' => $this->unit->agency_profile_id, 'unit_id' => $otherUnit->id]);

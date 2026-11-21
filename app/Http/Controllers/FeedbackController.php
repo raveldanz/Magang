@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Services\PrivateDocumentStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -54,12 +55,13 @@ class FeedbackController extends Controller
             $query->where('category', $request->category);
         }
         if ($request->filled('search')) {
-            $search = strtolower($request->search);
-            $query->where(function ($q) use ($search) {
-                $q->where('subject', 'like', "%{$search}%")
-                    ->orWhere('message', 'like', "%{$search}%")
-                    ->orWhere('sender_name', 'like', "%{$search}%")
-                    ->orWhere('sender_email', 'like', "%{$search}%");
+            $search = trim((string) $request->search);
+            $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+            $query->where(function ($q) use ($search, $like) {
+                $q->where('subject', $like, "%{$search}%")
+                    ->orWhere('message', $like, "%{$search}%")
+                    ->orWhere('sender_name', $like, "%{$search}%")
+                    ->orWhere('sender_email', $like, "%{$search}%");
             });
         }
 
@@ -82,7 +84,7 @@ class FeedbackController extends Controller
     {
         $user = Auth::user();
         $agencies = AgencyProfile::all();
-        $universities = University::all();
+        $universities = University::whereKey(old('target_university_id'))->get(); // dropdown memakai pencarian async
 
         return view('feedbacks.create', compact('user', 'agencies', 'universities'));
     }

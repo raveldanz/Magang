@@ -59,7 +59,7 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
         $this->assignedMentor = User::factory()->create(['role' => 'mentor', 'agency_profile_id' => $this->agency->id]);
         $this->unit = Unit::create(['agency_profile_id' => $this->agency->id, 'name' => 'Bidang Aptika', 'quota' => 5, 'head_user_id' => $this->unitHead->id]);
         $this->student = User::factory()->create(['role' => 'mahasiswa', 'university_id' => $this->univ->id]);
-        StudentProfile::create(['user_id' => $this->student->id, 'nim' => '1', 'universitas' => 'Universitas Uji', 'university_id' => $this->univ->id, 'jurusan' => 'TI', 'phone' => '08']);
+        StudentProfile::create(['user_id' => $this->student->id, 'nim' => '1', 'universitas' => 'Universitas Uji', 'university_id' => $this->univ->id, 'jurusan' => 'TI', 'phone' => '08', 'cv_path' => 'documents/student-profiles/cv.pdf', 'id_card_path' => 'documents/student-profiles/ktm.pdf']);
     }
 
     private function placement(string $status = 'active', array $data = []): Placement
@@ -155,9 +155,7 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
             'start_date' => Carbon::now()->addDays(5)->toDateString(),
             'end_date' => Carbon::now()->addDays(60)->toDateString(),
             'surat_pengantar' => UploadedFile::fake()->create('surat.pdf', 100, 'application/pdf'),
-            'cv' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
-            'transkrip' => UploadedFile::fake()->create('transkrip.pdf', 100, 'application/pdf'),
-            'id_card' => UploadedFile::fake()->create('ktm.pdf', 100, 'application/pdf'),
+            'proposal_kampus' => UploadedFile::fake()->create('proposal.pdf', 100, 'application/pdf'),
         ])->assertSessionHasNoErrors();
 
         $doc = ApplicationDocument::first();
@@ -192,9 +190,7 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
             'start_date' => Carbon::now()->addDays(5)->toDateString(),
             'end_date' => Carbon::now()->addDays(60)->toDateString(),
             'surat_pengantar' => UploadedFile::fake()->create('surat.pdf', 2049, 'application/pdf'),
-            'cv' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
-            'transkrip' => UploadedFile::fake()->create('transkrip.pdf', 100, 'application/pdf'),
-            'id_card' => UploadedFile::fake()->create('ktm.pdf', 100, 'application/pdf'),
+            'proposal_kampus' => UploadedFile::fake()->create('proposal.pdf', 100, 'application/pdf'),
         ])->assertSessionHasErrors('surat_pengantar');
 
         $this->assertSame(0, Application::count());

@@ -23,6 +23,7 @@
                 </p>
             </div>
         </div>
+        <a href="{{ route('admin.logbooks.index', array_merge(request()->except('page'), ['export' => 'csv'])) }}" class="inline-flex rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Ekspor logbook (CSV)</a>
     </x-slot>
 
     <div class="py-8">

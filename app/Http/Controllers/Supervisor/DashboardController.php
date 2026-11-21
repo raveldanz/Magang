@@ -21,7 +21,7 @@ class DashboardController extends Controller
         // Sinkronkan seluruh pengajuan magang yang tanggal mulainya telah tiba ke ACTIVE (on-demand batch sync)
         Application::syncStartedApplications();
 
-        $dispusip = AgencyProfile::where('agency_name', 'like', '%Perpustakaan%')->first()
+        $dispusip = AgencyProfile::whereRaw('LOWER(agency_name) LIKE ?', ['%perpustakaan%'])->first()
             ?? AgencyProfile::first();
 
         // 4 Bidang Resmi Dispusip

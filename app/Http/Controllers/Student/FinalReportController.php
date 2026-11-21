@@ -202,8 +202,8 @@ class FinalReportController extends Controller
 
         if ($isSuperAdmin) {
             $isAuthorized = true;
-        } elseif ($currentUser->role === 'admin') {
-            // Admin Dinas instansi yang sama
+        } elseif (in_array($currentUser->role, ['admin', 'supervisor'], true)) {
+            // Admin Dinas atau Supervisor (Kepala Dinas) instansi yang sama
             if ($currentUser->agency_profile_id && optional($application?->unit)->agency_profile_id === $currentUser->agency_profile_id) {
                 $isAuthorized = true;
             }

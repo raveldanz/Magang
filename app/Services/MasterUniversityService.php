@@ -228,6 +228,7 @@ class MasterUniversityService
             'require_dpl' => false,
         ]), 'created' => true];
     }
+
     /**
      * Skor kecocokan kata kunci terhadap nama-nama dan kode-kode sebuah entri master (0 = tidak cocok).
      *

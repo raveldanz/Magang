@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-8 bg-[#F5F8FC] min-h-screen text-slate-900 font-sans">
+    <div data-student-fields class="py-8 bg-[#F5F8FC] min-h-screen text-slate-900 font-sans">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <!-- Flash Success Message -->
@@ -20,11 +20,11 @@
 
             <!-- Error Validasi Input -->
             @if ($errors->any())
-                <div class="p-4 bg-red-50 border border-red-200 text-red-800 rounded-2xl text-xs space-y-1 shadow-sm">
+                <div data-field-summary class="p-4 bg-red-50 border border-red-200 text-red-800 rounded-2xl text-xs space-y-1 shadow-sm">
                     <p class="font-bold">Pengajuan Gagal Dikirim:</p>
                     <ul class="list-disc list-inside">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
+                        @foreach ($errors->getMessages() as $field => $messages)
+                            <li data-field-message="{{ $field }}">{{ implode(' ', $messages) }}</li>
                         @endforeach
                     </ul>
                 </div>
@@ -61,7 +61,6 @@
                     $otherRejectedCount = $rejMembers->where('id', '!=', $rejectedGroupApplication->id)->filter(fn($a) => $a->statusValue() === 'rejected')->count();
                     $activeSiblingsCount = $rejMembers->where('id', '!=', $rejectedGroupApplication->id)->reject(fn($a) => in_array($a->statusValue(), ['rejected', 'resigned'], true))->count();
                     $isRejLeader = $rejectedGroupApplication->role_in_group === 'leader' || (int) $rejGroup->leader_user_id === (int) Auth::id();
-                    $studentProf = Auth::user()->studentProfile;
                 @endphp
                 <div class="bg-white rounded-2xl border-2 border-indigo-200 shadow-sm p-6 sm:p-7 space-y-5">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-indigo-100">
@@ -122,57 +121,8 @@
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <!-- 1. CV -->
-                            <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
-                                <div class="flex items-center justify-between">
-                                    <label for="resubmit_cv" class="text-xs font-bold text-slate-800">1. Curriculum Vitae (CV) - PDF</label>
-                                    @if(!empty($studentProf?->cv_path))
-                                        <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'cv']) }}" target="_blank" class="text-[11px] font-semibold text-blue-600 hover:underline">Lihat Saat Ini</a>
-                                    @endif
-                                </div>
-                                <input type="file" data-max-kb="{{ \App\Support\UploadRules::MAX_DOCUMENT_KB }}" id="resubmit_cv" name="cv" accept=".pdf"
-                                       @change="if($event.target.files.length && $event.target.files[0].size > 2 * 1024 * 1024) { window.notify('Ukuran berkas CV maksimal 2MB.'); $event.target.value = ''; }"
-                                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer bg-white border border-slate-200 rounded-lg p-1" />
-                            </div>
-
-                            <!-- 2. Transkrip Nilai -->
-                            <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
-                                <div class="flex items-center justify-between">
-                                    <label for="resubmit_transkrip" class="text-xs font-bold text-slate-800">2. Transkrip Nilai / Rapor - PDF</label>
-                                    @if(!empty($studentProf?->transcript_path))
-                                        <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'transkrip']) }}" target="_blank" class="text-[11px] font-semibold text-blue-600 hover:underline">Lihat Saat Ini</a>
-                                    @endif
-                                </div>
-                                <input type="file" data-max-kb="{{ \App\Support\UploadRules::MAX_DOCUMENT_KB }}" id="resubmit_transkrip" name="transkrip" accept=".pdf"
-                                       @change="if($event.target.files.length && $event.target.files[0].size > 2 * 1024 * 1024) { window.notify('Ukuran berkas Transkrip Nilai / Rapor maksimal 2MB.'); $event.target.value = ''; }"
-                                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer bg-white border border-slate-200 rounded-lg p-1" />
-                            </div>
-
-                            <!-- 3. KTM -->
-                            <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
-                                <div class="flex items-center justify-between">
-                                    <label for="resubmit_id_card" class="text-xs font-bold text-slate-800">3. KTM / Kartu Pelajar (PDF/JPG/PNG)</label>
-                                    @if(!empty($studentProf?->id_card_path))
-                                        <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'id_card']) }}" target="_blank" class="text-[11px] font-semibold text-blue-600 hover:underline">Lihat Saat Ini</a>
-                                    @endif
-                                </div>
-                                <input type="file" data-max-kb="{{ \App\Support\UploadRules::MAX_DOCUMENT_KB }}" id="resubmit_id_card" name="id_card" accept=".pdf,.jpg,.jpeg,.png"
-                                       @change="if($event.target.files.length && $event.target.files[0].size > 2 * 1024 * 1024) { window.notify('Ukuran berkas KTM / Kartu Pelajar maksimal 2MB.'); $event.target.value = ''; }"
-                                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer bg-white border border-slate-200 rounded-lg p-1" />
-                            </div>
-
-                            <!-- 4. Surat Pengantar Kampus (Opsional) -->
-                            <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
-                                <div class="flex items-center justify-between">
-                                    <label for="resubmit_surat_pengantar" class="text-xs font-bold text-slate-800">4. Surat Pengantar / Proposal (Opsional - PDF)</label>
-                                    @if(!empty($rejGroup->proposal_letter_path))
-                                        <a href="{{ route('documents.group.proposal', $rejGroup->id) }}" target="_blank" class="text-[11px] font-semibold text-blue-600 hover:underline">Lihat Proposal Tim</a>
-                                    @endif
-                                </div>
-                                <input type="file" data-max-kb="{{ \App\Support\UploadRules::MAX_DOCUMENT_KB }}" id="resubmit_surat_pengantar" name="surat_pengantar" accept=".pdf"
-                                       @change="if($event.target.files.length && $event.target.files[0].size > 2 * 1024 * 1024) { window.notify('Ukuran Surat Pengantar / Proposal maksimal 2MB.'); $event.target.value = ''; }"
-                                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer bg-white border border-slate-200 rounded-lg p-1" />
-                            </div>
+                            <a class="sm:col-span-2 text-sm text-blue-700 underline" href="{{ route('student.profile.edit') }}">Perbarui CV dan KTM/KTP di Profil Saya</a>
+                            @include('student.application.campus-documents', ['scope' => 'revisi', 'required' => false])
                         </div>
 
                         @if($isRejLeader && $otherRejectedCount > 0)
@@ -425,21 +375,7 @@
                                     <form action="{{ route('student.group.submit') }}" data-autosave="kirim-kelompok-{{ auth()->id() }}" method="POST" enctype="multipart/form-data" class="space-y-4"
                                           x-data="{ groupFileName: '', groupFileUrl: null }">
                                         @csrf
-                                        <div class="space-y-2">
-                                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                                Surat Pengantar / Proposal Kelompok dari Kampus/Sekolah <span class="text-red-500">*</span>
-                                            </label>
-                                            <input type="file" data-max-kb="{{ \App\Support\UploadRules::MAX_DOCUMENT_KB }}" name="surat_pengantar" accept=".pdf" required
-                                                   @change="if($event.target.files.length) {
-                                                       const f = $event.target.files[0];
-                                                       if (f.size > 2 * 1024 * 1024) {
-                                                           window.notify('Ukuran Surat Pengantar Kelompok melebihi batas maksimal (Maksimal 2 MB). Silakan pilih berkas yang lebih kecil.');
-                                                           $event.target.value = '';
-                                                       }
-                                                   }"
-                                                   class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition bg-white border border-slate-200 rounded-xl p-1.5" />
-                                            <p class="text-[11px] text-slate-400">Format: Dokumen PDF resmi bertandatangan Dekan atau Kaprodi memuat seluruh nama anggota dengan ukuran maksimal 2MB.</p>
-                                        </div>
+                                        @include('student.application.campus-documents', ['scope' => 'kelompok', 'required' => true])
 
                                         <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
                                             <button type="submit"
@@ -479,14 +415,14 @@
                                 <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 <div>
                                     <p class="font-bold">Anda Terdaftar Sebagai Anggota</p>
-                                    <p class="text-blue-800 mt-0.5">Mohon tunggu Ketua Kelompok yaitu <strong>{{ $draftGroup->leader->name }}</strong> mengunggah Surat Pengantar Kampus/Sekolah dan mengirimkan berkas pengajuan ini ke Admin Dinas.</p>
+                                    <p class="text-blue-800 mt-0.5">Mohon tunggu Ketua Kelompok yaitu <strong>{{ $draftGroup->leader->name }}</strong> mengunggah Proposal Kampus dan Surat Pengantar dan mengirimkan berkas pengajuan ini ke Admin Dinas.</p>
                                 </div>
                             </div>
                         @endif
                     </div>
                 @else
                     <div x-data="{
-                        regMode: '{{ old('group_code') || old('name') || request('mode') === 'group' ? 'group' : (old('unit_id') || request('mode') === 'individual' ? 'individual' : '') }}'
+                        regMode: '{{ old('_application_mode') === 'group' || old('group_code') || old('name') || request('mode') === 'group' ? 'group' : (old('_application_mode') === 'individual' || old('unit_id') || request('mode') === 'individual' ? 'individual' : '') }}'
                     }" class="space-y-6">
 
                         <!-- Tampilan Awal: Pilihan 2 Card Besar Moda Pendaftaran -->
@@ -646,6 +582,7 @@
 
                             <form action="{{ route('student.application.store') }}" data-autosave="daftar-individu-{{ auth()->id() }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                                 @csrf
+                                <input type="hidden" name="_application_mode" value="individual">
 
                                 <!-- Bagian A: Pilihan Instansi & Unit Kerja / Divisi Magang Dispusip -->
                                 @php
@@ -721,17 +658,12 @@
                                         :show-asterisk="true"
                                     />
                                     @error('unit_id')
-                                        <p class="text-xs text-red-600 font-semibold mt-1">{{ $message }}</p>
+                                        <p data-inline-for="unit_id" class="text-xs text-red-600 font-semibold mt-1">{{ $message }}</p>
                                     @enderror
                                 </div>
 
                                 <!-- Bagian B: Periode Magang -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6"
-                                     x-data="{
-                                         startDate: @js(old('start_date', '')),
-                                         endDate: @js(old('end_date', '')),
-                                         today: '{{ date('Y-m-d') }}'
-                                     }">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-internship-period>
 
                                     <!-- Tanggal Mulai -->
                                     <div class="space-y-1.5">
@@ -739,12 +671,10 @@
                                         <x-text-input id="start_date"
                                                       name="start_date"
                                                       type="date"
-                                                      x-model="startDate"
-                                                      min="{{ date('Y-m-d') }}"
                                                       class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-500 p-2.5"
                                                       :value="old('start_date')"
                                                       required />
-                                        <x-input-error :messages="$errors->get('start_date')" class="mt-1" />
+                                        <x-input-error data-inline-for="start_date" :messages="$errors->get('start_date')" class="mt-1" />
                                     </div>
 
                                     <!-- Tanggal Selesai -->
@@ -753,12 +683,11 @@
                                         <x-text-input id="end_date"
                                                       name="end_date"
                                                       type="date"
-                                                      x-bind:min="startDate"
-                                                      x-model="endDate"
                                                       class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-500 p-2.5"
                                                       :value="old('end_date')"
                                                       required />
-                                        <x-input-error :messages="$errors->get('end_date')" class="mt-1" />
+                                        <p class="text-xs text-slate-500">Durasi magang minimal satu bulan sejak tanggal mulai.</p>
+                                        <x-input-error data-inline-for="end_date" :messages="$errors->get('end_date')" class="mt-1" />
                                     </div>
                                 </div>
 
@@ -768,79 +697,19 @@
                                 <div class="space-y-5">
                                     <div>
                                         <h3 class="text-sm font-bold text-slate-900">Dokumen Persyaratan Magang</h3>
-                                        <p class="text-xs text-slate-500 mt-0.5">Unggah Surat Pengantar resmi dari kampus/sekolah Anda. Dokumen personal CV, Transkrip/Rapor, dan KTM/Kartu Pelajar Anda otomatis terhubung dari profil.</p>
+                                        <p class="text-xs text-slate-500 mt-0.5">Unggah proposal kampus dan surat pengantar sebagai dua PDF terpisah. CV dan KTM/KTP diambil dari Profil Saya.</p>
                                     </div>
 
-                                    <!-- 1. Surat Pengantar / Proposal Kampus (Konsisten dengan Form Profil) -->
-                                    <div class="p-5 rounded-2xl border-2 border-blue-200/80 bg-blue-50/20 space-y-2.5"
-                                         x-data="{ chosenName: '', previewUrl: null }">
-
-                                        <div class="flex items-center justify-between">
-                                            <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider">
-                                                Surat Pengantar dari Kampus/Sekolah <span class="text-red-500">*</span>
-                                            </label>
-                                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800">
-                                                Wajib Diunggah
-                                            </span>
-                                        </div>
-
-                                        <div class="flex items-center gap-2 w-full pt-1">
-                                            <input type="file" data-max-kb="{{ \App\Support\UploadRules::MAX_DOCUMENT_KB }}"
-                                                   id="surat_pengantar"
-                                                   name="surat_pengantar"
-                                                   accept=".pdf"
-                                                   required
-                                                   class="hidden"
-                                                   @change="if($event.target.files.length) {
-                                                       const f = $event.target.files[0];
-                                                       if (f.size > 2 * 1024 * 1024) {
-                                                           window.notify('Ukuran Surat Pengantar melebihi batas maksimal (Maksimal 2 MB). Silakan pilih berkas yang lebih kecil.');
-                                                           $event.target.value = '';
-                                                           chosenName = '';
-                                                           previewUrl = null;
-                                                           return;
-                                                       }
-                                                       if (!f.name.toLowerCase().endsWith('.pdf')) {
-                                                           window.notify('Format Surat Pengantar harus berupa dokumen PDF (.pdf).');
-                                                           $event.target.value = '';
-                                                           chosenName = '';
-                                                           previewUrl = null;
-                                                           return;
-                                                       }
-                                                       chosenName = f.name;
-                                                       previewUrl = URL.createObjectURL(f);
-                                                   }" />
-
-                                            <button type="button"
-                                                    @click="document.getElementById('surat_pengantar').click()"
-                                                    class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
-                                                Pilih Berkas
-                                            </button>
-
-                                            <div class="min-w-0 flex-1 truncate text-xs">
-                                                <template x-if="chosenName">
-                                                    <a :href="previewUrl" target="_blank" class="text-blue-700 hover:text-blue-900 hover:underline font-bold truncate block cursor-pointer" :title="chosenName" x-text="chosenName"></a>
-                                                </template>
-                                                <template x-if="!chosenName">
-                                                    <span class="text-slate-400">Belum ada berkas dipilih</span>
-                                                </template>
-                                            </div>
-                                        </div>
-
-                                        <p class="text-[10px] text-slate-400">Format: Dokumen PDF resmi, Maks 2MB</p>
-                                        <x-input-error :messages="$errors->get('surat_pengantar')" class="mt-1" />
-                                    </div>
+                                    @include('student.application.campus-documents', ['scope' => 'perorangan', 'required' => true])
 
                                     <!-- Panel Dokumen Personal Otomatis dari Profil (Gaya Bersih Seragam Profil) -->
 @php
     $studentProfile = Auth::user()->studentProfile;
     $hasCv = !empty($studentProfile?->cv_path);
-    $hasTranscript = !empty($studentProfile?->transcript_path);
     $hasIdCard = !empty($studentProfile?->id_card_path);
-    $allComplete = $hasCv && $hasTranscript && $hasIdCard;
+    $allComplete = $hasCv && $hasIdCard;
 
     $cvDisplayName = $hasCv ? ('CV_' . ($studentProfile?->nim ?? 'Peserta Magang') . '.pdf') : '';
-    $transcriptDisplayName = $hasTranscript ? ('Transkrip_' . ($studentProfile?->nim ?? 'Peserta Magang') . '.pdf') : '';
     $idCardExt = $hasIdCard ? pathinfo($studentProfile->id_card_path, PATHINFO_EXTENSION) : 'pdf';
     $idCardDisplayName = $hasIdCard ? ('KTM_' . ($studentProfile?->nim ?? 'Peserta Magang') . '.' . $idCardExt) : '';
 @endphp
@@ -870,7 +739,7 @@
         Anda tidak perlu mengunggah ulang berkas identitas pribadi. Dokumen di bawah ini ditarik langsung dari profil peserta magang Anda:
     </p>
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
         <!-- 1. CV -->
         <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-2">
             <span class="block text-xs font-bold text-slate-800">1. Curriculum Vitae</span>
@@ -888,26 +757,9 @@
             </div>
         </div>
 
-        <!-- 2. Transkrip -->
+        <!-- 2. KTM -->
         <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-2">
-            <span class="block text-xs font-bold text-slate-800">2. Transkrip Nilai / Rapor</span>
-            <div class="min-w-0">
-                @if($hasTranscript)
-                    <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'transkrip']) }}"
-                       target="_blank"
-                       class="text-blue-600 hover:text-blue-800 hover:underline font-semibold text-xs truncate block cursor-pointer"
-                       title="Buka Transkrip">
-                        {{ $transcriptDisplayName }}
-                    </a>
-                @else
-                    <span class="text-xs text-rose-500 italic block">Belum diunggah di profil</span>
-                @endif
-            </div>
-        </div>
-
-        <!-- 3. KTM -->
-        <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-2">
-            <span class="block text-xs font-bold text-slate-800">3. KTM / Kartu Pelajar</span>
+            <span class="block text-xs font-bold text-slate-800">2. KTM/KTP atau Kartu Pelajar</span>
             <div class="min-w-0">
                 @if($hasIdCard)
                     <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'id_card']) }}"
@@ -991,6 +843,7 @@
                                                   get currentUnit() { return this.unitsData[this.selectedUnit] || null; }
                                               }">
                                             @csrf
+                                <input type="hidden" name="_application_mode" value="group">
                                             <div>
                                                 <x-input-label for="group_name" value="Nama Kelompok - Opsional" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
                                                 <x-text-input id="group_name" name="name" type="text" :value="old('name')" placeholder="Contoh: Tim Digitalisasi Arsip" class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-white mt-1 p-2.5" />
@@ -1021,14 +874,17 @@
                                                 </div>
                                             </div>
 
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" data-internship-period>
                                                 <div>
                                                     <x-input-label for="group_start_date" value="Tanggal Mulai" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
-                                                    <x-text-input id="group_start_date" name="start_date" type="date" min="{{ date('Y-m-d') }}" :value="old('start_date')" required class="block w-full text-xs rounded-xl border-slate-200 bg-white mt-1 p-2" />
+                                                    <x-text-input id="group_start_date" name="start_date" type="date" :value="old('start_date')" required class="block w-full text-xs rounded-xl border-slate-200 bg-white mt-1 p-2" />
+                                                    <x-input-error data-inline-for="start_date" :messages="$errors->get('start_date')" class="mt-1" />
                                                 </div>
                                                 <div>
                                                     <x-input-label for="group_end_date" value="Tanggal Selesai" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
-                                                    <x-text-input id="group_end_date" name="end_date" type="date" min="{{ date('Y-m-d') }}" :value="old('end_date')" required class="block w-full text-xs rounded-xl border-slate-200 bg-white mt-1 p-2" />
+                                                    <x-text-input id="group_end_date" name="end_date" type="date" :value="old('end_date')" required class="block w-full text-xs rounded-xl border-slate-200 bg-white mt-1 p-2" />
+                                                    <p class="text-xs text-slate-500">Durasi magang minimal satu bulan sejak tanggal mulai.</p>
+                                                    <x-input-error data-inline-for="end_date" :messages="$errors->get('end_date')" class="mt-1" />
                                                 </div>
                                             </div>
 
@@ -1058,6 +914,7 @@
 
                                         <form action="{{ route('student.group.join') }}" method="POST" class="space-y-4 pt-2">
                                             @csrf
+                                <input type="hidden" name="_application_mode" value="group">
                                             <div>
                                                 <x-input-label for="group_code" value="Kode Undangan Kelompok" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
                                                 <x-text-input id="group_code" name="group_code" type="text" :value="old('group_code')" placeholder="Contoh: GRP-8K2A1P" required
@@ -1119,6 +976,7 @@
                                         <div class="text-[11px] text-slate-400 mt-0.5 break-words">
                                             {{ $app->unit->agencyProfile->agency_name ?? '-' }}
                                         </div>
+                                        @include('student.application.campus-links', ['application' => $app])
                                     </td>
                                     <td class="py-4 px-4 text-xs text-slate-700 leading-relaxed">
                                         {{ \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}
@@ -1184,6 +1042,7 @@
                                 <div class="text-xs text-slate-500 mt-0.5">{{ $app->unit->agencyProfile->agency_name ?? '-' }}</div>
                             </div>
 
+                            @include('student.application.campus-links', ['application' => $app])
                             <!-- Body: Periode Magang -->
                             <div class="text-xs text-slate-600 bg-slate-50/80 px-3 py-2 rounded-xl border border-slate-100 flex flex-wrap items-center justify-between gap-2">
                                 <span class="text-slate-400 text-[11px] font-semibold uppercase tracking-wider">Periode</span>
@@ -1220,4 +1079,26 @@
 
         </div>
     </div>
+    <script>
+        document.querySelectorAll('[data-internship-period]').forEach(period => {
+            const start = period.querySelector('[name="start_date"]');
+            const end = period.querySelector('[name="end_date"]');
+
+            function updateMinimumEndDate() {
+                const date = start.valueAsDate;
+                if (!date) {
+                    end.removeAttribute('min');
+                    return;
+                }
+
+                const startDay = date.getUTCDate();
+                date.setUTCMonth(date.getUTCMonth() + 2, 0);
+                date.setUTCDate(Math.min(startDay, date.getUTCDate()));
+                end.min = date.toISOString().slice(0, 10);
+            }
+
+            start.addEventListener('input', updateMinimumEndDate);
+            updateMinimumEndDate();
+        });
+    </script>
 </x-app-layout>

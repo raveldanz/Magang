@@ -3,6 +3,9 @@
         <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
             {{ __('Logbook & Aktivitas Magang') }}
         </h2>
+        @if($placement)
+        <a href="{{ route('student.logbook.index', array_merge(request()->except('page'), ['export' => 'csv'])) }}" class="inline-flex rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Ekspor logbook (CSV)</a>
+        @endif
     </x-slot>
 
     <div class="py-5 sm:py-8 lg:py-10">

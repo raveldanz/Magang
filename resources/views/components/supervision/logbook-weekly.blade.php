@@ -131,7 +131,7 @@
                             </span>
                         @endif
                         @if ($role === 'lecturer')
-                            <span class="mt-1 inline-flex px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-sm font-medium">
+                            <span class="mt-1 hidden sm:inline-flex px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-sm font-medium">
                                 Verifikasi Pembimbing
                             </span>
                         @endif

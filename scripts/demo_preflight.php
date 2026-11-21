@@ -158,6 +158,21 @@ if ($driver === 'sqlite') {
     $pgDb = $envValue('DB_DATABASE') ?: 'magang';
     $pgUser = $envValue('DB_USERNAME') ?: 'postgres';
     $pgPass = $envValue('DB_PASSWORD') ?? '';
+
+    // Nyalakan PostgreSQL portabel (C:\pgsql) otomatis bila belum hidup
+    if (PHP_OS_FAMILY === 'Windows' && is_file('C:/pgsql/bin/pg_ctl.exe')) {
+        $probe = @fsockopen($pgHost, (int) $pgPort, $e1, $e2, 0.5);
+        if ($probe) {
+            fclose($probe);
+        } else {
+            $running = (string) @shell_exec('tasklist /FI "IMAGENAME eq postgres.exe" 2>NUL');
+            if (! stripos($running, 'postgres.exe') && is_file('C:/pgsql/data/postmaster.pid')) {
+                @unlink('C:/pgsql/data/postmaster.pid');
+            }
+            @exec('"C:\\pgsql\\bin\\pg_ctl.exe" -D "C:\\pgsql\\data" -l "C:\\pgsql\\logfile.log" -w -t 30 start >NUL 2>&1');
+        }
+    }
+
     $pgConnect = fn (string $db) => new PDO("pgsql:host={$pgHost};port={$pgPort};dbname={$db}", $pgUser, $pgPass, [PDO::ATTR_TIMEOUT => 3, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 
     // PDO melaporkan gagal sambung sebagai 08006; kode asli server (3D000) hanya ada di teks pesannya
