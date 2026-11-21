@@ -30,7 +30,7 @@ const strict = args.includes('--strict');
 const baseUrl = arg('--base', 'http://127.0.0.1:8000');
 const channel = arg('--channel', 'chrome');
 const maxProbes = Number(arg('--probes', 14));
-const scenarios = JSON.parse(fs.readFileSync(path.join(__dirname, 'stage_scenarios', `${stage}.json`), 'utf8'));
+const scenarios = JSON.parse(fs.readFileSync(path.join(__dirname, 'stage_scenarios', `${stage}.json`), 'utf8').replace(/^﻿/, ''));
 const outDir = path.join(root, 'public/test-artifacts/ui-stage', stage);
 fs.mkdirSync(outDir, { recursive: true });
 

@@ -306,7 +306,7 @@
                         <h3 class="font-bold text-sm sm:text-base text-slate-900">Tambah Pembimbing Baru</h3>
                         <p class="text-[11px] text-slate-400">Daftarkan pembimbing kampus</p>
                     </div>
-                    <button type="button" @click="showCreateModal = false" class="text-slate-400 hover:text-slate-600 text-sm font-bold">✕</button>
+                    <button type="button" @click="showCreateModal = false" class="inline-flex items-center justify-center h-11 w-11 sm:h-auto sm:w-auto text-slate-400 hover:text-slate-600 text-sm font-bold">✕</button>
                 </div>
 
                 <form method="POST" action="{{ route('university.lecturers.store') }}" class="space-y-3.5">
@@ -365,7 +365,7 @@
                         <h3 class="font-bold text-sm sm:text-base text-slate-900">Edit Data & Status Pembimbing</h3>
                         <p class="text-[11px] text-slate-400">Perbarui identitas atau status keaktifan pembimbing</p>
                     </div>
-                    <button type="button" @click="showEditModal = false" class="text-slate-400 hover:text-slate-600 text-sm font-bold">✕</button>
+                    <button type="button" @click="showEditModal = false" class="inline-flex items-center justify-center h-11 w-11 sm:h-auto sm:w-auto text-slate-400 hover:text-slate-600 text-sm font-bold">✕</button>
                 </div>
 
                 <form method="POST" :action="'/university/lecturers/' + editLecturer.id" class="space-y-3.5">

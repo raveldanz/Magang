@@ -409,7 +409,7 @@
                         </p>
                     </div>
                     <a href="{{ route('admin.mentors.index') }}"
-                        class="self-start sm:self-auto inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3.5 py-2 rounded-xl transition border border-blue-200 shadow-2xs">
+                        class="self-start sm:self-auto inline-flex items-center min-h-[44px] sm:min-h-0 gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3.5 py-2 rounded-xl transition border border-blue-200 shadow-2xs">
                         <span>Kelola Tim Mentor</span>
                     </a>
                 </div>
