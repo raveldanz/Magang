@@ -3,6 +3,8 @@ SIP-MAGANG - DEMO LEWAT WIFI (Dispusip Kota Surabaya)
 
 Panduan lengkap: PANDUAN_IT_SIP-MAGANG.pdf (di folder ini).
 Tidak perlu internet, Node.js, Composer, PostgreSQL, maupun instalasi apa pun.
+Bawaan zip memakai database SQLite. Bila komputer ini sudah terpasang PostgreSQL,
+lihat bagian "MEMAKAI POSTGRESQL" di bawah (opsional, dikerjakan sekali).
 
 CARA PAKAI (komputer server)
 ----------------------------
@@ -21,8 +23,25 @@ CARA PAKAI (komputer server)
 Berkas lain (tidak wajib):
   2_UJI_20_PENGGUNA.bat   uji otomatis 20 peserta selama 1 menit (saat demo menyala)
   3_RESET_DATA_DEMO.bat   kembalikan data demo ke awal (setelah demo dimatikan)
+  SAMBUNGKAN_POSTGRESQL.bat  pakai PostgreSQL yang sudah terpasang (lihat di bawah)
   CEK_KESIAPAN.bat        hanya memeriksa, tidak mengubah apa pun
   izinkan_firewall.bat    izin firewall manual (klik kanan > Run as administrator)
+
+MEMAKAI POSTGRESQL (opsional, sebelum langkah 2)
+------------------------------------------------
+1. Pastikan layanan PostgreSQL menyala (versi 12 ke atas, disarankan 16) dan Anda tahu
+   kata sandi pengguna "postgres" (diisi saat memasang PostgreSQL).
+2. Klik dua kali  SAMBUNGKAN_POSTGRESQL.bat  lalu jawab pertanyaannya
+   (cukup Enter untuk nilai bawaan; kata sandi tidak tampil saat diketik).
+   Database "sip_magang" dibuat otomatis dan diisi data demo.
+3. Setelah muncul [SELESAI], klik 1_MULAI_DEMO.bat seperti biasa.
+Kembali ke SQLite: hapus .env lalu ganti nama .env.sqlite.backup menjadi .env.
+
+INTERNET & DAFTAR SEKOLAH
+-------------------------
+- Demo berjalan tanpa internet. Bila ada internet, daftar SMA/SMK/SLB se-Indonesia
+  diambil otomatis (sekali seminggu, dicek tiap jam selama demo menyala).
+- Madrasah (MA) dan kampus yang belum ada tetap bisa diketik manual, lalu diverifikasi admin.
 
 JARINGAN
 --------

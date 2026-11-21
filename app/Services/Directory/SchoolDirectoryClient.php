@@ -124,6 +124,10 @@ class SchoolDirectoryClient
 
         try {
             $ca = config('services.school_directory.ca_bundle');
+            // Path di .env yang dibawa dari komputer lain (zip demo) tidak ada di sini: pakai bundel bawaan proyek.
+            if ($ca && ! is_file($ca)) {
+                $ca = is_file(resource_path('certs/cacert.pem')) ? resource_path('certs/cacert.pem') : null;
+            }
             $response = Http::acceptJson()
                 ->when($ca, fn ($http) => $http->withOptions(['verify' => $ca]))
                 ->timeout((int) config('services.school_directory.timeout', 15))

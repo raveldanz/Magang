@@ -40,8 +40,10 @@ return [
         'enabled' => env('SCHOOL_DIRECTORY_ENABLED', true),
         'base_url' => env('SCHOOL_DIRECTORY_URL', 'https://api-sekolah-indonesia.vercel.app'),
         'timeout' => (int) env('SCHOOL_DIRECTORY_TIMEOUT', 15),
-        // Windows/PHP tanpa curl.cainfo: isi dengan path cacert.pem (jangan matikan verifikasi SSL).
-        'ca_bundle' => env('SCHOOL_DIRECTORY_CA_BUNDLE'),
+        // PHP Windows sering tanpa curl.cainfo. Bawaan: bundel sertifikat Mozilla yang ikut proyek
+        // (resources/certs/cacert.pem), sehingga zip demo di PC mana pun tetap bisa memverifikasi SSL.
+        // Isi SCHOOL_DIRECTORY_CA_BUNDLE hanya bila jaringan kantor memakai sertifikat proxy sendiri.
+        'ca_bundle' => env('SCHOOL_DIRECTORY_CA_BUNDLE') ?: resource_path('certs/cacert.pem'),
     ],
 
     'vapid' => [

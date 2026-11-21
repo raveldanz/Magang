@@ -24,6 +24,8 @@ for /f "usebackq tokens=1,* delims==" %%A in ("%~dp0..\.env") do (
     if /i "%%A"=="DB_DATABASE" set "PGDATABASE=%%B"
     if /i "%%A"=="DB_PASSWORD" set "PGPASSWORD=%%B"
 )
+rem Kata sandi di .env bisa diapit tanda petik tunggal (ditulis SAMBUNGKAN_POSTGRESQL.bat)
+if defined PGPASSWORD set "PGPASSWORD=%PGPASSWORD:'=%"
 rem Nyalakan PostgreSQL portabel bila ada dan belum hidup
 if exist "C:\pgsql\bin\pg_ctl.exe" (
     "C:\pgsql\bin\pg_isready.exe" -h %PGHOST% -p %PGPORT% >nul 2>&1

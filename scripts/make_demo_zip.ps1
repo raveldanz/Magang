@@ -136,6 +136,9 @@ if ($envText -notmatch '(?m)^DB_CONNECTION=sqlite') {
     }
     $envText = [regex]::Replace($envText, '(?m)^(DB_(?:DATABASE|HOST|PORT|USERNAME|PASSWORD)=.*)$', '# $1')
 }
+# Path sertifikat SSL milik laptop ini tidak ada di laptop tujuan; tanpa baris ini aplikasi memakai
+# bundel bawaan proyek (resources/certs/cacert.pem) untuk API direktori sekolah.
+$envText = [regex]::Replace($envText, '(?m)^SCHOOL_DIRECTORY_CA_BUNDLE=.*\r?\n?', '')
 # Kunci notifikasi push (VAPID) tidak dipakai lewat alamat WiFi (bukan HTTPS) dan kunci privatnya tidak boleh
 # ikut ke laptop lain; dengan kunci kosong, layout tidak mendaftarkan push sama sekali.
 $envText = [regex]::Replace($envText, '(?m)^(VAPID_(?:PUBLIC|PRIVATE)_KEY)=.*$', '$1=')
