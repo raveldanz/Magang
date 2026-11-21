@@ -2,6 +2,7 @@ import Alpine from 'alpinejs';
 import { chatApp } from './chat/app';
 import { registerChatNotifier } from './chat/notifier';
 import { initAutosave, registerFormGuards } from './forms';
+import './group-documents';
 
 window.Alpine = Alpine;
 

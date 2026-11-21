@@ -191,6 +191,7 @@ class InternshipGroupWorkflowTest extends TestCase
 
         $response = $this->actingAs($this->leader)->post(route('student.group.submit'), [
             'surat_pengantar' => $file,
+            'proposal_kampus' => UploadedFile::fake()->create('proposal.pdf', 100, 'application/pdf'),
         ]);
 
         $response->assertRedirect(route('student.application.create'));
@@ -198,6 +199,13 @@ class InternshipGroupWorkflowTest extends TestCase
         $group->refresh();
         $this->assertEquals('pending', $group->status);
         $this->assertNotNull($group->proposal_letter_path);
+        foreach ($group->applications()->with('documents')->get() as $member) {
+            $cover = $member->documents->firstWhere('document_type', 'Surat Pengantar');
+            $proposal = $member->documents->firstWhere('document_type', 'Proposal Kampus');
+            $this->assertSame($group->proposal_letter_path, $cover->file_path);
+            $this->assertNotSame($cover->file_path, $proposal->file_path);
+            $this->actingAs($this->admin)->get(route('documents.application', $proposal))->assertOk();
+        }
 
         // Seluruh anggota kelompok berstatus pending
         $this->assertDatabaseHas('applications', [
@@ -1071,10 +1079,10 @@ class InternshipGroupWorkflowTest extends TestCase
         $this->assertDatabaseHas('placements', ['application_id' => $leaderApp->id]);
         $this->assertDatabaseMissing('placements', ['application_id' => $member1App->id]);
 
-        // 4. Member 1 memperbaiki berkas (upload transkrip baru) dan mengirim ulang ke kelompoknya via student.group.resubmit
-        $newTranscript = UploadedFile::fake()->create('transkrip_perbaikan.pdf', 200, 'application/pdf');
+        // 4. Member 1 memperbaiki proposal dan mengirim ulang ke kelompoknya via student.group.resubmit
+        $newProposal = UploadedFile::fake()->create('proposal_perbaikan.pdf', 200, 'application/pdf');
         $resubmitResp = $this->actingAs($this->member)->post(route('student.group.resubmit'), [
-            'transkrip' => $newTranscript,
+            'proposal_kampus' => $newProposal,
         ]);
         $resubmitResp->assertRedirect(route('student.application.create'));
         $resubmitResp->assertSessionHas('success');
@@ -1309,5 +1317,70 @@ class InternshipGroupWorkflowTest extends TestCase
             'application_id' => $memberApp->id,
             'mentor_id' => $this->mentor->id,
         ]);
+    }
+
+    public function test_admin_downloads_complete_private_group_pdfs_with_mixed_member_files(): void
+    {
+        $group = InternshipGroup::create([
+            'code' => 'GRP-BUNDLE', 'unit_id' => $this->unit->id, 'leader_user_id' => $this->leader->id,
+            'start_date' => '2026-01-01', 'end_date' => '2026-02-01',
+        ]);
+        foreach ([$this->leader, $this->member] as $student) {
+            Application::create([
+                'user_id' => $student->id, 'unit_id' => $this->unit->id, 'group_id' => $group->id,
+                'start_date' => '2026-01-01', 'end_date' => '2026-02-01', 'status' => 'pending',
+            ]);
+        }
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML('<p>Halaman 1</p><div style="page-break-before: always">Halaman 2</div>')->output();
+        Storage::disk('local')->put($this->leader->studentProfile->cv_path, $pdf);
+        Storage::disk('public')->put($this->member->studentProfile->cv_path, $pdf);
+        $image = UploadedFile::fake()->image('ktp.png', 60, 40);
+        Storage::disk('local')->put('documents/ktp.png', $image->getContent());
+        $this->leader->studentProfile->update(['id_card_path' => 'documents/ktp.png']);
+
+        $cv = route('admin.groups.documents', [$group, 'cv']);
+        $identity = route('admin.groups.documents', [$group, 'identitas']);
+        $other = User::factory()->create(['role' => 'admin', 'agency_profile_id' => AgencyProfile::create(['agency_name' => 'Instansi lain'])->id]);
+        $this->actingAs($other)->getJson($cv)->assertForbidden();
+        $this->actingAs($this->leader)->getJson($cv)->assertForbidden();
+
+        // Manifest: satu entri per anggota, urut sesuai pengajuan; PDF digabung di peramban (tanpa Node di server).
+        $manifest = $this->actingAs($this->admin)->getJson($cv)->assertOk()
+            ->assertJsonPath('filename', 'CV-Kelompok-'.$group->id.'.pdf')
+            ->assertJsonCount(2, 'files')
+            ->assertJsonPath('files.0.name', $this->leader->name)
+            ->assertJsonPath('files.0.type', 'application/pdf')
+            ->assertJsonPath('files.1.name', $this->member->name);
+
+        // Berkas tiap anggota disajikan lewat route berizin (disk privat maupun publik lama).
+        foreach ($manifest->json('files') as $entry) {
+            $file = $this->get($entry['url'])->assertOk()->assertHeader('Content-Type', 'application/pdf');
+            $this->assertStringStartsWith('%PDF', $file->streamedContent() ?: file_get_contents($file->baseResponse->getFile()->getPathname()));
+            $this->actingAs($other)->get($entry['url'])->assertForbidden();
+            $this->actingAs($this->admin);
+        }
+
+        // Supervisor (Kepala Dinas) instansi yang sama boleh, meskipun tercatat di bidang lain; admin bidang lain tidak.
+        $otherUnit = \App\Models\Unit::create(['agency_profile_id' => $this->unit->agency_profile_id, 'name' => 'Bidang Lain', 'quota' => 5]);
+        $supervisor = User::factory()->create(['role' => 'supervisor', 'agency_profile_id' => $this->unit->agency_profile_id, 'unit_id' => $otherUnit->id]);
+        $this->actingAs($supervisor)->getJson($cv)->assertOk()->assertJsonCount(2, 'files');
+        $unitAdmin = User::factory()->create(['role' => 'admin', 'agency_profile_id' => $this->unit->agency_profile_id, 'unit_id' => $otherUnit->id]);
+        $this->actingAs($unitAdmin)->getJson($cv)->assertForbidden();
+        $this->actingAs($this->admin);
+        // Anggota kelompok lain tidak dapat diambil lewat kelompok ini.
+        $outsider = Application::create([
+            'user_id' => User::factory()->create(['role' => 'mahasiswa'])->id, 'unit_id' => $this->unit->id,
+            'start_date' => '2026-01-01', 'end_date' => '2026-02-01', 'status' => 'pending',
+        ]);
+        $this->get(route('admin.groups.documents.file', [$group, 'cv', $outsider]))->assertNotFound();
+
+        // Berkas belum lengkap: pesan menyebut nama anggota (JSON untuk peramban, flash untuk akses langsung).
+        $this->getJson($identity)->assertStatus(422)->assertJsonPath('message', fn ($text) => str_contains($text, $this->member->name));
+        $this->get($identity)->assertRedirect()->assertSessionHas('error', fn ($text) => str_contains($text, $this->member->name));
+
+        Storage::disk('local')->put($this->member->studentProfile->id_card_path, $pdf);
+        $this->getJson($identity)->assertOk()
+            ->assertJsonPath('files.0.type', 'image/png')
+            ->assertJsonPath('files.1.type', 'application/pdf');
     }
 }

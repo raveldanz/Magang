@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ApplicationController as AdminApplicationControll
 use App\Http\Controllers\Admin\AuditLogController as AdminAuditLogController;
 use App\Http\Controllers\Admin\CertificateController as AdminCertificateController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\GroupDocumentBundleController;
 use App\Http\Controllers\Admin\LogbookController as AdminLogbookController;
 use App\Http\Controllers\Admin\MentorController as AdminMentorController;
 use App\Http\Controllers\Admin\PlacementAssignmentController;
@@ -32,6 +33,12 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::post('/admin/applications/bulk-update', [AdminApplicationController::class, 'bulkUpdateStatus'])->name('admin.applications.bulk_update');
     Route::get('/admin/applications/{id}', [AdminApplicationController::class, 'show'])->name('admin.applications.show')->withoutMiddleware(['role:admin,super_admin'])->middleware('role:admin,super_admin,supervisor');
     Route::match(['put', 'patch'], '/admin/applications/{id}', [AdminApplicationController::class, 'updateStatus'])->name('admin.applications.updateStatus')->withoutMiddleware(['role:admin,super_admin'])->middleware('role:admin,super_admin,supervisor');
+    Route::get('/admin/groups/{group}/documents/{type}', GroupDocumentBundleController::class)
+        ->whereIn('type', ['cv', 'identitas'])->name('admin.groups.documents')
+        ->withoutMiddleware(['role:admin,super_admin'])->middleware('role:admin,super_admin,supervisor');
+    Route::get('/admin/groups/{group}/documents/{type}/{application}', [GroupDocumentBundleController::class, 'file'])
+        ->whereIn('type', ['cv', 'identitas'])->whereNumber('application')->name('admin.groups.documents.file')
+        ->withoutMiddleware(['role:admin,super_admin'])->middleware('role:admin,super_admin,supervisor');
     Route::match(['put', 'patch'], '/admin/groups/{id}/status', [AdminApplicationController::class, 'updateGroupStatus'])->name('admin.groups.update_status');
     Route::get('/admin/applications/{id}/letter', [AdminApplicationController::class, 'downloadLetter'])->name('admin.applications.letter');
     Route::patch('/admin/applications/{id}/assignment', [PlacementAssignmentController::class, 'update'])->name('admin.applications.assignment');
