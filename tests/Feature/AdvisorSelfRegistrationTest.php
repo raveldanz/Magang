@@ -150,25 +150,40 @@ class AdvisorSelfRegistrationTest extends TestCase
         $this->assertDatabaseMissing('users', ['email' => 'tanpa.institusi@example.test']);
     }
 
-    public function test_personal_email_is_rejected_but_campus_subdomain_is_accepted(): void
+    public function test_advisor_needs_institution_email_but_campus_subdomain_is_accepted(): void
     {
-        foreach (['siswa@gmail.com', 'siswa@yahoo.co.id', 'siswa@outlook.com'] as $email) {
+        foreach (['guru@gmail.com', 'guru@yahoo.co.id', 'guru@outlook.com'] as $email) {
             $this->post('/register', [
-                'name' => 'Email Pribadi',
+                'register_as' => 'advisor',
+                'name' => 'Guru Email Pribadi',
                 'email' => $email,
-                'password' => 'RahasiaSiswa123',
-                'password_confirmation' => 'RahasiaSiswa123',
+                'university' => 'unesa',
+                'password' => 'RahasiaGuru123',
+                'password_confirmation' => 'RahasiaGuru123',
             ])->assertSessionHasErrors('email');
             $this->assertDatabaseMissing('users', ['email' => $email]);
         }
 
         $this->post('/register', [
-            'name' => 'Mahasiswa UGM',
-            'email' => 'mahasiswa@mail.ugm.ac.id',
+            'register_as' => 'advisor',
+            'name' => 'Dosen UGM',
+            'email' => 'dosen@mail.ugm.ac.id',
+            'university' => 'unesa',
+            'password' => 'RahasiaGuru123',
+            'password_confirmation' => 'RahasiaGuru123',
+        ])->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('users', ['email' => 'dosen@mail.ugm.ac.id', 'role' => 'dosen']);
+    }
+
+    public function test_student_may_register_with_personal_email(): void
+    {
+        $this->post('/register', [
+            'name' => 'Siswa SMK',
+            'email' => 'siswa.smk@gmail.com',
             'password' => 'RahasiaSiswa123',
             'password_confirmation' => 'RahasiaSiswa123',
         ])->assertRedirect(route('student.profile.edit'));
-        $this->assertDatabaseHas('users', ['email' => 'mahasiswa@mail.ugm.ac.id', 'role' => 'mahasiswa']);
+        $this->assertDatabaseHas('users', ['email' => 'siswa.smk@gmail.com', 'role' => 'mahasiswa']);
     }
 
     public function test_register_page_escapes_role_choice_for_javascript(): void

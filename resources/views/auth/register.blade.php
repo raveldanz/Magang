@@ -191,8 +191,9 @@
 
             <!-- Email Address -->
             <div>
-                <label for="email" class="block font-bold text-slate-700 text-xs uppercase tracking-wider leading-snug">
-                    ALAMAT EMAIL INSTITUSI
+                <label for="email" class="block font-bold text-slate-700 text-xs uppercase tracking-wider leading-snug"
+                       x-text="roleType === 'advisor' ? 'ALAMAT EMAIL INSTITUSI' : 'ALAMAT EMAIL AKTIF'">
+                    ALAMAT EMAIL AKTIF
                 </label>
                 <input id="email" 
                        class="block mt-1.5 w-full min-h-[44px] rounded-xl bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 text-sm shadow-2xs py-2.5 px-3.5 transition"
@@ -201,7 +202,7 @@
                        value="{{ old('email') }}" 
                        required 
                        autocomplete="username" 
-                       :placeholder="roleType === 'advisor' ? 'email@kampus.ac.id / email aktif' : 'nama@email.com / email institusi'"
+                       :placeholder="roleType === 'advisor' ? 'nama@kampus.ac.id / nama@sekolah.sch.id' : 'nama@email.com'"
                        oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Harap isi alamat email Anda.')}else if(this.validity.typeMismatch){this.setCustomValidity('Masukkan format alamat email yang valid.')}"
                        oninput="this.setCustomValidity('')" />
                 <x-input-error :messages="$errors->get('email')" class="mt-1.5" />

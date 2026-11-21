@@ -12,9 +12,10 @@ use Illuminate\Validation\Rules;
 class RegisterRequest extends FormRequest
 {
     /**
-     * Penyedia email pribadi yang ditolak saat daftar mandiri (gmail.com, yahoo.co.id, dst.).
-     * Hanya label pertama setelah "@" yang dicocokkan, sehingga subdomain kampus seperti
-     * mail.ugm.ac.id atau live.undip.ac.id tetap diterima.
+     * Penyedia email pribadi yang ditolak saat Pembimbing (dosen/guru) daftar mandiri (gmail.com,
+     * yahoo.co.id, dst.). Peserta magang boleh memakai email pribadi karena banyak siswa SMA/SMK
+     * tidak punya email sekolah. Hanya label pertama setelah "@" yang dicocokkan, sehingga
+     * subdomain kampus seperti mail.ugm.ac.id atau live.undip.ac.id tetap diterima.
      */
     private const PERSONAL_EMAIL_DOMAIN = '/@(gmail|googlemail|yahoo|ymail|rocketmail|hotmail|outlook|live|msn|icloud|me|aol|mail|protonmail|proton|yandex|gmx)\.[a-z]{2,}(\.[a-z]{2})?$/i';
 
@@ -42,8 +43,8 @@ class RegisterRequest extends FormRequest
             'email' => [
                 'required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class,
                 function (string $attribute, mixed $value, \Closure $fail): void {
-                    if (is_string($value) && preg_match(self::PERSONAL_EMAIL_DOMAIN, $value)) {
-                        $fail('Wajib menggunakan email resmi kampus (.ac.id), sekolah (.sch.id), atau instansi (.go.id).');
+                    if ($this->registersAdvisor() && is_string($value) && preg_match(self::PERSONAL_EMAIL_DOMAIN, $value)) {
+                        $fail('Akun Pembimbing wajib memakai email resmi kampus (.ac.id), sekolah (.sch.id), atau instansi (.go.id).');
                     }
                 },
             ],
