@@ -108,7 +108,7 @@ $devOnly = @(
     '.antigravity', '.github', 'tests', '.agentignore', '.aider.conf.yml', '.env.agents.example', '.editorconfig', '.npmrc',
     'AGENTS.md', 'AGENTS_WORKFLOW.md', 'GEMINI.md', 'CLAUDE.md', 'agent-runner.ps1', 'pr_description.md', 'reset_verified.php',
     'start_dev.bat', 'start_demo_kantor.bat', 'pgsql_ekspor.bat', 'pgsql_impor.bat',
-    'package.json', 'package-lock.json', 'vite.config.js', 'tailwind.config.js', 'postcss.config.js', 'phpunit.xml'
+    'package.json', 'package-lock.json', 'vite.config.js', 'tailwind.config.js', 'postcss.config.js', 'phpunit.xml', 'phpunit.pgsql.xml'
 )
 foreach ($item in $devOnly) {
     $p = Join-Path $dest $item

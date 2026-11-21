@@ -35,7 +35,7 @@ $box = '<span class="cb">&#9744;</span>';
 
 $logoSby = $img('images/logoPemkotSBY.png') ?: $img('images/logos/surabaya.png');
 $logoDispusip = $img('images/logos/dispusip.png');
-$tanggal = '17 November 2026';
+$tanggal = '22 November 2026';
 
 ob_start();
 ?>
@@ -131,7 +131,9 @@ PHP, database, dan semua komponen sudah ada di dalam zip.</p>
     ['3', 'Peserta masuk', 'Browser otomatis membuka halaman <b>ALAMAT DEMO</b> (alamat besar + kode QR + akun). Tampilkan ke layar/proyektor; peserta di WiFi yang sama cukup memindai QR.'],
 ], ['6%', '24%', '70%']) ?>
 <p class="muted">Berkas tambahan (tidak wajib): <?= $code('2_UJI_20_PENGGUNA.bat') ?> uji otomatis 20 peserta,
-<?= $code('3_RESET_DATA_DEMO.bat') ?> kembalikan data ke awal, <?= $code('CEK_KESIAPAN.bat') ?> pemeriksaan saja.</p>
+<?= $code('3_RESET_DATA_DEMO.bat') ?> kembalikan data ke awal, <?= $code('CEK_KESIAPAN.bat') ?> pemeriksaan saja,
+<?= $code('SAMBUNGKAN_POSTGRESQL.bat') ?> pakai PostgreSQL kantor (bagian 7). WiFi kantor: daftar periksa di bagian 8.
+Daftar sekolah/kampus &amp; internet: bagian 9.</p>
 
 <div class="tip"><b>Sudah dioptimalkan untuk 20 orang.</b> <span class="code">1_MULAI_DEMO.bat</span> menyalakan beberapa server sekaligus
 (4&ndash;8, sesuai jumlah inti prosesor) dan membagi peserta secara bergiliran. Hasil uji: 20 peserta serentak, separuh halaman terbuka
@@ -153,7 +155,8 @@ yang sama</b>, dan jaringan itu <b>tidak boleh memblokir sesama perangkat</b> (l
     ['Daya', 'Charger terpasang', 'Mode daya <i>Best performance</i>, sleep dimatikan'],
 ], ['30%', '35%', '35%']) ?>
 <p><b>Tidak perlu dipasang:</b> internet, PHP, XAMPP, Node.js, Composer, PostgreSQL/MySQL. Zip sudah membawa PHP 8.3 portabel,
-Microsoft Visual C++ Runtime, database SQLite berisi data demo, dan tampilan yang sudah jadi.</p>
+Microsoft Visual C++ Runtime, database SQLite berisi data demo, dan tampilan yang sudah jadi.
+Bila kantor <b>sudah punya PostgreSQL</b> dan ingin memakainya: bagian 7.</p>
 
 <h3>Perangkat peserta</h3>
 <p>HP Android/iPhone atau laptop apa pun dengan browser terbaru (Chrome, Edge, Safari, Firefox). Tidak perlu memasang aplikasi.</p>
@@ -253,8 +256,7 @@ Email "lupa kata sandi" tidak dikirim; reset kata sandi lewat Super Admin.</div>
 ], ['6%', '18%', '76%']) ?>
 
 <!-- ===================== 5. AKUN ===================== -->
-<div class="page-break"></div>
-<h2>5. Akun Demo</h2>
+<h2 style="margin-top:16px">5. Akun Demo</h2>
 <p>Kata sandi semua akun: <?= $code('password') ?>, kecuali Super Admin <?= $code('admin@gmail.com') ?>: <?= $code('admin123') ?>.
 Daftar ini juga tampil di halaman ALAMAT DEMO. Beberapa peserta boleh memakai akun yang sama.</p>
 <?= $table(['Peran', 'Email', 'Yang bisa dicoba'], [
@@ -305,14 +307,122 @@ Daftar ini juga tampil di halaman ALAMAT DEMO. Beberapa peserta boleh memakai ak
     ['Data pribadi ikut di zip', 'Zip berisi database demo baru; unggahan &amp; chat hasil uji pengembang tidak disertakan.', '&mdash;'],
 ], ['24%', '44%', '32%']) ?>
 
-<!-- ===================== 7. ISI ZIP ===================== -->
-<h2 style="margin-top:16px">7. Isi Folder SIP-MAGANG</h2>
+<!-- ===================== 7. POSTGRESQL ===================== -->
+<div class="page-break"></div>
+<h2>7. Memakai PostgreSQL yang Sudah Ada di Kantor (opsional)</h2>
+<p>Bawaan zip memakai database <b>SQLite</b> (satu berkas, tanpa pemasangan) dan sudah cukup untuk demo 20 orang.
+Bila komputer server, atau server lain di kantor, <b>sudah terpasang PostgreSQL</b> dan ingin dipakai, jalankan
+<?= $code('SAMBUNGKAN_POSTGRESQL.bat') ?> <b>sekali</b> sebelum <?= $code('1_MULAI_DEMO.bat') ?>. Tidak ada yang perlu diketik di Command Prompt.</p>
+
+<h3>Syarat</h3>
+<?= $table(['Syarat', 'Cara memeriksa'], [
+    ['PostgreSQL versi <b>12 atau lebih baru</b> (disarankan 16)', 'pgAdmin &rarr; klik server &rarr; tab <i>Properties</i>, atau Start Menu &rarr; "PostgreSQL 16".'],
+    ['Layanan PostgreSQL <b>menyala</b>', 'Tekan Win+R &rarr; '.$code('services.msc').' &rarr; cari <i>postgresql-x64-NN</i> &rarr; status <b>Running</b> (bila tidak: klik kanan &rarr; Start; <i>Startup type</i> sebaiknya Automatic).'],
+    ['Tahu <b>kata sandi</b> pengguna '.$code('postgres').'', 'Kata sandi yang diisi saat memasang PostgreSQL. Boleh juga pengguna lain yang punya izin membuat database (CREATEDB).'],
+    ['Port (bawaan '.$code('5432').')', 'pgAdmin &rarr; server &rarr; <i>Properties</i> &rarr; <i>Connection</i>.'],
+], ['38%', '62%']) ?>
+<p class="muted">Alat PostgreSQL (pgAdmin, psql) <b>tidak</b> wajib ada di komputer server: PHP bawaan zip sudah membawa penghubung PostgreSQL.</p>
+
+<h3>Langkah</h3>
+<table class="step">
+<tr><td class="no"><span>1</span></td><td><b>Pastikan demo mati</b>, lalu klik dua kali <?= $code('SAMBUNGKAN_POSTGRESQL.bat') ?> di folder <?= $code('C:\\SIP-MAGANG') ?>.</td></tr>
+<tr><td class="no"><span>2</span></td><td><b>Jawab 6 pertanyaan</b> (tekan Enter untuk nilai di dalam kurung), lihat tabel di bawah.</td></tr>
+<tr><td class="no"><span>3</span></td><td><b>Tunggu sampai [SELESAI]</b>. Yang dikerjakan otomatis: uji login &rarr; buat database &rarr; simpan pengaturan lama ke
+<?= $code('.env.sqlite.backup') ?> &rarr; tulis pengaturan PostgreSQL ke <?= $code('.env') ?> &rarr; buat tabel &amp; isi data demo (akun yang sama dengan bagian 5)
+&rarr; impor daftar sekolah.<br>
+<span class="ok">&#10003; Berhasil bila baris terakhir: [SELESAI] SIP-MAGANG tersambung ke PostgreSQL.</span></td></tr>
+<tr><td class="no"><span>4</span></td><td><b>Klik <?= $code('1_MULAI_DEMO.bat') ?></b> seperti biasa. Semua langkah bagian 2&ndash;4 tetap sama.</td></tr>
+</table>
+<?= $table(['Pertanyaan', 'Isi'], [
+    ['Alamat server', $code('127.0.0.1').' bila PostgreSQL ada di komputer ini; alamat IP server bila di komputer lain.'],
+    ['Port', $code('5432').' (kecuali diubah saat pemasangan).'],
+    ['Nama pengguna', $code('postgres').''],
+    ['Kata sandi', 'Tidak tampil saat diketik (normal). Tidak disimpan di layar maupun log, hanya di berkas '.$code('.env').'.'],
+    ['Nama database', $code('sip_magang').': <b>dibuat otomatis</b>. Database lain di server tidak disentuh.'],
+    ['Ambil daftar sekolah se-Indonesia sekarang?', $code('Y').' bila ada internet (3&ndash;5 menit); '.$code('T').' bila tidak (diambil otomatis nanti).'],
+], ['36%', '64%']) ?>
+<p class="muted">Bila database <?= $code('sip_magang') ?> sudah berisi data (mis. berkas dijalankan ulang), data itu <b>dipakai apa adanya</b>, tidak ditimpa.
+<?= $code('3_RESET_DATA_DEMO.bat') ?> pada mode PostgreSQL mengosongkan database itu lalu mengisi ulang data demo awal
+(bila pg_dump tersedia, data lama dicadangkan dulu ke <?= $code('database\\cadangan') ?>).</p>
+
+<h3>PostgreSQL di komputer lain (server database kantor)</h3>
+<ol>
+    <li>Di komputer PostgreSQL, buka <?= $code('postgresql.conf') ?> (folder <i>data</i>), pastikan <?= $code("listen_addresses = '*'") ?>.</li>
+    <li>Di <?= $code('pg_hba.conf') ?> tambahkan satu baris untuk komputer server demo, contoh:
+        <?= $code('host  all  postgres  192.168.1.23/32  scram-sha-256') ?> (ganti dengan IP komputer server demo; pada PostgreSQL lama
+        pakai <?= $code('md5') ?>). Database <?= $code('all') ?> diperlukan karena penyambung juga membuka database <?= $code('postgres') ?> untuk membuat
+        <?= $code('sip_magang') ?>; setelah tersambung boleh dipersempit menjadi <?= $code('sip_magang') ?>.</li>
+    <li>Restart layanan PostgreSQL, lalu izinkan port <?= $code('5432') ?> masuk di Windows Firewall komputer PostgreSQL
+        (Command Prompt sebagai Administrator):<br>
+        <?= $code('netsh advfirewall firewall add rule name="PostgreSQL 5432" dir=in action=allow protocol=TCP localport=5432') ?></li>
+    <li>Di komputer server demo jalankan <?= $code('SAMBUNGKAN_POSTGRESQL.bat') ?>, isi alamat server dengan IP komputer PostgreSQL.</li>
+</ol>
+<p class="muted">Peserta tetap membuka alamat komputer server demo; mereka tidak pernah tersambung langsung ke PostgreSQL.</p>
+
+<h3>Pesan yang mungkin muncul</h3>
+<?= $table(['Pesan', 'Arti &amp; solusi'], [
+    ['Login ditolak: nama pengguna atau kata sandi PostgreSQL salah', 'Ulangi dengan kata sandi yang benar. '.$code('.env').' tidak diubah bila gagal.'],
+    ['Tidak bisa terhubung ke PostgreSQL di ...', 'Layanan mati (services.msc &rarr; Start), port salah, atau (server lain) pg_hba.conf / firewall belum diizinkan.'],
+    ['... tidak punya izin CREATEDB', 'Buat database '.$code('sip_magang').' lewat pgAdmin (Databases &rarr; Create &rarr; Database), lalu ulangi.'],
+    ['PostgreSQL ... terlalu lama', 'Versi di bawah 12. Pakai SQLite bawaan zip, atau perbarui PostgreSQL.'],
+    ['Kata sandi berisi tanda petik tunggal', 'Buat pengguna khusus aplikasi dengan kata sandi tanpa tanda petik.'],
+    ['Server demo masih menyala', 'Matikan demo (Ctrl+C &rarr; Y), lalu ulangi.'],
+    ['[PERHATIAN] saat mengambil daftar sekolah', 'Tidak ada internet / diblokir proxy. Tidak apa-apa: diambil otomatis nanti (bagian 9).'],
+], ['40%', '60%']) ?>
+
+<h3>Kembali ke SQLite</h3>
+<p>Matikan demo, hapus berkas <?= $code('.env') ?>, ganti nama <?= $code('.env.sqlite.backup') ?> menjadi <?= $code('.env') ?>, lalu klik
+<?= $code('1_MULAI_DEMO.bat') ?>. Database PostgreSQL tidak dihapus dan bisa dipakai lagi kapan saja.</p>
+
+<!-- ===================== 8. WIFI KANTOR ===================== -->
+<h2 style="margin-top:18px">8. WiFi Kantor &mdash; Daftar Periksa Bagian IT</h2>
+<p>Aplikasi berjalan sepenuhnya di komputer server; WiFi hanya perlu <b>mengantar HP peserta ke komputer server</b>. Internet tidak wajib.</p>
+<?= $table(['', 'Periksa', 'Mengapa / cara'], [
+    [$box, 'Komputer server &amp; HP peserta di <b>SSID dan subnet yang sama</b>', 'IP keduanya berawalan sama (mis. '.$code('192.168.10.x').'). WiFi tamu dan WiFi pegawai sering berbeda jaringan.'],
+    [$box, '<b>Client/AP isolation</b> mati untuk SSID itu', 'Bila menyala, internet di HP jalan tetapi komputer server tidak bisa dibuka. Matikan sementara di pengaturan access point, atau pakai router sendiri.'],
+    [$box, 'Komputer server memakai <b>WiFi yang sama</b>, bukan kabel LAN di VLAN lain', 'Bila kabel dan WiFi berbeda VLAN, cabut kabel dan sambungkan server ke WiFi peserta.'],
+    [$box, '<b>Izin Windows Firewall</b> sudah dibuat', '1_MULAI_DEMO.bat memintanya (klik YES). Cadangan: klik kanan '.$code('izinkan_firewall.bat').' &rarr; Run as administrator. Izin berlaku untuk program PHP di folder ini, di semua jenis jaringan (Public, Private, Domain), jadi nomor port tidak perlu dibuka satu per satu.'],
+    [$box, 'Antivirus/firewall pihak ketiga (bila ada) tidak memblokir '.$code('C:\\SIP-MAGANG\\php\\php.exe'), 'Tambahkan pengecualian untuk program itu, atau untuk port TCP '.$code('8000').'&ndash;'.$code('8010').' masuk.'],
+    [$box, '<b>Alamat tetap</b> untuk komputer server', 'Reservasi DHCP di router/controller agar alamat (dan QR) tidak berubah antara Selasa dan Rabu.'],
+    [$box, 'Kapasitas WiFi &plusmn;25 perangkat', 'Access point kantor umumnya cukup. Hotspot HP tidak disarankan (bagian 1).'],
+    [$box, 'Uji 1 HP dari WiFi kantor', 'Bagian 2 langkah 3. Bila gagal padahal di komputer server bisa: isolation / beda jaringan (bagian 3).'],
+], ['6%', '38%', '56%']) ?>
+<div class="note"><b>Proxy kantor tidak berpengaruh pada peserta</b>: peserta membuka alamat IP lokal, bukan internet. Bila browser peserta memakai
+proxy otomatis, alamat lokal biasanya tetap langsung; bila tidak, tambahkan alamat server ke pengecualian proxy.</div>
+
+<!-- ===================== 9. INTERNET & API ===================== -->
+<h2 style="margin-top:16px">9. Internet, Daftar Sekolah &amp; Kampus</h2>
+<?= $table(['Data', 'Asal', 'Butuh internet?'], [
+    ['Kampus / perguruan tinggi', 'Daftar bawaan di dalam aplikasi (252 kampus) + kampus yang ditambahkan Super Admin/peserta.', '<b>Tidak</b>'],
+    ['Sekolah demo (SMKN 7, dll.) &amp; sekolah Jawa Timur bawaan', 'Ikut di database zip / diimpor saat persiapan.', '<b>Tidak</b>'],
+    ['SMA/SMK/SLB se-Indonesia (&plusmn;25.000)', 'Direktori sekolah publik di internet (api-sekolah-indonesia.vercel.app).', 'Ya, hanya saat mengambil'],
+    ['Madrasah Aliyah (MA)', 'Tidak tersedia di direktori (di bawah Kemenag).', 'Diketik manual'],
+], ['30%', '50%', '20%']) ?>
+<ul>
+    <li><b>Otomatis:</b> selama demo menyala, penjadwal memeriksa tiap jam; bila belum pernah atau sudah &ge; 7 hari, daftar sekolah se-Indonesia
+        diambil (3&ndash;5 menit, berjalan di latar, peserta tidak terganggu). Bila tidak ada internet, dicoba lagi jam berikutnya. Data lama tidak dihapus.</li>
+    <li><b>Tanpa internet tetap aman:</b> pendaftaran tetap jalan. Sekolah/kampus yang tidak ada di daftar bisa <b>diketik manual</b>,
+        lalu diverifikasi admin.</li>
+    <li><b>Sertifikat SSL disertakan</b> (<?= $code('resources\\certs\\cacert.pem') ?>), jadi koneksi aman (HTTPS) ke direktori berhasil walau PHP
+        tidak diatur khusus.</li>
+    <li><b>Kantor dengan proxy/inspeksi SSL:</b> bila pengambilan selalu gagal, tambahkan sertifikat root kantor ke sebuah berkas .pem lalu tulis
+        baris <?= $code('SCHOOL_DIRECTORY_CA_BUNDLE=C:\\path\\sertifikat-kantor.pem') ?> di <?= $code('.env') ?>. Atau izinkan domain
+        <?= $code('api-sekolah-indonesia.vercel.app') ?> di proxy.</li>
+    <li><b>Mengambil manual</b> (opsional, saat demo mati): Command Prompt di folder SIP-MAGANG &rarr;
+        <?= $code('php\\php.exe artisan institutions:sync-external') ?>.</li>
+</ul>
+<p class="muted">Yang dikirim ke internet hanya permintaan daftar sekolah (nama provinsi/kata kunci). Data peserta, akun, dan berkas tidak pernah dikirim keluar.</p>
+
+<!-- ===================== 10. ISI ZIP ===================== -->
+<div class="page-break"></div>
+<h2>10. Isi Folder SIP-MAGANG</h2>
 <?= $table(['Berkas / folder', 'Fungsi'], [
     [$code('BACA_DULU.txt'), 'Ringkasan langkah dalam bentuk teks.'],
     [$code('PANDUAN_IT_SIP-MAGANG.pdf'), 'Panduan ini.'],
     [$code('1_MULAI_DEMO.bat'), '<b>Satu-satunya yang perlu diklik.</b> Semua persiapan (lokasi, PHP, izin firewall, anti-sleep, database, server) lalu membuka halaman ALAMAT DEMO.'],
     [$code('2_UJI_20_PENGGUNA.bat'), 'Uji beban otomatis 20 pengguna selama 1 menit.'],
     [$code('3_RESET_DATA_DEMO.bat'), 'Mengembalikan data demo ke keadaan saat zip diekstrak (server harus dimatikan dulu).'],
+    [$code('SAMBUNGKAN_POSTGRESQL.bat'), 'Opsional: memakai PostgreSQL yang sudah terpasang (bagian 7). Pengaturan lama disimpan di '.$code('.env.sqlite.backup').'.'],
     [$code('izinkan_firewall.bat'), 'Cadangan manual izin firewall (klik kanan &rarr; Run as administrator). Biasanya tidak perlu karena sudah diminta 1_MULAI_DEMO.bat.'],
     [$code('CEK_KESIAPAN.bat'), 'Memeriksa kesiapan tanpa mengubah apa pun.'],
     [$code('start_demo.bat'), 'Mesin penyala demo (dipanggil 1_MULAI_DEMO.bat); tidak perlu diklik langsung.'],

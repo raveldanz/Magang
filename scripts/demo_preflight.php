@@ -279,6 +279,26 @@ if (! $checkOnly && ! $errors) {
             // junction / folder hasil ekstrak zip
             exec('cmd /c rmdir "'.str_replace('/', '\\', $link).'" 2>&1', $o, $c);
         }
+        if (is_dir($link) && $target) {
+            // Folder biasa (mis. dibuat seeder saat migrate --seed di PostgreSQL): pindahkan isinya ke
+            // storage/app/public tanpa menimpa berkas yang sudah ada, lalu hapus foldernya.
+            $items = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($link, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+            foreach ($items as $item) {
+                $relative = substr($item->getPathname(), strlen($link) + 1);
+                $dest = $target.DIRECTORY_SEPARATOR.$relative;
+                if ($item->isDir()) {
+                    @rmdir($item->getPathname());
+
+                    continue;
+                }
+                if (! file_exists($dest)) {
+                    @mkdir(dirname($dest), 0777, true);
+                    @copy($item->getPathname(), $dest);
+                }
+                @unlink($item->getPathname());
+            }
+            @rmdir($link);
+        }
         if (file_exists($link)) {
             $warnings[] = 'public/storage berupa folder biasa (bukan tautan). Hapus folder itu lalu jalankan ulang agar logo/gambar tampil.';
         } else {

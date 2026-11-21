@@ -4639,3 +4639,13 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   1. Anggap `universities` berukuran puluhan ribu baris: dilarang `University::all()`/`->get()` tanpa filter, `updateOrCreate` per institusi, atau `@js(seluruh nama)`; pakai `listable()`, pencarian async, atau prafilter SQL.
   2. Sebelum menghapus berkas lama saat mengganti unggahan, periksa tidak ada baris lain yang merujuk path yang sama (data demo memakai berkas contoh bersama).
   3. Audit PostgreSQL wajib dijalankan setelah sinkron direktori penuh, bukan hanya di DB seeder kecil.
+
+### [LRN-166] Zip Demo ke PostgreSQL Kantor: PHP Portabel Tanpa CA, Tautan `public/storage` Jadi Folder Biasa
+- **Date:** 2026-11-22
+- **Problem / Symptom:** Zip demo hanya bisa SQLite; untuk PC kantor yang sudah punya PostgreSQL tidak ada jalur sambung. Saat diuji di salinan zip: (1) `institutions:sync-external` gagal SSL karena PHP portabel di `php\` tidak punya `curl.cainfo`; (2) seeding saat penyambungan membuat `public/storage` sebagai folder biasa sehingga preflight tidak bisa membuat junction; (3) `3_RESET_DATA_DEMO.bat` mode PostgreSQL mensyaratkan `database\pgsql\magang.dump` yang tidak ada di zip.
+- **Root Cause:** Alur demo dirancang untuk laptop pengembang (PostgreSQL portabel `C:\pgsql`, PHP sistem dengan CA bundle) dan zip SQLite; tidak ada yang menguji kombinasi zip + PostgreSQL eksternal dari nol.
+- **Fix Applied:** `SAMBUNGKAN_POSTGRESQL.bat` + `scripts/pgsql_connect.php` (uji login dengan pesan ramah, buat DB, tulis `.env` dengan cadangan `.env.sqlite.backup`, migrate+seed, kata sandi tak pernah dicetak); CA Mozilla dibundel di `resources/certs/cacert.pem` sebagai bawaan `services.school_directory.ca_bundle` (jalur env yang tidak ada jatuh ke bundel); preflight memindahkan isi folder `public/storage` lalu membuat tautan; reset PostgreSQL tanpa dump = `migrate:fresh --seed` + hapus penanda sinkron; panduan IT bab 7-9 (PostgreSQL, WiFi kantor, API sekolah).
+- **Prevention Rule:**
+  1. Setiap perubahan alur demo diuji dari zip yang diekstrak di folder baru (bukan folder kerja), untuk SQLite dan PostgreSQL, termasuk crawl semua role.
+  2. Klien HTTPS di aplikasi tidak boleh bergantung pada `php.ini` mesin target: sertakan CA bundle sendiri.
+  3. Penyambung ke DB eksternal butuh akses ke database `postgres` untuk membuat DB; dokumentasikan `pg_hba.conf` dengan database `all` saat penyiapan.
