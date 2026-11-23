@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\University;
+use App\Services\Directory\CollegeDirectoryClient;
 use App\Services\Directory\SchoolDirectoryClient;
 use App\Services\MasterUniversityService;
 use Illuminate\Http\JsonResponse;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\DB;
  */
 class InstitutionSearchController extends Controller
 {
-    public function search(Request $request, SchoolDirectoryClient $directory): JsonResponse
+    public function search(Request $request, SchoolDirectoryClient $directory, CollegeDirectoryClient $collegeDirectory): JsonResponse
     {
         $q = trim((string) $request->query('q', ''));
         $limit = max(1, min(50, (int) $request->query('limit', 25)));
@@ -53,8 +54,7 @@ class InstitutionSearchController extends Controller
             'institution_type' => $u->institution_type,
         ])->all();
 
-        // Hasil lokal sedikit: tambahkan saran dari direktori nasional (maks 5), belum disimpan.
-        // Saran direktori hanya untuk pencarian sekolah (bukan saat memilih kampus).
+        // Hasil lokal sedikit: tambahkan saran sekolah dari direktori nasional (maks 5), belum disimpan.
         if ($q !== '' && mb_strlen($q) >= 3 && count($data) < 8 && $type !== University::TYPE_COLLEGE && $directory->enabled()) {
             $known = $rows->pluck('code')->filter()->all();
             $added = 0;
@@ -74,15 +74,71 @@ class InstitutionSearchController extends Controller
             }
         }
 
+        // Hasil lokal sedikit: tambahkan saran kampus dari direktori perguruan tinggi API (maks 5), belum disimpan.
+        if ($q !== '' && mb_strlen($q) >= 3 && count($data) < 8 && $type !== University::TYPE_SCHOOL && $collegeDirectory->enabled()) {
+            $knownNames = array_map('mb_strtolower', $rows->pluck('name')->all());
+            $added = 0;
+            foreach ($collegeDirectory->search($q, 10) as $hit) {
+                if ($added >= 5 || in_array(mb_strtolower($hit['name']), $knownNames, true)) {
+                    continue;
+                }
+                $data[] = [
+                    'id' => 'college:'.$hit['key'],
+                    'name' => $hit['name'],
+                    'acronym' => $hit['acronym'] ?: 'PTN/PTS',
+                    'meta' => trim(($hit['domain'] ?? '').(! empty($hit['state_province']) ? ' · '.$hit['state_province'] : ''), ' ·') ?: 'Indonesia',
+                    'institution_type' => University::TYPE_COLLEGE,
+                    'resolve_url' => route('institutions.resolve'),
+                ];
+                $added++;
+            }
+        }
+
         return response()->json(['status' => 'success', 'data' => array_slice($data, 0, $limit)]);
     }
 
     /**
-     * Simpan sekolah dari saran direktori agar punya id. Hanya menerima NPSN: datanya diambil dari
-     * hasil API yang tersimpan di cache server, bukan dari isian pengguna.
+     * Simpan institusi (sekolah/kampus) dari saran direktori API agar punya id database.
+     * Hanya menerima NPSN / college_key yang benar-benar tersimpan di cache server hasil API.
      */
-    public function resolve(Request $request, SchoolDirectoryClient $directory, MasterUniversityService $master): JsonResponse
-    {
+    public function resolve(
+        Request $request,
+        SchoolDirectoryClient $directory,
+        CollegeDirectoryClient $collegeDirectory,
+        MasterUniversityService $master
+    ): JsonResponse {
+        $npsn = $request->input('npsn');
+        $collegeKey = $request->input('college_key');
+
+        if (! $npsn && ! $collegeKey && $request->filled('id')) {
+            $rawId = (string) $request->input('id');
+            if (str_starts_with($rawId, 'npsn:')) {
+                $npsn = substr($rawId, 5);
+            } elseif (str_starts_with($rawId, 'college:')) {
+                $collegeKey = substr($rawId, 8);
+            }
+        }
+
+        if ($collegeKey) {
+            $row = $collegeDirectory->cached((string) $collegeKey);
+            if ($row === null) {
+                return response()->json(['status' => 'error', 'message' => 'Data perguruan tinggi tidak ditemukan di direktori API. Cari ulang nama kampusnya.'], 404);
+            }
+
+            $university = $master->upsertDirectoryCollege($row)['university'];
+            if (! $university) {
+                return response()->json(['status' => 'error', 'message' => 'Data perguruan tinggi tidak valid.'], 422);
+            }
+
+            return response()->json(['status' => 'success', 'data' => [
+                'id' => $university->id,
+                'name' => $university->name,
+                'acronym' => $university->acronym ?: $university->code,
+                'meta' => $university->code,
+                'institution_type' => $university->institution_type,
+            ]]);
+        }
+
         $validated = $request->validate(['npsn' => ['required', 'string', 'regex:/^\d{6,10}$/']]);
 
         $row = $directory->cached($validated['npsn']);

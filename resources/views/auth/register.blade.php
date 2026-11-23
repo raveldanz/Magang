@@ -112,7 +112,14 @@
                        autocomplete="name" 
                        :placeholder="roleType === 'advisor' ? 'Contoh: Dr. Budi Santoso, S.Kom.' : 'Nama lengkap Anda'"
                        oninvalid="this.setCustomValidity('Harap isi nama lengkap Anda terlebih dahulu.')"
-                       oninput="this.setCustomValidity('')" />
+                       @input="if (roleType === 'student' && !$event.isComposing) {
+                           const upper = $el.value.toLocaleUpperCase('id-ID');
+                           if ($el.value !== upper) {
+                               const caret = $el.value.slice(0, $el.selectionStart).toLocaleUpperCase('id-ID').length;
+                               $el.value = upper;
+                               $el.setSelectionRange(caret, caret);
+                           }
+                       }; setCustomValidity('')" />
                 <x-input-error :messages="$errors->get('name')" class="mt-1.5" />
             </div>
 

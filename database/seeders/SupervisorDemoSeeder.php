@@ -40,8 +40,8 @@ class SupervisorDemoSeeder extends Seeder
                 ['agency_name' => 'Dinas Perpustakaan dan Kearsipan'],
                 [
                     'government_name' => 'Pemerintah Kota Surabaya',
-                    'address' => 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Kec. Rungkut, Kota Surabaya, Jawa Timur 60293',
-                    'phone' => '(031) 8707682',
+                    'address' => 'Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Surabaya 60275',
+                    'phone' => '(031) 8707329',
                     'email' => 'dispusip@surabaya.go.id',
                     'website' => 'https://dispusip.surabaya.go.id',
                     'signee_name' => 'Ir. Mia Santi Dewi, M.Si',

@@ -231,15 +231,18 @@
             if (item) this.select(item);
         },
 
-        // Saran direktori nasional (id 'npsn:...') disimpan dulu lewat POST agar punya id database.
+        // Saran direktori nasional API (sekolah 'npsn:...' atau kampus 'college:...') disimpan dulu lewat POST agar punya id database.
         async select(item) {
-            if (item && item.raw && item.raw.resolve_url && String(item.id).startsWith('npsn:')) {
+            if (item && item.raw && item.raw.resolve_url && (String(item.id).startsWith('npsn:') || String(item.id).startsWith('college:'))) {
                 try {
                     const token = document.querySelector('meta[name=csrf-token]')?.content || '';
+                    const payload = String(item.id).startsWith('npsn:')
+                        ? { npsn: String(item.id).slice(5) }
+                        : { college_key: String(item.id).slice(8) };
                     const res = await fetch(item.raw.resolve_url, {
                         method: 'POST', credentials: 'same-origin',
                         headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token, 'X-Requested-With': 'XMLHttpRequest' },
-                        body: JSON.stringify({ npsn: String(item.id).slice(5) }),
+                        body: JSON.stringify(payload),
                     });
                     if (!res.ok) throw new Error('HTTP ' + res.status);
                     const saved = (await res.json()).data;

@@ -10,6 +10,7 @@ use App\Models\Placement;
 use App\Models\University;
 use App\Models\User;
 use App\Services\Admin\UniversityManagementService;
+use App\Services\MasterUniversityService;
 use App\Services\UniversityHubService;
 use App\Services\UniversityResolver;
 use App\Support\CsvSafe;
@@ -103,10 +104,71 @@ class UniversityController extends Controller
             'total_active_interns' => $totalActiveInterns,
         ];
 
+        // Pencarian Tambahan di Direktori Nasional (API & Master Kemendikbud)
+        $externalSuggestions = collect();
+        if ($request->filled('search') && mb_strlen(trim($request->search)) >= 2) {
+            try {
+                $masterService = app(MasterUniversityService::class);
+                $hits = $masterService->search(trim($request->search), 8);
+                $externalSuggestions = $hits->filter(function ($item) {
+                    return empty($item['is_in_db']) || empty($item['id']);
+                })->values();
+            } catch (\Throwable $e) {
+                \Log::warning('Gagal mencari di direktori master/API: '.$e->getMessage());
+            }
+        }
+
         $user = Auth::user();
         $isSuperAdmin = ($user?->isSuperAdmin() ?? false);
 
-        return view('admin.universities.index', compact('universities', 'unregisteredCount', 'pendingVerificationCount', 'isSuperAdmin', 'macroStats', 'mergeSuggestions', 'verifiedOptions'));
+        return view('admin.universities.index', compact('universities', 'unregisteredCount', 'pendingVerificationCount', 'isSuperAdmin', 'macroStats', 'mergeSuggestions', 'verifiedOptions', 'externalSuggestions'));
+    }
+
+    /**
+     * Impor cepat institusi (sekolah/kampus) dari direktori nasional API/Master ke mitra lokal.
+     */
+    public function quickImport(Request $request, MasterUniversityService $masterService)
+    {
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat menambahkan kampus/sekolah mitra.');
+
+        $name = trim((string) $request->input('name'));
+        if ($name === '') {
+            return back()->with('error', 'Nama institusi tidak boleh kosong.');
+        }
+
+        $npsn = trim((string) $request->input('npsn'));
+        $institutionType = $request->input('institution_type');
+
+        if ($institutionType === University::TYPE_SCHOOL || ! empty($npsn)) {
+            $row = [
+                'npsn' => $npsn ?: 'SCH-'.rand(1000, 9999),
+                'name' => $name,
+                'form' => $request->input('form', 'SMK'),
+                'address' => $request->input('address', ''),
+                'city' => $request->input('city', 'Kota Surabaya'),
+                'province' => $request->input('province', 'Jawa Timur'),
+                'status' => 'NEGERI',
+            ];
+            $result = $masterService->upsertDirectorySchool($row);
+            $univ = $result['university'];
+        } else {
+            $row = [
+                'name' => $name,
+                'acronym' => $request->input('acronym', ''),
+                'state_province' => $request->input('city', 'Indonesia'),
+                'country' => 'Indonesia',
+                'web_page' => $request->input('web_page', ''),
+            ];
+            $result = $masterService->upsertDirectoryCollege($row);
+            $univ = $result['university'];
+        }
+
+        if (! $univ) {
+            return back()->with('error', 'Gagal menambahkan institusi.');
+        }
+
+        return redirect()->route('admin.universities.index', ['search' => $univ->name])
+            ->with('success', "Institusi '{$univ->name}' berhasil ditambahkan ke daftar Mitra!");
     }
 
     /**

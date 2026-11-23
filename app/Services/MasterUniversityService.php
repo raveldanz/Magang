@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\University;
+use App\Services\Directory\CollegeDirectoryClient;
 use App\Services\Directory\SchoolDirectoryClient;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +21,13 @@ class MasterUniversityService
 
     protected ?array $schoolData = null;
 
-    public function __construct(private UniversityResolver $resolver, private SchoolDirectoryClient $directory) {}
+    public function __construct(
+        private UniversityResolver $resolver,
+        private SchoolDirectoryClient $directory,
+        private ?CollegeDirectoryClient $collegeDirectory = null
+    ) {
+        $this->collegeDirectory ??= app(CollegeDirectoryClient::class);
+    }
 
     /**
      * Path ke dataset Master Perguruan Tinggi Indonesia
@@ -173,7 +180,109 @@ class MasterUniversityService
             }
         }
 
+        // 4. Perguruan tinggi dari direktori nasional/internasional (API) yang belum ada di database lokal
+        if ($this->collegeDirectory?->enabled()) {
+            $fromCollegeApi = [];
+            foreach ($this->collegeDirectory->search($keyword, $limit) as $row) {
+                $cleanKey = $this->normalize($row['name']);
+                if ($row['name'] === '' || isset($seenKeys[$cleanKey])) {
+                    continue;
+                }
+                $seenKeys[$cleanKey] = true;
+                $fromCollegeApi[] = [
+                    'id' => null,
+                    'key' => $row['key'],
+                    'name' => $row['name'],
+                    'code' => $row['acronym'],
+                    'acronym' => $row['acronym'],
+                    'city' => $row['state_province'] ?? 'Indonesia',
+                    'province' => $row['country'] ?? 'Indonesia',
+                    'type' => 'PTN/PTS',
+                    'institution_type' => University::TYPE_COLLEGE,
+                    'is_in_db' => false,
+                ];
+                if (count($fromCollegeApi) >= 5) {
+                    break;
+                }
+            }
+            if ($fromCollegeApi !== []) {
+                $results = $results->take(max(0, $limit - count($fromCollegeApi)))->concat($fromCollegeApi);
+            }
+        }
+
         return $results->take($limit);
+    }
+
+    /**
+     * Upsert satu perguruan tinggi dari direktori API eksternal.
+     *
+     * @param  array{name: string, key?: string, acronym?: string, domain?: string, web_page?: string, state_province?: string, country?: string}  $row
+     * @return array{university: University|null, created: bool}
+     */
+    public function upsertDirectoryCollege(array $row): array
+    {
+        $name = trim((string) ($row['name'] ?? ''));
+        if ($name === '') {
+            return ['university' => null, 'created' => false];
+        }
+
+        $existing = University::whereRaw('LOWER(name) = ?', [mb_strtolower($name)])
+            ->orWhere(function ($q) use ($name) {
+                $norm = $this->resolver->findExact($name);
+                if ($norm) {
+                    $q->where('id', $norm->id);
+                }
+            })
+            ->first();
+
+        if ($existing) {
+            $changes = [];
+            if (empty($existing->address) && ! empty($row['state_province'])) {
+                $changes['address'] = $row['state_province'].', Indonesia';
+            }
+            if ($changes !== []) {
+                $existing->update($changes);
+            }
+
+            return ['university' => $existing, 'created' => false];
+        }
+
+        $acronym = trim((string) ($row['acronym'] ?? ''));
+        if ($acronym === '') {
+            $words = preg_split('/\s+/', $name);
+            $letters = '';
+            foreach ($words as $w) {
+                $first = mb_substr($w, 0, 1);
+                if (ctype_alnum($first)) {
+                    $letters .= strtoupper($first);
+                }
+            }
+            $acronym = mb_substr($letters, 0, 6) ?: 'UNIV';
+        }
+
+        $code = $acronym;
+        if (University::where('code', $code)->exists()) {
+            $code = $acronym.'-'.rand(100, 999);
+        }
+
+        $address = (! empty($row['state_province']) ? $row['state_province'].', ' : '').'Indonesia';
+
+        $university = University::create([
+            'name' => $name,
+            'code' => $code,
+            'acronym' => $acronym,
+            'address' => $address,
+            'logo' => null,
+            'is_verified' => true,
+            'status' => 'active',
+            'institution_type' => University::TYPE_COLLEGE,
+            'evaluation_scheme' => 'both',
+            'weight_mentor' => 40,
+            'weight_lecturer' => 60,
+            'require_dpl' => true,
+        ]);
+
+        return ['university' => $university, 'created' => true];
     }
 
     /**
@@ -360,6 +469,7 @@ class MasterUniversityService
         $acronym = trim($item['acronym'] ?? $code);
         $city = trim($item['city'] ?? 'Indonesia');
         $province = trim($item['province'] ?? 'Indonesia');
+        $logo = trim($item['logo'] ?? '');
 
         $existing = University::whereRaw('LOWER(name) = ?', [mb_strtolower($name)])
             ->orWhere(fn ($q) => $q->whereNotNull('code')->where('code', $code))
@@ -369,6 +479,9 @@ class MasterUniversityService
             $changes = ['is_verified' => true, 'status' => 'active'];
             if ($fillAcronym && ! $existing->acronym) {
                 $changes['acronym'] = $acronym;
+            }
+            if ($logo !== '' && empty($existing->logo)) {
+                $changes['logo'] = $logo;
             }
             $existing->update($changes);
 
@@ -380,6 +493,7 @@ class MasterUniversityService
             'code' => $code,
             'acronym' => $acronym,
             'address' => $city.', '.$province,
+            'logo' => $logo !== '' ? $logo : null,
             'is_verified' => true,
             'status' => 'active',
             'institution_type' => University::TYPE_COLLEGE,

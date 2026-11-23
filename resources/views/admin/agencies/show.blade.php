@@ -97,7 +97,12 @@
                             </div>
 
                             <!-- Ringkasan Instansi & Akun Admin -->
-                            @php $firstAdmin = $adminUsers->firstWhere('unit_id', null) ?? $adminUsers->first(); @endphp
+                            @php 
+                                $firstAdmin = $adminUsers->first(fn ($u) => str_contains($u->email, 'dispusip') && is_null($u->unit_id))
+                                    ?? $adminUsers->first(fn ($u) => str_contains($u->email, 'dispusip'))
+                                    ?? $adminUsers->firstWhere('unit_id', null) 
+                                    ?? $adminUsers->first(); 
+                            @endphp
                             <dl class="cc-facts grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 mt-3 border-t border-slate-100">
                                 <div class="min-w-0 flex flex-col justify-between">
                                     <div>
