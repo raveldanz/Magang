@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth overflow-x-hidden w-full">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,13 +24,17 @@
 
         <style>
             [x-cloak] { display: none !important; }
+            html, body {
+                max-width: 100vw;
+                overflow-x: hidden;
+            }
         </style>
     </head>
     {{-- data-autosave-purge: draf isian form milik akun sebelumnya dihapus dari tab ini saat halaman masuk/daftar --}}
-    <body class="app-readable font-sans text-gray-900 antialiased bg-slate-50" data-autosave-purge>
-        <div class="min-h-screen flex flex-col justify-center items-center pt-6 sm:pt-0 p-4">
+    <body class="app-readable font-sans text-slate-900 antialiased bg-[#F5F8FC] overflow-x-hidden w-full" data-autosave-purge>
+        <div class="min-h-screen w-full flex flex-col justify-center items-center px-4 py-6 sm:px-6 lg:px-8">
             
-            <div class="w-full sm:max-w-md">
+            <div class="w-full sm:max-w-md max-w-full">
                 {{ $slot }}
             </div>
 

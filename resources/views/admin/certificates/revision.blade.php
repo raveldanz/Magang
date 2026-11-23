@@ -5,7 +5,7 @@
             description="Lakukan koreksi terpadu pada nilai evaluasi, biodata peserta magang, dan periode magang sesuai catatan dari Atasan.">
             <x-slot name="actions">
                 <a href="{{ route('admin.certificates.index') }}" 
-                   class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200 shadow-xs transition">
+                   class="inline-flex items-center min-h-[44px] sm:min-h-0 gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200 shadow-xs transition">
                     &larr; Kembali ke Daftar Sertifikat
                 </a>
             </x-slot>
@@ -67,7 +67,7 @@
 
                     <div class="shrink-0 flex items-center gap-2">
                         <a href="{{ route('admin.certificates.show', $placement->id) }}" target="_blank" 
-                           class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs border border-amber-300 shadow-2xs transition">
+                           class="inline-flex items-center min-h-[44px] sm:min-h-0 gap-1.5 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs border border-amber-300 shadow-2xs transition">
                             <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             <span>Pratinjau Draft Sertifikat</span>
                         </a>
@@ -227,7 +227,7 @@
                                     </div>
                                     <p class="text-slate-600">Total entri logbook yang telah diunggah: <strong>{{ $logbookCount }} hari kegiatan</strong>.</p>
                                     <a href="{{ route('admin.logbooks.index', ['search' => $student->name]) }}" target="_blank"
-                                       class="inline-flex items-center gap-1 font-bold text-blue-700 hover:text-blue-800 mt-1">
+                                       class="inline-flex items-center min-h-[44px] sm:min-h-0 gap-1 font-bold text-blue-700 hover:text-blue-800 mt-1">
                                         Lihat Logbook Harian &rarr;
                                     </a>
                                 </div>
@@ -243,7 +243,7 @@
                                     @if($finalReport && ($finalReport->file_path || $finalReport->file_laporan))
                                         <p class="text-slate-600">Status Laporan: <strong class="text-emerald-700">Telah Diunggah & Disetujui</strong></p>
                                         <a href="{{ asset('storage/' . ($finalReport->file_path ?: $finalReport->file_laporan)) }}" target="_blank"
-                                           class="inline-flex items-center gap-1 font-bold text-blue-700 hover:text-blue-800 mt-1">
+                                           class="inline-flex items-center min-h-[44px] sm:min-h-0 gap-1 font-bold text-blue-700 hover:text-blue-800 mt-1">
                                             Unduh Naskah Laporan (PDF) &rarr;
                                         </a>
                                     @else
@@ -382,13 +382,13 @@
                             {{-- Tombol Aksi --}}
                             <div class="space-y-2 pt-2">
                                 <button type="submit" name="action" value="resubmit"
-                                        class="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black text-sm shadow-md shadow-emerald-600/30 transition flex items-center justify-center gap-2 cursor-pointer">
+                                        class="w-full min-h-[44px] sm:min-h-0 py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black text-sm shadow-md shadow-emerald-600/30 transition flex items-center justify-center gap-2 cursor-pointer">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                                     <span>Simpan & Ajukan Ulang ke Atasan</span>
                                 </button>
 
                                 <button type="submit" name="action" value="save_draft"
-                                        class="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer">
+                                        class="w-full min-h-[44px] sm:min-h-0 py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer">
                                     <span>Simpan Draf (Belum Dikirim ke Atasan)</span>
                                 </button>
                             </div>

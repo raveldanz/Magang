@@ -59,7 +59,7 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
         $this->assignedMentor = User::factory()->create(['role' => 'mentor', 'agency_profile_id' => $this->agency->id]);
         $this->unit = Unit::create(['agency_profile_id' => $this->agency->id, 'name' => 'Bidang Aptika', 'quota' => 5, 'head_user_id' => $this->unitHead->id]);
         $this->student = User::factory()->create(['role' => 'mahasiswa', 'university_id' => $this->univ->id]);
-        StudentProfile::create(['user_id' => $this->student->id, 'nim' => '1', 'universitas' => 'Universitas Uji', 'university_id' => $this->univ->id, 'jurusan' => 'TI', 'phone' => '08']);
+        StudentProfile::create(['user_id' => $this->student->id, 'nim' => '1', 'universitas' => 'Universitas Uji', 'university_id' => $this->univ->id, 'jurusan' => 'TI', 'phone' => '08', 'cv_path' => 'documents/student-profiles/cv.pdf', 'id_card_path' => 'documents/student-profiles/ktm.pdf']);
     }
 
     private function placement(string $status = 'active', array $data = []): Placement
@@ -155,9 +155,7 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
             'start_date' => Carbon::now()->addDays(5)->toDateString(),
             'end_date' => Carbon::now()->addDays(60)->toDateString(),
             'surat_pengantar' => UploadedFile::fake()->create('surat.pdf', 100, 'application/pdf'),
-            'cv' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
-            'transkrip' => UploadedFile::fake()->create('transkrip.pdf', 100, 'application/pdf'),
-            'id_card' => UploadedFile::fake()->create('ktm.pdf', 100, 'application/pdf'),
+            'proposal_kampus' => UploadedFile::fake()->create('proposal.pdf', 100, 'application/pdf'),
         ])->assertSessionHasNoErrors();
 
         $doc = ApplicationDocument::first();
@@ -192,9 +190,7 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
             'start_date' => Carbon::now()->addDays(5)->toDateString(),
             'end_date' => Carbon::now()->addDays(60)->toDateString(),
             'surat_pengantar' => UploadedFile::fake()->create('surat.pdf', 2049, 'application/pdf'),
-            'cv' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
-            'transkrip' => UploadedFile::fake()->create('transkrip.pdf', 100, 'application/pdf'),
-            'id_card' => UploadedFile::fake()->create('ktm.pdf', 100, 'application/pdf'),
+            'proposal_kampus' => UploadedFile::fake()->create('proposal.pdf', 100, 'application/pdf'),
         ])->assertSessionHasErrors('surat_pengantar');
 
         $this->assertSame(0, Application::count());
@@ -236,6 +232,35 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
         $this->actingAs($this->student)->post(route('student.final_report.store'), [
             'file_laporan' => UploadedFile::fake()->create('laporan.pdf', 4800, 'application/pdf'),
         ])->assertSessionHasNoErrors();
+    }
+
+    public function test_mengganti_laporan_tidak_menghapus_berkas_yang_dipakai_bersama(): void
+    {
+        Storage::fake('local');
+        Storage::fake('public');
+        $shared = 'documents/applications/contoh-bersama.pdf';
+        Storage::disk('local')->put($shared, '%PDF-1.4 contoh');
+        $placement = $this->placement('active', ['mentor_id' => $this->assignedMentor->id, 'pembimbing_id' => $this->assignedMentor->id]);
+        ApplicationDocument::create(['application_id' => $placement->application_id, 'document_type' => 'CV', 'file_path' => $shared]);
+        FinalReport::create(['placement_id' => $placement->id, 'title' => 'Draf', 'file_path' => $shared, 'final_report_path' => $shared, 'status' => 'pending']);
+
+        // Berkas contoh bersama (data demo) tetap ada setelah peserta mengunggah naskah baru.
+        $this->actingAs($this->student)->post(route('student.final_report.store'), [
+            'file_laporan' => UploadedFile::fake()->create('laporan.pdf', 100, 'application/pdf'),
+        ])->assertSessionHasNoErrors();
+        Storage::disk('local')->assertExists($shared);
+        $own = FinalReport::where('placement_id', $placement->id)->value('file_path');
+        $this->assertNotSame($shared, $own);
+        Storage::disk('local')->assertExists($own);
+
+        // Berkas milik peserta sendiri tetap dibersihkan saat diganti lagi.
+        $own = 'final_reports/Laporan_Akhir_lama_milik_sendiri.pdf';
+        Storage::disk('local')->put($own, '%PDF-1.4 lama');
+        FinalReport::where('placement_id', $placement->id)->update(['file_path' => $own, 'final_report_path' => $own]);
+        $this->actingAs($this->student)->post(route('student.final_report.store'), [
+            'file_laporan' => UploadedFile::fake()->create('laporan-baru.pdf', 100, 'application/pdf'),
+        ])->assertSessionHasNoErrors();
+        Storage::disk('local')->assertMissing($own);
     }
 
     // ---------------------------------------------------------------

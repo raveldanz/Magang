@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class ApplicationController extends Controller
 {
@@ -25,9 +26,11 @@ class ApplicationController extends Controller
     public function create()
     {
         $units = Unit::with('agencyProfile')
-            ->withCount(['applications as occupied_count_db' => function ($query) {
-                $query->occupyingQuota();
-            }])->get();
+            ->withCount([
+                'applications as occupied_count_db' => function ($query) {
+                    $query->occupyingQuota();
+                },
+            ])->get();
         $groupedUnits = $units->groupBy(function ($unit) {
             return $unit->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya';
         });
@@ -59,7 +62,7 @@ class ApplicationController extends Controller
             ->first();
 
         // 3. Ambil seluruh riwayat pengajuan mahasiswa
-        $applicationHistory = Application::with(['unit.agencyProfile', 'group.leader', 'group.applications.user.studentProfile'])
+        $applicationHistory = Application::with(['documents', 'unit.agencyProfile', 'group.leader', 'group.applications.user.studentProfile'])
             ->where('user_id', $user->id)
             ->latest()
             ->get();
@@ -105,37 +108,27 @@ class ApplicationController extends Controller
             return redirect()->route('student.application.create')->with('error', $msg);
         }
 
-        $hasProfileDocs = $user->studentProfile->hasCompletePersonalDocuments();
-        $hasUploadedAll = $request->hasFile('cv') && $request->hasFile('transkrip') && $request->hasFile('id_card');
-
-        if (! $hasProfileDocs && ! $hasUploadedAll) {
+        if (! $user->studentProfile->hasCompletePersonalDocuments()) {
             return redirect()->route('student.profile.edit')
-                ->with('error', 'Silakan lengkapi berkas personal Anda yaitu CV, Transkrip Nilai, dan KTM pada menu Profil Saya terlebih dahulu.');
+                ->with('error', 'Silakan lengkapi berkas personal Anda yaitu CV dan KTM/KTP pada menu Profil Saya terlebih dahulu.');
         }
 
         $request->validate([
             'unit_id' => 'required|exists:units,id',
-            'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => ['required', 'date', 'after_or_equal:start_date', $this->maxInternshipEndRule($request)],
+            'start_date' => 'required|date',
+            'end_date' => ['bail', 'required', 'date', $this->internshipDurationRule($request)],
             'surat_pengantar' => 'required|'.UploadRules::APPLICATION_DOCUMENT,
-            'cv' => 'nullable|'.UploadRules::APPLICATION_DOCUMENT,
-            'transkrip' => 'nullable|'.UploadRules::APPLICATION_DOCUMENT,
-            'id_card' => 'nullable|'.UploadRules::APPLICATION_ID_CARD,
+            'proposal_kampus' => 'required|'.UploadRules::APPLICATION_DOCUMENT,
         ], [
             'start_date.required' => 'Tanggal mulai magang wajib diisi.',
             'start_date.date' => 'Tanggal mulai magang tidak valid.',
-            'start_date.after_or_equal' => 'Tanggal mulai magang tidak boleh sebelum hari ini.',
             'end_date.required' => 'Tanggal selesai magang wajib diisi.',
-            'end_date.after_or_equal' => 'Tanggal selesai magang harus setelah atau sama dengan tanggal mulai.',
+            'proposal_kampus.required' => 'Proposal Kampus wajib diunggah.',
             'surat_pengantar.required' => 'Surat Pengantar dari kampus/sekolah wajib diunggah.',
+            'proposal_kampus.mimes' => 'Proposal Kampus harus berformat PDF.',
+            'proposal_kampus.max' => 'Ukuran Proposal Kampus maksimal 2 MB.',
             'surat_pengantar.mimes' => 'File Surat Pengantar harus berformat PDF.',
             'surat_pengantar.max' => 'Ukuran file Surat Pengantar maksimal 2MB.',
-            'cv.mimes' => 'File CV harus berformat PDF.',
-            'cv.max' => 'Ukuran file CV maksimal 2MB.',
-            'transkrip.mimes' => 'File Transkrip Nilai harus berformat PDF.',
-            'transkrip.max' => 'Ukuran file Transkrip Nilai maksimal 2MB.',
-            'id_card.mimes' => 'File KTM atau Kartu Identitas harus berformat PDF, JPG, JPEG, atau PNG.',
-            'id_card.max' => 'Ukuran file KTM atau Kartu Identitas maksimal 2MB.',
         ]);
 
         // Cek Sisa Kuota Instansi yang Dipilih
@@ -146,76 +139,20 @@ class ApplicationController extends Controller
                 ->withErrors(['unit_id' => 'Kuota untuk Bidang ini sudah penuh. Silakan pilih Bidang Dispusip lain.']);
         }
 
-        $storage = app(PrivateDocumentStorage::class);
-        $proposalPath = $storage->storeApplicationDocument($request->file('surat_pengantar'));
-        $newlyUploadedPaths = [$proposalPath];
-
-        if ($request->hasFile('cv')) {
-            $cvPath = $storage->storeApplicationDocument($request->file('cv'));
-            $newlyUploadedPaths[] = $cvPath;
-        } else {
-            $cvPath = $user->studentProfile->cv_path;
-        }
-
-        if ($request->hasFile('transkrip')) {
-            $transcriptPath = $storage->storeApplicationDocument($request->file('transkrip'));
-            $newlyUploadedPaths[] = $transcriptPath;
-        } else {
-            $transcriptPath = $user->studentProfile->transcript_path;
-        }
-
-        if ($request->hasFile('id_card')) {
-            $idCardPath = $storage->storeApplicationDocument($request->file('id_card'));
-            $newlyUploadedPaths[] = $idCardPath;
-        } else {
-            $idCardPath = $user->studentProfile->id_card_path;
-        }
-
-        // Pastikan seluruh berkas prasyarat wajib telah terpenuhi sebelum membuat pengajuan
-        if (! $cvPath || ! $transcriptPath || ! $idCardPath) {
-            $missingDocs = [];
-            if (! $cvPath) {
-                $missingDocs[] = 'CV';
-            }
-            if (! $transcriptPath) {
-                $missingDocs[] = 'Transkrip Nilai / Rapor';
-            }
-            if (! $idCardPath) {
-                $missingDocs[] = 'KTM / Kartu Pelajar';
-            }
-
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Pengajuan magang belum dapat dikirim karena berkas prasyarat ('.implode(', ', $missingDocs).') belum lengkap. Silakan lengkapi berkas pada menu Profil Saya terlebih dahulu.');
-        }
-
-        // Simpan Data Pengajuan dalam transaksi + kunci baris user, supaya klik ganda /
-        // dua tab yang submit bersamaan tidak menghasilkan 2 pengajuan aktif sekaligus.
-        $application = DB::transaction(function () use ($request, $user, $proposalPath, $cvPath, $transcriptPath, $idCardPath) {
+        $application = $this->withCampusUploads($request, function (array $paths) use ($request, $user) {
             User::whereKey($user->id)->lockForUpdate()->first();
 
             $alreadyActive = Application::where('user_id', $user->id)
                 ->whereIn('status', ['pending', 'waiting_approval', 'accepted', 'active', 'completed'])
                 ->exists();
             if ($alreadyActive) {
-                return null;
+                return false;
             }
 
-            if ($request->hasFile('cv') || $request->hasFile('transkrip') || $request->hasFile('id_card')) {
-                $user->studentProfile->update(array_filter([
-                    'cv_path' => $cvPath,
-                    'transcript_path' => $transcriptPath,
-                    'id_card_path' => $idCardPath,
-                ]));
-            }
-
-            return $this->createApplicationRecords($request, $proposalPath, $cvPath, $transcriptPath, $idCardPath);
+            return $this->createApplicationRecords($request, $paths, $user);
         });
 
         if (! $application) {
-            // Pengajuan ganda dibatalkan: hapus hanya berkas baru yang diunggah pada request ini (jangan hapus berkas profil!)
-            $storage->discard($newlyUploadedPaths);
-
             return redirect()->route('student.application.create')
                 ->with('error', 'Anda masih memiliki berkas pengajuan magang yang sedang diproses. Mohon tunggu proses verifikasi admin dinas.');
         }
@@ -223,39 +160,39 @@ class ApplicationController extends Controller
         return redirect()->back()->with('success', 'Pengajuan magang dan dokumen persyaratan berhasil dikirim!');
     }
 
-    /**
-     * Buat record pengajuan + dokumen persyaratan (dipanggil di dalam transaksi).
-     */
-    /**
-     * Periode magang paling lama satu tahun sejak tanggal mulai, supaya salah ketik tahun
-     * (misalnya 2062) tidak lolos menjadi pengajuan.
-     */
-    private function maxInternshipEndRule(Request $request): \Closure
+    private function internshipDurationRule(Request $request): \Closure
     {
         return function (string $attribute, mixed $value, \Closure $fail) use ($request) {
+            if (! is_string($request->input('start_date')) || ! $request->filled('start_date')) {
+                return;
+            }
+
             try {
-                $start = Carbon::parse((string) $request->input('start_date'));
+                $start = Carbon::parse($request->input('start_date'));
                 $end = Carbon::parse((string) $value);
             } catch (InvalidFormatException) {
                 return;
             }
 
-            if ($end->gt($start->copy()->addYear())) {
+            if ($end->lt($start->copy()->addMonthNoOverflow())) {
+                $fail('Periode magang minimal 1 bulan sejak tanggal mulai.');
+            } elseif ($end->gt($start->copy()->addYear())) {
                 $fail('Periode magang paling lama 1 tahun sejak tanggal mulai.');
             }
         };
     }
 
-    private function createApplicationRecords(Request $request, ?string $proposalPath, ?string $cvPath, ?string $transcriptPath, ?string $idCardPath): Application
+    private function createApplicationRecords(Request $request, array $paths, User $user): Application
     {
+        $cvPath = $user->studentProfile->cv_path;
+        $idCardPath = $user->studentProfile->id_card_path;
         $application = Application::create([
             'user_id' => Auth::id(),
             'unit_id' => $request->unit_id,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
-            'proposal_letter_path' => $proposalPath,
+            'proposal_letter_path' => $paths['surat_pengantar'],
             'cv_path' => $cvPath,
-            'transcript_path' => $transcriptPath,
             'id_card_path' => $idCardPath,
             'status' => 'pending',
             'letter_token' => Str::random(32),
@@ -263,9 +200,9 @@ class ApplicationController extends Controller
 
         // Simpan Dokumen Persyaratan ke tabel application_documents
         $documents = [
-            'Surat Pengantar' => $proposalPath,
+            'Surat Pengantar' => $paths['surat_pengantar'],
+            'Proposal Kampus' => $paths['proposal_kampus'],
             'CV' => $cvPath,
-            'Transkrip Nilai' => $transcriptPath,
         ];
         if ($idCardPath) {
             $documents['KTM / Kartu Identitas'] = $idCardPath;
@@ -307,7 +244,7 @@ class ApplicationController extends Controller
 
         if (! $user->studentProfile->hasCompletePersonalDocuments()) {
             return redirect()->route('student.profile.edit')
-                ->with('error', 'Silakan lengkapi berkas personal Anda yaitu CV, Transkrip Nilai, dan KTM pada menu Profil Saya terlebih dahulu sebelum membuat kelompok.');
+                ->with('error', 'Silakan lengkapi berkas personal Anda yaitu CV dan KTM/KTP pada menu Profil Saya terlebih dahulu sebelum membuat kelompok.');
         }
 
         $hasActive = Application::where('user_id', $user->id)
@@ -319,12 +256,9 @@ class ApplicationController extends Controller
 
         $request->validate([
             'unit_id' => 'required|exists:units,id',
-            'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => ['required', 'date', 'after_or_equal:start_date', $this->maxInternshipEndRule($request)],
+            'start_date' => 'required|date',
+            'end_date' => ['bail', 'required', 'date', $this->internshipDurationRule($request)],
             'name' => 'nullable|string|max:100',
-        ], [
-            'start_date.after_or_equal' => 'Tanggal mulai magang tidak boleh sebelum hari ini.',
-            'end_date.after_or_equal' => 'Tanggal selesai magang harus setelah atau sama dengan tanggal mulai.',
         ]);
 
         $unit = Unit::findOrFail($request->unit_id);
@@ -353,7 +287,6 @@ class ApplicationController extends Controller
                 'role_in_group' => 'leader',
                 'status' => 'draft',
                 'cv_path' => $user->studentProfile->cv_path,
-                'transcript_path' => $user->studentProfile->transcript_path,
                 'id_card_path' => $user->studentProfile->id_card_path,
                 'letter_token' => Str::random(32),
             ]);
@@ -375,7 +308,7 @@ class ApplicationController extends Controller
 
         if (! $user->studentProfile->hasCompletePersonalDocuments()) {
             return redirect()->route('student.profile.edit')
-                ->with('error', 'Silakan lengkapi berkas personal Anda yaitu CV, Transkrip Nilai, dan KTM pada menu Profil Saya terlebih dahulu sebelum bergabung ke kelompok.');
+                ->with('error', 'Silakan lengkapi berkas personal Anda yaitu CV dan KTM/KTP pada menu Profil Saya terlebih dahulu sebelum bergabung ke kelompok.');
         }
 
         $hasActive = Application::where('user_id', $user->id)
@@ -436,7 +369,6 @@ class ApplicationController extends Controller
             'role_in_group' => 'member',
             'status' => 'draft',
             'cv_path' => $user->studentProfile->cv_path,
-            'transcript_path' => $user->studentProfile->transcript_path,
             'id_card_path' => $user->studentProfile->id_card_path,
             'letter_token' => Str::random(32),
         ]);
@@ -552,8 +484,12 @@ class ApplicationController extends Controller
 
         $request->validate([
             'surat_pengantar' => 'required|'.UploadRules::APPLICATION_DOCUMENT,
+            'proposal_kampus' => 'required|'.UploadRules::APPLICATION_DOCUMENT,
         ], [
-            'surat_pengantar.required' => 'Surat Pengantar / Proposal magang kelompok wajib diunggah.',
+            'proposal_kampus.required' => 'Proposal Kampus wajib diunggah.',
+            'surat_pengantar.required' => 'Surat Pengantar magang kelompok wajib diunggah.',
+            'proposal_kampus.mimes' => 'Proposal Kampus harus berformat PDF.',
+            'proposal_kampus.max' => 'Ukuran Proposal Kampus maksimal 2 MB.',
             'surat_pengantar.mimes' => 'File Surat Pengantar harus berformat PDF.',
             'surat_pengantar.max' => 'Ukuran file Surat Pengantar maksimal 2MB (2048 KB).',
         ]);
@@ -562,40 +498,49 @@ class ApplicationController extends Controller
             return redirect()->back()->with('error', 'Sisa kuota Bidang Dispusip tidak mencukupi untuk jumlah anggota kelompok ini.');
         }
 
-        $storage = app(PrivateDocumentStorage::class);
-        $proposalPath = $storage->storeApplicationDocument($request->file('surat_pengantar'));
-
-        DB::transaction(function () use ($group, $proposalPath) {
+        $this->withCampusUploads($request, function (array $paths) use ($group) {
+            $lockedGroup = InternshipGroup::whereKey($group->id)->lockForUpdate()->firstOrFail();
+            if ($lockedGroup->status !== 'draft') {
+                throw ValidationException::withMessages(['surat_pengantar' => 'Kelompok sudah diajukan.']);
+            }
+            $group = $lockedGroup->load(['applications.user.studentProfile', 'unit']);
+            if ($group->applications->count() < 2 || $group->unit->remaining_quota < $group->applications->count()) {
+                throw ValidationException::withMessages(['surat_pengantar' => 'Keanggotaan kelompok atau kuota bidang telah berubah. Periksa kembali sebelum mengirim.']);
+            }
             $group->update([
                 'status' => 'pending',
-                'proposal_letter_path' => $proposalPath,
+                'proposal_letter_path' => $paths['surat_pengantar'],
             ]);
 
             foreach ($group->applications as $app) {
+                $profile = $app->user->studentProfile;
+                if (! $profile?->hasCompletePersonalDocuments()) {
+                    throw ValidationException::withMessages(['anggota' => "CV dan kartu identitas {$app->user->name} perlu dilengkapi di Profil Saya."]);
+                }
                 $app->update([
                     'status' => 'pending',
-                    'proposal_letter_path' => $proposalPath,
+                    'cv_path' => $profile->cv_path,
+                    'id_card_path' => $profile->id_card_path,
+                    'proposal_letter_path' => $paths['surat_pengantar'],
                 ]);
 
-                ApplicationDocument::firstOrCreate([
+                ApplicationDocument::updateOrCreate([
                     'application_id' => $app->id,
                     'document_type' => 'Surat Pengantar',
-                ], ['file_path' => $proposalPath]);
+                ], ['file_path' => $paths['surat_pengantar']]);
+                ApplicationDocument::updateOrCreate([
+                    'application_id' => $app->id,
+                    'document_type' => 'Proposal Kampus',
+                ], ['file_path' => $paths['proposal_kampus']]);
 
                 if ($app->cv_path) {
-                    ApplicationDocument::firstOrCreate([
+                    ApplicationDocument::updateOrCreate([
                         'application_id' => $app->id,
                         'document_type' => 'CV',
                     ], ['file_path' => $app->cv_path]);
                 }
-                if ($app->transcript_path) {
-                    ApplicationDocument::firstOrCreate([
-                        'application_id' => $app->id,
-                        'document_type' => 'Transkrip Nilai',
-                    ], ['file_path' => $app->transcript_path]);
-                }
                 if ($app->id_card_path) {
-                    ApplicationDocument::firstOrCreate([
+                    ApplicationDocument::updateOrCreate([
                         'application_id' => $app->id,
                         'document_type' => 'KTM / Kartu Identitas',
                     ], ['file_path' => $app->id_card_path]);
@@ -639,22 +584,6 @@ class ApplicationController extends Controller
                 ->with('error', 'Data pengajuan kelompok yang perlu diperbaiki tidak ditemukan.');
         }
 
-        $request->validate([
-            'cv' => 'nullable|'.UploadRules::APPLICATION_DOCUMENT,
-            'transkrip' => 'nullable|'.UploadRules::APPLICATION_DOCUMENT,
-            'id_card' => 'nullable|'.UploadRules::APPLICATION_ID_CARD,
-            'surat_pengantar' => 'nullable|'.UploadRules::APPLICATION_DOCUMENT,
-        ], [
-            'cv.mimes' => 'File CV harus berformat PDF.',
-            'cv.max' => 'Ukuran file CV maksimal 2MB (2048 KB).',
-            'transkrip.mimes' => 'File Transkrip Nilai harus berformat PDF.',
-            'transkrip.max' => 'Ukuran file Transkrip Nilai maksimal 2MB (2048 KB).',
-            'id_card.mimes' => 'File KTM atau Kartu Identitas harus berformat PDF, JPG, JPEG, atau PNG.',
-            'id_card.max' => 'Ukuran file KTM atau Kartu Identitas maksimal 2MB (2048 KB).',
-            'surat_pengantar.mimes' => 'File Surat Pengantar harus berformat PDF.',
-            'surat_pengantar.max' => 'Ukuran file Surat Pengantar maksimal 2MB (2048 KB).',
-        ]);
-
         return $this->resubmitToExistingGroup($request, $application, $application->group);
     }
 
@@ -665,48 +594,30 @@ class ApplicationController extends Controller
     {
         $user = Auth::user();
         $profile = $user->studentProfile;
-        $storage = app(PrivateDocumentStorage::class);
+        $request->validate([
+            'surat_pengantar' => 'nullable|'.UploadRules::APPLICATION_DOCUMENT,
+            'proposal_kampus' => 'nullable|'.UploadRules::APPLICATION_DOCUMENT,
+        ], [
+            'proposal_kampus.mimes' => 'Proposal Kampus harus berformat PDF.',
+            'proposal_kampus.max' => 'Ukuran Proposal Kampus maksimal 2 MB.',
+            'surat_pengantar.mimes' => 'File Surat Pengantar harus berformat PDF.',
+            'surat_pengantar.max' => 'Ukuran file Surat Pengantar maksimal 2MB (2048 KB).',
+        ]);
 
-        $cvPath = $profile->cv_path;
-        $transcriptPath = $profile->transcript_path;
-        $idCardPath = $profile->id_card_path;
-
-        if ($request->hasFile('cv')) {
-            $cvPath = $storage->store($request->file('cv'), 'documents/student-profiles');
-        }
-        if ($request->hasFile('transkrip')) {
-            $transcriptPath = $storage->store($request->file('transkrip'), 'documents/student-profiles');
-        }
-        if ($request->hasFile('id_card')) {
-            $idCardPath = $storage->store($request->file('id_card'), 'documents/student-profiles');
-        }
-
-        if ($request->hasFile('cv') || $request->hasFile('transkrip') || $request->hasFile('id_card')) {
-            $profile->update([
-                'cv_path' => $cvPath,
-                'transcript_path' => $transcriptPath,
-                'id_card_path' => $idCardPath,
-            ]);
+        $cvPath = $profile?->cv_path;
+        $idCardPath = $profile?->id_card_path;
+        if (! $cvPath || ! $idCardPath) {
+            return redirect()->route('student.profile.edit')->with('error', 'Lengkapi CV dan KTM/KTP di Profil Saya sebelum mengajukan ulang.');
         }
 
-        if (empty($cvPath) || empty($transcriptPath) || empty($idCardPath)) {
-            return redirect()->back()->with('error', 'Berkas personal (CV, Transkrip Nilai, dan KTM) wajib lengkap sebelum mengajukan ulang ke kelompok.');
-        }
-
-        $newProposalPath = null;
-        if ($request->hasFile('surat_pengantar')) {
-            $newProposalPath = $storage->storeApplicationDocument($request->file('surat_pengantar'));
-        }
-
-        $finalProposalPath = $newProposalPath ?: ($application->proposal_letter_path ?: $group->proposal_letter_path);
-
-        DB::transaction(function () use ($application, $group, $user, $cvPath, $transcriptPath, $idCardPath, $newProposalPath, $finalProposalPath, $request) {
+        $this->withCampusUploads($request, function (array $paths) use ($application, $group, $user, $cvPath, $idCardPath, $request) {
+            $newProposalPath = $paths['surat_pengantar'] ?? null;
+            $finalProposalPath = $newProposalPath ?: ($application->proposal_letter_path ?: $group->proposal_letter_path);
             $application->update([
                 'status' => 'pending',
                 'rejection_note' => null,
                 'rejection_reason' => null,
                 'cv_path' => $cvPath,
-                'transcript_path' => $transcriptPath,
                 'id_card_path' => $idCardPath,
                 'proposal_letter_path' => $finalProposalPath,
             ]);
@@ -722,10 +633,9 @@ class ApplicationController extends Controller
                 ['application_id' => $application->id, 'document_type' => 'CV'],
                 ['file_path' => $cvPath]
             );
-            ApplicationDocument::updateOrCreate(
-                ['application_id' => $application->id, 'document_type' => 'Transkrip Nilai'],
-                ['file_path' => $transcriptPath]
-            );
+            if (isset($paths['proposal_kampus'])) {
+                $application->documents()->updateOrCreate(['document_type' => 'Proposal Kampus'], ['file_path' => $paths['proposal_kampus']]);
+            }
             ApplicationDocument::updateOrCreate(
                 ['application_id' => $application->id, 'document_type' => 'KTM / Kartu Identitas'],
                 ['file_path' => $idCardPath]
@@ -746,7 +656,6 @@ class ApplicationController extends Controller
                 foreach ($rejectedSiblings as $sibling) {
                     $sibProfile = $sibling->user?->studentProfile;
                     $sibCv = $sibProfile?->cv_path ?: $sibling->cv_path;
-                    $sibTranscript = $sibProfile?->transcript_path ?: $sibling->transcript_path;
                     $sibIdCard = $sibProfile?->id_card_path ?: $sibling->id_card_path;
                     $sibProposal = $newProposalPath ?: ($sibling->proposal_letter_path ?: $finalProposalPath);
 
@@ -755,7 +664,6 @@ class ApplicationController extends Controller
                         'rejection_note' => null,
                         'rejection_reason' => null,
                         'cv_path' => $sibCv,
-                        'transcript_path' => $sibTranscript,
                         'id_card_path' => $sibIdCard,
                         'proposal_letter_path' => $sibProposal,
                     ]);
@@ -772,11 +680,8 @@ class ApplicationController extends Controller
                             ['file_path' => $sibCv]
                         );
                     }
-                    if ($sibTranscript) {
-                        ApplicationDocument::updateOrCreate(
-                            ['application_id' => $sibling->id, 'document_type' => 'Transkrip Nilai'],
-                            ['file_path' => $sibTranscript]
-                        );
+                    if (isset($paths['proposal_kampus'])) {
+                        $sibling->documents()->updateOrCreate(['document_type' => 'Proposal Kampus'], ['file_path' => $paths['proposal_kampus']]);
                     }
                     if ($sibIdCard) {
                         ApplicationDocument::updateOrCreate(
@@ -805,5 +710,32 @@ class ApplicationController extends Controller
 
         return redirect()->route('student.application.create')
             ->with('success', "Perbaikan berkas berhasil dikirim! Anda telah kembali terdaftar aktif pada kelompok '{$group->name}' dan sedang menunggu verifikasi Admin Dinas.");
+    }
+
+    /** Simpan dua unggahan terpisah; bersihkan berkas baru jika transaksi batal. */
+    private function withCampusUploads(Request $request, \Closure $persist): mixed
+    {
+        $storage = app(PrivateDocumentStorage::class);
+        $paths = [];
+        try {
+            foreach (['surat_pengantar', 'proposal_kampus'] as $field) {
+                if ($request->hasFile($field)) {
+                    $paths[$field] = $storage->storeApplicationDocument($request->file($field));
+                    if (! $paths[$field]) {
+                        throw ValidationException::withMessages([$field => 'Berkas gagal disimpan. Silakan unggah kembali.']);
+                    }
+                }
+            }
+            $result = DB::transaction(fn () => $persist($paths));
+        } catch (\Throwable $error) {
+            $storage->discard($paths);
+            throw $error;
+        }
+
+        if ($result === false) {
+            $storage->discard($paths);
+        }
+
+        return $result;
     }
 }

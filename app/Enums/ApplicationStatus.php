@@ -78,14 +78,14 @@ enum ApplicationStatus: string
     public function badgeColor(): string
     {
         return match ($this) {
-            self::DRAFT => 'bg-slate-100 text-slate-700 border-slate-300',
-            self::PENDING => 'bg-amber-50 text-amber-700 border-amber-300',
-            self::WAITING_APPROVAL => 'bg-purple-50 text-purple-700 border-purple-200',
-            self::ACCEPTED => 'bg-indigo-50 text-indigo-700 border-indigo-300',
-            self::ACTIVE => 'bg-emerald-50 text-emerald-700 border-emerald-300',
-            self::COMPLETED => 'bg-blue-50 text-blue-700 border-blue-300',
-            self::REJECTED => 'bg-rose-50 text-rose-700 border-rose-300',
-            self::RESIGNED => 'bg-slate-100 text-slate-700 border-slate-300',
+            self::DRAFT => 'bg-slate-100 text-slate-800 border-slate-300',
+            self::PENDING => 'bg-amber-50 text-amber-800 border-amber-300',
+            self::WAITING_APPROVAL => 'bg-purple-50 text-purple-800 border-purple-300',
+            self::ACCEPTED => 'bg-indigo-50 text-indigo-800 border-indigo-300',
+            self::ACTIVE => 'bg-emerald-50 text-emerald-800 border-emerald-300',
+            self::COMPLETED => 'bg-blue-50 text-blue-800 border-blue-300',
+            self::REJECTED => 'bg-rose-50 text-rose-800 border-rose-300',
+            self::RESIGNED => 'bg-slate-100 text-slate-800 border-slate-300',
         };
     }
 

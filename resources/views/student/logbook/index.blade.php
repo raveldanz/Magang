@@ -3,6 +3,9 @@
         <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
             {{ __('Logbook & Aktivitas Magang') }}
         </h2>
+        @if($placement)
+        <a href="{{ route('student.logbook.index', array_merge(request()->except('page'), ['export' => 'csv'])) }}" class="inline-flex rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Ekspor logbook (CSV)</a>
+        @endif
     </x-slot>
 
     <div class="py-5 sm:py-8 lg:py-10">
@@ -500,26 +503,26 @@
                                                isImage: {{ $isImg ? 'true' : 'false' }}, 
                                                title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->translatedFormat('d M Y') }}' 
                                            })"
-                                           target="_blank" class="px-2.5 py-1 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-lg border border-blue-100 flex items-center gap-1 cursor-pointer">
+                                           target="_blank" class="min-h-[44px] px-2.5 py-1 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-lg border border-blue-100 flex items-center gap-1 cursor-pointer">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                                             <span>Lampiran</span>
                                         </a>
                                     @endif
                                 </div>
 
-                                <p class="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <p class="break-words text-sm text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
                                     {{ $log->activity }}
                                 </p>
                                 @if(!empty($log->feedback))
                                     <div class="p-2 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-start gap-1">
                                         <span class="font-bold shrink-0">Catatan Mentor:</span>
-                                        <span>{{ $log->feedback }}</span>
+                                        <span class="min-w-0 break-words">{{ $log->feedback }}</span>
                                     </div>
                                 @endif
                                 @if($requiresDpl && !empty($log->lecturer_feedback))
                                     <div class="p-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800 flex items-start gap-1">
                                         <span class="font-bold shrink-0">Catatan Pembimbing:</span>
-                                        <span>{{ $log->lecturer_feedback }}</span>
+                                        <span class="min-w-0 break-words">{{ $log->lecturer_feedback }}</span>
                                     </div>
                                 @endif
 
@@ -540,7 +543,7 @@
 
                                 @if ($lifecycle === 'ACTIVE' && (strtolower($log->status) === 'pending' || strtolower($log->status) === 'rejected' || strtolower($log->lecturer_status ?? '') === 'rejected'))
                                     <div class="flex items-center gap-2 pt-1">
-                                        <a href="{{ route('student.logbook.edit', $log->id) }}" class="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
+                                        <a href="{{ route('student.logbook.edit', $log->id) }}" class="min-h-[44px] flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
                                             <span>Edit Logbook</span>
                                         </a>
                                         <form action="{{ route('student.logbook.destroy', $log->id) }}" method="POST" class="shrink-0">
@@ -553,7 +556,7 @@
                                                         name: @js('Logbook ' . \Carbon\Carbon::parse($log->date)->translatedFormat('d M Y')),
                                                         desc: @js(\Illuminate\Support\Str::limit(strip_tags($log->activity ?? ''), 90))
                                                     })"
-                                                    class="px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition cursor-pointer">
+                                                    class="min-h-[44px] px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition cursor-pointer">
                                                 Hapus
                                             </button>
                                         </form>

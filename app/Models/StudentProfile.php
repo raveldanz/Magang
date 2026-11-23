@@ -38,7 +38,7 @@ class StudentProfile extends Model
 
     public function hasCompletePersonalDocuments(): bool
     {
-        return ! empty($this->cv_path) && ! empty($this->transcript_path) && ! empty($this->id_card_path);
+        return ! empty($this->cv_path) && ! empty($this->id_card_path);
     }
 
     public function university()

@@ -263,7 +263,9 @@ class SecurityAuthorizationTest extends TestCase
         Storage::fake('public');
 
         $student = User::factory()->create(['role' => 'mahasiswa']);
-        $student->studentProfile()->create(['nim' => '123', 'universitas' => 'Unesa', 'jurusan' => 'TI', 'phone' => '08']);
+        $cv = UploadedFile::fake()->create('cv.pdf', 10, 'application/pdf')->store('documents/student-profiles', 'local');
+        $identity = UploadedFile::fake()->create('ktm.pdf', 10, 'application/pdf')->store('documents/student-profiles', 'local');
+        $student->studentProfile()->create(['nim' => '123', 'universitas' => 'Unesa', 'jurusan' => 'TI', 'phone' => '08', 'cv_path' => $cv, 'id_card_path' => $identity]);
         $unit = Unit::create(['agency_profile_id' => $this->agencyA->id, 'name' => 'Unit Upload', 'quota' => 5]);
 
         $this->actingAs($student)->post(route('student.application.store'), [
@@ -271,13 +273,13 @@ class SecurityAuthorizationTest extends TestCase
             'start_date' => Carbon::now()->addDays(5)->toDateString(),
             'end_date' => Carbon::now()->addDays(60)->toDateString(),
             'surat_pengantar' => UploadedFile::fake()->create('surat.pdf', 10, 'application/pdf'),
-            'cv' => UploadedFile::fake()->create('cv.pdf', 10, 'application/pdf'),
-            'transkrip' => UploadedFile::fake()->create('transkrip.pdf', 10, 'application/pdf'),
-            'id_card' => UploadedFile::fake()->create('ktm.pdf', 10, 'application/pdf'),
+            'proposal_kampus' => UploadedFile::fake()->create('proposal.pdf', 100, 'application/pdf'),
         ])->assertSessionHasNoErrors();
 
         $docs = ApplicationDocument::all();
         $this->assertCount(4, $docs);
+        $this->assertNotSame($docs->firstWhere('document_type', 'Surat Pengantar')->file_path, $docs->firstWhere('document_type', 'Proposal Kampus')->file_path);
+        $this->assertSame($cv, $docs->firstWhere('document_type', 'CV')->file_path);
         foreach ($docs as $doc) {
             Storage::disk('local')->assertExists($doc->file_path);
             Storage::disk('public')->assertMissing($doc->file_path);
@@ -349,5 +351,11 @@ class SecurityAuthorizationTest extends TestCase
         $this->actingAs($otherStudent)->get($url)->assertForbidden();
         $this->actingAs($student)->get($url)->assertOk();
         $this->actingAs($this->mentorA)->get($url)->assertOk();
+
+        // Supervisor (Kepala Dinas) memeriksa laporan saat revisi sertifikat: hanya instansinya sendiri.
+        $supervisorA = User::factory()->create(['role' => 'supervisor', 'agency_profile_id' => $this->agencyA->id]);
+        $supervisorB = User::factory()->create(['role' => 'supervisor', 'agency_profile_id' => $this->agencyB->id]);
+        $this->actingAs($supervisorA)->get($url)->assertOk();
+        $this->actingAs($supervisorB)->get($url)->assertForbidden();
     }
 }

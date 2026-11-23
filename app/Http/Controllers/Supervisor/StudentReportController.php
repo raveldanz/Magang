@@ -18,7 +18,7 @@ class StudentReportController extends Controller
      */
     public function index(Request $request)
     {
-        $dispusip = AgencyProfile::where('agency_name', 'like', '%Perpustakaan%')->first()
+        $dispusip = AgencyProfile::whereRaw('LOWER(agency_name) LIKE ?', ['%perpustakaan%'])->first()
             ?? AgencyProfile::first();
 
         // 4 Bidang Devisi Dispusip

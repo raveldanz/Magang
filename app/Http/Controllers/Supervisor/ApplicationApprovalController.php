@@ -69,7 +69,7 @@ class ApplicationApprovalController extends Controller
 
         $applications = $query->latest()->paginate(10)->withQueryString();
 
-        $dispusip = AgencyProfile::where('agency_name', 'like', '%Perpustakaan%')->first() ?? AgencyProfile::first();
+        $dispusip = AgencyProfile::whereRaw('LOWER(agency_name) LIKE ?', ['%perpustakaan%'])->first() ?? AgencyProfile::first();
         $units = Unit::when($dispusip, fn ($q) => $q->where('agency_profile_id', $dispusip->id))
             ->orderBy('name')
             ->get();

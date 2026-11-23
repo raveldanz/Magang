@@ -67,7 +67,7 @@
             </button>
             <div class="flex items-center justify-between gap-2 px-2.5 pt-1 pb-1.5">
                 <p class="text-xs text-slate-500">Percakapan yang dibisukan tidak memunculkan notifikasi.</p>
-                <button type="button" @click="$store.chatPrefs.testSound()" class="h-8 px-2.5 rounded-lg text-xs font-bold text-blue-600 hover:bg-blue-50 whitespace-nowrap">Tes suara</button>
+                <button type="button" @click="$store.chatPrefs.testSound()" class="h-8 min-h-[44px] sm:min-h-0 px-2.5 rounded-lg text-xs font-bold text-blue-600 hover:bg-blue-50 whitespace-nowrap">Tes suara</button>
             </div>
         </div>
 
@@ -79,13 +79,13 @@
 
         <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-hide" role="tablist" aria-label="Saring percakapan">
             <button type="button" @click="listFilter = 'all'" role="tab" :aria-selected="listFilter === 'all'"
-                    class="h-8 px-3 rounded-full text-xs font-bold whitespace-nowrap transition shrink-0"
+                    class="h-8 min-h-[44px] sm:min-h-0 px-3 rounded-full text-xs font-bold whitespace-nowrap transition inline-flex items-center shrink-0"
                     :class="listFilter === 'all' ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
                 Semua
             </button>
 
             <button type="button" @click="listFilter = 'priority'" role="tab" :aria-selected="listFilter === 'priority'"
-                    class="h-8 px-3 rounded-full text-xs font-bold whitespace-nowrap transition inline-flex items-center gap-1.5 shrink-0"
+                    class="h-8 min-h-[44px] sm:min-h-0 px-3 rounded-full text-xs font-bold whitespace-nowrap transition inline-flex items-center gap-1.5 shrink-0"
                     :class="listFilter === 'priority' ? 'bg-amber-600 text-white shadow-2xs' : 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100'">
                 <span class="w-1.5 h-1.5 rounded-full" :class="listFilter === 'priority' ? 'bg-white' : 'bg-amber-500'"></span>
                 <span>Prioritas</span>
@@ -95,7 +95,7 @@
             </button>
 
             <button type="button" @click="listFilter = 'channels'" role="tab" :aria-selected="listFilter === 'channels'"
-                    class="h-8 px-3 rounded-full text-xs font-bold whitespace-nowrap transition inline-flex items-center gap-1 shrink-0"
+                    class="h-8 min-h-[44px] sm:min-h-0 px-3 rounded-full text-xs font-bold whitespace-nowrap transition inline-flex items-center gap-1 shrink-0"
                     :class="listFilter === 'channels' ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
                 <span>Saluran Pengumuman</span>
                 <span x-show="totalUnreadChannels > 0" class="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold"
@@ -104,26 +104,26 @@
             </button>
 
             <button type="button" @click="listFilter = 'students'" role="tab" :aria-selected="listFilter === 'students'"
-                    class="h-8 px-3 rounded-full text-xs font-bold whitespace-nowrap transition shrink-0"
+                    class="h-8 min-h-[44px] sm:min-h-0 px-3 rounded-full text-xs font-bold whitespace-nowrap transition inline-flex items-center shrink-0"
                     :class="listFilter === 'students' ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
                 Peserta Magang
             </button>
 
             <button type="button" @click="listFilter = 'staff'" role="tab" :aria-selected="listFilter === 'staff'"
-                    class="h-8 px-3 rounded-full text-xs font-bold whitespace-nowrap transition shrink-0"
+                    class="h-8 min-h-[44px] sm:min-h-0 px-3 rounded-full text-xs font-bold whitespace-nowrap transition inline-flex items-center shrink-0"
                     :class="listFilter === 'staff' ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
                 Kedinasan
             </button>
 
             <button type="button" @click="listFilter = 'unread'" role="tab" :aria-selected="listFilter === 'unread'"
-                    class="h-8 px-3 rounded-full text-xs font-bold whitespace-nowrap transition inline-flex items-center gap-1 shrink-0"
+                    class="h-8 min-h-[44px] sm:min-h-0 px-3 rounded-full text-xs font-bold whitespace-nowrap transition inline-flex items-center gap-1 shrink-0"
                     :class="listFilter === 'unread' ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
                 <span>Belum dibaca</span>
                 <span x-show="totalUnreadGroups > 0" x-text="`(${totalUnreadGroups})`"></span>
             </button>
 
             <button type="button" @click="listFilter = 'groups'" role="tab" :aria-selected="listFilter === 'groups'"
-                    class="h-8 px-3 rounded-full text-xs font-bold whitespace-nowrap transition shrink-0"
+                    class="h-8 min-h-[44px] sm:min-h-0 px-3 rounded-full text-xs font-bold whitespace-nowrap transition inline-flex items-center shrink-0"
                     :class="listFilter === 'groups' ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
                 Grup
             </button>

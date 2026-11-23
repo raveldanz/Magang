@@ -8,6 +8,7 @@ use App\Models\Application;
 use App\Models\AuditLog;
 use App\Models\Logbook;
 use App\Models\Placement;
+use App\Services\LogbookCsv;
 use App\Services\PrivateDocumentStorage;
 use App\Services\UniversityResolver;
 use App\Support\UploadRules;
@@ -41,7 +42,7 @@ class LogbookController extends Controller
         return $app;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         $userId = $user->id;
@@ -57,6 +58,10 @@ class LogbookController extends Controller
 
         // Pemicu on-the-fly jika tanggal mulai telah tiba
         $application->autoActivateIfStarted();
+
+        if ($request->query('export') === 'csv') {
+            return LogbookCsv::download(Logbook::whereHas('placement', fn ($query) => $query->where('application_id', $application->id)));
+        }
 
         // 3. Tentukan status lifecycle pengajuan
         $lifecycle = $application->status instanceof ApplicationStatus ? strtoupper($application->status->value) : strtoupper((string) $application->status);

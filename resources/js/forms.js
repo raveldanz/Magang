@@ -1,3 +1,5 @@
+import { registerStudentValidation } from './student-validation';
+
 /**
  * Pengaman form untuk seluruh aplikasi.
  *
@@ -323,6 +325,10 @@ export function initAutosave() {
 /* ------------------------------------------------------------------------------ Pemasangan */
 
 export function registerFormGuards() {
+    registerStudentValidation(input => {
+        const problem = oversizedFile(input);
+        return problem ? oversizeMessage(problem) : '';
+    });
     document.addEventListener('change', onFileChange);
     document.addEventListener('submit', onSubmitCapture, true);
     document.addEventListener('submit', onSubmitBubble);

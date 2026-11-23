@@ -53,7 +53,7 @@ class StudentQcFlowTest extends TestCase
         $this->mentor = User::factory()->create(['role' => 'mentor', 'agency_profile_id' => $this->agency->id]);
         $this->unit = Unit::create(['agency_profile_id' => $this->agency->id, 'name' => 'Bidang Aptika', 'quota' => 5]);
         $this->student = User::factory()->create(['role' => 'mahasiswa', 'university_id' => $this->univ->id]);
-        StudentProfile::create(['user_id' => $this->student->id, 'nim' => '1', 'universitas' => 'Universitas Uji', 'university_id' => $this->univ->id, 'jurusan' => 'TI', 'phone' => '08']);
+        StudentProfile::create(['user_id' => $this->student->id, 'nim' => '1', 'universitas' => 'Universitas Uji', 'university_id' => $this->univ->id, 'jurusan' => 'TI', 'phone' => '08', 'cv_path' => 'documents/student-profiles/cv.pdf', 'id_card_path' => 'documents/student-profiles/ktm.pdf']);
     }
 
     private function placement(string $status = 'active', array $data = []): Placement
@@ -71,24 +71,41 @@ class StudentQcFlowTest extends TestCase
 
     private function applicationPayload(string $start, string $end): array
     {
+        $this->student->studentProfile->update(['cv_path' => 'cv.pdf', 'id_card_path' => 'ktm.pdf']);
+
         return [
             'unit_id' => $this->unit->id,
             'start_date' => $start,
             'end_date' => $end,
             'surat_pengantar' => UploadedFile::fake()->create('surat.pdf', 100, 'application/pdf'),
-            'cv' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
-            'transkrip' => UploadedFile::fake()->create('transkrip.pdf', 100, 'application/pdf'),
-            'id_card' => UploadedFile::fake()->create('ktm.pdf', 100, 'application/pdf'),
+            'proposal_kampus' => UploadedFile::fake()->create('proposal.pdf', 100, 'application/pdf'),
+            'proposal_kampus' => UploadedFile::fake()->create('proposal.pdf', 100, 'application/pdf'),
         ];
     }
 
-    public function test_pengajuan_dengan_tanggal_mulai_di_masa_lalu_ditolak(): void
+    public function test_both_campus_documents_are_required_separately(): void
+    {
+        foreach (['surat_pengantar', 'proposal_kampus'] as $missing) {
+            $payload = $this->applicationPayload('2026-01-01', '2026-03-01');
+            unset($payload[$missing]);
+            $this->actingAs($this->student)->post(route('student.application.store'), $payload)
+                ->assertSessionHasErrors($missing);
+        }
+
+        $this->assertDatabaseCount('applications', 0);
+    }
+
+    public function test_pengajuan_menerima_tanggal_lampau_dengan_durasi_minimal_satu_bulan_kalender(): void
     {
         $this->actingAs($this->student)
-            ->post(route('student.application.store'), $this->applicationPayload('2020-01-01', '2020-03-01'))
-            ->assertSessionHasErrors(['start_date' => 'Tanggal mulai magang tidak boleh sebelum hari ini.']);
+            ->post(route('student.application.store'), $this->applicationPayload('2020-01-31', '2020-02-28'))
+            ->assertSessionHasErrors(['end_date' => 'Periode magang minimal 1 bulan sejak tanggal mulai.']);
 
-        $this->assertSame(0, Application::count());
+        $this->actingAs($this->student)
+            ->post(route('student.application.store'), $this->applicationPayload('2020-01-31', '2020-02-29'))
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame(1, Application::count());
     }
 
     public function test_pengajuan_dengan_periode_lebih_dari_satu_tahun_ditolak(): void
@@ -108,15 +125,19 @@ class StudentQcFlowTest extends TestCase
         $this->assertSame(1, Application::count());
     }
 
-    public function test_kelompok_dengan_tanggal_mulai_di_masa_lalu_ditolak(): void
+    public function test_kelompok_menerima_tanggal_lampau_dengan_durasi_minimal_satu_bulan_kalender(): void
     {
         $this->student->studentProfile->update(['cv_path' => 'a.pdf', 'transcript_path' => 'b.pdf', 'id_card_path' => 'c.pdf']);
 
         $this->actingAs($this->student)
-            ->post(route('student.group.create'), ['unit_id' => $this->unit->id, 'start_date' => '2019-01-01', 'end_date' => '2019-03-01', 'name' => 'Tim Lampau'])
-            ->assertSessionHasErrors('start_date');
+            ->post(route('student.group.create'), ['unit_id' => $this->unit->id, 'start_date' => '2019-01-31', 'end_date' => '2019-02-27', 'name' => 'Tim Lampau'])
+            ->assertSessionHasErrors('end_date');
 
-        $this->assertSame(0, Application::count());
+        $this->actingAs($this->student)
+            ->post(route('student.group.create'), ['unit_id' => $this->unit->id, 'start_date' => '2019-01-31', 'end_date' => '2019-02-28', 'name' => 'Tim Lampau'])
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame(1, Application::count());
     }
 
     public function test_logbook_menolak_tanggal_masa_depan_dan_sebelum_magang(): void
@@ -191,6 +212,37 @@ class StudentQcFlowTest extends TestCase
         $this->assertSame('Judul Lama', $report->title, 'Judul lama tidak boleh tertimpa judul bawaan saat kolom judul dikosongkan.');
     }
 
+    public function test_profil_mengapitalisasi_data_diri_dan_cukup_dengan_cv_dan_identitas(): void
+    {
+        $email = $this->student->email;
+        $this->actingAs($this->student)->post(route('student.profile.update'), [
+            'name' => 'Nur Aisyah',
+            'nim' => 'mHs-001',
+            'university_id' => $this->univ->id,
+            'faculty' => 'Ilmu Komputer',
+            'jurusan' => 'Sistem Informasi',
+            'alamat' => 'Jl. Merdeka',
+            'emergency_contact_name' => 'Budi',
+            'phone' => '08123456789',
+            'cv' => UploadedFile::fake()->create('cv.pdf', 10, 'application/pdf'),
+            'id_card' => UploadedFile::fake()->create('ktp.pdf', 10, 'application/pdf'),
+        ])->assertSessionHasNoErrors();
+
+        $user = $this->student->fresh();
+        $profile = $user->studentProfile;
+        $this->assertSame('NUR AISYAH', $user->name);
+        $this->assertSame($email, $user->email);
+        $this->assertSame('mHs-001', $profile->nim);
+        $this->assertSame('ILMU KOMPUTER', $profile->faculty);
+        $this->assertSame('SISTEM INFORMASI', $profile->major);
+        $this->assertSame('JL. MERDEKA', $profile->address);
+        $this->assertSame('BUDI', $profile->emergency_contact_name);
+        $this->assertTrue($profile->hasCompletePersonalDocuments());
+
+        $this->get(route('student.profile.edit'))->assertOk()
+            ->assertDontSee('name="transkrip"', false);
+    }
+
     public function test_mengganti_dokumen_profil_tidak_menghapus_berkas_yang_masih_dipakai_pengajuan(): void
     {
         $oldCv = 'documents/student-profiles/cv-lama.pdf';
@@ -199,7 +251,7 @@ class StudentQcFlowTest extends TestCase
         Storage::disk('local')->put($oldTranscript, 'transkrip lama');
         $this->student->studentProfile->update(['cv_path' => $oldCv, 'transcript_path' => $oldTranscript]);
 
-        // Pengajuan yang sudah aktif tetap menunjuk CV lama; transkrip lama tidak dirujuk siapa pun.
+        // Pengajuan yang sudah aktif tetap menunjuk CV lama; transkrip historis tetap tersimpan di profil.
         $placement = $this->placement('active');
         $placement->application->update(['cv_path' => $oldCv]);
 
@@ -217,7 +269,8 @@ class StudentQcFlowTest extends TestCase
         $this->assertNotSame($oldCv, $profile->cv_path);
         Storage::disk('local')->assertExists($profile->cv_path);
         Storage::disk('local')->assertExists($oldCv);
-        Storage::disk('local')->assertMissing($oldTranscript);
+        Storage::disk('local')->assertExists($oldTranscript);
+        $this->assertSame($oldTranscript, $profile->transcript_path);
         $this->assertSame($oldCv, $placement->application->fresh()->cv_path);
     }
 

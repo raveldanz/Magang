@@ -14,7 +14,7 @@
         .d-only { display: none !important; }
     }
     .mlist { display: flex; flex-direction: column; gap: 12px; padding: 12px; background: #f8fafc; }
-    .mcard { background: #fff; border: 1px solid #e6ebf2; border-radius: 16px; padding: 14px; box-shadow: 0 1px 2px rgba(15, 23, 42, .04); }
+    .mcard { background: #fff; border: 1px solid #e6ebf2; border-radius: 16px; padding: 14px; box-shadow: 0 1px 2px rgba(15, 23, 42, .04); max-width: 100%; box-sizing: border-box; overflow-wrap: anywhere; }
     .mcard-head { display: flex; align-items: flex-start; gap: 12px; }
     .mcard-main { flex: 1; min-width: 0; }
     .mavatar { flex: none; width: 40px; height: 40px; border-radius: 12px; background: #eff6ff; color: #1d4ed8; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
@@ -34,7 +34,7 @@
     .mpill-blue { background: #eff6ff; color: #1d4ed8; }
     .mbar { height: 6px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
     .mbar > i { display: block; height: 100%; border-radius: 999px; }
-    .mbtn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; line-height: 1; cursor: pointer; }
+    .mbtn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; line-height: 1; cursor: pointer; }
     .mbtn-block { display: flex; width: 100%; }
     .mbtn-primary { background: #2563eb; color: #fff; }
     .mbtn-primary:active { background: #1d4ed8; }

@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Student;
 use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
+use App\Models\ApplicationDocument;
 use App\Models\AuditLog;
 use App\Models\FinalReport;
 use App\Models\InternshipProject;
+use App\Models\StudentProfile;
 use App\Support\SafeUpload;
 use App\Support\UploadRules;
 use Illuminate\Http\Request;
@@ -130,7 +132,9 @@ class FinalReportController extends Controller
             // Bersihkan file lama milik mahasiswa ini jika ada (kecuali file default/template bawaan)
             if ($finalReport && $finalReport->file_path) {
                 $baseOld = basename($finalReport->file_path);
-                if (! in_array($baseOld, ['default.pdf', 'sample_laporan_akhir.pdf', 'test_report.pdf'])) {
+                // Berkas yang juga dirujuk baris lain (mis. PDF contoh data demo) tidak boleh ikut terhapus.
+                if (! in_array($baseOld, ['default.pdf', 'sample_laporan_akhir.pdf', 'test_report.pdf'])
+                    && ! $this->isFileReferencedElsewhere($finalReport)) {
                     if (Storage::disk('local')->exists($finalReport->file_path)) {
                         Storage::disk('local')->delete($finalReport->file_path);
                     } elseif (Storage::disk('public')->exists($finalReport->file_path)) {
@@ -179,6 +183,26 @@ class FinalReportController extends Controller
         return redirect()->route('student.final_report.index')->with('success', 'Laporan akhir magang berhasil diperbarui dan disimpan.');
     }
 
+    /** Apakah berkas laporan ini juga dipakai laporan/dokumen lain sehingga tidak boleh dihapus. */
+    private function isFileReferencedElsewhere(FinalReport $report): bool
+    {
+        $path = $report->file_path;
+
+        return FinalReport::whereKeyNot($report->id)
+            ->where(fn ($q) => $q->where('file_path', $path)->orWhere('final_report_path', $path))
+            ->exists()
+            || Application::where('cv_path', $path)
+                ->orWhere('transcript_path', $path)
+                ->orWhere('id_card_path', $path)
+                ->orWhere('proposal_letter_path', $path)
+                ->exists()
+            || ApplicationDocument::where('file_path', $path)->exists()
+            || StudentProfile::where('cv_path', $path)
+                ->orWhere('transcript_path', $path)
+                ->orWhere('id_card_path', $path)
+                ->exists();
+    }
+
     /**
      * Buka / Unduh Berkas Naskah Laporan Akhir dengan Nama Terformat & Otorisasi Ketat
      */
@@ -202,8 +226,8 @@ class FinalReportController extends Controller
 
         if ($isSuperAdmin) {
             $isAuthorized = true;
-        } elseif ($currentUser->role === 'admin') {
-            // Admin Dinas instansi yang sama
+        } elseif (in_array($currentUser->role, ['admin', 'supervisor'], true)) {
+            // Admin Dinas atau Supervisor (Kepala Dinas) instansi yang sama
             if ($currentUser->agency_profile_id && optional($application?->unit)->agency_profile_id === $currentUser->agency_profile_id) {
                 $isAuthorized = true;
             }

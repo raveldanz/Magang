@@ -158,6 +158,21 @@ if ($driver === 'sqlite') {
     $pgDb = $envValue('DB_DATABASE') ?: 'magang';
     $pgUser = $envValue('DB_USERNAME') ?: 'postgres';
     $pgPass = $envValue('DB_PASSWORD') ?? '';
+
+    // Nyalakan PostgreSQL portabel (C:\pgsql) otomatis bila belum hidup
+    if (PHP_OS_FAMILY === 'Windows' && is_file('C:/pgsql/bin/pg_ctl.exe')) {
+        $probe = @fsockopen($pgHost, (int) $pgPort, $e1, $e2, 0.5);
+        if ($probe) {
+            fclose($probe);
+        } else {
+            $running = (string) @shell_exec('tasklist /FI "IMAGENAME eq postgres.exe" 2>NUL');
+            if (! stripos($running, 'postgres.exe') && is_file('C:/pgsql/data/postmaster.pid')) {
+                @unlink('C:/pgsql/data/postmaster.pid');
+            }
+            @exec('"C:\\pgsql\\bin\\pg_ctl.exe" -D "C:\\pgsql\\data" -l "C:\\pgsql\\logfile.log" -w -t 30 start >NUL 2>&1');
+        }
+    }
+
     $pgConnect = fn (string $db) => new PDO("pgsql:host={$pgHost};port={$pgPort};dbname={$db}", $pgUser, $pgPass, [PDO::ATTR_TIMEOUT => 3, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 
     // PDO melaporkan gagal sambung sebagai 08006; kode asli server (3D000) hanya ada di teks pesannya
@@ -263,6 +278,26 @@ if (! $checkOnly && ! $errors) {
         if (file_exists($link) || is_link($link)) {
             // junction / folder hasil ekstrak zip
             exec('cmd /c rmdir "'.str_replace('/', '\\', $link).'" 2>&1', $o, $c);
+        }
+        if (is_dir($link) && $target) {
+            // Folder biasa (mis. dibuat seeder saat migrate --seed di PostgreSQL): pindahkan isinya ke
+            // storage/app/public tanpa menimpa berkas yang sudah ada, lalu hapus foldernya.
+            $items = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($link, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+            foreach ($items as $item) {
+                $relative = substr($item->getPathname(), strlen($link) + 1);
+                $dest = $target.DIRECTORY_SEPARATOR.$relative;
+                if ($item->isDir()) {
+                    @rmdir($item->getPathname());
+
+                    continue;
+                }
+                if (! file_exists($dest)) {
+                    @mkdir(dirname($dest), 0777, true);
+                    @copy($item->getPathname(), $dest);
+                }
+                @unlink($item->getPathname());
+            }
+            @rmdir($link);
         }
         if (file_exists($link)) {
             $warnings[] = 'public/storage berupa folder biasa (bukan tautan). Hapus folder itu lalu jalankan ulang agar logo/gambar tampil.';

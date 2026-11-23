@@ -117,16 +117,13 @@ class DashboardController extends Controller
                 ->get();
         }
 
-        $allUniversities = University::orderBy('name')->get();
-
         return view('dashboard', compact(
             'user',
             'profile',
             'application',
             'availableDosens',
             'university',
-            'univName',
-            'allUniversities'
+            'univName'
         ));
     }
 

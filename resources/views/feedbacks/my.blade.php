@@ -8,7 +8,7 @@
                 
             </div>
 
-            <a href="{{ route('feedbacks.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+            <a href="{{ route('feedbacks.create') }}" class="inline-flex items-center min-h-[44px] sm:min-h-0 gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                 <span>Kirim Laporan Kendala</span>
             </a>

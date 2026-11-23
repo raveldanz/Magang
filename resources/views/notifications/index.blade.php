@@ -15,7 +15,7 @@
                 <form action="{{ route('notifications.mark_all_read') }}" method="POST" class="inline-flex items-center m-0 p-0">
                     @csrf
                     <button type="submit" 
-                            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold shadow-2xs transition cursor-pointer"
+                            class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold shadow-2xs transition cursor-pointer"
                             style="height: 38px !important; min-height: 38px !important; max-height: 38px !important; line-height: 1 !important; box-sizing: border-box !important;">
                         <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                         <span>Tandai Semua Dibaca</span>
@@ -23,7 +23,7 @@
                 </form>
 
                 <a href="{{ route('feedbacks.create') }}" 
-                   class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md transition cursor-pointer"
+                   class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md transition cursor-pointer"
                    style="height: 38px !important; min-height: 38px !important; max-height: 38px !important; line-height: 1 !important; box-sizing: border-box !important; background-color: #2563eb !important; color: #ffffff !important;">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                     <span>Kirim Laporan Kendala</span>
@@ -48,48 +48,48 @@
             <!-- Filter Navigation Tabs -->
             <div class="bg-white rounded-2xl border border-slate-100 p-2 shadow-2xs flex items-center gap-1.5 overflow-x-auto">
                 <a href="{{ route('notifications.index', ['category' => 'all']) }}" 
-                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? 'all') === 'all' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                   class="inline-flex items-center min-h-[44px] sm:min-h-0 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? 'all') === 'all' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
                     Semua Pemberitahuan
                 </a>
 
                 <a href="{{ route('notifications.index', ['category' => 'urgent']) }}" 
-                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 {{ ($category ?? '') === 'urgent' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                   class="min-h-[44px] sm:min-h-0 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 {{ ($category ?? '') === 'urgent' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
                     Perlu Tindakan Segera
                 </a>
 
                 <a href="{{ route('notifications.index', ['category' => 'logbook']) }}" 
-                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'logbook' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                   class="inline-flex items-center min-h-[44px] sm:min-h-0 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'logbook' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
                     Logbook
                 </a>
 
                 <a href="{{ route('notifications.index', ['category' => 'evaluation']) }}"
-                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'evaluation' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                   class="inline-flex items-center min-h-[44px] sm:min-h-0 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'evaluation' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
                     Evaluasi & Sertifikat
                 </a>
 
                 <a href="{{ route('notifications.index', ['category' => 'application']) }}" 
-                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'application' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                   class="inline-flex items-center min-h-[44px] sm:min-h-0 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'application' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
                     Pendaftaran
                 </a>
 
                 <a href="{{ route('notifications.index', ['category' => 'university']) }}" 
-                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'university' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                   class="inline-flex items-center min-h-[44px] sm:min-h-0 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'university' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
                     Kampus & Sekolah
                 </a>
 
                 <a href="{{ route('notifications.index', ['category' => 'feedback']) }}" 
-                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'feedback' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                   class="inline-flex items-center min-h-[44px] sm:min-h-0 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'feedback' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
                     Feedback
                 </a>
 
                 <a href="{{ route('notifications.index', ['category' => 'chat']) }}"
-                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'chat' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                   class="inline-flex items-center min-h-[44px] sm:min-h-0 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'chat' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
                     Pesan Chat
                 </a>
 
                 @if(Auth::user() && (Auth::user()->role === 'super_admin' || Auth::user()->role === 'admin'))
                     <a href="{{ route('notifications.index', ['category' => 'audit']) }}" 
-                       class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'audit' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                       class="inline-flex items-center min-h-[44px] sm:min-h-0 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'audit' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
                          Audit
                     </a>
                 @endif
@@ -142,7 +142,7 @@
                         @if(!empty($notif['action_url']))
                             <div class="shrink-0 flex items-center gap-2 sm:self-center">
                                 <a href="{{ $notif['action_url'] }}" 
-                                   class="inline-flex items-center gap-1.5 px-4 py-2.5 {{ $isUrgent ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white' }} text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
+                                   class="inline-flex items-center min-h-[44px] sm:min-h-0 gap-1.5 px-4 py-2.5 {{ $isUrgent ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white' }} text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
                                     <span>{{ $notif['action_label'] ?? 'Tindak Lanjuti' }}</span>
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                                 </a>

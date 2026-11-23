@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\University;
+use App\Services\Directory\SchoolDirectoryClient;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -19,7 +20,7 @@ class MasterUniversityService
 
     protected ?array $schoolData = null;
 
-    public function __construct(private UniversityResolver $resolver) {}
+    public function __construct(private UniversityResolver $resolver, private SchoolDirectoryClient $directory) {}
 
     /**
      * Path ke dataset Master Perguruan Tinggi Indonesia
@@ -147,7 +148,85 @@ class MasterUniversityService
             }
         }
 
+        // 3. Sekolah dari direktori nasional (API) yang belum ada di database lokal; tersimpan saat dipilih.
+        //    Maksimal 5 slot, mengganti entri lokal berskor terendah agar hasil API tidak tertutup kecocokan longgar.
+        if ($this->directory->enabled()) {
+            $knownNpsn = $results->pluck('npsn')->filter()->all();
+            $fromApi = [];
+            foreach ($this->directory->search($keyword, $limit) as $row) {
+                $cleanKey = $this->normalize($row['name']);
+                if ($row['npsn'] === '' || isset($seenKeys[$cleanKey]) || in_array($row['npsn'], $knownNpsn, true)) {
+                    continue;
+                }
+                $seenKeys[$cleanKey] = true;
+                $fromApi[] = $this->schoolItem([
+                    'name' => $row['name'], 'npsn' => $row['npsn'], 'form' => $row['form'],
+                    'address' => $row['address'], 'city' => $row['city'], 'province' => $row['province'],
+                    'status' => $row['status'],
+                ]);
+                if (count($fromApi) >= 5) {
+                    break;
+                }
+            }
+            if ($fromApi !== []) {
+                $results = $results->take(max(0, $limit - count($fromApi)))->concat($fromApi);
+            }
+        }
+
         return $results->take($limit);
+    }
+
+    /**
+     * Upsert satu sekolah dari direktori nasional (data pihak ketiga, bukan input moderator).
+     * Kunci hanya NPSN (kolom code): baris yang sudah ada hanya dilengkapi di kolom kosong dan TIDAK PERNAH
+     * diubah is_verified/status/institution_type-nya, sehingga keputusan moderasi admin tidak tertimpa.
+     * Nama yang sama dengan baris lain tanpa NPSN dipakai untuk mengisi NPSN-nya, bukan membuat duplikat.
+     *
+     * @param  array{npsn: string, name: string, form?: string, address?: string, city?: string, province?: string, status?: string}  $row
+     * @return array{university: University|null, created: bool}
+     */
+    public function upsertDirectorySchool(array $row): array
+    {
+        $npsn = trim((string) $row['npsn']);
+        $name = trim((string) $row['name']);
+        if ($npsn === '' || $name === '') {
+            return ['university' => null, 'created' => false];
+        }
+        $address = collect([$row['address'] ?? null, $row['city'] ?? null, $row['province'] ?? null])
+            ->filter(fn ($part) => trim((string) $part) !== '')->implode(', ');
+
+        $existing = University::where('code', $npsn)->first();
+        if (! $existing) {
+            $sameName = University::whereRaw('LOWER(name) = ?', [mb_strtolower($name)])->first();
+            if ($sameName) {
+                if ($sameName->code === null || $sameName->code === '') {
+                    $sameName->update(['code' => $npsn]);
+                }
+
+                return ['university' => $sameName, 'created' => false];
+            }
+        }
+
+        if ($existing) {
+            if (! $existing->address && $address !== '') {
+                $existing->update(['address' => $address]);
+            }
+
+            return ['university' => $existing, 'created' => false];
+        }
+
+        return ['university' => University::create([
+            'name' => $name,
+            'code' => $npsn,
+            'address' => $address ?: null,
+            'is_verified' => true, // NPSN = identitas resmi satuan pendidikan di registri nasional
+            'status' => 'active',
+            'institution_type' => University::TYPE_SCHOOL,
+            'evaluation_scheme' => 'mentor_only',
+            'weight_mentor' => 100,
+            'weight_lecturer' => 0,
+            'require_dpl' => false,
+        ]), 'created' => true];
     }
 
     /**

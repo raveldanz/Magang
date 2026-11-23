@@ -53,7 +53,7 @@
             <header class="sticky top-0 z-50 bg-white w-full border-b border-slate-200/80">
                 @if(session()->has('impersonator_id'))
                     <aside aria-label="Impersonation Alert" class="bg-gradient-to-r from-amber-600 via-rose-600 to-red-600 text-white shadow-md border-b border-rose-700/60 w-full overflow-hidden">
-                        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 flex flex-col sm:flex-row items-center justify-between gap-2 min-h-[44px]">
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-col sm:flex-row items-center justify-between gap-2 min-h-[44px]">
                             <div class="flex items-center gap-2.5 text-xs sm:text-sm font-medium text-white/95 tracking-normal min-w-0 max-w-full">
                                 <span class="relative flex h-3 w-3 shrink-0 items-center justify-center">
                                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
@@ -68,7 +68,7 @@
                             </div>
                             <form action="{{ route('admin.impersonate.leave') }}" method="POST" class="shrink-0 m-0 w-full sm:w-auto">
                                 @csrf
-                                <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-1 bg-white hover:bg-rose-50 text-rose-700 text-xs font-bold rounded-lg shadow-sm transition active:scale-95 cursor-pointer border border-white/40">
+                                <button type="submit" class="w-full sm:w-auto min-h-[44px] sm:min-h-[34px] inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-rose-50 text-rose-700 text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer border border-white/40">
                                     <svg class="w-3.5 h-3.5 text-rose-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                                     </svg>
@@ -89,12 +89,12 @@
             @auth
                 @if (auth()->user()->must_change_password && !session()->has('impersonator_id'))
                     <aside aria-label="Peringatan Keamanan Password" class="bg-amber-50 border-b border-amber-300 w-full">
-                        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                             <p class="text-xs sm:text-sm text-amber-900 flex items-start gap-2">
                                 <svg class="w-4 h-4 mt-0.5 shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                 <span><strong>Akun Anda masih memakai password bawaan/sementara.</strong> Password ini diketahui orang lain (pembuat akun atau publik). Segera ganti password Anda — peringatan ini akan terus tampil sampai password diganti.</span>
                             </p>
-                            <a href="{{ route('profile.edit') }}#update-password" class="shrink-0 inline-flex items-center justify-center min-h-[40px] px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold rounded-lg transition">
+                            <a href="{{ route('profile.edit') }}#update-password" class="shrink-0 inline-flex items-center justify-center min-h-[44px] sm:min-h-[40px] px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition">
                                 Ganti Password Sekarang
                             </a>
                         </div>
@@ -105,7 +105,7 @@
             <!-- Page Heading -->
             @isset($header)
                 <header class="bg-white shadow-xs w-full border-b border-slate-100 relative z-30">
-                    <div class="max-w-7xl mx-auto py-4 px-3 sm:px-6 lg:px-8 w-full">
+                    <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 w-full">
                         {{ $header }}
                     </div>
                 </header>
@@ -150,7 +150,7 @@
         }"
         @toast.window="add($event.detail.type || 'info', $event.detail.message)"
         data-toast-root
-        class="fixed bottom-4 right-4 z-50 flex flex-col space-y-2 pointer-events-none max-w-[calc(100vw-2rem)] sm:max-w-sm w-full"
+        class="fixed bottom-4 right-3 sm:right-4 z-50 flex flex-col space-y-2 pointer-events-none max-w-[calc(100vw-1.5rem)] sm:max-w-sm w-full"
         style="z-index: 99999;">
             <template x-for="t in toasts" :key="t.id">
                 <div x-show="true"
@@ -161,15 +161,15 @@
                      x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                      x-transition:leave-end="opacity-0 translate-y-2 scale-95"
                      :role="t.type === 'error' ? 'alert' : 'status'"
-                     class="pointer-events-auto p-4 rounded-2xl shadow-xl border-2 flex items-start gap-3 backdrop-blur-md transition-all text-base"
+                     class="pointer-events-auto p-3.5 sm:p-4 rounded-2xl shadow-xl border-2 flex items-start gap-3 backdrop-blur-md transition-all text-sm sm:text-base"
                      :class="{
                          'bg-white/95 border-emerald-200 text-emerald-900 shadow-emerald-500/10': t.type === 'success',
                          'bg-white/95 border-rose-200 text-rose-900 shadow-rose-500/10': t.type === 'error',
                          'bg-white/95 border-amber-200 text-amber-900 shadow-amber-500/10': t.type === 'warning',
                          'bg-white/95 border-blue-200 text-blue-900 shadow-blue-500/10': t.type === 'info'
                      }">
-                    <div class="flex-1 font-medium leading-snug" x-text="t.message"></div>
-                    <button type="button" @click="remove(t.id)" class="shrink-0 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition" aria-label="Tutup pesan">
+                    <div class="flex-1 min-w-0 font-medium leading-snug break-words" x-text="t.message"></div>
+                    <button type="button" @click="remove(t.id)" class="shrink-0 min-w-[44px] min-h-[44px] sm:min-w-[36px] sm:min-h-[36px] flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition cursor-pointer" aria-label="Tutup pesan">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
@@ -179,7 +179,7 @@
         @auth
         <!-- Toast Pesan Chat Baru (dipicu chat-notifier.js) -->
         <div x-data="chatToasts" @chat-toast.window="push($event.detail)"
-             class="fixed top-24 inset-x-3 sm:inset-x-auto sm:right-4 sm:w-96 space-y-2 pointer-events-none" style="z-index: 99998;"
+             class="fixed top-20 sm:top-24 inset-x-3 sm:inset-x-auto sm:right-4 sm:w-96 max-w-[calc(100vw-1.5rem)] space-y-2 pointer-events-none" style="z-index: 99998;"
              aria-live="polite">
             <template x-for="t in items" :key="t.id">
                 <a :href="t.url" @click="if (window.__chatOpenConversation) { $event.preventDefault(); window.__chatOpenConversation(t.conversation_id); remove(t.id); }"
@@ -194,8 +194,8 @@
                         <span class="block text-sm font-bold text-slate-900 truncate" x-text="t.title"></span>
                         <span class="block text-xs text-slate-600 line-clamp-2" x-text="t.preview"></span>
                     </span>
-                    <button type="button" @click.prevent.stop="remove(t.id)" class="shrink-0 text-slate-400 hover:text-slate-600 p-1" aria-label="Tutup">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <button type="button" @click.prevent.stop="remove(t.id)" class="shrink-0 min-w-[44px] min-h-[44px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer" aria-label="Tutup">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </a>
             </template>

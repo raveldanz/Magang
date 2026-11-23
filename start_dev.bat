@@ -32,7 +32,13 @@ if errorlevel 1 (
 )
 
 echo [1/3] Memastikan PostgreSQL aktif (dilewati bila C:\pgsql tidak ada)...
-if exist "C:\pgsql\bin\pg_ctl.exe" "C:\pgsql\bin\pg_ctl.exe" -D "C:\pgsql\data" -l "C:\pgsql\logfile.log" -w -t 30 start >nul 2>&1
+if exist "C:\pgsql\bin\pg_ctl.exe" (
+    if exist "C:\pgsql\data\postmaster.pid" (
+        tasklist /FI "IMAGENAME eq postgres.exe" 2>nul | find /I "postgres.exe" >nul
+        if errorlevel 1 del /f /q "C:\pgsql\data\postmaster.pid" >nul 2>&1
+    )
+    "C:\pgsql\bin\pg_ctl.exe" -D "C:\pgsql\data" -l "C:\pgsql\logfile.log" -w -t 30 start >nul 2>&1
+)
 
 echo [2/3] Membuka Vite dev bundler di jendela baru...
 start "Vite Dev" cmd /k "npm run dev"

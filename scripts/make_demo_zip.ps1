@@ -86,6 +86,8 @@ $excludeDirs = @(
     (Join-Path $root 'php'),
     (Join-Path $root 'public\test-artifacts'), (Join-Path $root 'public\storage'), (Join-Path $root 'public\presentation'),
     (Join-Path $root 'storage\logs'), (Join-Path $root 'storage\app\backups'), (Join-Path $root 'storage\app\private\backups'),
+    # Penanda sinkron sekolah milik database laptop ini; database zip baru harus sinkron sendiri (lihat routes/console.php)
+    (Join-Path $root 'storage\app\private\sync'),
     (Join-Path $root 'database\cadangan'), (Join-Path $root 'database\pgsql'),
     (Join-Path $root 'storage\framework\sessions'), (Join-Path $root 'storage\framework\views'),
     (Join-Path $root 'storage\framework\cache'), (Join-Path $root 'storage\framework\testing'),
@@ -106,7 +108,7 @@ $devOnly = @(
     '.antigravity', '.github', 'tests', '.agentignore', '.aider.conf.yml', '.env.agents.example', '.editorconfig', '.npmrc',
     'AGENTS.md', 'AGENTS_WORKFLOW.md', 'GEMINI.md', 'CLAUDE.md', 'agent-runner.ps1', 'pr_description.md', 'reset_verified.php',
     'start_dev.bat', 'start_demo_kantor.bat', 'pgsql_ekspor.bat', 'pgsql_impor.bat',
-    'package.json', 'package-lock.json', 'vite.config.js', 'tailwind.config.js', 'postcss.config.js', 'phpunit.xml'
+    'package.json', 'package-lock.json', 'vite.config.js', 'tailwind.config.js', 'postcss.config.js', 'phpunit.xml', 'phpunit.pgsql.xml'
 )
 foreach ($item in $devOnly) {
     $p = Join-Path $dest $item
@@ -134,6 +136,9 @@ if ($envText -notmatch '(?m)^DB_CONNECTION=sqlite') {
     }
     $envText = [regex]::Replace($envText, '(?m)^(DB_(?:DATABASE|HOST|PORT|USERNAME|PASSWORD)=.*)$', '# $1')
 }
+# Path sertifikat SSL milik laptop ini tidak ada di laptop tujuan; tanpa baris ini aplikasi memakai
+# bundel bawaan proyek (resources/certs/cacert.pem) untuk API direktori sekolah.
+$envText = [regex]::Replace($envText, '(?m)^SCHOOL_DIRECTORY_CA_BUNDLE=.*\r?\n?', '')
 # Kunci notifikasi push (VAPID) tidak dipakai lewat alamat WiFi (bukan HTTPS) dan kunci privatnya tidak boleh
 # ikut ke laptop lain; dengan kunci kosong, layout tidak mendaftarkan push sama sekali.
 $envText = [regex]::Replace($envText, '(?m)^(VAPID_(?:PUBLIC|PRIVATE)_KEY)=.*$', '$1=')

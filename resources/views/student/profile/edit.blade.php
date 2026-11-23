@@ -9,27 +9,26 @@
         </h2>
     </x-slot>
 
-    <div class="py-5 sm:py-8 lg:py-10">
+    <div data-student-fields class="py-5 sm:py-8 lg:py-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6"
+             data-photo-url="{{ ($profile?->photo ?? $user?->studentProfile?->photo) ? route('student.photo', $user->id) . '?v=' . substr(md5((string) ($profile?->photo ?? $user?->studentProfile?->photo)), 0, 8) : '' }}"
              x-data="{
-                photoPreview: '{{ ($profile?->photo ?? $user?->studentProfile?->photo) ? route('student.photo', $user->id) . '?v=' . substr(md5((string) ($profile?->photo ?? $user?->studentProfile?->photo)), 0, 8) : '' }}',
+                photoPreview: '',
+                init() { this.photoPreview = this.$root.dataset.photoUrl; },
                 photoName: '',
                 educationLevel: @js(old('education_level', $profile?->education_level ?? 'perguruan_tinggi') === 'sekolah' ? 'sekolah' : 'perguruan_tinggi'),
                 showModal: false,
                 cvName: '',
-                transcriptName: '',
                 idCardName: '',
                 handlePhotoChange(e) {
                     const file = e.target.files[0];
-                    if (file) {
-                        if (file.size > 2 * 1024 * 1024) {
-                            window.notify('Ukuran foto profil maksimal 2MB.');
-                            e.target.value = '';
-                            return;
-                        }
-                        this.photoName = file.name;
-                        this.photoPreview = URL.createObjectURL(file);
+                    if (!file) {
+                        this.photoName = '';
+                        this.photoPreview = this.$root.dataset.photoUrl;
+                        return;
                     }
+                    this.photoName = file.name;
+                    this.photoPreview = URL.createObjectURL(file);
                 }
              }">
 
@@ -59,7 +58,7 @@
 
             <!-- Validation Errors Summary Banner -->
             @if ($errors->any())
-                <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs text-rose-900 text-xs sm:text-sm space-y-1">
+                <div data-field-summary class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs text-rose-900 text-xs sm:text-sm space-y-1">
                     <div class="flex items-center gap-2 font-bold text-rose-950">
                         <svg class="w-4 h-4 text-rose-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
@@ -67,8 +66,8 @@
                         <span>Mohon periksa kembali formulir Anda. Terjadi kesalahan pengisian atau unggah berkas:</span>
                     </div>
                     <ul class="list-disc list-inside space-y-0.5 text-xs text-rose-800 pl-6">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
+                        @foreach ($errors->getMessages() as $field => $messages)
+                            <li data-field-message="{{ $field }}">{{ implode(' ', $messages) }}</li>
                         @endforeach
                     </ul>
                 </div>
@@ -78,8 +77,7 @@
             @php
                 $missingDocs = [];
                 if (empty($profile?->cv_path)) $missingDocs[] = 'Curriculum Vitae (CV)';
-                if (empty($profile?->transcript_path)) $missingDocs[] = 'Transkrip Nilai / Rapor';
-                if (empty($profile?->id_card_path)) $missingDocs[] = 'KTM / Kartu Pelajar';
+                if (empty($profile?->id_card_path)) $missingDocs[] = 'KTP / KTM / Kartu Pelajar';
             @endphp
             @if (!empty($missingDocs) && !session('success'))
                 <div class="p-4 bg-amber-50/90 border-l-4 border-amber-500 rounded-r-xl shadow-xs text-amber-950 text-xs sm:text-sm space-y-1">
@@ -177,7 +175,7 @@
                         <ul class="text-[11px] text-blue-800/90 space-y-1.5 list-disc list-inside leading-relaxed">
                             <li>Gunakan foto formal dan jelas berformat JPG/PNG (maks. 2MB).</li>
                             <li>Pastikan NIM/NIS, kampus/sekolah, dan nomor WhatsApp aktif terisi benar.</li>
-                            <li>Lengkapi CV, Transkrip/Rapor, dan KTM/Kartu Pelajar untuk syarat pendaftaran magang.</li>
+                            <li>Lengkapi CV dan KTP/KTM/Kartu Pelajar untuk syarat pendaftaran magang.</li>
                         </ul>
                     </div>
                 </div>
@@ -191,7 +189,16 @@
                             <p class="text-xs text-slate-500 mt-0.5">Lengkapi informasi foto, akademik, dan kontak Anda untuk keperluan administrasi magang</p>
                         </div>
 
-                        <form action="{{ route('student.profile.update') }}" data-autosave="profil-{{ auth()->id() }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                        <form action="{{ route('student.profile.update') }}" @input.capture="const field = $event.target;
+                                  if (!$event.isComposing && ['name', 'faculty', 'jurusan', 'alamat', 'emergency_contact_name'].includes(field.name)) {
+                                      const upper = field.value.toLocaleUpperCase('id-ID');
+                                      if (field.value !== upper) {
+                                          const caret = field.value.slice(0, field.selectionStart).toLocaleUpperCase('id-ID').length;
+                                          field.value = upper;
+                                          field.setSelectionRange(caret, caret);
+                                      }
+                                  }"
+                              data-autosave="profil-{{ auth()->id() }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                             @csrf
 
                             <!-- Section 1: Identitas Akun, Foto & NIM -->
@@ -228,7 +235,7 @@
         </button>
 
         <!-- Nama Berkas Foto (Dapat Diklik Langsung untuk Pratinjau) -->
-        <div class="min-w-0 flex-1 truncate text-xs">
+        <div class="min-w-0 flex-1 break-words text-xs sm:truncate">
             <!-- Jika baru saja memilih file dari komputer -->
             <template x-if="photoName">
                 <a href="javascript:void(0)"
@@ -257,21 +264,21 @@
     </div>
 
     <p class="text-[10px] text-slate-400">Format: JPG, JPEG, PNG (Maks. 2MB)</p>
-    <x-input-error :messages="$errors->get('photo')" class="mt-1" />
+    <x-input-error data-inline-for="photo" :messages="$errors->get('photo')" class="mt-1" />
 </div>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <x-input-label for="name" value="Nama Lengkap (Sesuai Akun)" class="text-xs font-bold uppercase tracking-wider" />
-                                        <x-text-input id="name" name="name" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="Auth::user()?->name ?? $user?->name ?? ''" required />
-                                        <x-input-error :messages="$errors->get('name')" class="mt-1" />
+                                        <x-text-input id="name" name="name" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('name', $user->name)" required />
+                                        <x-input-error data-inline-for="name" :messages="$errors->get('name')" class="mt-1" />
                                     </div>
 
                                     <div>
                                         <label for="nim" class="block font-medium text-xs font-bold uppercase tracking-wider text-gray-700"
                                                x-text="educationLevel === 'sekolah' ? 'Nomor Induk Siswa (NIS / NISN)' : 'Nomor Induk Mahasiswa (NIM)'">{{ $isSchoolProfile ? 'Nomor Induk Siswa (NIS / NISN)' : 'Nomor Induk Mahasiswa (NIM)' }}</label>
                                         <x-text-input id="nim" name="nim" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('nim', $profile?->nim ?? '')" x-bind:placeholder="educationLevel === 'sekolah' ? 'Contoh: 0061234567' : 'Contoh: 22081010001'" placeholder="Contoh: 22081010001" required />
-                                        <x-input-error :messages="$errors->get('nim')" class="mt-1" />
+                                        <x-input-error data-inline-for="nim" :messages="$errors->get('nim')" class="mt-1" />
                                     </div>
                                 </div>
                             </div>
@@ -303,7 +310,7 @@
                                             </span>
                                         </label>
                                     </div>
-                                    <x-input-error :messages="$errors->get('education_level')" class="mt-1" />
+                                    <x-input-error data-inline-for="education_level" :messages="$errors->get('education_level')" class="mt-1" />
                                 </fieldset>
 
                                 <!-- Pilihan Universitas -->
@@ -315,6 +322,7 @@
                                     <x-searchable-select
                                         name="university_id"
                                         :items="$universities"
+                                        :remote-url="route('institutions.search')"
                                         :selected="$selectedUniversity"
                                         :allow-custom="true"
                                         custom-name="custom_university_name"
@@ -322,8 +330,8 @@
                                         placeholder="-- Cari nama kampus/sekolah atau singkatan (misal: UNESA, ITS, SMKN 1 Surabaya) --"
                                         :required="true"
                                     />
-                                    <x-input-error :messages="$errors->get('university_id')" class="mt-1" />
-                                    <x-input-error :messages="$errors->get('custom_university_name')" class="mt-1" />
+                                    <x-input-error data-inline-for="university_id" :messages="$errors->get('university_id')" class="mt-1" />
+                                    <x-input-error data-inline-for="custom_university_name" :messages="$errors->get('custom_university_name')" class="mt-1" />
 
                                     @if (session('university_suggestions'))
                                         <div class="mt-2 p-3 rounded-xl bg-blue-50 border border-blue-200 space-y-2">
@@ -358,21 +366,21 @@
                                     <div x-show="educationLevel !== 'sekolah'" @style(['display: none' => $isSchoolProfile])>
                                         <x-input-label for="faculty" value="Fakultas" class="text-xs font-bold uppercase tracking-wider" />
                                         <x-text-input id="faculty" name="faculty" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('faculty', $profile?->faculty ?? $profile?->fakultas ?? '')" placeholder="Contoh: Ilmu Komputer" x-bind:required="educationLevel !== 'sekolah'" x-bind:disabled="educationLevel === 'sekolah'" />
-                                        <x-input-error :messages="$errors->get('faculty')" class="mt-1" />
+                                        <x-input-error data-inline-for="faculty" :messages="$errors->get('faculty')" class="mt-1" />
                                     </div>
 
                                     <div>
                                         <label for="jurusan" class="block font-medium text-xs font-bold uppercase tracking-wider text-gray-700"
                                                x-text="educationLevel === 'sekolah' ? 'Jurusan / Kompetensi Keahlian' : 'Program Studi / Jurusan'">{{ $isSchoolProfile ? 'Jurusan / Kompetensi Keahlian' : 'Program Studi / Jurusan' }}</label>
                                         <x-text-input id="jurusan" name="jurusan" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('jurusan', $profile?->jurusan ?? $profile?->major ?? '')" x-bind:placeholder="educationLevel === 'sekolah' ? 'Contoh: Otomatisasi Tata Kelola Perkantoran' : 'Contoh: Teknik Informatika'" placeholder="Contoh: Teknik Informatika" required />
-                                        <x-input-error :messages="$errors->get('jurusan')" class="mt-1" />
+                                        <x-input-error data-inline-for="jurusan" :messages="$errors->get('jurusan')" class="mt-1" />
                                     </div>
 
                                     <div>
                                         <label for="semester" class="block font-medium text-xs font-bold uppercase tracking-wider text-gray-700"
                                                x-text="educationLevel === 'sekolah' ? 'Kelas Saat Ini (10-13)' : 'Semester Saat Ini'">{{ $isSchoolProfile ? 'Kelas Saat Ini (10-13)' : 'Semester Saat Ini' }}</label>
                                         <x-text-input id="semester" name="semester" type="text" inputmode="numeric" class="mt-1 block w-full text-xs sm:text-sm" :value="old('semester', $profile?->semester ?? '')" x-bind:placeholder="educationLevel === 'sekolah' ? 'Contoh: 11' : 'Contoh: 5 / 6 / 7'" placeholder="Contoh: 5 / 6 / 7" required />
-                                        <x-input-error :messages="$errors->get('semester')" class="mt-1" />
+                                        <x-input-error data-inline-for="semester" :messages="$errors->get('semester')" class="mt-1" />
                                     </div>
                                 </div>
                             </div>
@@ -387,13 +395,13 @@
                                     <div>
                                         <x-input-label for="phone" value="No. WhatsApp / HP Aktif" class="text-xs font-bold uppercase tracking-wider" />
                                         <x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('phone', $profile?->phone ?? '')" placeholder="Contoh: 081234567890" required />
-                                        <x-input-error :messages="$errors->get('phone')" class="mt-1" />
+                                        <x-input-error data-inline-for="phone" :messages="$errors->get('phone')" class="mt-1" />
                                     </div>
 
                                     <div>
                                         <x-input-label for="alamat" value="Alamat Domisili / Tempat Tinggal*" class="text-xs font-bold uppercase tracking-wider" />
                                         <x-text-input id="alamat" name="alamat" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('alamat', $profile?->alamat ?? $profile?->address ?? '')" placeholder="Contoh: Jl. Rungkut Asri Timur No. 12, Surabaya" />
-                                        <x-input-error :messages="$errors->get('alamat')" class="mt-1" />
+                                        <x-input-error data-inline-for="alamat" :messages="$errors->get('alamat')" class="mt-1" />
                                     </div>
                                 </div>
                             </div>
@@ -408,13 +416,13 @@
                                     <div>
                                         <x-input-label for="emergency_contact_name" value="Nama Kontak Darurat atau Hubungan Keluarga" class="text-xs font-bold uppercase tracking-wider" />
                                         <x-text-input id="emergency_contact_name" name="emergency_contact_name" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('emergency_contact_name', $profile?->emergency_contact_name ?? '')" placeholder="Contoh: Bpk. Haryanto - Ayah" />
-                                        <x-input-error :messages="$errors->get('emergency_contact_name')" class="mt-1" />
+                                        <x-input-error data-inline-for="emergency_contact_name" :messages="$errors->get('emergency_contact_name')" class="mt-1" />
                                     </div>
 
                                     <div>
                                         <x-input-label for="emergency_contact_phone" value="Nomor HP Kontak Darurat" class="text-xs font-bold uppercase tracking-wider" />
                                         <x-text-input id="emergency_contact_phone" name="emergency_contact_phone" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('emergency_contact_phone', $profile?->emergency_contact_phone ?? '')" placeholder="Contoh: 081298765432" />
-                                        <x-input-error :messages="$errors->get('emergency_contact_phone')" class="mt-1" />
+                                        <x-input-error data-inline-for="emergency_contact_phone" :messages="$errors->get('emergency_contact_phone')" class="mt-1" />
                                     </div>
                                 </div>
                                 <p class="text-xs text-slate-400 italic">Kolom kontak darurat bersifat opsional.</p>
@@ -434,7 +442,7 @@
         Unggah berkas identitas akademik Anda di sini satu kali saja. Berkas ini otomatis terhubung pada setiap pengajuan magang Anda, baik pendaftaran individu maupun tim kelompok.
     </p>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
 
         <!-- 1. Curriculum Vitae -->
         @php
@@ -455,26 +463,7 @@
                            name="cv"
                            accept=".pdf"
                            class="hidden"
-                           @change="
-                               const f = $event.target.files[0];
-                               if (f) {
-                                   if (f.size > 2 * 1024 * 1024) {
-                                       window.notify('Ukuran berkas CV melebihi batas maksimal (Maksimal 2 MB). Silakan pilih berkas yang lebih kecil.');
-                                       $event.target.value = '';
-                                       selectedName = '';
-                                       return;
-                                   }
-                                   if (!f.name.toLowerCase().endsWith('.pdf')) {
-                                       window.notify('Format berkas CV harus berupa dokumen PDF (.pdf).');
-                                       $event.target.value = '';
-                                       selectedName = '';
-                                       return;
-                                   }
-                                   selectedName = f.name;
-                               } else {
-                                   selectedName = '';
-                               }
-                           " />
+                           @change="selectedName = $event.target.files[0]?.name || ''" />
 
                     <!-- Tombol Pilih Berkas Berdiri Sendiri -->
                     <button type="button"
@@ -484,10 +473,10 @@
                     </button>
 
                     <!-- Tempat Teks / Nama File yang Menggantikan 'No file chosen' -->
-                    <div class="min-w-0 flex-1 truncate text-xs">
+                    <div class="min-w-0 flex-1 break-words text-xs sm:truncate">
                         <!-- Jika ada file baru yang dipilih dari perangkat -->
                         <template x-if="selectedName">
-                            <span class="text-slate-700 font-medium truncate block" x-text="selectedName"></span>
+                            <span class="text-slate-700 font-medium block break-words sm:truncate" x-text="selectedName"></span>
                         </template>
 
                         <!-- Jika file sudah tersimpan di database: nama bersih & bisa diklik -->
@@ -509,83 +498,11 @@
                 </div>
 
                 <p class="text-[10px] text-slate-400">Format: PDF, Maks 2MB</p>
-                <x-input-error :messages="$errors->get('cv')" class="mt-1" />
+                <x-input-error data-inline-for="cv" :messages="$errors->get('cv')" class="mt-1" />
             </div>
         </div>
 
-        <!-- 2. Transkrip Nilai Akademik -->
-        @php
-            $hasTranscript = !empty($profile?->transcript_path);
-            $transcriptDisplayName = $hasTranscript ? ('Transkrip_' . ($profile?->nim ?? 'Peserta') . '.pdf') : '';
-        @endphp
-        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2.5 flex flex-col justify-between"
-             x-data="{ selectedName: '' }">
-            <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-800">
-                    2. Transkrip Nilai / Rapor
-                </label>
-
-                <div class="flex items-center gap-2 w-full">
-                    <input type="file" data-max-kb="2048"
-                           id="transkrip"
-                           name="transkrip"
-                           accept=".pdf"
-                           class="hidden"
-                           @change="
-                               const f = $event.target.files[0];
-                               if (f) {
-                                   if (f.size > 2 * 1024 * 1024) {
-                                       window.notify('Ukuran berkas Transkrip Nilai melebihi batas maksimal (Maksimal 2 MB). Silakan pilih berkas yang lebih kecil.');
-                                       $event.target.value = '';
-                                       selectedName = '';
-                                       return;
-                                   }
-                                   if (!f.name.toLowerCase().endsWith('.pdf')) {
-                                       window.notify('Format berkas Transkrip Nilai harus berupa dokumen PDF (.pdf).');
-                                       $event.target.value = '';
-                                       selectedName = '';
-                                       return;
-                                   }
-                                   selectedName = f.name;
-                               } else {
-                                   selectedName = '';
-                               }
-                           " />
-
-                    <button type="button"
-                            @click="document.getElementById('transkrip').click()"
-                            class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
-                        Pilih Berkas
-                    </button>
-
-                    <div class="min-w-0 flex-1 truncate text-xs">
-                        <template x-if="selectedName">
-                            <span class="text-slate-700 font-medium truncate block" x-text="selectedName"></span>
-                        </template>
-
-                        @if($hasTranscript)
-                            <template x-if="!selectedName">
-                                <a href="{{ route('student.document', ['userId' => $user->id, 'type' => 'transkrip']) }}"
-                                   target="_blank"
-                                   class="text-blue-600 hover:text-blue-800 hover:underline font-semibold truncate block cursor-pointer"
-                                   title="Buka dokumen">
-                                    {{ $transcriptDisplayName }}
-                                </a>
-                            </template>
-                        @else
-                            <template x-if="!selectedName">
-                                <span class="text-slate-400">Belum ada berkas dipilih</span>
-                            </template>
-                        @endif
-                    </div>
-                </div>
-
-                <p class="text-[10px] text-slate-400">Format: PDF, Maks 2MB</p>
-                <x-input-error :messages="$errors->get('transkrip')" class="mt-1" />
-            </div>
-        </div>
-
-        <!-- 3. Kartu Tanda Mahasiswa (KTM) -->
+        <!-- 2. Kartu Tanda Mahasiswa (KTM) -->
         @php
             $hasIdCard = !empty($profile?->id_card_path);
             $idCardExt = $hasIdCard ? pathinfo($profile->id_card_path, PATHINFO_EXTENSION) : 'pdf';
@@ -595,7 +512,7 @@
              x-data="{ selectedName: '' }">
             <div class="space-y-2">
                 <label class="block text-xs font-bold text-slate-800">
-                    3. KTM / Kartu Pelajar
+                    2. KTP / KTM / Kartu Pelajar
                 </label>
 
                 <div class="flex items-center gap-2 w-full">
@@ -604,27 +521,7 @@
                            name="id_card"
                            accept=".pdf,image/png,image/jpeg,image/jpg"
                            class="hidden"
-                           @change="
-                               const f = $event.target.files[0];
-                               if (f) {
-                                   if (f.size > 2 * 1024 * 1024) {
-                                       window.notify('Ukuran berkas KTM / Kartu Identitas melebihi batas maksimal (Maksimal 2 MB). Silakan pilih berkas yang lebih kecil.');
-                                       $event.target.value = '';
-                                       selectedName = '';
-                                       return;
-                                   }
-                                   const ext = f.name.toLowerCase().split('.').pop();
-                                   if (!['pdf', 'jpg', 'jpeg', 'png'].includes(ext)) {
-                                       window.notify('Format berkas KTM harus berupa PDF, JPG, JPEG, atau PNG.');
-                                       $event.target.value = '';
-                                       selectedName = '';
-                                       return;
-                                   }
-                                   selectedName = f.name;
-                               } else {
-                                   selectedName = '';
-                               }
-                           " />
+                           @change="selectedName = $event.target.files[0]?.name || ''" />
 
                     <button type="button"
                             @click="document.getElementById('id_card').click()"
@@ -632,9 +529,9 @@
                         Pilih Berkas
                     </button>
 
-                    <div class="min-w-0 flex-1 truncate text-xs">
+                    <div class="min-w-0 flex-1 break-words text-xs sm:truncate">
                         <template x-if="selectedName">
-                            <span class="text-slate-700 font-medium truncate block" x-text="selectedName"></span>
+                            <span class="text-slate-700 font-medium block break-words sm:truncate" x-text="selectedName"></span>
                         </template>
 
                         @if($hasIdCard)
@@ -655,7 +552,7 @@
                 </div>
 
                 <p class="text-[10px] text-slate-400">Format: PDF, JPG, PNG, Maks 2MB</p>
-                <x-input-error :messages="$errors->get('id_card')" class="mt-1" />
+                <x-input-error data-inline-for="id_card" :messages="$errors->get('id_card')" class="mt-1" />
             </div>
         </div>
 

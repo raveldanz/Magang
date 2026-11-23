@@ -387,11 +387,6 @@
             ? \Carbon\Carbon::parse($application->end_date)->translatedFormat('d F Y') 
             : '-';
 
-        // Data Pembimbing
-        $pembimbing = $application->placement?->pembimbing ?? $application->placement?->mentor;
-        $pembimbingName = $pembimbing?->name ?? 'Pembimbing Lapangan / Unit Kerja Terkait';
-        $pembimbingPhone = $pembimbing?->phone ?? $pembimbing?->studentProfile?->phone ?? $phone ?? '-';
-
         // Bersihkan nama mahasiswa dari embel-embel debug/seeder seperti (Accepted Future Date)
         $cleanStudentName = preg_replace('/\s*\([^)]*\)/', '', $application->user?->name ?? '-');
 
@@ -565,7 +560,7 @@
 
             <!-- 5. PARAGRAF PELAKSANAAN & NARAHUBUNG -->
             <p>
-                Untuk melaksanakan Praktik Kerja Magang pada <strong>{{ $agencyName }}</strong> dengan jadwal pelaksanaan mulai tanggal <strong>{{ $startDateFormatted }}</strong> s.d. <strong>{{ $endDateFormatted }}</strong> pada Unit Kerja <strong>{{ $application->unit->name ?? 'Dinas' }}</strong>. Informasi lebih lanjut dapat menghubungi Sdr. <strong>{{ $pembimbingName }}</strong> dengan Kontak/HP: <strong>{{ $pembimbingPhone }}</strong>.
+                Untuk melaksanakan Praktik Kerja Magang pada <strong>{{ $agencyName }}</strong> dengan jadwal pelaksanaan mulai tanggal <strong>{{ $startDateFormatted }}</strong> s.d. <strong>{{ $endDateFormatted }}</strong> pada Unit Kerja <strong>{{ $application->unit->name ?? 'Dinas' }}</strong>. Untuk informasi lebih lanjut, silakan hubungi <strong>Pak Nanang</strong> selaku narahubung magang.
             </p>
 
             <p>

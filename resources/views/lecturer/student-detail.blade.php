@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center gap-2 text-xs sm:text-sm">
             <a href="{{ route('lecturer.monitoring.index') }}" 
-               class="font-semibold text-slate-600 hover:text-slate-900 transition">
+               class="inline-flex items-center min-h-[44px] sm:min-h-0 font-semibold text-slate-600 hover:text-slate-900 transition">
                 Peserta Bimbingan
             </a>
             <span class="text-slate-300">/</span>
@@ -173,7 +173,7 @@
                                 </div>
                             </div>
 
-                            <p class="text-xs text-slate-500 font-medium mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                            <p class="text-sm sm:text-xs text-slate-500 font-medium mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
                                 <span>NIM/NIS {{ $profile->nim ?? '-' }}</span>
                                 <span class="text-slate-300">&bull;</span>
                                 <span>{{ $profile->jurusan ?? '-' }}</span>
@@ -188,7 +188,7 @@
                         @if ($showGroup)
                             <a href="{{ route('chat.placement', $placement->id) }}" 
                                title="Buka Forum Diskusi Bersama"
-                               class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs transition active:scale-95 text-center cursor-pointer">
+                               class="inline-flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-0 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs transition active:scale-95 text-center cursor-pointer">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                                 </svg>
@@ -199,7 +199,7 @@
                         @if ($cleanStudentPhone)
                             <a href="https://wa.me/{{ $cleanStudentPhone }}?text={{ $waMessage }}" target="_blank"
                                title="Hubungi via WhatsApp ({{ $studentPhone }})"
-                               class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/90 text-xs font-semibold rounded-xl shadow-2xs transition active:scale-95 text-center cursor-pointer">
+                               class="inline-flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-0 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/90 text-xs font-semibold rounded-xl shadow-2xs transition active:scale-95 text-center cursor-pointer">
                                 <svg class="w-4 h-4 text-emerald-600 fill-current shrink-0" viewBox="0 0 24 24">
                                     <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.861.174.086.275.072.376-.044.101-.116.433-.506.549-.68.116-.173.231-.145.39-.086s1.011.477 1.184.564.289.13.332.202c.043.073.043.419-.101.824z"/>
                                 </svg>
@@ -213,7 +213,7 @@
                                 <input type="hidden" name="user_id" value="{{ $student->id }}">
                                 <button type="submit" 
                                         title="Kirim pesan langsung ke {{ $student->name }}"
-                                        class="inline-flex items-center justify-center gap-1.5 w-full px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 text-xs font-semibold rounded-xl shadow-2xs transition active:scale-95 text-center cursor-pointer">
+                                        class="inline-flex items-center justify-center gap-1.5 w-full min-h-[44px] sm:min-h-0 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 text-xs font-semibold rounded-xl shadow-2xs transition active:scale-95 text-center cursor-pointer">
                                     <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                                     </svg>
@@ -228,7 +228,7 @@
                                 <input type="hidden" name="user_id" value="{{ $mentor->id }}">
                                 <button type="submit" 
                                         title="Kirim pesan ke Mentor Lapangan"
-                                        class="inline-flex items-center justify-center gap-1.5 w-full px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 text-xs font-semibold rounded-xl shadow-2xs transition active:scale-95 text-center cursor-pointer">
+                                        class="inline-flex items-center justify-center gap-1.5 w-full min-h-[44px] sm:min-h-0 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 text-xs font-semibold rounded-xl shadow-2xs transition active:scale-95 text-center cursor-pointer">
                                     <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                     </svg>
@@ -241,19 +241,21 @@
                 </div>
 
                 <!-- Structured Placement Details (Clean, Unified, Minimalist) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3.5 border-t border-slate-100 text-xs">
+                <div x-data="{ buka: false }">
+                <button type="button" @click="buka = !buka" :aria-expanded="buka.toString()" class="sm:hidden w-full min-h-[48px] inline-flex items-center justify-between gap-2 text-base font-bold text-slate-900 pt-3.5 border-t border-slate-100"><span>Lihat data magang</span><svg class="w-5 h-5 transition" :class="buka && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg></button>
+                <div :class="{ 'hidden': !buka }" class="hidden sm:!grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3 sm:pt-3.5 sm:border-t border-slate-100 text-base sm:text-xs">
                     <!-- 1. Instansi & Bidang -->
                     <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50/70 border border-slate-100 min-w-0">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Instansi & Bidang</span>
+                        <span class="text-sm sm:text-[10px] font-bold text-slate-500 sm:text-slate-400 uppercase tracking-wider block">Instansi & Bidang</span>
                         <div class="font-bold text-slate-900 truncate mt-1" title="{{ $agency->agency_name ?? '-' }}">{{ $agency->agency_name ?? '-' }}</div>
-                        <div class="text-[11px] text-slate-500 truncate mt-0.5" title="{{ $unit->name ?? '-' }}">{{ $unit->name ?? '-' }}</div>
+                        <div class="text-sm sm:text-[11px] text-slate-500 truncate mt-0.5" title="{{ $unit->name ?? '-' }}">{{ $unit->name ?? '-' }}</div>
                     </div>
 
                     <!-- 2. Pembimbing Dinas (Mentor) -->
                     <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50/70 border border-slate-100 min-w-0">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Mentor Dinas</span>
+                        <span class="text-sm sm:text-[10px] font-bold text-slate-500 sm:text-slate-400 uppercase tracking-wider block">Mentor Dinas</span>
                         <div class="font-bold text-slate-900 truncate mt-1" title="{{ $mentor->name ?? 'Belum Ditugaskan' }}">{{ $mentor->name ?? 'Belum Ditugaskan' }}</div>
-                        <div class="text-[11px] text-slate-500 truncate mt-0.5">
+                        <div class="text-sm sm:text-[11px] text-slate-500 truncate mt-0.5">
                             @if($nilaiDinas > 0)
                                 <span class="text-slate-700 font-semibold">Nilai Dinas: {{ number_format($nilaiDinas, 1) }}</span>
                             @else
@@ -264,19 +266,20 @@
 
                     <!-- 3. Periode Waktu -->
                     <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50/70 border border-slate-100 min-w-0">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Periode Magang</span>
+                        <span class="text-sm sm:text-[10px] font-bold text-slate-500 sm:text-slate-400 uppercase tracking-wider block">Periode Magang</span>
                         <div class="font-bold text-slate-900 truncate mt-1">
                             {{ $app?->start_date ? \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M') : '-' }} &ndash; {{ $app?->end_date ? \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') : '-' }}
                         </div>
-                        <div class="text-[11px] text-slate-500 truncate mt-0.5">{{ $targetDays }} hari kerja</div>
+                        <div class="text-sm sm:text-[11px] text-slate-500 truncate mt-0.5">{{ $targetDays }} hari kerja</div>
                     </div>
 
                     <!-- 4. Skema Evaluasi Kampus -->
                     <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50/70 border border-slate-100 min-w-0">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Skema Penilaian</span>
+                        <span class="text-sm sm:text-[10px] font-bold text-slate-500 sm:text-slate-400 uppercase tracking-wider block">Skema Penilaian</span>
                         <div class="font-bold text-slate-900 truncate mt-1">{{ $isMentorOnly ? '100% Mentor Dinas' : 'Pembimbing + Mentor Dinas' }}</div>
-                        <div class="text-[11px] text-slate-500 truncate mt-0.5" title="{{ $univ->name ?? '-' }}">{{ $univ->name ?? 'Kampus Mitra' }}</div>
+                        <div class="text-sm sm:text-[11px] text-slate-500 truncate mt-0.5" title="{{ $univ->name ?? '-' }}">{{ $univ->name ?? 'Kampus Mitra' }}</div>
                     </div>
+                </div>
                 </div>
             </div>
 
@@ -291,19 +294,19 @@
                         </div>
                         <div class="min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
-                                <h4 class="text-xs sm:text-sm font-bold text-amber-950">Peringatan Keaktifan Peserta Magang</h4>
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200/80 text-amber-900">
+                                <h4 class="text-base sm:text-sm font-bold text-amber-950">Peringatan Keaktifan Peserta Magang</h4>
+                                <span class="px-2 py-0.5 rounded-full text-sm sm:text-[10px] font-bold bg-amber-200/80 text-amber-900">
                                     {{ $daysSinceLastLogbook }} Hari Belum Mengisi Logbook
                                 </span>
                             </div>
-                            <p class="text-xs text-amber-800/90 mt-1">
+                            <p class="text-sm sm:text-xs text-amber-800/90 mt-1">
                                 Peserta Magang belum menginput entri logbook baru dalam {{ $daysSinceLastLogbook }} hari terakhir. Mohon hubungi peserta magang untuk memastikan keteraturan pencatatan magang.
                             </p>
                         </div>
                     </div>
                     @if ($cleanStudentPhone)
                         <a href="https://wa.me/{{ $cleanStudentPhone }}?text={{ $waMessage }}" target="_blank"
-                           class="inline-flex items-center gap-1.5 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition shadow-xs shrink-0 cursor-pointer active:scale-95">
+                           class="inline-flex items-center justify-center gap-1.5 w-full sm:w-auto min-h-[52px] sm:min-h-0 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-base sm:text-xs font-bold transition shadow-xs shrink-0 cursor-pointer active:scale-95">
                             <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
                                 <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.861.174.086.275.072.376-.044.101-.116.433-.506.549-.68.116-.173.231-.145.39-.086s1.011.477 1.184.564.289.13.332.202c.043.073.043.419-.101.824z"/>
                             </svg>
@@ -321,31 +324,31 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
                         <div>
-                            <h3 class="font-bold text-sm text-slate-900 leading-tight">Kesiapan Penilaian Akhir Magang</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">Pantau kelengkapan berkas dan aktivitas sebelum penerbitan nilai akademik</p>
+                            <h3 class="font-bold text-base sm:text-sm text-slate-900 leading-tight">Kesiapan Penilaian Akhir Magang</h3>
+                            <p class="text-sm sm:text-xs text-slate-500 mt-0.5">Pantau kelengkapan berkas dan aktivitas sebelum penerbitan nilai akademik</p>
                         </div>
                     </div>
                     
                     <div class="flex items-center gap-3 self-end sm:self-center">
                         <div class="text-right">
-                            <span class="text-xs font-bold text-slate-900">{{ $readyCount }} dari {{ $totalRequirements }} Syarat</span>
+                            <span class="text-sm sm:text-xs font-bold text-slate-900">{{ $readyCount }} dari {{ $totalRequirements }} Syarat</span>
                             <div class="w-24 bg-slate-100 rounded-full h-1.5 mt-1 overflow-hidden">
                                 <div class="bg-blue-600 h-1.5 rounded-full transition-all duration-500" style="width: {{ $readinessPercent }}%"></div>
                             </div>
                         </div>
-                        <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $readinessPercent === 100 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80' : 'bg-slate-100 text-slate-700' }}">
+                        <span class="text-sm sm:text-xs font-bold px-2.5 py-1 rounded-full {{ $readinessPercent === 100 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80' : 'bg-slate-100 text-slate-700' }}">
                             {{ $readinessPercent }}%
                         </span>
                     </div>
                 </div>
 
                 <!-- Interactive Micro-Cards (3 Syarat jika 100% Dinas, 4 Syarat jika Skema Ganda) -->
-                <div class="grid grid-cols-1 sm:grid-cols-{{ $isMentorOnly ? '3' : '2 lg:grid-cols-4' }} gap-2.5 sm:gap-3 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-{{ $isMentorOnly ? '3' : '2 lg:grid-cols-4' }} gap-2.5 sm:gap-3 text-base sm:text-xs">
                     <!-- 1. Logbook -->
                     <button type="button" @click="activeTab = 'logbook'"
                             class="p-3 sm:p-3.5 rounded-xl border transition text-left cursor-pointer group {{ $readyLogbook ? 'bg-emerald-50/50 border-emerald-200/80 hover:bg-emerald-50' : 'bg-slate-50/70 border-slate-200/70 hover:bg-slate-50' }}">
                         <div class="flex items-center justify-between gap-1">
-                            <span class="text-[11px] font-semibold text-slate-500 group-hover:text-slate-800 transition">1. Logbook Harian</span>
+                            <span class="text-sm sm:text-[11px] font-semibold text-slate-500 group-hover:text-slate-800 transition">1. Logbook Harian</span>
                             @if($readyLogbook)
                                 <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                             @else
@@ -361,7 +364,7 @@
                     <button type="button" @click="activeTab = 'laporan'"
                             class="p-3 sm:p-3.5 rounded-xl border transition text-left cursor-pointer group {{ $readyReport ? 'bg-emerald-50/50 border-emerald-200/80 hover:bg-emerald-50' : ($finalReport ? 'bg-amber-50/50 border-amber-200/80 hover:bg-amber-50' : 'bg-slate-50/70 border-slate-200/70 hover:bg-slate-50') }}">
                         <div class="flex items-center justify-between gap-1">
-                            <span class="text-xs font-semibold text-slate-600 group-hover:text-slate-800 transition">2. Laporan Akhir (Persetujuan Pembimbing)</span>
+                            <span class="text-sm sm:text-xs font-semibold text-slate-600 group-hover:text-slate-800 transition">2. Laporan Akhir (Persetujuan Pembimbing)</span>
                             @if($readyReport)
                                 <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                             @elseif($finalReport)
@@ -385,7 +388,7 @@
                     <button type="button" @click="activeTab = 'evaluasi'"
                             class="p-3 sm:p-3.5 rounded-xl border transition text-left cursor-pointer group {{ $readyMentorScore ? 'bg-emerald-50/50 border-emerald-200/80 hover:bg-emerald-50' : 'bg-slate-50/70 border-slate-200/70 hover:bg-slate-50' }}">
                         <div class="flex items-center justify-between gap-1">
-                            <span class="text-[11px] font-semibold text-slate-500 group-hover:text-slate-800 transition">3. Nilai Dinas ({{ $isMentorOnly ? '100%' : ($univ->weight_mentor ?? 60).'%' }})</span>
+                            <span class="text-sm sm:text-[11px] font-semibold text-slate-500 group-hover:text-slate-800 transition">3. Nilai Dinas ({{ $isMentorOnly ? '100%' : ($univ->weight_mentor ?? 60).'%' }})</span>
                             @if($readyMentorScore)
                                 <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                             @else
@@ -402,11 +405,11 @@
                         <button type="button" @click="activeTab = 'evaluasi'"
                                 class="p-3 sm:p-3.5 rounded-xl border transition text-left cursor-pointer group {{ $readyLecturerScore ? 'bg-emerald-50/50 border-emerald-200/80 hover:bg-emerald-50' : 'bg-blue-50/40 border-blue-200/80 hover:bg-blue-50/70' }}">
                             <div class="flex items-center justify-between gap-1">
-                                <span class="text-xs font-semibold text-slate-600 group-hover:text-slate-800 transition">4. Nilai Pembimbing</span>
+                                <span class="text-sm sm:text-xs font-semibold text-slate-600 group-hover:text-slate-800 transition">4. Nilai Pembimbing</span>
                                 @if($readyLecturerScore)
                                     <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                                 @else
-                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-700">Input</span>
+                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-sm sm:text-xs font-bold bg-blue-100 text-blue-700">Input</span>
                                 @endif
                             </div>
                             <div class="font-bold mt-1 text-slate-900 group-hover:text-blue-600 transition">
@@ -428,7 +431,7 @@
                             :class="activeTab === 'evaluasi' 
                                 ? 'border-blue-600 text-blue-600 font-bold' 
                                 : 'border-transparent text-slate-500 hover:text-slate-700 font-medium'"
-                            class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center transition cursor-pointer flex items-center justify-center gap-1 sm:gap-2">
+                            class="flex-1 sm:flex-initial min-h-[48px] sm:min-h-0 py-3 px-1 border-b-2 text-sm text-center transition cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2">
                         <span class="sm:hidden">Nilai</span>
                         <span class="hidden sm:inline">Evaluasi & Nilai</span>
                     </button>
@@ -437,9 +440,9 @@
                             :class="activeTab === 'logbook' 
                                 ? 'border-blue-600 text-blue-600 font-bold' 
                                 : 'border-transparent text-slate-500 hover:text-slate-700 font-medium'"
-                            class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center transition cursor-pointer flex items-center justify-center gap-1 sm:gap-2">
+                            class="flex-1 sm:flex-initial min-h-[48px] sm:min-h-0 py-3 px-1 border-b-2 text-sm text-center transition cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2">
                         <span>Logbook</span>
-                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold"
+                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-sm sm:text-[11px] font-semibold"
                               :class="activeTab === 'logbook' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'">
                             {{ $logbookTotal }}
                         </span>
@@ -449,12 +452,12 @@
                             :class="activeTab === 'laporan' 
                                 ? 'border-blue-600 text-blue-600 font-bold' 
                                 : 'border-transparent text-slate-500 hover:text-slate-700 font-medium'"
-                            class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center transition cursor-pointer flex items-center justify-center gap-1 sm:gap-2">
+                            class="flex-1 sm:flex-initial min-h-[48px] sm:min-h-0 py-3 px-1 border-b-2 text-sm text-center transition cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2">
                         <span>Laporan</span>
                         @if($isReportApproved)
-                            <span class="px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-emerald-100 text-emerald-800">ACC</span>
+                            <span class="px-1.5 py-0.5 rounded-full text-sm sm:text-[10px] font-semibold bg-emerald-100 text-emerald-800">ACC</span>
                         @elseif($finalReport)
-                            <span class="px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-amber-100 text-amber-800">Review</span>
+                            <span class="px-1.5 py-0.5 rounded-full text-sm sm:text-[10px] font-semibold bg-amber-100 text-amber-800">Review</span>
                         @endif
                     </button>
 
@@ -462,9 +465,9 @@
                             :class="activeTab === 'bimbingan' 
                                 ? 'border-blue-600 text-blue-600 font-bold' 
                                 : 'border-transparent text-slate-500 hover:text-slate-700 font-medium'"
-                            class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center transition cursor-pointer flex items-center justify-center gap-1 sm:gap-2">
+                            class="flex-1 sm:flex-initial min-h-[48px] sm:min-h-0 py-3 px-1 border-b-2 text-sm text-center transition cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2">
                         <span>Bimbingan</span>
-                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold"
+                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-sm sm:text-[11px] font-semibold"
                               :class="activeTab === 'bimbingan' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'">
                             {{ $consultations->count() }}
                         </span>
@@ -492,7 +495,7 @@
                                 </a>
                             @else
                                 <a href="{{ route('lecturer.evaluations.create', $placement->id) }}"
-                                   class="inline-flex items-center justify-center w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
+                                   class="inline-flex items-center justify-center w-full sm:w-auto min-h-[44px] sm:min-h-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
                                     {{ $isMentorOnly ? ($eval?->feedback_dosen ? 'Ubah Catatan Bimbingan' : 'Beri Catatan Bimbingan') : ($hasEval ? 'Ubah Nilai Evaluasi' : 'Isi Nilai Evaluasi') }}
                                 </a>
                             @endif
@@ -612,7 +615,7 @@
                         <textarea name="advisor_notes" rows="3" placeholder="Tuliskan catatan internal mengenai progres, kendala khusus, atau poin evaluasi peserta magang ini..."
                                   class="w-full text-xs sm:text-sm bg-slate-50 border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 rounded-xl p-3 shadow-2xs">{{ old('advisor_notes', $placement->advisor_notes) }}</textarea>
                         <div class="flex justify-end">
-                            <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
+                            <button type="submit" class="min-h-[44px] sm:min-h-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
                                 Simpan Catatan Pribadi
                             </button>
                         </div>

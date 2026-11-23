@@ -33,6 +33,15 @@ if errorlevel 1 goto php_broken
 rem Worker/penjadwal sisa sesi sebelumnya dihentikan dulu agar tidak berjalan ganda
 call :stop_workers
 
+rem Pastikan PostgreSQL lokal (C:\pgsql) hidup bila terpasang di laptop ini
+if exist "C:\pgsql\bin\pg_ctl.exe" (
+    if exist "C:\pgsql\data\postmaster.pid" (
+        tasklist /FI "IMAGENAME eq postgres.exe" 2>nul | find /I "postgres.exe" >nul
+        if errorlevel 1 del /f /q "C:\pgsql\data\postmaster.pid" >nul 2>&1
+    )
+    "C:\pgsql\bin\pg_ctl.exe" -D "C:\pgsql\data" -l "C:\pgsql\logfile.log" -w -t 30 start >nul 2>&1
+)
+
 "%PHP_EXE%" "%~dp0scripts\demo_preflight.php"
 if errorlevel 1 goto fail
 

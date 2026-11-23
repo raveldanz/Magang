@@ -87,7 +87,7 @@ class DashboardController extends Controller
         $unitStats = [];
         $percent = fn (int $count) => $totalStudents > 0 ? round(($count / $totalStudents) * 100, 1) : 0;
 
-        $dispusip = AgencyProfile::where('agency_name', 'like', '%Perpustakaan%')->first()
+        $dispusip = AgencyProfile::whereRaw('LOWER(agency_name) LIKE ?', ['%perpustakaan%'])->first()
             ?? AgencyProfile::first();
         $currentAgency = $agencyId ? AgencyProfile::find($agencyId) : $dispusip;
         $targetAgencyId = $currentAgency?->id;
@@ -139,7 +139,7 @@ class DashboardController extends Controller
         }
 
         // Distribusi Kampus Universitas (berdasarkan users.university_id — sudah dirapikan lewat migrasi backfill)
-        $universities = University::all();
+        $universities = University::listable()->get();
         $countsByUniversity = Application::query()
             ->join('users', 'users.id', '=', 'applications.user_id')
             ->when($agencyId, fn ($q) => $q->join('units', 'units.id', '=', 'applications.unit_id')

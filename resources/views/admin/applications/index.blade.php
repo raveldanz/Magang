@@ -16,7 +16,7 @@
                     @csrf
                     <button type="submit"
                             title="Periksa dan sinkronkan status magang yang tanggal mulainya telah tiba ke ACTIVE"
-                            class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:border-slate-400 active:scale-95 shadow-2xs transition">
+                            class="inline-flex items-center gap-1.5 min-h-[44px] sm:min-h-0 px-3.5 py-2 text-xs font-semibold rounded-xl text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:border-slate-400 active:scale-95 shadow-2xs transition">
                         <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
@@ -66,7 +66,7 @@
                                 </svg>
                             </div>
                             <input type="text" name="search" value="{{ request('search') }}" 
-                                placeholder="Cari nama peserta magang, NIM/NIS, atau kampus/sekolah..." 
+                                placeholder="Cari nama, NIM/NIS, atau kampus..."
                                 class="w-full text-xs sm:text-sm bg-white border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs font-medium placeholder:text-gray-400 h-10"
                                 style="padding-left: 2.75rem !important; padding-right: 1rem !important;" />
                         </div>
@@ -665,7 +665,7 @@
                                                                     </td>
                                                                     <td class="py-2.5 px-3 text-center whitespace-nowrap">
                                                                         <a href="{{ route('admin.applications.show', $memberApp->id) }}" 
-                                                                           class="inline-flex items-center gap-1 px-3 py-1 text-[11px] font-bold rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white border border-blue-200 transition"
+                                                                           class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 gap-1 px-3 py-1 text-[11px] font-bold rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white border border-blue-200 transition"
                                                                            title="Lihat Detail &amp; Kelola Keputusan">
                                                                             Detail
                                                                         </a>
@@ -835,7 +835,7 @@
                                 <!-- Accordion Button Mobile -->
                                 <button type="button" 
                                         @click="expanded = !expanded" 
-                                        class="w-full inline-flex items-center justify-between px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-xs font-bold rounded-xl border border-indigo-200 transition cursor-pointer">
+                                        class="w-full inline-flex items-center justify-between min-h-[44px] sm:min-h-0 px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-xs font-bold rounded-xl border border-indigo-200 transition cursor-pointer">
                                     <span x-text="expanded ? 'Tutup Daftar Anggota' : 'Buka Daftar ' + {{ $groupMemberCount }} + ' Anggota'"></span>
                                     <svg class="w-4 h-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -859,7 +859,7 @@
                                                 <x-status-badge :status="$memberApp->status" />
                                             </div>
                                             <div class="flex items-center justify-end gap-1.5 pt-1 border-t border-slate-200/60">
-                                                <a href="{{ route('admin.applications.show', $memberApp->id) }}" class="px-2.5 py-1 text-[10px] font-bold rounded-lg bg-blue-50 text-blue-700 border border-blue-200">
+                                                <a href="{{ route('admin.applications.show', $memberApp->id) }}" class="min-h-[44px] sm:min-h-0 inline-flex items-center justify-center px-2.5 py-1 text-[10px] font-bold rounded-lg bg-blue-50 text-blue-700 border border-blue-200">
                                                     Detail
                                                 </a>
                                             </div>

@@ -17,15 +17,15 @@
                 </p>
             </div>
 
-            <div class="flex items-center gap-2 shrink-0">
-                <a href="{{ url('/') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-2xs">
-                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <div class="flex flex-wrap items-center gap-2 shrink-0">
+                <a href="{{ url('/') }}" class="inline-flex items-center justify-center gap-2 min-h-[44px] sm:min-h-[40px] px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-2xs">
+                    <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                     <span>Beranda Utama</span>
                 </a>
                 @auth
                     @if(Auth::user()->role === 'mahasiswa')
-                        <a href="{{ route('student.projects.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        <a href="{{ route('student.projects.create') }}" class="inline-flex items-center justify-center gap-2 min-h-[44px] sm:min-h-[40px] px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             <span>Unggah Karya Proyek</span>
                         </a>
                     @endif
@@ -77,13 +77,13 @@
                                    name="search" 
                                    value="{{ $search }}" 
                                    placeholder="Cari judul proyek, nama peserta magang, kampus, atau topik inovasi..." 
-                                   class="w-full text-xs sm:text-sm bg-white border border-slate-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs font-medium placeholder:text-slate-400 h-11 transition"
+                                   class="w-full text-sm bg-white border border-slate-300 text-slate-900 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-2xs font-medium placeholder:text-slate-400 h-11 transition"
                                    style="padding-left: 2.75rem !important; padding-right: 1rem !important;">
                         </div>
 
                         <div class="flex items-center gap-2 shrink-0">
-                            <button type="submit" class="inline-flex items-center justify-center gap-2 px-5 h-11 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition duration-150 cursor-pointer w-full sm:w-auto">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <button type="submit" class="inline-flex items-center justify-center gap-2 px-5 h-11 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition duration-150 cursor-pointer flex-1 sm:flex-initial">
+                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                                 </svg>
                                 <span>Filter</span>
@@ -91,7 +91,7 @@
 
                             @if(!empty($search) || (!empty($category) && $category !== 'all') || (!empty($year) && $year !== 'all') || (!empty($sort) && $sort !== 'latest'))
                                 <a href="{{ route('public.projects.index') }}" class="inline-flex items-center justify-center gap-1.5 px-4 h-11 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs sm:text-sm font-semibold rounded-xl shadow-2xs transition duration-150 shrink-0">
-                                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-3.5 h-3.5 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                     </svg>
                                     <span>Reset</span>
@@ -155,7 +155,7 @@
                         </p>
                     </div>
                     <div>
-                        <a href="{{ route('public.projects.index') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">
+                        <a href="{{ route('public.projects.index') }}" class="inline-flex items-center justify-center gap-2 min-h-[44px] sm:min-h-[40px] px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold rounded-xl transition">
                             Reset Semua Filter
                         </a>
                     </div>
@@ -188,13 +188,13 @@
                                                 <span>{{ $projectList->count() }} Karya Inovasi</span>
                                             </span>
                                         </div>
-                                        <p class="text-xs text-slate-400 font-medium mt-0.5">
+                                        <p class="text-xs text-slate-500 font-medium mt-0.5">
                                             Dokumentasi luaran karya dan kontribusi nyata peserta magang pada periode tahun {{ $yr }}
                                         </p>
                                     </div>
                                 </div>
 
-                                <div class="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-400">
+                                <div class="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-500">
                                     <span>Arsip Karya Magang</span>
                                     <span class="text-slate-300">&bull;</span>
                                     <span class="font-mono text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
@@ -249,7 +249,8 @@
                                                     <div x-data="{ menuOpen: false, copied: false }" class="absolute top-3 right-3 z-20" @click.outside="menuOpen = false">
                                                         <button @click.prevent.stop="menuOpen = !menuOpen" 
                                                                 type="button" 
-                                                                class="w-7 h-7 rounded-xl bg-slate-900/70 hover:bg-slate-900 text-white flex items-center justify-center transition backdrop-blur-xs cursor-pointer shadow-sm"
+                                                                class="w-9 h-9 sm:w-7 sm:h-7 rounded-xl bg-slate-900/75 hover:bg-slate-900 text-white flex items-center justify-center transition backdrop-blur-xs cursor-pointer shadow-sm"
+                                                                aria-label="Opsi Proyek"
                                                                 title="Opsi Proyek">
                                                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                                                         </button>
@@ -261,17 +262,17 @@
                                                              x-transition:leave="transition ease-in duration-75"
                                                              x-transition:leave-start="opacity-100 scale-100"
                                                              x-transition:leave-end="opacity-0 scale-95"
-                                                             class="absolute right-0 top-full mt-1.5 w-48 bg-white rounded-2xl shadow-xl border border-slate-200 py-1.5 z-30 text-xs">
+                                                             class="absolute right-0 top-full mt-1.5 w-52 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-xl border border-slate-200 py-1.5 z-30 text-xs">
                                                             
                                                             {{-- 1. Sembunyikan / Publikasikan --}}
                                                             <form action="{{ route('projects.toggle_visibility', $project->id) }}" method="POST" @click.stop>
                                                                 @csrf
-                                                                <button type="submit" class="w-full text-left px-3.5 py-2 hover:bg-slate-50 flex items-center gap-2 text-slate-700 font-semibold cursor-pointer">
+                                                                <button type="submit" class="w-full min-h-[42px] sm:min-h-[36px] text-left px-3.5 py-2 hover:bg-slate-50 flex items-center gap-2 text-slate-700 font-semibold cursor-pointer">
                                                                     @if($project->is_public)
-                                                                        <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                                                                        <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
                                                                         <span>Sembunyikan Proyek</span>
                                                                     @else
-                                                                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                                        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                                                         <span>Tampilkan ke Publik</span>
                                                                     @endif
                                                                 </button>
@@ -280,8 +281,8 @@
                                                             {{-- 2. Salin Tautan --}}
                                                             <button type="button" 
                                                                     @click.prevent.stop="navigator.clipboard.writeText('{{ route('projects.show', $project->id) }}'); copied = true; setTimeout(() => { copied = false; menuOpen = false; }, 1800);" 
-                                                                    class="w-full text-left px-3.5 py-2 hover:bg-slate-50 flex items-center gap-2 text-slate-700 font-semibold cursor-pointer">
-                                                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                                                    class="w-full min-h-[42px] sm:min-h-[36px] text-left px-3.5 py-2 hover:bg-slate-50 flex items-center gap-2 text-slate-700 font-semibold cursor-pointer">
+                                                                <svg class="w-4 h-4 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                                                 <span x-text="copied ? 'Tautan Tersalin! ✓' : 'Salin Tautan'">Salin Tautan</span>
                                                             </button>
 
@@ -291,8 +292,8 @@
                                                                 <form action="{{ route('projects.destroy', $project->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus proyek ini secara permanen?');" @click.stop>
                                                                     @csrf
                                                                     @method('DELETE')
-                                                                    <button type="submit" class="w-full text-left px-3.5 py-2 hover:bg-rose-50 flex items-center gap-2 text-rose-600 font-semibold cursor-pointer">
-                                                                        <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                                    <button type="submit" class="w-full min-h-[42px] sm:min-h-[36px] text-left px-3.5 py-2 hover:bg-rose-50 flex items-center gap-2 text-rose-600 font-semibold cursor-pointer">
+                                                                        <svg class="w-4 h-4 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                                                         <span>Hapus Proyek</span>
                                                                     </button>
                                                                 </form>
@@ -334,20 +335,20 @@
                                                 </p>
                                             </div>
 
-                                            <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                                            <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2.5">
                                                 <div class="min-w-0">
                                                     <div class="text-xs font-bold text-slate-800 truncate">
                                                         {{ $mhs->name ?? 'Peserta Magang' }}
                                                     </div>
-                                                    <div class="text-[10px] text-slate-400 font-medium truncate">
+                                                    <div class="text-[11px] text-slate-500 font-medium truncate">
                                                         {{ $univ }}
                                                     </div>
                                                 </div>
 
                                                 <a href="{{ route('projects.show', $project->id) }}" 
-                                                   class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 group-hover:bg-blue-600 group-hover:text-white text-slate-700 text-xs font-bold transition">
+                                                   class="shrink-0 inline-flex items-center justify-center gap-1.5 min-h-[40px] sm:min-h-[34px] px-3.5 py-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-50 border border-slate-200/70 sm:border-transparent group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 text-slate-700 text-xs font-bold transition whitespace-nowrap">
                                                     <span>Buka Detail</span>
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                                                 </a>
                                             </div>
 

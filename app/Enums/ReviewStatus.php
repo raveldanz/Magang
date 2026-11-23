@@ -51,10 +51,10 @@ enum ReviewStatus: string
     public function badgeColor(): string
     {
         return match ($this) {
-            self::PENDING => 'bg-amber-50 text-amber-700 border-amber-300',
-            self::APPROVED => 'bg-emerald-50 text-emerald-700 border-emerald-300',
-            self::REJECTED => 'bg-rose-50 text-rose-700 border-rose-300',
-            self::REVISION => 'bg-orange-50 text-orange-700 border-orange-300',
+            self::PENDING => 'bg-amber-50 text-amber-800 border-amber-300',
+            self::APPROVED => 'bg-emerald-50 text-emerald-800 border-emerald-300',
+            self::REJECTED => 'bg-rose-50 text-rose-800 border-rose-300',
+            self::REVISION => 'bg-orange-50 text-orange-800 border-orange-300',
         };
     }
 

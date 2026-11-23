@@ -151,7 +151,8 @@ class LecturerUniversityQcFlowTest extends TestCase
             'nilai_disiplin' => 88, 'nilai_kinerja' => 90, 'nilai_laporan' => 86,
             'nilai_pembimbing' => 88,
             'score_mastery' => 80, 'score_report' => 90, 'score_attitude' => 85.5,
-            'nilai_akademik' => 85.17,
+            'nilai_dosen' => 85.17,
+            'nilai_akademik' => 85,
             'final_score' => 86.3, 'grade' => 'A',
         ]);
 

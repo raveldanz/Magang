@@ -198,15 +198,24 @@ class MasterUniversityAndFileValidationQcTest extends TestCase
     public function test_database_export_artisan_command_generates_sql_file(): void
     {
         $testFileName = 'test_qc_export_'.time().'.sql';
-        $this->artisan('db:export-sql', ['--filename' => $testFileName])
-            ->assertSuccessful();
-
         $path = storage_path('app/backups/'.$testFileName);
-        $this->assertFileExists($path);
-        $content = file_get_contents($path);
-        $this->assertStringContainsString('SIP-MAGANG DATABASE EXPORT', $content);
 
-        // Bersihkan file uji coba
-        @unlink($path);
+        try {
+            $this->artisan('db:export-sql', ['--filename' => $testFileName])
+                ->assertSuccessful();
+
+            $this->assertFileExists($path);
+            $content = (string) file_get_contents($path);
+            $this->assertNotSame('', trim($content));
+
+            $isPgDump = str_contains($content, 'PostgreSQL database dump');
+            $isPhpExport = str_contains($content, 'SIP-MAGANG DATABASE EXPORT');
+            $this->assertTrue(
+                $isPgDump || $isPhpExport,
+                'Berkas SQL ekspor harus berisi header pg_dump atau SIP-MAGANG DATABASE EXPORT.'
+            );
+        } finally {
+            @unlink($path);
+        }
     }
 }

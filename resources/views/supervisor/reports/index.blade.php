@@ -5,7 +5,7 @@
                 <h2 class="font-bold text-xl sm:text-2xl text-slate-900 leading-tight">
                     Laporan Peserta Magang
                 </h2>
-                <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+                <p class="text-sm text-slate-500 mt-0.5">
                     Pemantauan luaran naskah laporan dan proyek inovasi peserta magang
                 </p>
             </div>
@@ -17,51 +17,54 @@
 
             <!-- 1. Ringkasan Metrik Pemantauan (Style Dinas Bersih) -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-1">
-                    <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider block">
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs flex items-center justify-between gap-3 sm:block sm:space-y-1">
+                    <span class="text-sm sm:text-xs font-semibold text-slate-600 uppercase tracking-wider block">
                         Total Peserta Magang
                     </span>
                     <div class="text-2xl font-bold text-slate-900">
                         {{ $totalPlacements }}
                     </div>
-                    <span class="text-xs text-slate-600 block">
+                    <span class="hidden sm:block text-xs text-slate-600">
                         Peserta penempatan aktif dan selesai
                     </span>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-1">
-                    <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider block">
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs flex items-center justify-between gap-3 sm:block sm:space-y-1">
+                    <span class="text-sm sm:text-xs font-semibold text-slate-600 uppercase tracking-wider block">
                         Proyek Inovasi Tercipta
                     </span>
                     <div class="text-2xl font-bold text-slate-900">
                         {{ $totalProjects }}
                     </div>
-                    <span class="text-xs text-slate-600 block">
+                    <span class="hidden sm:block text-xs text-slate-600">
                         Karya luaran proyek untuk masyarakat
                     </span>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-1">
-                    <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider block">
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs flex items-center justify-between gap-3 sm:block sm:space-y-1">
+                    <span class="text-sm sm:text-xs font-semibold text-slate-600 uppercase tracking-wider block">
                         Naskah Laporan Disetujui
                     </span>
                     <div class="text-2xl font-bold text-slate-900">
                         {{ $totalApprovedReports }}
                     </div>
-                    <span class="text-xs text-slate-600 block">
+                    <span class="hidden sm:block text-xs text-slate-600">
                         Telah disetujui pembimbing
                     </span>
                 </div>
             </div>
 
             <!-- 2. Filter Bar Rapi & Kondusif -->
-            <form method="GET" action="{{ route('supervisor.reports.index') }}" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col md:flex-row gap-3">
-                <div class="flex-1">
-                    <input type="text" name="search" value="{{ $searchQuery }}" placeholder="Cari nama peserta magang, NIM/NIS, atau kampus/sekolah..." class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
+            @php $filterAktif = (bool) ($searchQuery || $unitFilter || $statusFilter); @endphp
+            <form method="GET" action="{{ route('supervisor.reports.index') }}" x-data="{ buka: @js($filterAktif) }" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col md:flex-row gap-3">
+                <button type="button" @click="buka = !buka" :aria-expanded="buka.toString()" class="sm:hidden w-full min-h-[48px] inline-flex items-center justify-between gap-2 text-base font-bold text-slate-900"><span>Cari atau saring laporan</span><svg class="w-5 h-5 transition" :class="buka && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg></button>
+
+                <div class="flex-1 {{ $filterAktif ? '' : 'hidden' }} sm:!block" :class="{ 'hidden': !buka }">
+                    <input type="text" name="search" value="{{ $searchQuery }}" placeholder="Cari nama peserta magang, NIM/NIS, atau kampus/sekolah..." class="min-h-[52px] sm:min-h-0 w-full text-base sm:text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
                 </div>
 
-                <div class="w-full md:w-56">
-                    <select name="unit_id" class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
+                <div class="w-full md:w-56 {{ $filterAktif ? '' : 'hidden' }} sm:!block" :class="{ 'hidden': !buka }">
+                    <select name="unit_id" class="min-h-[52px] sm:min-h-0 w-full text-base sm:text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
                         <option value="">Semua Unit Bidang</option>
                         @foreach ($units as $u)
                             <option value="{{ $u->id }}" {{ (string)$unitFilter === (string)$u->id ? 'selected' : '' }}>
@@ -71,8 +74,8 @@
                     </select>
                 </div>
 
-                <div class="w-full md:w-52">
-                    <select name="status" class="w-full text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
+                <div class="w-full md:w-52 {{ $filterAktif ? '' : 'hidden' }} sm:!block" :class="{ 'hidden': !buka }">
+                    <select name="status" class="min-h-[52px] sm:min-h-0 w-full text-base sm:text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
                         <option value="">Semua Status Laporan</option>
                         <option value="approved" {{ $statusFilter === 'approved' ? 'selected' : '' }}>Disetujui</option>{{-- status-guard:ignore --}}
                         <option value="pending" {{ $statusFilter === 'pending' ? 'selected' : '' }}>Menunggu Tinjauan</option>{{-- status-guard:ignore --}}
@@ -81,12 +84,12 @@
                     </select>
                 </div>
 
-                <div class="flex items-center gap-2 shrink-0">
-                    <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-2xs">
+                <div class="flex items-center gap-2 shrink-0 {{ $filterAktif ? '' : 'hidden' }} sm:!flex" :class="{ 'hidden': !buka }">
+                    <button type="submit" class="min-h-[52px] sm:min-h-0 flex-1 sm:flex-none inline-flex items-center justify-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-base sm:text-xs font-bold rounded-xl transition shadow-2xs">
                         Terapkan
                     </button>
                     @if ($searchQuery || $unitFilter || $statusFilter)
-                        <a href="{{ route('supervisor.reports.index') }}" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">
+                        <a href="{{ route('supervisor.reports.index') }}" class="min-h-[52px] sm:min-h-0 inline-flex items-center justify-center px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-base sm:text-xs font-bold rounded-xl transition">
                             Reset
                         </a>
                     @endif
@@ -192,33 +195,33 @@
                         <div class="p-4 space-y-3">
                             <div class="flex items-start justify-between gap-3">
                                 <div>
-                                    <h4 class="font-bold text-sm text-slate-900">{{ $student?->name ?? '-' }}</h4>
-                                    <p class="text-xs text-slate-500 mt-0.5">{{ $profile?->nim ?? '-' }} &bull; {{ $profile?->universitas ?? '-' }}</p>
+                                    <h4 class="font-bold text-base sm:text-sm text-slate-900">{{ $student?->name ?? '-' }}</h4>
+                                    <p class="text-sm sm:text-xs text-slate-500 mt-0.5">{{ $profile?->nim ?? '-' }} &bull; {{ $profile?->universitas ?? '-' }}</p>
                                 </div>
                                 <div>
                                     @if ($finalReport)
                                         <x-status-badge type="review" :status="$finalReport->status" />
                                     @else
-                                        <span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
+                                        <span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full text-sm sm:text-xs font-medium">
                                             Belum Mengunggah
                                         </span>
                                     @endif
                                 </div>
                             </div>
 
-                            <div class="p-3 bg-slate-50 rounded-xl space-y-1 text-xs">
+                            <div class="p-3 bg-slate-50 rounded-xl space-y-1 text-sm sm:text-xs">
                                 <div class="text-slate-600">Bidang: <strong>{{ $unit?->name ?? '-' }}</strong></div>
                                 <div class="text-slate-600">Proyek: <strong>{{ $projectsCount > 0 ? $projectsCount . ' Proyek' : 'Belum Ada' }}</strong></div>
                             </div>
 
                             <div class="pt-1">
-                                <a href="{{ route('supervisor.reports.show', $item->id) }}" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl text-center block transition">
+                                <a href="{{ route('supervisor.reports.show', $item->id) }}" class="min-h-[52px] sm:min-h-0 w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-base sm:text-xs font-bold rounded-xl text-center flex items-center justify-center transition">
                                     Lihat Detail Laporan & Proyek
                                 </a>
                             </div>
                         </div>
                     @empty
-                        <div class="p-8 text-center text-slate-500 text-xs">
+                        <div class="p-8 text-center text-slate-500 text-sm sm:text-xs">
                             Tidak ada data peserta magang ditemukan.
                         </div>
                     @endforelse

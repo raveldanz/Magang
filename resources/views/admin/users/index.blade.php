@@ -11,7 +11,7 @@
             </div>
 
             @if($isSuperAdmin)
-                <a href="{{ route('admin.users.create') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer w-full sm:w-auto">
+                <a href="{{ route('admin.users.create') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-[44px] sm:min-h-0 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer w-full sm:w-auto">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
                     <span>Tambah Pengguna Baru</span>
                 </a>
@@ -72,7 +72,7 @@
                         <a href="{{ route('admin.units.index', ['agency_id' => $selectedAgency->id]) }}" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold rounded-xl transition">
                             Lihat Unit Dinas
                         </a>
-                        <a href="{{ route('admin.users.index') }}" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-xl transition">
+                        <a href="{{ route('admin.users.index') }}" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-xl transition"
                             Reset Filter
                         </a>
                     </div>
@@ -98,7 +98,7 @@
                         <a href="{{ route('admin.applications.index', ['university_id' => $selectedUniversity->id]) }}" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold rounded-xl transition">
                             Pengajuan Peserta Magang
                         </a>
-                        <a href="{{ route('admin.users.index') }}" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-xl transition">
+                        <a href="{{ route('admin.users.index') }}" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-xl transition"
                             Reset Filter
                         </a>
                     </div>
@@ -118,10 +118,10 @@
                         </div>
                     </div>
                     <div class="flex items-center flex-wrap gap-2 shrink-0">
-                        <a href="{{ route('admin.units.index') }}" class="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-xs transition">
+                        <a href="{{ route('admin.units.index') }}" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-xs transition">
                             Kelola Unit / Bidang
                         </a>
-                        <a href="{{ route('admin.users.index') }}" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-xl transition">
+                        <a href="{{ route('admin.users.index') }}" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-xl transition"
                             Reset Filter
                         </a>
                     </div>
@@ -139,12 +139,12 @@
                             </svg>
                         </div>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, email, NIM/NIS..." 
-                               class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
+                               class="w-full min-h-[44px] sm:min-h-0 text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
                                style="padding-left: 2.75rem !important; padding-right: 1rem !important; padding-top: 0.65rem !important; padding-bottom: 0.65rem !important;">
                     </div>
 
                     <!-- Filter Role -->
-                    <select name="role" x-model="role" class="w-full py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                    <select name="role" x-model="role" class="w-full min-h-[44px] sm:min-h-0 py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium"
                         <option value="">Semua Role Pengguna</option>
                         <option value="mahasiswa" {{ request('role') === 'mahasiswa' ? 'selected' : '' }}>Peserta Magang</option>
                         <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin Bidang / Dispusip</option>
@@ -158,7 +158,7 @@
                     <div>
                         <!-- Case 1: Universitas / Mahasiswa / Dosen -->
                         <div x-show="['universitas', 'dosen', 'mahasiswa'].includes(role)">
-                            <select name="university_id" :disabled="!['universitas', 'dosen', 'mahasiswa'].includes(role)" class="w-full py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                            <select name="university_id" :disabled="!['universitas', 'dosen', 'mahasiswa'].includes(role)" class="w-full min-h-[44px] sm:min-h-0 py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium"
                                 <option value="">Semua Kampus / Sekolah</option>
                                 @foreach($universities as $u)
                                     <option value="{{ $u->id }}" {{ request('university_id') == $u->id ? 'selected' : '' }}>
@@ -170,7 +170,7 @@
 
                         <!-- Case 2: Admin Dinas / Mentor Lapangan / Supervisor / Default -->
                         <div x-show="!['universitas', 'dosen', 'mahasiswa'].includes(role)">
-                            <select name="unit_id" :disabled="['universitas', 'dosen', 'mahasiswa'].includes(role)" class="w-full py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                            <select name="unit_id" :disabled="['universitas', 'dosen', 'mahasiswa'].includes(role)" class="w-full min-h-[44px] sm:min-h-0 py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium"
                                 <option value="">Semua Bidang Dinas</option>
                                 @if(isset($units))
                                     @foreach($units as $unit)
@@ -185,11 +185,11 @@
 
                     <!-- Submit & Reset -->
                     <div class="flex items-center gap-2">
-                        <button type="submit" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer text-center">
+                        <button type="submit" class="flex-1 inline-flex items-center justify-center min-h-[44px] sm:min-h-0 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer text-center">
                             Terapkan Filter
                         </button>
                         @if(request()->hasAny(['search', 'role', 'agency_id', 'university_id', 'unit_id']))
-                            <a href="{{ route('admin.users.index') }}" class="px-3.5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold rounded-xl transition text-center">
+                            <a href="{{ route('admin.users.index') }}" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-3.5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold rounded-xl transition text-center">
                                 Reset
                             </a>
                         @endif
@@ -552,7 +552,7 @@
                                                 @csrf
                                                 <button type="submit" 
                                                         title="Masuk sebagai {{ $u->name }} (Login As)"
-                                                        class="w-full py-2 px-2.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
+                                                        class="w-full min-h-[44px] sm:min-h-0 py-2 px-2.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
                                                     <span>Login As</span>
                                                 </button>
@@ -560,7 +560,7 @@
 
                                             <!-- Edit -->
                                             <a href="{{ route('admin.users.edit', $u->id) }}" 
-                                               class="w-full py-2 px-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 text-center">
+                                               class="w-full min-h-[44px] sm:min-h-0 py-2 px-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 text-center">
                                                 <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                                 <span>Edit</span>
                                             </a>
@@ -574,7 +574,7 @@
                                                             email: @js((string) ($u->email)),
                                                             role: @js((string) ($u->roleLabel()))
                                                         })" 
-                                                        class="w-full py-2 px-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer" 
+                                                        class="w-full min-h-[44px] sm:min-h-0 py-2 px-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer" 
                                                         title="Reset password ke default: password">
                                                     <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
                                                     <span>Reset</span>
@@ -590,7 +590,7 @@
                                                             name: @js((string) ($u->name)),
                                                             desc: 'Email: {{ $u->email }} &bull; Role: {{ addslashes($u->roleLabel()) }}'
                                                         })" 
-                                                        class="w-full py-2 px-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                                                        class="w-full min-h-[44px] sm:min-h-0 py-2 px-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
                                                         title="Hapus Pengguna">
                                                     <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                                     <span>Hapus</span>
@@ -602,7 +602,7 @@
                                         <div class="grid {{ ($showReset && $showDelete) ? 'grid-cols-3' : (($showReset || $showDelete) ? 'grid-cols-2' : 'grid-cols-1') }} gap-2">
                                             <!-- Edit -->
                                             <a href="{{ route('admin.users.edit', $u->id) }}" 
-                                               class="w-full py-2 px-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 text-center">
+                                               class="w-full min-h-[44px] sm:min-h-0 py-2 px-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 text-center">
                                                 <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                                 <span>Edit</span>
                                             </a>
@@ -616,7 +616,7 @@
                                                             email: @js((string) ($u->email)),
                                                             role: @js((string) ($u->roleLabel()))
                                                         })" 
-                                                        class="w-full py-2 px-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer" 
+                                                        class="w-full min-h-[44px] sm:min-h-0 py-2 px-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer" 
                                                         title="Reset password ke default: password">
                                                     <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
                                                     <span>Reset</span>
@@ -632,7 +632,7 @@
                                                             name: @js((string) ($u->name)),
                                                             desc: 'Email: {{ $u->email }} &bull; Role: {{ addslashes($u->roleLabel()) }}'
                                                         })" 
-                                                        class="w-full py-2 px-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                                                        class="w-full min-h-[44px] sm:min-h-0 py-2 px-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
                                                         title="Hapus Pengguna">
                                                     <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                                     <span>Hapus</span>
@@ -676,7 +676,7 @@
                     <span class="inline-flex items-center justify-center bg-blue-600 text-white text-xs font-semibold px-2.5 py-1 rounded-full" x-text="selectedCount"></span>
                     <span class="text-sm font-medium text-slate-200 hidden sm:inline">akun dipilih</span>
                 </div>
-                <button type="button" @click="clearSelection()" class="text-xs text-slate-400 hover:text-white underline transition">
+                <button type="button" @click="clearSelection()" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-3 sm:px-0 text-xs text-slate-400 hover:text-white underline transition">
                     Batal
                 </button>
             </div>
@@ -689,7 +689,7 @@
                 <!-- Reset Massal Button -->
                 <button type="button" 
                         @click="openBulkResetModal()" 
-                        class="bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium px-4 py-2 rounded-xl transition shadow-sm inline-flex items-center gap-2 cursor-pointer">
+                        class="min-h-[44px] sm:min-h-0 bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium px-4 py-2 rounded-xl transition shadow-sm inline-flex items-center gap-2 cursor-pointer">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                     </svg>
@@ -699,7 +699,7 @@
                 <!-- Hapus Massal Button -->
                 <button type="button" 
                         @click="openBulkDeleteModal()" 
-                        class="bg-rose-600 hover:bg-rose-500 text-white text-sm font-medium px-4 py-2 rounded-xl transition shadow-sm inline-flex items-center gap-2 cursor-pointer">
+                        class="min-h-[44px] sm:min-h-0 bg-rose-600 hover:bg-rose-500 text-white text-sm font-medium px-4 py-2 rounded-xl transition shadow-sm inline-flex items-center gap-2 cursor-pointer">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>

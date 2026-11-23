@@ -5,7 +5,7 @@
         <div class="flex flex-col min-h-0 h-full">
             <div class="h-16 px-4 flex items-center justify-between gap-2 border-b border-slate-100 shrink-0">
                 <p class="text-sm font-extrabold text-slate-900" x-text="isChannelChat ? 'Info Saluran' : (isGroupChat ? 'Info Grup' : 'Info Kontak')"></p>
-                <button type="button" @click="infoOpen = false" class="w-9 h-9 rounded-xl text-slate-500 hover:bg-slate-100 flex items-center justify-center" aria-label="Tutup info">
+                <button type="button" @click="infoOpen = false" class="h-11 w-11 sm:h-9 sm:w-9 rounded-xl text-slate-500 hover:bg-slate-100 inline-flex items-center justify-center" aria-label="Tutup info">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
@@ -71,7 +71,7 @@
                             Grup bimbingan ini dibuat dan dikelola secara otomatis oleh sistem untuk mempermudah koordinasi peserta bimbingan aktif dengan pembimbing.
                         </p>
                     </template>
-                    <a x-show="active.placement_url" :href="active.placement_url" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800">
+                    <a x-show="active.placement_url" :href="active.placement_url" class="inline-flex items-center min-h-[44px] sm:min-h-0 gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800">
                         Buka detail magang peserta →
                     </a>
                 </div>
@@ -96,15 +96,15 @@
                         <div class="flex items-center justify-between gap-2">
                             <p class="text-xs font-bold uppercase tracking-wide text-slate-400">Anggota (<span x-text="active.member_count"></span>)</p>
                             <div class="flex items-center gap-1" x-show="active.can_manage && !readOnly">
-                                <button type="button" @click="editGroup()" class="h-8 px-2.5 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100">Ubah</button>
-                                <button type="button" @click="openContacts('add')" class="h-8 px-2.5 rounded-lg text-xs font-bold text-blue-600 hover:bg-blue-50">+ Tambah</button>
+                                <button type="button" @click="editGroup()" class="h-8 min-h-[44px] sm:min-h-0 inline-flex items-center px-2.5 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100">Ubah</button>
+                                <button type="button" @click="openContacts('add')" class="h-8 min-h-[44px] sm:min-h-0 inline-flex items-center px-2.5 rounded-lg text-xs font-bold text-blue-600 hover:bg-blue-50">+ Tambah</button>
                             </div>
                         </div>
                         <div class="space-y-1">
                             <template x-for="member in active.members" :key="member.id">
                                 <div x-data="{ open: false }" class="rounded-xl" :class="open ? 'bg-slate-50' : 'hover:bg-slate-50'">
                                     <div class="flex items-center gap-3 p-2">
-                                        <button type="button" @click="open = !open" class="flex items-center gap-3 min-w-0 flex-1 text-left" :aria-expanded="open" :aria-label="`Lihat kontak ${member.name}`">
+                                        <button type="button" @click="open = !open" class="flex items-center gap-3 min-w-0 flex-1 min-h-[44px] sm:min-h-0 text-left" :aria-expanded="open" :aria-label="`Lihat kontak ${member.name}`">
                                             <span class="relative w-9 h-9 rounded-full text-white text-xs font-bold flex items-center justify-center shrink-0" :style="{ backgroundColor: member.color }">
                                                 <span x-text="member.initials"></span>
                                                 <span x-show="member.online" class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
@@ -119,7 +119,7 @@
                                             <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                                         </button>
                                         <button type="button" x-show="active.can_manage && !member.is_me && !readOnly" @click="askRemoveMember(member)"
-                                                class="w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center shrink-0" :aria-label="`Keluarkan ${member.name}`" title="Keluarkan dari grup">
+                                                class="h-11 w-11 sm:h-8 sm:w-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 inline-flex items-center justify-center shrink-0" :aria-label="`Keluarkan ${member.name}`" title="Keluarkan dari grup">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"/></svg>
                                         </button>
                                     </div>

@@ -229,6 +229,20 @@ class University extends Model
         return implode('|', UniversityResolver::keywordsFor($this));
     }
 
+    /**
+     * Daftar untuk filter/statistik: semua perguruan tinggi, serta sekolah yang benar-benar dipakai
+     * (punya pengguna). Sekolah hasil sinkron direktori nasional yang belum terpakai tidak ikut,
+     * supaya halaman admin tidak memuat puluhan ribu baris. Pilihan di form memakai pencarian async.
+     */
+    public function scopeListable(Builder $query): Builder
+    {
+        return $query->where(function (Builder $q) {
+            $q->where('institution_type', '!=', self::TYPE_SCHOOL)
+                ->orWhereNull('institution_type')
+                ->orWhereExists(fn ($sub) => $sub->selectRaw('1')->from('users')->whereColumn('users.university_id', 'universities.id'));
+        });
+    }
+
     public function scopeVerified(Builder $query): Builder
     {
         return $query->where('is_verified', true);

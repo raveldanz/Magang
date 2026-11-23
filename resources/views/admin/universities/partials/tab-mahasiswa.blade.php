@@ -11,7 +11,7 @@
                         </div>
 
                         <div class="cc-head-actions flex items-center gap-2">
-                            <a href="{{ route('admin.applications.index', ['university_id' => $university->id]) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold border border-blue-200 transition">
+                            <a href="{{ route('admin.applications.index', ['university_id' => $university->id]) }}" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 min-h-[44px] sm:min-h-0 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold border border-blue-200 transition">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                                 <span>Buka di Pengajuan Masuk</span>
                             </a>
@@ -24,14 +24,14 @@
                         
                         <div class="relative flex-1">
                             <input type="text" name="student_search" value="{{ request('student_search') }}" placeholder="Cari nama peserta magang, NIM/NIS, atau program studi..." 
-                                   class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500"
+                                   class="w-full min-h-[44px] sm:min-h-0 text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500"
                                    style="padding-left: 2.25rem !important; padding-right: 0.75rem !important; padding-top: 0.5rem !important; padding-bottom: 0.5rem !important;">
                             <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400 pl-3">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                             </div>
                         </div>
 
-                        <select name="student_status" class="text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2">
+                        <select name="student_status" class="min-h-[44px] sm:min-h-0 text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2">
                             <option value="">Semua Status Peserta Magang</option>
                             <option value="action" {{ request('student_status') === 'action' ? 'selected' : '' }}>Perlu Tindakan</option>
                             <optgroup label="Status Pengajuan">
@@ -42,11 +42,11 @@
                             <option value="no_application" {{ request('student_status') === 'no_application' ? 'selected' : '' }}>Belum Mengajukan</option>
                         </select>
 
-                        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-2xs cursor-pointer">
+                        <button type="submit" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-2xs cursor-pointer">
                             Filter
                         </button>
                         @if(request('student_search') || request('student_status'))
-                            <a href="{{ route('admin.universities.show', ['university' => $university->id, 'tab' => 'mahasiswa']) }}" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition text-center">
+                            <a href="{{ route('admin.universities.show', ['university' => $university->id, 'tab' => 'mahasiswa']) }}" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition text-center">
                                 Reset
                             </a>
                         @endif
@@ -266,7 +266,7 @@
                                     @if($isSuperAdmin && $latestApp && ($dosen || in_array($mSt, ['accepted', 'active'], true)))
                                         <button type="button"
                                                 @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = @js((string) ($student->name)); showAssignAdvisorModal = true;"
-                                                class="cc-link" style="margin-top:2px">{{ $dosen ? 'Ganti Pembimbing' : '+ Tugaskan Pembimbing' }}</button>
+                                                class="cc-link inline-flex items-center min-h-[44px] sm:min-h-0" style="margin-top:2px">{{ $dosen ? 'Ganti Pembimbing' : '+ Tugaskan Pembimbing' }}</button>
                                     @endif
                                 </div>
                                 <div>

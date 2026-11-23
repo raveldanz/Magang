@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -331,6 +332,10 @@ class ChatService
     public function unreadTotalForNavbar(User $user): int
     {
         try {
+            if (! Schema::hasTable('chat_messages') || ! Schema::hasTable('chat_participants')) {
+                return 0;
+            }
+
             return $this->unreadTotal($user);
         } catch (QueryException $e) {
             report($e);

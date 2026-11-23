@@ -11,7 +11,7 @@
     <!-- Tombol Tambah Dosen (Mengarah ke form create & otomatis kembali ke sini) -->
     @if($isSuperAdmin)
     <a href="{{ route('admin.users.create', ['university_id' => $university->id, 'role' => 'dosen', 'return_to' => url()->current()]) }}" 
-       class="cc-head-actions inline-flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
+       class="cc-head-actions inline-flex items-center justify-center gap-2 px-3.5 py-2 min-h-[44px] sm:min-h-0 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
         <span>Tambah Pembimbing Baru</span>
     </a>

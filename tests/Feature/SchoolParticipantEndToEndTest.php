@@ -81,7 +81,6 @@ class SchoolParticipantEndToEndTest extends TestCase
             'semester' => 11,
             'phone' => '081234567890',
             'cv' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
-            'transkrip' => UploadedFile::fake()->create('rapor.pdf', 100, 'application/pdf'),
             'id_card' => UploadedFile::fake()->create('kartu-pelajar.pdf', 100, 'application/pdf'),
         ])->assertSessionHasNoErrors();
         $student = $student->fresh();
@@ -93,9 +92,7 @@ class SchoolParticipantEndToEndTest extends TestCase
             'start_date' => now()->toDateString(),
             'end_date' => now()->addDays(60)->toDateString(),
             'surat_pengantar' => UploadedFile::fake()->create('surat-pengantar.pdf', 100, 'application/pdf'),
-            'cv' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
-            'transkrip' => UploadedFile::fake()->create('rapor.pdf', 100, 'application/pdf'),
-            'id_card' => UploadedFile::fake()->create('kartu-pelajar.pdf', 100, 'application/pdf'),
+            'proposal_kampus' => UploadedFile::fake()->create('proposal.pdf', 100, 'application/pdf'),
         ])->assertSessionHasNoErrors();
         $application = Application::where('user_id', $student->id)->firstOrFail();
         $this->assertSame('pending', $application->statusValue());
@@ -148,7 +145,7 @@ class SchoolParticipantEndToEndTest extends TestCase
         // Halaman mentor & pembimbing menampilkan siswa dengan label sekolah
         $this->actingAs($mentor)->get(route('mentor.students.show', $placement->id))
             ->assertOk()->assertSee('Kampus/Sekolah')->assertDontSee('Dosen Pembimbing');
-        $this->actingAs($teacher)->get(route('lecturer.dashboard'))->assertOk()->assertSee('Putri Ayu Lestari');
+        $this->actingAs($teacher)->get(route('lecturer.dashboard'))->assertOk()->assertSee('PUTRI AYU LESTARI');
 
         // ── 9. Laporan akhir diunggah lalu disetujui mentor ──
         $this->actingAs($student)->post(route('student.final_report.store'), [

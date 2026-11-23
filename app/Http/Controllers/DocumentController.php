@@ -108,27 +108,10 @@ class DocumentController extends Controller
             $location = ['disk' => null, 'path' => $legacy];
         }
 
-        // Fallback resilience: jika berkas spesifik belum ada di disk fisik, gunakan template proposal standar
-        if (! $location) {
-            foreach ([
-                'documents/applications/sample_proposal_kelompok.pdf',
-                'documents/applications/default_proposal.pdf',
-                'final_reports/default.pdf',
-            ] as $fallbackCandidate) {
-                if ($loc = PrivateDocumentStorage::locate($fallbackCandidate)) {
-                    $location = $loc;
-                    break;
-                } elseif ($legacy = self::resolveStoredFile($fallbackCandidate)) {
-                    $location = ['disk' => null, 'path' => $legacy];
-                    break;
-                }
-            }
-        }
-
         abort_unless($location, 404, 'Berkas dokumen proposal tidak ditemukan di penyimpanan server.');
 
         $ext = strtolower(pathinfo($location['path'], PATHINFO_EXTENSION) ?: 'pdf');
-        $downloadName = 'proposal_kelompok_'.Str::slug($group->name ?: 'tim', '_').'_'.$group->code.'.'.$ext;
+        $downloadName = 'berkas_pengajuan_kelompok_'.Str::slug($group->name ?: 'tim', '_').'_'.$group->code.'.'.$ext;
 
         return [$group, $location, $downloadName];
     }
@@ -181,8 +164,8 @@ class DocumentController extends Controller
             $location = ['disk' => null, 'path' => $legacy];
         }
 
-        // Fallback resilience: jika berkas fisik tidak ditemukan, gunakan dokumen template standar
-        if (! $location) {
+        // Pertahankan fallback demo lama untuk tipe dokumen selain dua berkas pengajuan kampus.
+        if (! $location && ! in_array($document->document_type, ['Surat Pengantar', 'Proposal Kampus'], true)) {
             foreach ([
                 'documents/applications/sample_proposal.pdf',
                 'documents/applications/default_proposal.pdf',

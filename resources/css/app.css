@@ -153,3 +153,81 @@
     font-size: 11px !important;
     line-height: 1.35;
 }
+
+/* ==========================================================================
+   Fondasi Design System Global SIP-MAGANG (Tipografi, Kartu, CTA, Anti-Overflow)
+   Standar resmi rujukan: .antigravity/rules/ui_ux_standard.md
+   ========================================================================== */
+@layer components {
+    /* Container & Card Global */
+    .ui-container {
+        @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full;
+    }
+    .ui-card {
+        @apply bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 sm:p-6;
+    }
+    .ui-card-lg {
+        @apply bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-8;
+    }
+
+    /* Skala Tipografi Resmi */
+    .ui-h1 {
+        @apply text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight;
+    }
+    .ui-h2 {
+        @apply text-lg sm:text-xl font-bold text-slate-900 tracking-tight leading-snug;
+    }
+    .ui-h3 {
+        @apply text-base sm:text-lg font-bold text-slate-900 leading-snug;
+    }
+    .ui-body {
+        @apply text-sm sm:text-base text-slate-700 leading-relaxed;
+    }
+    .ui-caption {
+        @apply text-xs text-slate-500 leading-normal;
+    }
+
+    /* Standar Tombol CTA Global (Primary, Secondary, Danger, Ghost) */
+    .btn-primary {
+        @apply inline-flex items-center justify-center gap-2 min-h-[44px] sm:min-h-[40px] px-5 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs hover:shadow-md transition duration-150 ease-in-out active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+    .btn-secondary {
+        @apply inline-flex items-center justify-center gap-2 min-h-[44px] sm:min-h-[40px] px-4 py-2.5 bg-white hover:bg-slate-50 active:bg-slate-100 border border-slate-300 text-slate-700 text-xs sm:text-sm font-bold rounded-xl shadow-2xs transition duration-150 ease-in-out active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+    .btn-danger {
+        @apply inline-flex items-center justify-center gap-2 min-h-[44px] sm:min-h-[40px] px-4 py-2.5 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 border border-transparent text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition duration-150 ease-in-out active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+    .btn-ghost {
+        @apply inline-flex items-center justify-center gap-2 min-h-[44px] sm:min-h-[40px] px-3.5 py-2 bg-transparent hover:bg-slate-100 active:bg-slate-200/70 text-slate-700 hover:text-blue-600 text-xs sm:text-sm font-bold rounded-xl transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/40 disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+
+    /* Wrapper Tabel Responsif Anti-Overflow */
+    .ui-table-wrap {
+        @apply w-full max-w-full overflow-x-auto scrollbar-thin rounded-2xl border border-slate-200/80 bg-white;
+    }
+}
+
+/* ==========================================================================
+   Isolasi Perbaikan Layar Kecil / Mobile (<= 639px) — Anti-Rusak Desktop
+   ========================================================================== */
+@media (max-width: 639px) {
+    .btn-action-group {
+        flex-wrap: wrap !important;
+        justify-content: flex-start !important;
+    }
+    .btn-action-edit,
+    .btn-action-reset,
+    .btn-action-delete,
+    .btn-action-login,
+    .btn-action-create {
+        min-height: 38px !important;
+        height: auto !important;
+        max-height: none !important;
+        padding: 8px 12px !important;
+    }
+    /* Cegah elemen flex/grid & modal meluber keluar dari viewport 375px */
+    .app-readable main {
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+}

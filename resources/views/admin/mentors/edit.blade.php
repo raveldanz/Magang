@@ -44,14 +44,14 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Nama Lengkap & Gelar <span class="text-rose-500">*</span>
                         </label>
-                        <input type="text" name="name" value="{{ old('name', $mentor->name) }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                        <input type="text" name="name" value="{{ old('name', $mentor->name) }}" required class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Email Kedinasan / Akun Login <span class="text-rose-500">*</span>
                         </label>
-                        <input type="email" name="email" value="{{ old('email', $mentor->email) }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                        <input type="email" name="email" value="{{ old('email', $mentor->email) }}" required class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                     </div>
 
                     @if(! $isSuperAdmin && auth()->user()->unit_id)
@@ -70,7 +70,7 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Bidang Resmi Dispusip Tempat Bertugas <span class="text-rose-500">*</span>
                             </label>
-                            <select name="unit_id" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                            <select name="unit_id" required class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                                 <option value="">-- Pilih Salah Satu dari 4 Bidang Resmi --</option>
                                 @foreach($units as $u)
                                     <option value="{{ $u->id }}" {{ old('unit_id', $mentor->unit_id) == $u->id ? 'selected' : '' }}>{{ $u->name }} (Kuota: {{ $u->quota }})</option>
@@ -100,7 +100,7 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Status Keaktifan
                         </label>
-                        <select name="status" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                        <select name="status" class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                             @foreach(\App\Enums\AccountStatus::cases() as $accountCase)
                                 <option value="{{ $accountCase->value }}" {{ old('status', $mentor->status ?? 'active') === $accountCase->value ? 'selected' : '' }}>{{ $accountCase->label() }}</option>
                             @endforeach
@@ -109,10 +109,10 @@
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
-                        <a href="{{ route('admin.mentors.index') }}" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                        <a href="{{ route('admin.mentors.index') }}" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                             Batal
                         </a>
-                        <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                        <button type="submit" class="inline-flex items-center justify-center min-h-[44px] sm:min-h-0 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                             Simpan Perubahan
                         </button>
                     </div>
