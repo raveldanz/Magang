@@ -79,6 +79,7 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::resource('/admin/users', AdminUserController::class)->names('admin.users');
 
     // Master Perguruan Tinggi (Universitas)
+    Route::post('/admin/universities/quick-import', [AdminUniversityController::class, 'quickImport'])->name('admin.universities.quick_import');
     Route::post('/admin/universities/{id}/create-account', [AdminUniversityController::class, 'createAccount'])->name('admin.universities.create_account');
     Route::post('/admin/universities/{id}/verify', [AdminUniversityController::class, 'verify'])->name('admin.universities.verify');
     Route::post('/admin/universities/{id}/merge', [AdminUniversityController::class, 'merge'])->name('admin.universities.merge');

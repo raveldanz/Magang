@@ -46,6 +46,14 @@ return [
         'ca_bundle' => env('SCHOOL_DIRECTORY_CA_BUNDLE') ?: resource_path('certs/cacert.pem'),
     ],
 
+    // Direktori perguruan tinggi (Higher Education Directory) untuk live search & auto-cache
+    'college_directory' => [
+        'enabled' => env('COLLEGE_DIRECTORY_ENABLED', true),
+        'base_url' => env('COLLEGE_DIRECTORY_URL', 'http://universities.hipolabs.com'),
+        'timeout' => (int) env('COLLEGE_DIRECTORY_TIMEOUT', 5),
+        'ca_bundle' => env('COLLEGE_DIRECTORY_CA_BUNDLE') ?: resource_path('certs/cacert.pem'),
+    ],
+
     'vapid' => [
         'public_key' => env('VAPID_PUBLIC_KEY', ''),
         'private_key' => env('VAPID_PRIVATE_KEY', ''),

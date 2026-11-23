@@ -1,2116 +1,2367 @@
 [
-  {
-    "name": "Universitas Negeri Surabaya",
-    "code": "UNESA",
-    "acronym": "UNESA",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Airlangga",
-    "code": "UNAIR",
-    "acronym": "UNAIR",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Institut Teknologi Sepuluh Nopember",
-    "code": "ITS",
-    "acronym": "ITS",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Pembangunan Nasional Veteran Jawa Timur",
-    "code": "UPN-JATIM",
-    "acronym": "UPN Jatim",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Elektronika Negeri Surabaya",
-    "code": "PENS",
-    "acronym": "PENS",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Perkapalan Negeri Surabaya",
-    "code": "PPNS",
-    "acronym": "PPNS",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "UIN Sunan Ampel Surabaya",
-    "code": "UINSA",
-    "acronym": "UINSA",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Poltekkes Kemenkes Surabaya",
-    "code": "POLTEKKES-SBY",
-    "acronym": "Poltekkes Surabaya",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Brawijaya",
-    "code": "UB",
-    "acronym": "UB",
-    "city": "Kota Malang",
-    "province": "Jawa Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Negeri Malang",
-    "code": "UM",
-    "acronym": "UM",
-    "city": "Kota Malang",
-    "province": "Jawa Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Malang",
-    "code": "POLINEMA",
-    "acronym": "POLINEMA",
-    "city": "Kota Malang",
-    "province": "Jawa Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "UIN Maulana Malik Ibrahim Malang",
-    "code": "UIN-MALANG",
-    "acronym": "UIN Malang",
-    "city": "Kota Malang",
-    "province": "Jawa Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Jember",
-    "code": "UNEJ",
-    "acronym": "UNEJ",
-    "city": "Kabupaten Jember",
-    "province": "Jawa Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Jember",
-    "code": "POLIJE",
-    "acronym": "POLIJE",
-    "city": "Kabupaten Jember",
-    "province": "Jawa Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Trunojoyo Madura",
-    "code": "UTM",
-    "acronym": "UTM",
-    "city": "Kabupaten Bangkalan",
-    "province": "Jawa Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Madura",
-    "code": "POLTERA",
-    "acronym": "POLTERA",
-    "city": "Kabupaten Sampang",
-    "province": "Jawa Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Kristen Petra",
-    "code": "UKP",
-    "acronym": "UK Petra",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Surabaya",
-    "code": "UBAYA",
-    "acronym": "UBAYA",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Ciputra Surabaya",
-    "code": "UC",
-    "acronym": "UC",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Katolik Widya Mandala Surabaya",
-    "code": "UKWMS",
-    "acronym": "UKWMS",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas 17 Agustus 1945 Surabaya",
-    "code": "UNTAG-SBY",
-    "acronym": "UNTAG Surabaya",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Narotama",
-    "code": "UNNAR",
-    "acronym": "Narotama",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Muhammadiyah Surabaya",
-    "code": "UM-SURABAYA",
-    "acronym": "UM Surabaya",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Bhayangkara Surabaya",
-    "code": "UBHARA-SBY",
-    "acronym": "Ubhara Surabaya",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Wijaya Kusuma Surabaya",
-    "code": "UWKS",
-    "acronym": "UWKS",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Dinamika (STIKOM Surabaya)",
-    "code": "UNDIKA",
-    "acronym": "UNDIKA",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Hang Tuah",
-    "code": "UHT",
-    "acronym": "UHT",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Dr. Soetomo",
-    "code": "UNITOMO",
-    "acronym": "UNITOMO",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Nahdlatul Ulama Surabaya",
-    "code": "UNUSA",
-    "acronym": "UNUSA",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas PGRI Adi Buana Surabaya",
-    "code": "UNIPA-SBY",
-    "acronym": "UNIPA Surabaya",
-    "city": "Kota Surabaya",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Muhammadiyah Malang",
-    "code": "UMM",
-    "acronym": "UMM",
-    "city": "Kota Malang",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Islam Malang",
-    "code": "UNISMA",
-    "acronym": "UNISMA",
-    "city": "Kota Malang",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Merdeka Malang",
-    "code": "UNMER",
-    "acronym": "UNMER",
-    "city": "Kota Malang",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Institut Teknologi Nasional Malang",
-    "code": "ITN-MALANG",
-    "acronym": "ITN Malang",
-    "city": "Kota Malang",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Muhammadiyah Sidoarjo",
-    "code": "UMSIDA",
-    "acronym": "UMSIDA",
-    "city": "Kabupaten Sidoarjo",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Muhammadiyah Gresik",
-    "code": "UMG",
-    "acronym": "UMG",
-    "city": "Kabupaten Gresik",
-    "province": "Jawa Timur",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Indonesia",
-    "code": "UI",
-    "acronym": "UI",
-    "city": "Kota Depok / Jakarta",
-    "province": "DKI Jakarta",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Negeri Jakarta",
-    "code": "UNJ",
-    "acronym": "UNJ",
-    "city": "Kota Jakarta Timur",
-    "province": "DKI Jakarta",
-    "type": "PTN"
-  },
-  {
-    "name": "UIN Syarif Hidayatullah Jakarta",
-    "code": "UIN-JKT",
-    "acronym": "UIN Jakarta",
-    "city": "Kota Tangerang Selatan",
-    "province": "Banten",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Pembangunan Nasional Veteran Jakarta",
-    "code": "UPN-VJ",
-    "acronym": "UPN Jakarta",
-    "city": "Kota Jakarta Selatan",
-    "province": "DKI Jakarta",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Jakarta",
-    "code": "PNJ",
-    "acronym": "PNJ",
-    "city": "Kota Depok",
-    "province": "Jawa Barat",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Media Kreatif",
-    "code": "POLIMEDIA",
-    "acronym": "Polimedia",
-    "city": "Kota Jakarta Selatan",
-    "province": "DKI Jakarta",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Sultan Ageng Tirtayasa",
-    "code": "UNTIRTA",
-    "acronym": "UNTIRTA",
-    "city": "Kota Serang",
-    "province": "Banten",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Bina Nusantara",
-    "code": "BINUS",
-    "acronym": "BINUS",
-    "city": "Kota Jakarta Barat",
-    "province": "DKI Jakarta",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Trisakti",
-    "code": "USAKTI",
-    "acronym": "Trisakti",
-    "city": "Kota Jakarta Barat",
-    "province": "DKI Jakarta",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Tarumanagara",
-    "code": "UNTAR",
-    "acronym": "UNTAR",
-    "city": "Kota Jakarta Barat",
-    "province": "DKI Jakarta",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Katolik Indonesia Atma Jaya",
-    "code": "UNIKA-ATMAJAYA",
-    "acronym": "Atma Jaya Jakarta",
-    "city": "Kota Jakarta Selatan",
-    "province": "DKI Jakarta",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Mercu Buana",
-    "code": "UMB",
-    "acronym": "Mercu Buana",
-    "city": "Kota Jakarta Barat",
-    "province": "DKI Jakarta",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Gunadarma",
-    "code": "UG",
-    "acronym": "Gunadarma",
-    "city": "Kota Depok / Jakarta",
-    "province": "Jawa Barat",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Muhammadiyah Prof. Dr. HAMKA",
-    "code": "UHAMKA",
-    "acronym": "UHAMKA",
-    "city": "Kota Jakarta Timur",
-    "province": "DKI Jakarta",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Al-Azhar Indonesia",
-    "code": "UAI",
-    "acronym": "UAI",
-    "city": "Kota Jakarta Selatan",
-    "province": "DKI Jakarta",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Pancasila",
-    "code": "UP",
-    "acronym": "Pancasila",
-    "city": "Kota Jakarta Selatan",
-    "province": "DKI Jakarta",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Bakrie",
-    "code": "U-BAKRIE",
-    "acronym": "Bakrie",
-    "city": "Kota Jakarta Selatan",
-    "province": "DKI Jakarta",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Multimedia Nusantara",
-    "code": "UMN",
-    "acronym": "UMN",
-    "city": "Kabupaten Tangerang",
-    "province": "Banten",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Pelita Harapan",
-    "code": "UPH",
-    "acronym": "UPH",
-    "city": "Kabupaten Tangerang",
-    "province": "Banten",
-    "type": "PTS"
-  },
-  {
-    "name": "Swiss German University",
-    "code": "SGU",
-    "acronym": "SGU",
-    "city": "Kota Tangerang",
-    "province": "Banten",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Pamulang",
-    "code": "UNPAM",
-    "acronym": "UNPAM",
-    "city": "Kota Tangerang Selatan",
-    "province": "Banten",
-    "type": "PTS"
-  },
-  {
-    "name": "Institut Teknologi Bandung",
-    "code": "ITB",
-    "acronym": "ITB",
-    "city": "Kota Bandung",
-    "province": "Jawa Barat",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Padjadjaran",
-    "code": "UNPAD",
-    "acronym": "UNPAD",
-    "city": "Kabupaten Sumedang / Bandung",
-    "province": "Jawa Barat",
-    "type": "PTN"
-  },
-  {
-    "name": "Institut Pertanian Bogor",
-    "code": "IPB",
-    "acronym": "IPB University",
-    "city": "Kota Bogor",
-    "province": "Jawa Barat",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Pendidikan Indonesia",
-    "code": "UPI",
-    "acronym": "UPI",
-    "city": "Kota Bandung",
-    "province": "Jawa Barat",
-    "type": "PTN"
-  },
-  {
-    "name": "UIN Sunan Gunung Djati Bandung",
-    "code": "UIN-SGD",
-    "acronym": "UIN Bandung",
-    "city": "Kota Bandung",
-    "province": "Jawa Barat",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Bandung",
-    "code": "POLBAN",
-    "acronym": "POLBAN",
-    "city": "Kabupaten Bandung Barat",
-    "province": "Jawa Barat",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Manufaktur Bandung",
-    "code": "POLMAN",
-    "acronym": "POLMAN Bandung",
-    "city": "Kota Bandung",
-    "province": "Jawa Barat",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Singaperbangsa Karawang",
-    "code": "UNSIKA",
-    "acronym": "UNSIKA",
-    "city": "Kabupaten Karawang",
-    "province": "Jawa Barat",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Siliwangi",
-    "code": "UNSIL",
-    "acronym": "UNSIL",
-    "city": "Kota Tasikmalaya",
-    "province": "Jawa Barat",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Telkom",
-    "code": "TEL-U",
-    "acronym": "Telkom University",
-    "city": "Kabupaten Bandung",
-    "province": "Jawa Barat",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Katolik Parahyangan",
-    "code": "UNPAR",
-    "acronym": "UNPAR",
-    "city": "Kota Bandung",
-    "province": "Jawa Barat",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Kristen Maranatha",
-    "code": "UKM-BDG",
-    "acronym": "Maranatha",
-    "city": "Kota Bandung",
-    "province": "Jawa Barat",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Pasundan",
-    "code": "UNPAS",
-    "acronym": "UNPAS",
-    "city": "Kota Bandung",
-    "province": "Jawa Barat",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Islam Bandung",
-    "code": "UNISBA",
-    "acronym": "UNISBA",
-    "city": "Kota Bandung",
-    "province": "Jawa Barat",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Widyatama",
-    "code": "UTAMA",
-    "acronym": "Widyatama",
-    "city": "Kota Bandung",
-    "province": "Jawa Barat",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Komputer Indonesia",
-    "code": "UNIKOM",
-    "acronym": "UNIKOM",
-    "city": "Kota Bandung",
-    "province": "Jawa Barat",
-    "type": "PTS"
-  },
-  {
-    "name": "President University",
-    "code": "PRESUNIV",
-    "acronym": "President University",
-    "city": "Kabupaten Bekasi",
-    "province": "Jawa Barat",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Gadjah Mada",
-    "code": "UGM",
-    "acronym": "UGM",
-    "city": "Kabupaten Sleman / Yogyakarta",
-    "province": "D.I. Yogyakarta",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Negeri Yogyakarta",
-    "code": "UNY",
-    "acronym": "UNY",
-    "city": "Kota Yogyakarta",
-    "province": "D.I. Yogyakarta",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Pembangunan Nasional Veteran Yogyakarta",
-    "code": "UPN-YK",
-    "acronym": "UPN Jogja",
-    "city": "Kabupaten Sleman",
-    "province": "D.I. Yogyakarta",
-    "type": "PTN"
-  },
-  {
-    "name": "UIN Sunan Kalijaga Yogyakarta",
-    "code": "UIN-SUKA",
-    "acronym": "UIN Suka",
-    "city": "Kota Yogyakarta",
-    "province": "D.I. Yogyakarta",
-    "type": "PTN"
-  },
-  {
-    "name": "Institut Seni Indonesia Yogyakarta",
-    "code": "ISI-YK",
-    "acronym": "ISI Jogja",
-    "city": "Kabupaten Bantul",
-    "province": "D.I. Yogyakarta",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Islam Indonesia",
-    "code": "UII",
-    "acronym": "UII",
-    "city": "Kabupaten Sleman",
-    "province": "D.I. Yogyakarta",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Muhammadiyah Yogyakarta",
-    "code": "UMY",
-    "acronym": "UMY",
-    "city": "Kabupaten Bantul",
-    "province": "D.I. Yogyakarta",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Atma Jaya Yogyakarta",
-    "code": "UAJY",
-    "acronym": "Atma Jaya Jogja",
-    "city": "Kabupaten Sleman",
-    "province": "D.I. Yogyakarta",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Sanata Dharma",
-    "code": "USD",
-    "acronym": "Sanata Dharma",
-    "city": "Kabupaten Sleman",
-    "province": "D.I. Yogyakarta",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Ahmad Dahlan",
-    "code": "UAD",
-    "acronym": "UAD",
-    "city": "Kota Yogyakarta",
-    "province": "D.I. Yogyakarta",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas AMIKOM Yogyakarta",
-    "code": "AMIKOM",
-    "acronym": "AMIKOM",
-    "city": "Kabupaten Sleman",
-    "province": "D.I. Yogyakarta",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Diponegoro",
-    "code": "UNDIP",
-    "acronym": "UNDIP",
-    "city": "Kota Semarang",
-    "province": "Jawa Tengah",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Negeri Semarang",
-    "code": "UNNES",
-    "acronym": "UNNES",
-    "city": "Kota Semarang",
-    "province": "Jawa Tengah",
-    "type": "PTN"
-  },
-  {
-    "name": "UIN Walisongo Semarang",
-    "code": "UIN-WALISONGO",
-    "acronym": "UIN Walisongo",
-    "city": "Kota Semarang",
-    "province": "Jawa Tengah",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Semarang",
-    "code": "POLINES",
-    "acronym": "POLINES",
-    "city": "Kota Semarang",
-    "province": "Jawa Tengah",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Sebelas Maret",
-    "code": "UNS",
-    "acronym": "UNS",
-    "city": "Kota Surakarta",
-    "province": "Jawa Tengah",
-    "type": "PTN"
-  },
-  {
-    "name": "Institut Seni Indonesia Surakarta",
-    "code": "ISI-SKA",
-    "acronym": "ISI Solo",
-    "city": "Kota Surakarta",
-    "province": "Jawa Tengah",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Jenderal Soedirman",
-    "code": "UNSOED",
-    "acronym": "UNSOED",
-    "city": "Kabupaten Banyumas",
-    "province": "Jawa Tengah",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Tidar",
-    "code": "UNTIDAR",
-    "acronym": "UNTIDAR",
-    "city": "Kota Magelang",
-    "province": "Jawa Tengah",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Dian Nuswantoro",
-    "code": "UDINUS",
-    "acronym": "UDINUS",
-    "city": "Kota Semarang",
-    "province": "Jawa Tengah",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Islam Sultan Agung",
-    "code": "UNISSULA",
-    "acronym": "UNISSULA",
-    "city": "Kota Semarang",
-    "province": "Jawa Tengah",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Muhammadiyah Surakarta",
-    "code": "UMS",
-    "acronym": "UMS",
-    "city": "Kabupaten Sukoharjo / Solo",
-    "province": "Jawa Tengah",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Kristen Satya Wacana",
-    "code": "UKSW",
-    "acronym": "UKSW Salatiga",
-    "city": "Kota Salatiga",
-    "province": "Jawa Tengah",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Syiah Kuala",
-    "code": "USK",
-    "acronym": "USK",
-    "city": "Kota Banda Aceh",
-    "province": "Aceh",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Sumatera Utara",
-    "code": "USU",
-    "acronym": "USU",
-    "city": "Kota Medan",
-    "province": "Sumatera Utara",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Negeri Medan",
-    "code": "UNIMED",
-    "acronym": "UNIMED",
-    "city": "Kota Medan",
-    "province": "Sumatera Utara",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Medan",
-    "code": "POLMED",
-    "acronym": "POLMED",
-    "city": "Kota Medan",
-    "province": "Sumatera Utara",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Riau",
-    "code": "UNRI",
-    "acronym": "UNRI",
-    "city": "Kota Pekanbaru",
-    "province": "Riau",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Andalas",
-    "code": "UNAND",
-    "acronym": "UNAND",
-    "city": "Kota Padang",
-    "province": "Sumatera Barat",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Negeri Padang",
-    "code": "UNP",
-    "acronym": "UNP",
-    "city": "Kota Padang",
-    "province": "Sumatera Barat",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Sriwijaya",
-    "code": "UNSRI",
-    "acronym": "UNSRI",
-    "city": "Kota Palembang / Indralaya",
-    "province": "Sumatera Selatan",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Sriwijaya",
-    "code": "POLSRI",
-    "acronym": "POLSRI",
-    "city": "Kota Palembang",
-    "province": "Sumatera Selatan",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Lampung",
-    "code": "UNILA",
-    "acronym": "UNILA",
-    "city": "Kota Bandar Lampung",
-    "province": "Lampung",
-    "type": "PTN"
-  },
-  {
-    "name": "Institut Teknologi Sumatera",
-    "code": "ITERA",
-    "acronym": "ITERA",
-    "city": "Kabupaten Lampung Selatan",
-    "province": "Lampung",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Bengkulu",
-    "code": "UNIB",
-    "acronym": "UNIB",
-    "city": "Kota Bengkulu",
-    "province": "Bengkulu",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Jambi",
-    "code": "UNJA",
-    "acronym": "UNJA",
-    "city": "Kota Jambi",
-    "province": "Jambi",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Maritim Raja Ali Haji",
-    "code": "UMRAH",
-    "acronym": "UMRAH",
-    "city": "Kota Tanjungpinang",
-    "province": "Kepulauan Riau",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Batam",
-    "code": "POLIBATAM",
-    "acronym": "Polibatam",
-    "city": "Kota Batam",
-    "province": "Kepulauan Riau",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Udayana",
-    "code": "UNUD",
-    "acronym": "UNUD",
-    "city": "Kabupaten Badung / Denpasar",
-    "province": "Bali",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Pendidikan Ganesha",
-    "code": "UNDIKSHA",
-    "acronym": "UNDIKSHA",
-    "city": "Kabupaten Buleleng",
-    "province": "Bali",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Bali",
-    "code": "PNB",
-    "acronym": "PNB",
-    "city": "Kabupaten Badung",
-    "province": "Bali",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Mataram",
-    "code": "UNRAM",
-    "acronym": "UNRAM",
-    "city": "Kota Mataram",
-    "province": "Nusa Tenggara Barat",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Nusa Cendana",
-    "code": "UNDANA",
-    "acronym": "UNDANA",
-    "city": "Kota Kupang",
-    "province": "Nusa Tenggara Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Kupang",
-    "code": "PNK",
-    "acronym": "PNK",
-    "city": "Kota Kupang",
-    "province": "Nusa Tenggara Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Tanjungpura",
-    "code": "UNTAN",
-    "acronym": "UNTAN",
-    "city": "Kota Pontianak",
-    "province": "Kalimantan Barat",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Pontianak",
-    "code": "POLNEP",
-    "acronym": "POLNEP",
-    "city": "Kota Pontianak",
-    "province": "Kalimantan Barat",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Palangka Raya",
-    "code": "UPR",
-    "acronym": "UPR",
-    "city": "Kota Palangka Raya",
-    "province": "Kalimantan Tengah",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Lambung Mangkurat",
-    "code": "ULM",
-    "acronym": "ULM",
-    "city": "Kota Banjarmasin",
-    "province": "Kalimantan Selatan",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Banjarmasin",
-    "code": "POLIBAN",
-    "acronym": "POLIBAN",
-    "city": "Kota Banjarmasin",
-    "province": "Kalimantan Selatan",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Mulawarman",
-    "code": "UNMUL",
-    "acronym": "UNMUL",
-    "city": "Kota Samarinda",
-    "province": "Kalimantan Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Samarinda",
-    "code": "POLNES",
-    "acronym": "POLNES",
-    "city": "Kota Samarinda",
-    "province": "Kalimantan Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Institut Teknologi Kalimantan",
-    "code": "ITK",
-    "acronym": "ITK",
-    "city": "Kota Balikpapan",
-    "province": "Kalimantan Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Balikpapan",
-    "code": "POLTEKBA",
-    "acronym": "POLTEKBA",
-    "city": "Kota Balikpapan",
-    "province": "Kalimantan Timur",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Borneo Tarakan",
-    "code": "UBT",
-    "acronym": "UBT",
-    "city": "Kota Tarakan",
-    "province": "Kalimantan Utara",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Hasanuddin",
-    "code": "UNHAS",
-    "acronym": "UNHAS",
-    "city": "Kota Makassar",
-    "province": "Sulawesi Selatan",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Negeri Makassar",
-    "code": "UNM",
-    "acronym": "UNM",
-    "city": "Kota Makassar",
-    "province": "Sulawesi Selatan",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Ujung Pandang",
-    "code": "PNUP",
-    "acronym": "PNUP",
-    "city": "Kota Makassar",
-    "province": "Sulawesi Selatan",
-    "type": "PTN"
-  },
-  {
-    "name": "UIN Alauddin Makassar",
-    "code": "UIN-ALAUDDIN",
-    "acronym": "UIN Alauddin",
-    "city": "Kabupaten Gowa / Makassar",
-    "province": "Sulawesi Selatan",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Muslim Indonesia",
-    "code": "UMI",
-    "acronym": "UMI Makassar",
-    "city": "Kota Makassar",
-    "province": "Sulawesi Selatan",
-    "type": "PTS"
-  },
-  {
-    "name": "Universitas Sam Ratulangi",
-    "code": "UNSRAT",
-    "acronym": "UNSRAT",
-    "city": "Kota Manado",
-    "province": "Sulawesi Utara",
-    "type": "PTN"
-  },
-  {
-    "name": "Politeknik Negeri Manado",
-    "code": "POLIMDO",
-    "acronym": "POLIMDO",
-    "city": "Kota Manado",
-    "province": "Sulawesi Utara",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Tadulako",
-    "code": "UNTAD",
-    "acronym": "UNTAD",
-    "city": "Kota Palu",
-    "province": "Sulawesi Tengah",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Halu Oleo",
-    "code": "UHO",
-    "acronym": "UHO",
-    "city": "Kota Kendari",
-    "province": "Sulawesi Tenggara",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Negeri Gorontalo",
-    "code": "UNG",
-    "acronym": "UNG",
-    "city": "Kota Gorontalo",
-    "province": "Gorontalo",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Sulawesi Barat",
-    "code": "UNSULBAR",
-    "acronym": "UNSULBAR",
-    "city": "Kabupaten Majene",
-    "province": "Sulawesi Barat",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Pattimura",
-    "code": "UNPATTI",
-    "acronym": "UNPATTI",
-    "city": "Kota Ambon",
-    "province": "Maluku",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Khairun",
-    "code": "UNKHAIR",
-    "acronym": "UNKHAIR",
-    "city": "Kota Ternate",
-    "province": "Maluku Utara",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Cenderawasih",
-    "code": "UNCEN",
-    "acronym": "UNCEN",
-    "city": "Kota Jayapura",
-    "province": "Papua",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Papua",
-    "code": "UNIPA-PAPUA",
-    "acronym": "UNIPA Papua",
-    "city": "Kabupaten Manokwari",
-    "province": "Papua Barat",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Musamus Merauke",
-    "code": "UNMUS",
-    "acronym": "UNMUS",
-    "city": "Kabupaten Merauke",
-    "province": "Papua Selatan",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Terbuka",
-    "code": "UT",
-    "acronym": "UT",
-    "city": "Kota Tangerang Selatan",
-    "province": "Banten",
-    "type": "PTN"
-  },
-  {
-    "name": "Universitas Nusa Putra",
-    "code": "UNP-146",
-    "acronym": "UNP",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "https://nusaputra.ac.id/"
-  },
-  {
-    "name": "Akademi Farmasi Mitra Sehat Mandiri Sidoarjo",
-    "code": "AFMSMS-147",
-    "acronym": "AFMSMS",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.akfarmitseda.ac.id/"
-  },
-  {
-    "name": "Institut Sains & Teknologi Akprind",
-    "code": "ISTA-148",
-    "acronym": "ISTA",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.akprind.ac.id/"
-  },
-  {
-    "name": "STMIK AMIKOM Yogyakarta",
-    "code": "SAY-149",
-    "acronym": "SAY",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.amikom.ac.id/"
-  },
-  {
-    "name": "STIKES RS Anwar Medika",
-    "code": "SAM-150",
-    "acronym": "SAM",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.stikesrsanwarmedika.ac.id/"
-  },
-  {
-    "name": "Binus University",
-    "code": "BU-151",
-    "acronym": "BU",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.binus.ac.id/"
-  },
-  {
-    "name": "STIKES Bina Sehat PPNI Mojokerto",
-    "code": "SBSPM-152",
-    "acronym": "SBSPM",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.stikes-ppni.ac.id/"
-  },
-  {
-    "name": "Universitas Bung Hatta",
-    "code": "UBH-153",
-    "acronym": "UBH",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.bunghatta.ac.id/"
-  },
-  {
-    "name": "Universitas Ibn Chaldun Jakarta",
-    "code": "UICJ-154",
-    "acronym": "UICJ",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.ibnuchaldun.ac.id/"
-  },
-  {
-    "name": "Universitas Indonusa Esa Unggul",
-    "code": "UIEU-155",
-    "acronym": "UIEU",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.indonusa.ac.id/"
-  },
-  {
-    "name": "Bogor Agricultural University",
-    "code": "BAU-156",
-    "acronym": "BAU",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.ipb.ac.id/"
-  },
-  {
-    "name": "Institut Sains dan Teknologi Al Kamal",
-    "code": "ISDTK-157",
-    "acronym": "ISDTK",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.ista.ac.id/"
-  },
-  {
-    "name": "Institut Teknologi Adhi Tama Surabaya",
-    "code": "ITATS-158",
-    "acronym": "ITATS",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.itats.ac.id/"
-  },
-  {
-    "name": "Universitas Janabadra",
-    "code": "UJ-159",
-    "acronym": "UJ",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.janabadra.ac.id/"
-  },
-  {
-    "name": "Universitas Jayabaya",
-    "code": "UJ-160",
-    "acronym": "UJ",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.jayabaya.ac.id/"
-  },
-  {
-    "name": "Universitas Ma Chung",
-    "code": "UC-161",
-    "acronym": "UC",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.machung.ac.id/"
-  },
-  {
-    "name": "Universitas Maarif Hasyim Latif",
-    "code": "UMHL-162",
-    "acronym": "UMHL",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.umaha.ac.id/"
-  },
-  {
-    "name": "Universitas Mahendradatta",
-    "code": "UM-163",
-    "acronym": "UM",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.mahendradatta.org/"
-  },
-  {
-    "name": "Universitas Dr. R. Moestopo",
-    "code": "UDM-164",
-    "acronym": "UDM",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.moestopo.ac.id/"
-  },
-  {
-    "name": "Universitas HKBP Nommensen",
-    "code": "UHN-165",
-    "acronym": "UHN",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.nommensen.org/"
-  },
-  {
-    "name": "Universitas Pembangunan Panca Budi",
-    "code": "UPPB-166",
-    "acronym": "UPPB",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.pancabudi.ac.id/"
-  },
-  {
-    "name": "Universitas Paramadina Mulya",
-    "code": "UPM-167",
-    "acronym": "UPM",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.paramadina.ac.id/"
-  },
-  {
-    "name": "Universitas Nasional Pasim",
-    "code": "UNP-168",
-    "acronym": "UNP",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.pasim.ac.id/"
-  },
-  {
-    "name": "STIE Perbanas",
-    "code": "SP-169",
-    "acronym": "SP",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.perbanas.ac.id/"
-  },
-  {
-    "name": "Perbanas Institute",
-    "code": "PI-170",
-    "acronym": "PI",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://perbanas.id/"
-  },
-  {
-    "name": "Prasetiya Mulya Business School",
-    "code": "PMBS-171",
-    "acronym": "PMBS",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.pmbs.ac.id/"
-  },
-  {
-    "name": "Politeknik Negeri Lhokseumawe",
-    "code": "PNL-172",
-    "acronym": "PNL",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTN",
-    "website": "http://www.pnl.ac.id/"
-  },
-  {
-    "name": "Politeknik Negeri Padang",
-    "code": "PNP-173",
-    "acronym": "PNP",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTN",
-    "website": "http://www.polinpdg.ac.id/"
-  },
-  {
-    "name": "Politeknik Pos Indonesia",
-    "code": "PPI-174",
-    "acronym": "PPI",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.poltekpos.ac.id/"
-  },
-  {
-    "name": "Politeknik Negeri Sambas",
-    "code": "PNS-175",
-    "acronym": "PNS",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTN",
-    "website": "http://www.poltesa.ac.id/"
-  },
-  {
-    "name": "Universitas Putera Batam",
-    "code": "UPB-176",
-    "acronym": "UPB",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.puterabatam.ac.id/"
-  },
-  {
-    "name": "Universitas Sarjanawiyata Tamansiswa",
-    "code": "UST-177",
-    "acronym": "UST",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.sarjanawiyata.ac.id/"
-  },
-  {
-    "name": "STMIK Sinar Nusantara",
-    "code": "SSN-178",
-    "acronym": "SSN",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.sinus.ac.id/"
-  },
-  {
-    "name": "Sekolah Tinggi Akuntansi Negara (STAN)",
-    "code": "STAN(-179",
-    "acronym": "STAN(",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.stan.ac.id/"
-  },
-  {
-    "name": "Trisakti Institute of Tourism",
-    "code": "TIT-180",
-    "acronym": "TIT",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.stptrisakti.ac.id/"
-  },
-  {
-    "name": "Universitas Klabat",
-    "code": "UK-181",
-    "acronym": "UK",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unklab.ac.id/"
-  },
-  {
-    "name": "Universitas Bhayangkara Jakarta Raya",
-    "code": "UBJR-182",
-    "acronym": "UBJR",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.ubharajaya.ac.id/"
-  },
-  {
-    "name": "Universitas Bunda Mulia Jakarta",
-    "code": "UBMJ-183",
-    "acronym": "UBMJ",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.ubm.ac.id/"
-  },
-  {
-    "name": "Universitas Darma Agung",
-    "code": "UDA-184",
-    "acronym": "UDA",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.uda.ac.id/"
-  },
-  {
-    "name": "Universitas Ibn Khaldun Bogor",
-    "code": "UIKB-185",
-    "acronym": "UIKB",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.uika-bogor.ac.id/"
-  },
-  {
-    "name": "Universitas Islam Jakarta",
-    "code": "UIJ-186",
-    "acronym": "UIJ",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.uinjkt.ac.id/"
-  },
-  {
-    "name": "Universitas Islam Riau",
-    "code": "UIR-187",
-    "acronym": "UIR",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.uir.ac.id/"
-  },
-  {
-    "name": "Universitas Islam Sumatera Utara",
-    "code": "UISU-188",
-    "acronym": "UISU",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.uisu.ac.id/"
-  },
-  {
-    "name": "Universitas Kristen Duta Wacana",
-    "code": "UKDW-189",
-    "acronym": "UKDW",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.ukdw.ac.id/"
-  },
-  {
-    "name": "Universitas Kristen Indonesia",
-    "code": "UKI-190",
-    "acronym": "UKI",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.uki.ac.id/"
-  },
-  {
-    "name": "Universitas Kristen Indonesia Tomohon",
-    "code": "UKIT-191",
-    "acronym": "UKIT",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.ukit-tomohon.org/"
-  },
-  {
-    "name": "Universitas Kristen Krida Wacana",
-    "code": "UKKW-192",
-    "acronym": "UKKW",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.ukrida.ac.id/"
-  },
-  {
-    "name": "Universitas Methodist Indonesia",
-    "code": "UMI-193",
-    "acronym": "UMI",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.umi-mdn.edu/"
-  },
-  {
-    "name": "Universitas Muhammadiyah Jakarta",
-    "code": "UMJ-194",
-    "acronym": "UMJ",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.umj.ac.id/"
-  },
-  {
-    "name": "Universitas Muria Kudus",
-    "code": "UMK-195",
-    "acronym": "UMK",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.umk.ac.id/"
-  },
-  {
-    "name": "Universitas Muhammadiyah Magelang",
-    "code": "UMM-196",
-    "acronym": "UMM",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.ummgl.ac.id/"
-  },
-  {
-    "name": "Universitas Muhammadiyah Sumatra Utara",
-    "code": "UMSU-197",
-    "acronym": "UMSU",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.umsu.ac.id/"
-  },
-  {
-    "name": "Universitas Advent Indonesia",
-    "code": "UAI-198",
-    "acronym": "UAI",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unai.edu/"
-  },
-  {
-    "name": "Universitas Nasional Jakarta",
-    "code": "UNJ-199",
-    "acronym": "UNJ",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unas.ac.id/"
-  },
-  {
-    "name": "Universitas Amir Hamzah",
-    "code": "UAH-200",
-    "acronym": "UAH",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unhamzah.ac.id/"
-  },
-  {
-    "name": "Universitas Bojonegoro",
-    "code": "UB-201",
-    "acronym": "UB",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unigoro.ac.id/"
-  },
-  {
-    "name": "Universitas Katolik Soegijapranoto",
-    "code": "UKS-202",
-    "acronym": "UKS",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unika.ac.id/"
-  },
-  {
-    "name": "Universitas Pekalongan",
-    "code": "UP-203",
-    "acronym": "UP",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unikal.ac.id/"
-  },
-  {
-    "name": "Universitas Kediri",
-    "code": "UK-204",
-    "acronym": "UK",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unik-kediri.ac.id/"
-  },
-  {
-    "name": "Universitas Lancang Kuning",
-    "code": "ULK-205",
-    "acronym": "ULK",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://unilak.ac.id/"
-  },
-  {
-    "name": "Universitas Negeri Manado",
-    "code": "UNM-206",
-    "acronym": "UNM",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTN",
-    "website": "http://www.unima.ac.id/"
-  },
-  {
-    "name": "Universitas Islam Nusantara",
-    "code": "UIN-207",
-    "acronym": "UIN",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.uninus.ac.id/"
-  },
-  {
-    "name": "Universitas Pesantren Darul Ulum Jombang",
-    "code": "UPDUJ-208",
-    "acronym": "UPDUJ",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unipdu.ac.id/"
-  },
-  {
-    "name": "Universitas Madura",
-    "code": "UM-209",
-    "acronym": "UM",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unira.ac.id/"
-  },
-  {
-    "name": "Universitas Muhammadiyah Makassar",
-    "code": "UMM-210",
-    "acronym": "UMM",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unismuh.ac.id/"
-  },
-  {
-    "name": "Universitas Slamet Riyadi Surakarta",
-    "code": "USRS-211",
-    "acronym": "USRS",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unisri.ac.id/"
-  },
-  {
-    "name": "Universitas Islam Syekh-Yusuf",
-    "code": "UIS-212",
-    "acronym": "UIS",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unistangerang.ac.id/"
-  },
-  {
-    "name": "Unitomo Surabaya",
-    "code": "US-213",
-    "acronym": "US",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unitomo.ac.id/"
-  },
-  {
-    "name": "Universitas Trilogi",
-    "code": "UT-214",
-    "acronym": "UT",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.universitas-trilogi.ac.id/"
-  },
-  {
-    "name": "Universitas Jenderal Achmad Yani",
-    "code": "UJAY-215",
-    "acronym": "UJAY",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unjani.ac.id/"
-  },
-  {
-    "name": "Universitas Krisnadwipayana",
-    "code": "UK-216",
-    "acronym": "UK",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unkris.ac.id/"
-  },
-  {
-    "name": "Universitas Mahasaraswati Denpasar",
-    "code": "UMD-217",
-    "acronym": "UMD",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unmas.org/"
-  },
-  {
-    "name": "Universitas Merdeka Madiun",
-    "code": "UMM-218",
-    "acronym": "UMM",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unmer-madiun.ac.id/"
-  },
-  {
-    "name": "Universitas Muhammadiyah Jember",
-    "code": "UMJ-219",
-    "acronym": "UMJ",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unmuhjember.ac.id/"
-  },
-  {
-    "name": "Universitas Muhammadiyah Mataram",
-    "code": "UMM-220",
-    "acronym": "UMM",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unmuhmataram.com/"
-  },
-  {
-    "name": "STMIK Widya Cipta Dharma",
-    "code": "SWCD-221",
-    "acronym": "SWCD",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.wicida.ac.id/"
-  },
-  {
-    "name": "Universitas Pakuan",
-    "code": "UP-222",
-    "acronym": "UP",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unpak.ac.id/"
-  },
-  {
-    "name": "Universitas Ngurah Rai",
-    "code": "UNR-223",
-    "acronym": "UNR",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unr.ac.id/"
-  },
-  {
-    "name": "Universitas Darma Persada",
-    "code": "UDP-224",
-    "acronym": "UDP",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unsada.ac.id/"
-  },
-  {
-    "name": "Universitas Swadaya Gunung Djati",
-    "code": "USGD-225",
-    "acronym": "USGD",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unswagati-crb.ac.id/"
-  },
-  {
-    "name": "Universitas 17 Agustus 1945 Banyuwangi",
-    "code": "UA1B-226",
-    "acronym": "UA1B",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.untag-banyuwangi.ac.id/"
-  },
-  {
-    "name": "Universitas 17 Agustus 1945 Cirebon",
-    "code": "UA1C-227",
-    "acronym": "UA1C",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.untagcirebon.info/"
-  },
-  {
-    "name": "Universitas 17 Agustus 1945 Jakarta",
-    "code": "UA1J-228",
-    "acronym": "UA1J",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.untag-jkt.org/"
-  },
-  {
-    "name": "Universitas 17 Agustus 1945 Samarinda",
-    "code": "UA1S-229",
-    "acronym": "UA1S",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.untag-smd.ac.id/"
-  },
-  {
-    "name": "Universitas 17 Agustus 1945 Semarang",
-    "code": "UA1S-230",
-    "acronym": "UA1S",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.untagsmg.ac.id/"
-  },
-  {
-    "name": "Universitas Wijaya Kusuma Purwokerto",
-    "code": "UWKP-231",
-    "acronym": "UWKP",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.unwiku.ac.id/"
-  },
-  {
-    "name": "Universitas Proklamasi 45",
-    "code": "UP-232",
-    "acronym": "UP",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.up45.ac.id/"
-  },
-  {
-    "name": "Universitas Pancasakti Tegal",
-    "code": "UPT-233",
-    "acronym": "UPT",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.upstegal.ac.id/"
-  },
-  {
-    "name": "Universitas Simalungun",
-    "code": "US-234",
-    "acronym": "US",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.usi.ac.id/"
-  },
-  {
-    "name": "Universitas Semarang",
-    "code": "US-235",
-    "acronym": "US",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.usm.ac.id/"
-  },
-  {
-    "name": "Universitas Terbuka Indonesia",
-    "code": "UTI-236",
-    "acronym": "UTI",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.ut.ac.id/"
-  },
-  {
-    "name": "Universitas Tidar Magelang",
-    "code": "UTM-237",
-    "acronym": "UTM",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.untidar.ac.id/"
-  },
-  {
-    "name": "Universitas Tunas Pembangunan",
-    "code": "UTP-238",
-    "acronym": "UTP",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.utp.ac.id/"
-  },
-  {
-    "name": "Universitas Widya Gama Malang",
-    "code": "UWGM-239",
-    "acronym": "UWGM",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.widyagama.ac.id/"
-  },
-  {
-    "name": "Universitas Katolik Widya Karya",
-    "code": "UKWK-240",
-    "acronym": "UKWK",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.widyakarya.ac.id/"
-  },
-  {
-    "name": "Universitas Katolik Widya Manadala",
-    "code": "UKWM-241",
-    "acronym": "UKWM",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.wima.ac.id/"
-  },
-  {
-    "name": "Universitas Wisnuwardhana",
-    "code": "UW-242",
-    "acronym": "UW",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.wisnuwardhana.ac.id/"
-  },
-  {
-    "name": "Universitas Persada Indonesia Y.A.I",
-    "code": "UPIY-243",
-    "acronym": "UPIY",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.yai.ac.id/"
-  },
-  {
-    "name": "Universitas Yarsi",
-    "code": "UY-244",
-    "acronym": "UY",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "http://www.yarsi.ac.id/"
-  },
-  {
-    "name": "Duta Bangsa University",
-    "code": "DBU-245",
-    "acronym": "DBU",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "https://udb.ac.id/"
-  },
-  {
-    "name": "Akademi Farmasi Yarsis Pekanbaru",
-    "code": "AFYP-246",
-    "acronym": "AFYP",
-    "city": "Indonesia",
-    "province": "Indonesia",
-    "type": "PTS",
-    "website": "https://akfaryarsiptk.ac.id/"
-  },
-  {
-    "name": "STMIK Adhi Guna",
-    "code": "SAG-247",
-    "acronym": "SAG",
-    "city": "Central Sulawesi",
-    "province": "Central Sulawesi",
-    "type": "PTS",
-    "website": "https://stmikadhiguna.ac.id/"
-  },
-  {
-    "name": "UIN Datokarama Palu",
-    "code": "UDP-248",
-    "acronym": "UDP",
-    "city": "Central Sulawesi",
-    "province": "Central Sulawesi",
-    "type": "PTS",
-    "website": "https://uindatokarama.ac.id/"
-  },
-  {
-    "name": "Universitas Alkhairaat",
-    "code": "UA-249",
-    "acronym": "UA",
-    "city": "Central Sulawesi",
-    "province": "Central Sulawesi",
-    "type": "PTS",
-    "website": "https://unisapalu.ac.id/"
-  },
-  {
-    "name": "Universitas Muhammadiyah Palu",
-    "code": "UMP-250",
-    "acronym": "UMP",
-    "city": "Central Sulawesi",
-    "province": "Central Sulawesi",
-    "type": "PTS",
-    "website": "https://unismuhpalu.ac.id/"
-  },
-  {
-    "name": "Universitas Sintuwu Maroso",
-    "code": "USM-251",
-    "acronym": "USM",
-    "city": "Central Sulawesi",
-    "province": "Central Sulawesi",
-    "type": "PTS",
-    "website": "https://unsimar.ac.id/"
-  }
+    {
+        "name": "Universitas Negeri Surabaya",
+        "code": "UNESA",
+        "acronym": "UNESA",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTN",
+        "logo": "images/logos/unesa.png"
+    },
+    {
+        "name": "Universitas Airlangga",
+        "code": "UNAIR",
+        "acronym": "UNAIR",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTN",
+        "logo": "images/logos/unair.png"
+    },
+    {
+        "name": "Institut Teknologi Sepuluh Nopember",
+        "code": "ITS",
+        "acronym": "ITS",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTN",
+        "logo": "images/logos/its.png"
+    },
+    {
+        "name": "Universitas Pembangunan Nasional Veteran Jawa Timur",
+        "code": "UPN-JATIM",
+        "acronym": "UPN Jatim",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTN",
+        "logo": "images/logos/upnjatim.png"
+    },
+    {
+        "name": "Politeknik Elektronika Negeri Surabaya",
+        "code": "PENS",
+        "acronym": "PENS",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTN",
+        "logo": "images/logos/pens.png"
+    },
+    {
+        "name": "Politeknik Perkapalan Negeri Surabaya",
+        "code": "PPNS",
+        "acronym": "PPNS",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTN",
+        "logo": "images/logos/ppns.png"
+    },
+    {
+        "name": "UIN Sunan Ampel Surabaya",
+        "code": "UINSA",
+        "acronym": "UINSA",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTN",
+        "logo": "images/logos/uinsa.png"
+    },
+    {
+        "name": "Poltekkes Kemenkes Surabaya",
+        "code": "POLTEKKES-SBY",
+        "acronym": "Poltekkes Surabaya",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTN",
+        "logo": "images/logos/poltekkes-sby.png"
+    },
+    {
+        "name": "Universitas Brawijaya",
+        "code": "UB",
+        "acronym": "UB",
+        "city": "Kota Malang",
+        "province": "Jawa Timur",
+        "type": "PTN",
+        "logo": "images/logos/ub.png"
+    },
+    {
+        "name": "Universitas Negeri Malang",
+        "code": "UM",
+        "acronym": "UM",
+        "city": "Kota Malang",
+        "province": "Jawa Timur",
+        "type": "PTN",
+        "logo": "images/logos/um.png"
+    },
+    {
+        "name": "Politeknik Negeri Malang",
+        "code": "POLINEMA",
+        "acronym": "POLINEMA",
+        "city": "Kota Malang",
+        "province": "Jawa Timur",
+        "type": "PTN",
+        "logo": "images/logos/polinema.svg"
+    },
+    {
+        "name": "UIN Maulana Malik Ibrahim Malang",
+        "code": "UIN-MALANG",
+        "acronym": "UIN Malang",
+        "city": "Kota Malang",
+        "province": "Jawa Timur",
+        "type": "PTN",
+        "logo": "images/logos/uin-malang.svg"
+    },
+    {
+        "name": "Universitas Jember",
+        "code": "UNEJ",
+        "acronym": "UNEJ",
+        "city": "Kabupaten Jember",
+        "province": "Jawa Timur",
+        "type": "PTN",
+        "logo": "images/logos/unej.png"
+    },
+    {
+        "name": "Politeknik Negeri Jember",
+        "code": "POLIJE",
+        "acronym": "POLIJE",
+        "city": "Kabupaten Jember",
+        "province": "Jawa Timur",
+        "type": "PTN",
+        "logo": "images/logos/polije.svg"
+    },
+    {
+        "name": "Universitas Trunojoyo Madura",
+        "code": "UTM",
+        "acronym": "UTM",
+        "city": "Kabupaten Bangkalan",
+        "province": "Jawa Timur",
+        "type": "PTN",
+        "logo": "images/logos/utm.svg"
+    },
+    {
+        "name": "Politeknik Negeri Madura",
+        "code": "POLTERA",
+        "acronym": "POLTERA",
+        "city": "Kabupaten Sampang",
+        "province": "Jawa Timur",
+        "type": "PTN",
+        "logo": "images/logos/poltera.svg"
+    },
+    {
+        "name": "Universitas Kristen Petra",
+        "code": "UKP",
+        "acronym": "UK Petra",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/petra.png"
+    },
+    {
+        "name": "Universitas Surabaya",
+        "code": "UBAYA",
+        "acronym": "UBAYA",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/ubaya.png"
+    },
+    {
+        "name": "Universitas Ciputra Surabaya",
+        "code": "UC",
+        "acronym": "UC",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/ciputra.png"
+    },
+    {
+        "name": "Universitas Katolik Widya Mandala Surabaya",
+        "code": "UKWMS",
+        "acronym": "UKWMS",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/ukwms.png"
+    },
+    {
+        "name": "Universitas 17 Agustus 1945 Surabaya",
+        "code": "UNTAG-SBY",
+        "acronym": "UNTAG Surabaya",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/untag-sby.png"
+    },
+    {
+        "name": "Universitas Narotama",
+        "code": "UNNAR",
+        "acronym": "Narotama",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/narotama.png"
+    },
+    {
+        "name": "Universitas Muhammadiyah Surabaya",
+        "code": "UM-SURABAYA",
+        "acronym": "UM Surabaya",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/um-surabaya.png"
+    },
+    {
+        "name": "Universitas Bhayangkara Surabaya",
+        "code": "UBHARA-SBY",
+        "acronym": "Ubhara Surabaya",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/ubhara.png"
+    },
+    {
+        "name": "Universitas Wijaya Kusuma Surabaya",
+        "code": "UWKS",
+        "acronym": "UWKS",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/uwks.png"
+    },
+    {
+        "name": "Universitas Dinamika (STIKOM Surabaya)",
+        "code": "UNDIKA",
+        "acronym": "UNDIKA",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/dinamika.png"
+    },
+    {
+        "name": "Universitas Hang Tuah",
+        "code": "UHT",
+        "acronym": "UHT",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/hangtuah.png"
+    },
+    {
+        "name": "Universitas Dr. Soetomo",
+        "code": "UNITOMO",
+        "acronym": "UNITOMO",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/unitomo.png"
+    },
+    {
+        "name": "Universitas Nahdlatul Ulama Surabaya",
+        "code": "UNUSA",
+        "acronym": "UNUSA",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/unusa.png"
+    },
+    {
+        "name": "Universitas PGRI Adi Buana Surabaya",
+        "code": "UNIPA-SBY",
+        "acronym": "UNIPA Surabaya",
+        "city": "Kota Surabaya",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/unipasby.png"
+    },
+    {
+        "name": "Universitas Muhammadiyah Malang",
+        "code": "UMM",
+        "acronym": "UMM",
+        "city": "Kota Malang",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/umm.svg"
+    },
+    {
+        "name": "Universitas Islam Malang",
+        "code": "UNISMA",
+        "acronym": "UNISMA",
+        "city": "Kota Malang",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/unisma.svg"
+    },
+    {
+        "name": "Universitas Merdeka Malang",
+        "code": "UNMER",
+        "acronym": "UNMER",
+        "city": "Kota Malang",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/unmer.svg"
+    },
+    {
+        "name": "Institut Teknologi Nasional Malang",
+        "code": "ITN-MALANG",
+        "acronym": "ITN Malang",
+        "city": "Kota Malang",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/itn.svg"
+    },
+    {
+        "name": "Universitas Muhammadiyah Sidoarjo",
+        "code": "UMSIDA",
+        "acronym": "UMSIDA",
+        "city": "Kabupaten Sidoarjo",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/umsida.svg"
+    },
+    {
+        "name": "Universitas Muhammadiyah Gresik",
+        "code": "UMG",
+        "acronym": "UMG",
+        "city": "Kabupaten Gresik",
+        "province": "Jawa Timur",
+        "type": "PTS",
+        "logo": "images/logos/umg.svg"
+    },
+    {
+        "name": "Universitas Indonesia",
+        "code": "UI",
+        "acronym": "UI",
+        "city": "Kota Depok / Jakarta",
+        "province": "DKI Jakarta",
+        "type": "PTN",
+        "logo": "images/logos/ui.png"
+    },
+    {
+        "name": "Universitas Negeri Jakarta",
+        "code": "UNJ",
+        "acronym": "UNJ",
+        "city": "Kota Jakarta Timur",
+        "province": "DKI Jakarta",
+        "type": "PTN",
+        "logo": "images/logos/unj.svg"
+    },
+    {
+        "name": "UIN Syarif Hidayatullah Jakarta",
+        "code": "UIN-JKT",
+        "acronym": "UIN Jakarta",
+        "city": "Kota Tangerang Selatan",
+        "province": "Banten",
+        "type": "PTN",
+        "logo": "images/logos/uin-jakarta.svg"
+    },
+    {
+        "name": "Universitas Pembangunan Nasional Veteran Jakarta",
+        "code": "UPN-VJ",
+        "acronym": "UPN Jakarta",
+        "city": "Kota Jakarta Selatan",
+        "province": "DKI Jakarta",
+        "type": "PTN",
+        "logo": "images/logos/upnvj.png"
+    },
+    {
+        "name": "Politeknik Negeri Jakarta",
+        "code": "PNJ",
+        "acronym": "PNJ",
+        "city": "Kota Depok",
+        "province": "Jawa Barat",
+        "type": "PTN",
+        "logo": "images/logos/pnj.svg"
+    },
+    {
+        "name": "Politeknik Negeri Media Kreatif",
+        "code": "POLIMEDIA",
+        "acronym": "Polimedia",
+        "city": "Kota Jakarta Selatan",
+        "province": "DKI Jakarta",
+        "type": "PTN",
+        "logo": "images/logos/polimedia.svg"
+    },
+    {
+        "name": "Universitas Sultan Ageng Tirtayasa",
+        "code": "UNTIRTA",
+        "acronym": "UNTIRTA",
+        "city": "Kota Serang",
+        "province": "Banten",
+        "type": "PTN",
+        "logo": "images/logos/untirta.svg"
+    },
+    {
+        "name": "Universitas Bina Nusantara",
+        "code": "BINUS",
+        "acronym": "BINUS",
+        "city": "Kota Jakarta Barat",
+        "province": "DKI Jakarta",
+        "type": "PTS",
+        "logo": "images/logos/binus.svg"
+    },
+    {
+        "name": "Universitas Trisakti",
+        "code": "USAKTI",
+        "acronym": "Trisakti",
+        "city": "Kota Jakarta Barat",
+        "province": "DKI Jakarta",
+        "type": "PTS",
+        "logo": "images/logos/trisakti.svg"
+    },
+    {
+        "name": "Universitas Tarumanagara",
+        "code": "UNTAR",
+        "acronym": "UNTAR",
+        "city": "Kota Jakarta Barat",
+        "province": "DKI Jakarta",
+        "type": "PTS",
+        "logo": "images/logos/untar.svg"
+    },
+    {
+        "name": "Universitas Katolik Indonesia Atma Jaya",
+        "code": "UNIKA-ATMAJAYA",
+        "acronym": "Atma Jaya Jakarta",
+        "city": "Kota Jakarta Selatan",
+        "province": "DKI Jakarta",
+        "type": "PTS",
+        "logo": "images/logos/atmajaya.svg"
+    },
+    {
+        "name": "Universitas Mercu Buana",
+        "code": "UMB",
+        "acronym": "Mercu Buana",
+        "city": "Kota Jakarta Barat",
+        "province": "DKI Jakarta",
+        "type": "PTS",
+        "logo": "images/logos/mercubuana.svg"
+    },
+    {
+        "name": "Universitas Gunadarma",
+        "code": "UG",
+        "acronym": "Gunadarma",
+        "city": "Kota Depok / Jakarta",
+        "province": "Jawa Barat",
+        "type": "PTS",
+        "logo": "images/logos/gunadarma.svg"
+    },
+    {
+        "name": "Universitas Muhammadiyah Prof. Dr. HAMKA",
+        "code": "UHAMKA",
+        "acronym": "UHAMKA",
+        "city": "Kota Jakarta Timur",
+        "province": "DKI Jakarta",
+        "type": "PTS",
+        "logo": "images/logos/uhamka.svg"
+    },
+    {
+        "name": "Universitas Al-Azhar Indonesia",
+        "code": "UAI",
+        "acronym": "UAI",
+        "city": "Kota Jakarta Selatan",
+        "province": "DKI Jakarta",
+        "type": "PTS",
+        "logo": "images/logos/uai.svg"
+    },
+    {
+        "name": "Universitas Pancasila",
+        "code": "UP",
+        "acronym": "Pancasila",
+        "city": "Kota Jakarta Selatan",
+        "province": "DKI Jakarta",
+        "type": "PTS",
+        "logo": "images/logos/pancasila.svg"
+    },
+    {
+        "name": "Universitas Bakrie",
+        "code": "U-BAKRIE",
+        "acronym": "Bakrie",
+        "city": "Kota Jakarta Selatan",
+        "province": "DKI Jakarta",
+        "type": "PTS",
+        "logo": "images/logos/bakrie.svg"
+    },
+    {
+        "name": "Universitas Multimedia Nusantara",
+        "code": "UMN",
+        "acronym": "UMN",
+        "city": "Kabupaten Tangerang",
+        "province": "Banten",
+        "type": "PTS",
+        "logo": "images/logos/umn.svg"
+    },
+    {
+        "name": "Universitas Pelita Harapan",
+        "code": "UPH",
+        "acronym": "UPH",
+        "city": "Kabupaten Tangerang",
+        "province": "Banten",
+        "type": "PTS",
+        "logo": "images/logos/uph.png"
+    },
+    {
+        "name": "Swiss German University",
+        "code": "SGU",
+        "acronym": "SGU",
+        "city": "Kota Tangerang",
+        "province": "Banten",
+        "type": "PTS",
+        "logo": "images/logos/sgu.svg"
+    },
+    {
+        "name": "Universitas Pamulang",
+        "code": "UNPAM",
+        "acronym": "UNPAM",
+        "city": "Kota Tangerang Selatan",
+        "province": "Banten",
+        "type": "PTS",
+        "logo": "images/logos/unpam.svg"
+    },
+    {
+        "name": "Institut Teknologi Bandung",
+        "code": "ITB",
+        "acronym": "ITB",
+        "city": "Kota Bandung",
+        "province": "Jawa Barat",
+        "type": "PTN",
+        "logo": "images/logos/itb.png"
+    },
+    {
+        "name": "Universitas Padjadjaran",
+        "code": "UNPAD",
+        "acronym": "UNPAD",
+        "city": "Kabupaten Sumedang / Bandung",
+        "province": "Jawa Barat",
+        "type": "PTN",
+        "logo": "images/logos/unpad.svg"
+    },
+    {
+        "name": "Institut Pertanian Bogor",
+        "code": "IPB",
+        "acronym": "IPB University",
+        "city": "Kota Bogor",
+        "province": "Jawa Barat",
+        "type": "PTN",
+        "logo": "images/logos/ipb.svg"
+    },
+    {
+        "name": "Universitas Pendidikan Indonesia",
+        "code": "UPI",
+        "acronym": "UPI",
+        "city": "Kota Bandung",
+        "province": "Jawa Barat",
+        "type": "PTN",
+        "logo": "images/logos/upi.svg"
+    },
+    {
+        "name": "UIN Sunan Gunung Djati Bandung",
+        "code": "UIN-SGD",
+        "acronym": "UIN Bandung",
+        "city": "Kota Bandung",
+        "province": "Jawa Barat",
+        "type": "PTN",
+        "logo": "images/logos/uin-bandung.svg"
+    },
+    {
+        "name": "Politeknik Negeri Bandung",
+        "code": "POLBAN",
+        "acronym": "POLBAN",
+        "city": "Kabupaten Bandung Barat",
+        "province": "Jawa Barat",
+        "type": "PTN",
+        "logo": "images/logos/polban.svg"
+    },
+    {
+        "name": "Politeknik Manufaktur Bandung",
+        "code": "POLMAN",
+        "acronym": "POLMAN Bandung",
+        "city": "Kota Bandung",
+        "province": "Jawa Barat",
+        "type": "PTN",
+        "logo": "images/logos/polman-bandung.svg"
+    },
+    {
+        "name": "Universitas Singaperbangsa Karawang",
+        "code": "UNSIKA",
+        "acronym": "UNSIKA",
+        "city": "Kabupaten Karawang",
+        "province": "Jawa Barat",
+        "type": "PTN",
+        "logo": "images/logos/unsika.svg"
+    },
+    {
+        "name": "Universitas Siliwangi",
+        "code": "UNSIL",
+        "acronym": "UNSIL",
+        "city": "Kota Tasikmalaya",
+        "province": "Jawa Barat",
+        "type": "PTN",
+        "logo": "images/logos/unsil.svg"
+    },
+    {
+        "name": "Universitas Telkom",
+        "code": "TEL-U",
+        "acronym": "Telkom University",
+        "city": "Kabupaten Bandung",
+        "province": "Jawa Barat",
+        "type": "PTS",
+        "logo": "images/logos/telkom.svg"
+    },
+    {
+        "name": "Universitas Katolik Parahyangan",
+        "code": "UNPAR",
+        "acronym": "UNPAR",
+        "city": "Kota Bandung",
+        "province": "Jawa Barat",
+        "type": "PTS",
+        "logo": "images/logos/unpar.svg"
+    },
+    {
+        "name": "Universitas Kristen Maranatha",
+        "code": "UKM-BDG",
+        "acronym": "Maranatha",
+        "city": "Kota Bandung",
+        "province": "Jawa Barat",
+        "type": "PTS",
+        "logo": "images/logos/maranatha.svg"
+    },
+    {
+        "name": "Universitas Pasundan",
+        "code": "UNPAS",
+        "acronym": "UNPAS",
+        "city": "Kota Bandung",
+        "province": "Jawa Barat",
+        "type": "PTS",
+        "logo": "images/logos/unpas.svg"
+    },
+    {
+        "name": "Universitas Islam Bandung",
+        "code": "UNISBA",
+        "acronym": "UNISBA",
+        "city": "Kota Bandung",
+        "province": "Jawa Barat",
+        "type": "PTS",
+        "logo": "images/logos/unisba.svg"
+    },
+    {
+        "name": "Universitas Widyatama",
+        "code": "UTAMA",
+        "acronym": "Widyatama",
+        "city": "Kota Bandung",
+        "province": "Jawa Barat",
+        "type": "PTS",
+        "logo": "images/logos/widyatama.svg"
+    },
+    {
+        "name": "Universitas Komputer Indonesia",
+        "code": "UNIKOM",
+        "acronym": "UNIKOM",
+        "city": "Kota Bandung",
+        "province": "Jawa Barat",
+        "type": "PTS",
+        "logo": "images/logos/unikom.svg"
+    },
+    {
+        "name": "President University",
+        "code": "PRESUNIV",
+        "acronym": "President University",
+        "city": "Kabupaten Bekasi",
+        "province": "Jawa Barat",
+        "type": "PTS",
+        "logo": "images/logos/president.svg"
+    },
+    {
+        "name": "Universitas Gadjah Mada",
+        "code": "UGM",
+        "acronym": "UGM",
+        "city": "Kabupaten Sleman / Yogyakarta",
+        "province": "D.I. Yogyakarta",
+        "type": "PTN",
+        "logo": "images/logos/ugm.png"
+    },
+    {
+        "name": "Universitas Negeri Yogyakarta",
+        "code": "UNY",
+        "acronym": "UNY",
+        "city": "Kota Yogyakarta",
+        "province": "D.I. Yogyakarta",
+        "type": "PTN",
+        "logo": "images/logos/uny.svg"
+    },
+    {
+        "name": "Universitas Pembangunan Nasional Veteran Yogyakarta",
+        "code": "UPN-YK",
+        "acronym": "UPN Jogja",
+        "city": "Kabupaten Sleman",
+        "province": "D.I. Yogyakarta",
+        "type": "PTN",
+        "logo": "images/logos/upn-jogja.svg"
+    },
+    {
+        "name": "UIN Sunan Kalijaga Yogyakarta",
+        "code": "UIN-SUKA",
+        "acronym": "UIN Suka",
+        "city": "Kota Yogyakarta",
+        "province": "D.I. Yogyakarta",
+        "type": "PTN",
+        "logo": "images/logos/uin-suka.svg"
+    },
+    {
+        "name": "Institut Seni Indonesia Yogyakarta",
+        "code": "ISI-YK",
+        "acronym": "ISI Jogja",
+        "city": "Kabupaten Bantul",
+        "province": "D.I. Yogyakarta",
+        "type": "PTN",
+        "logo": "images/logos/isi-jogja.svg"
+    },
+    {
+        "name": "Universitas Islam Indonesia",
+        "code": "UII",
+        "acronym": "UII",
+        "city": "Kabupaten Sleman",
+        "province": "D.I. Yogyakarta",
+        "type": "PTS",
+        "logo": "images/logos/uii.svg"
+    },
+    {
+        "name": "Universitas Muhammadiyah Yogyakarta",
+        "code": "UMY",
+        "acronym": "UMY",
+        "city": "Kabupaten Bantul",
+        "province": "D.I. Yogyakarta",
+        "type": "PTS",
+        "logo": "images/logos/umy.svg"
+    },
+    {
+        "name": "Universitas Atma Jaya Yogyakarta",
+        "code": "UAJY",
+        "acronym": "Atma Jaya Jogja",
+        "city": "Kabupaten Sleman",
+        "province": "D.I. Yogyakarta",
+        "type": "PTS",
+        "logo": "images/logos/uajy.svg"
+    },
+    {
+        "name": "Universitas Sanata Dharma",
+        "code": "USD",
+        "acronym": "Sanata Dharma",
+        "city": "Kabupaten Sleman",
+        "province": "D.I. Yogyakarta",
+        "type": "PTS",
+        "logo": "images/logos/usd.svg"
+    },
+    {
+        "name": "Universitas Ahmad Dahlan",
+        "code": "UAD",
+        "acronym": "UAD",
+        "city": "Kota Yogyakarta",
+        "province": "D.I. Yogyakarta",
+        "type": "PTS",
+        "logo": "images/logos/uad.svg"
+    },
+    {
+        "name": "Universitas AMIKOM Yogyakarta",
+        "code": "AMIKOM",
+        "acronym": "AMIKOM",
+        "city": "Kabupaten Sleman",
+        "province": "D.I. Yogyakarta",
+        "type": "PTS",
+        "logo": "images/logos/amikom.svg"
+    },
+    {
+        "name": "Universitas Diponegoro",
+        "code": "UNDIP",
+        "acronym": "UNDIP",
+        "city": "Kota Semarang",
+        "province": "Jawa Tengah",
+        "type": "PTN",
+        "logo": "images/logos/undip.png"
+    },
+    {
+        "name": "Universitas Negeri Semarang",
+        "code": "UNNES",
+        "acronym": "UNNES",
+        "city": "Kota Semarang",
+        "province": "Jawa Tengah",
+        "type": "PTN",
+        "logo": "images/logos/unnes.svg"
+    },
+    {
+        "name": "UIN Walisongo Semarang",
+        "code": "UIN-WALISONGO",
+        "acronym": "UIN Walisongo",
+        "city": "Kota Semarang",
+        "province": "Jawa Tengah",
+        "type": "PTN",
+        "logo": "images/logos/uin-walisongo.svg"
+    },
+    {
+        "name": "Politeknik Negeri Semarang",
+        "code": "POLINES",
+        "acronym": "POLINES",
+        "city": "Kota Semarang",
+        "province": "Jawa Tengah",
+        "type": "PTN",
+        "logo": "images/logos/polines.svg"
+    },
+    {
+        "name": "Universitas Sebelas Maret",
+        "code": "UNS",
+        "acronym": "UNS",
+        "city": "Kota Surakarta",
+        "province": "Jawa Tengah",
+        "type": "PTN",
+        "logo": "images/logos/uns.png"
+    },
+    {
+        "name": "Institut Seni Indonesia Surakarta",
+        "code": "ISI-SKA",
+        "acronym": "ISI Solo",
+        "city": "Kota Surakarta",
+        "province": "Jawa Tengah",
+        "type": "PTN",
+        "logo": "images/logos/isi-solo.svg"
+    },
+    {
+        "name": "Universitas Jenderal Soedirman",
+        "code": "UNSOED",
+        "acronym": "UNSOED",
+        "city": "Kabupaten Banyumas",
+        "province": "Jawa Tengah",
+        "type": "PTN",
+        "logo": "images/logos/unsoed.svg"
+    },
+    {
+        "name": "Universitas Tidar",
+        "code": "UNTIDAR",
+        "acronym": "UNTIDAR",
+        "city": "Kota Magelang",
+        "province": "Jawa Tengah",
+        "type": "PTN",
+        "logo": "images/logos/untidar.svg"
+    },
+    {
+        "name": "Universitas Dian Nuswantoro",
+        "code": "UDINUS",
+        "acronym": "UDINUS",
+        "city": "Kota Semarang",
+        "province": "Jawa Tengah",
+        "type": "PTS",
+        "logo": "images/logos/udinus.svg"
+    },
+    {
+        "name": "Universitas Islam Sultan Agung",
+        "code": "UNISSULA",
+        "acronym": "UNISSULA",
+        "city": "Kota Semarang",
+        "province": "Jawa Tengah",
+        "type": "PTS",
+        "logo": "images/logos/unissula.svg"
+    },
+    {
+        "name": "Universitas Muhammadiyah Surakarta",
+        "code": "UMS",
+        "acronym": "UMS",
+        "city": "Kabupaten Sukoharjo / Solo",
+        "province": "Jawa Tengah",
+        "type": "PTS",
+        "logo": "images/logos/ums.svg"
+    },
+    {
+        "name": "Universitas Kristen Satya Wacana",
+        "code": "UKSW",
+        "acronym": "UKSW Salatiga",
+        "city": "Kota Salatiga",
+        "province": "Jawa Tengah",
+        "type": "PTS",
+        "logo": "images/logos/uksw.svg"
+    },
+    {
+        "name": "Universitas Syiah Kuala",
+        "code": "USK",
+        "acronym": "USK",
+        "city": "Kota Banda Aceh",
+        "province": "Aceh",
+        "type": "PTN",
+        "logo": "images/logos/usk.svg"
+    },
+    {
+        "name": "Universitas Sumatera Utara",
+        "code": "USU",
+        "acronym": "USU",
+        "city": "Kota Medan",
+        "province": "Sumatera Utara",
+        "type": "PTN",
+        "logo": "images/logos/usu.svg"
+    },
+    {
+        "name": "Universitas Negeri Medan",
+        "code": "UNIMED",
+        "acronym": "UNIMED",
+        "city": "Kota Medan",
+        "province": "Sumatera Utara",
+        "type": "PTN",
+        "logo": "images/logos/unimed.svg"
+    },
+    {
+        "name": "Politeknik Negeri Medan",
+        "code": "POLMED",
+        "acronym": "POLMED",
+        "city": "Kota Medan",
+        "province": "Sumatera Utara",
+        "type": "PTN",
+        "logo": "images/logos/polmed.svg"
+    },
+    {
+        "name": "Universitas Riau",
+        "code": "UNRI",
+        "acronym": "UNRI",
+        "city": "Kota Pekanbaru",
+        "province": "Riau",
+        "type": "PTN",
+        "logo": "images/logos/unri.svg"
+    },
+    {
+        "name": "Universitas Andalas",
+        "code": "UNAND",
+        "acronym": "UNAND",
+        "city": "Kota Padang",
+        "province": "Sumatera Barat",
+        "type": "PTN",
+        "logo": "images/logos/unand.svg"
+    },
+    {
+        "name": "Universitas Negeri Padang",
+        "code": "UNP",
+        "acronym": "UNP",
+        "city": "Kota Padang",
+        "province": "Sumatera Barat",
+        "type": "PTN",
+        "logo": "images/logos/unp-padang.svg"
+    },
+    {
+        "name": "Universitas Sriwijaya",
+        "code": "UNSRI",
+        "acronym": "UNSRI",
+        "city": "Kota Palembang / Indralaya",
+        "province": "Sumatera Selatan",
+        "type": "PTN",
+        "logo": "images/logos/unsri.svg"
+    },
+    {
+        "name": "Politeknik Negeri Sriwijaya",
+        "code": "POLSRI",
+        "acronym": "POLSRI",
+        "city": "Kota Palembang",
+        "province": "Sumatera Selatan",
+        "type": "PTN",
+        "logo": "images/logos/polsri.svg"
+    },
+    {
+        "name": "Universitas Lampung",
+        "code": "UNILA",
+        "acronym": "UNILA",
+        "city": "Kota Bandar Lampung",
+        "province": "Lampung",
+        "type": "PTN",
+        "logo": "images/logos/unila.svg"
+    },
+    {
+        "name": "Institut Teknologi Sumatera",
+        "code": "ITERA",
+        "acronym": "ITERA",
+        "city": "Kabupaten Lampung Selatan",
+        "province": "Lampung",
+        "type": "PTN",
+        "logo": "images/logos/itera.svg"
+    },
+    {
+        "name": "Universitas Bengkulu",
+        "code": "UNIB",
+        "acronym": "UNIB",
+        "city": "Kota Bengkulu",
+        "province": "Bengkulu",
+        "type": "PTN",
+        "logo": "images/logos/unib.svg"
+    },
+    {
+        "name": "Universitas Jambi",
+        "code": "UNJA",
+        "acronym": "UNJA",
+        "city": "Kota Jambi",
+        "province": "Jambi",
+        "type": "PTN",
+        "logo": "images/logos/unja.svg"
+    },
+    {
+        "name": "Universitas Maritim Raja Ali Haji",
+        "code": "UMRAH",
+        "acronym": "UMRAH",
+        "city": "Kota Tanjungpinang",
+        "province": "Kepulauan Riau",
+        "type": "PTN",
+        "logo": "images/logos/umrah.svg"
+    },
+    {
+        "name": "Politeknik Negeri Batam",
+        "code": "POLIBATAM",
+        "acronym": "Polibatam",
+        "city": "Kota Batam",
+        "province": "Kepulauan Riau",
+        "type": "PTN",
+        "logo": "images/logos/polibatam.svg"
+    },
+    {
+        "name": "Universitas Udayana",
+        "code": "UNUD",
+        "acronym": "UNUD",
+        "city": "Kabupaten Badung / Denpasar",
+        "province": "Bali",
+        "type": "PTN",
+        "logo": "images/logos/unud.svg"
+    },
+    {
+        "name": "Universitas Pendidikan Ganesha",
+        "code": "UNDIKSHA",
+        "acronym": "UNDIKSHA",
+        "city": "Kabupaten Buleleng",
+        "province": "Bali",
+        "type": "PTN",
+        "logo": "images/logos/undiksha.svg"
+    },
+    {
+        "name": "Politeknik Negeri Bali",
+        "code": "PNB",
+        "acronym": "PNB",
+        "city": "Kabupaten Badung",
+        "province": "Bali",
+        "type": "PTN",
+        "logo": "images/logos/pnb.svg"
+    },
+    {
+        "name": "Universitas Mataram",
+        "code": "UNRAM",
+        "acronym": "UNRAM",
+        "city": "Kota Mataram",
+        "province": "Nusa Tenggara Barat",
+        "type": "PTN",
+        "logo": "images/logos/unram.svg"
+    },
+    {
+        "name": "Universitas Nusa Cendana",
+        "code": "UNDANA",
+        "acronym": "UNDANA",
+        "city": "Kota Kupang",
+        "province": "Nusa Tenggara Timur",
+        "type": "PTN",
+        "logo": "images/logos/undana.svg"
+    },
+    {
+        "name": "Politeknik Negeri Kupang",
+        "code": "PNK",
+        "acronym": "PNK",
+        "city": "Kota Kupang",
+        "province": "Nusa Tenggara Timur",
+        "type": "PTN",
+        "logo": "images/logos/pnk.svg"
+    },
+    {
+        "name": "Universitas Tanjungpura",
+        "code": "UNTAN",
+        "acronym": "UNTAN",
+        "city": "Kota Pontianak",
+        "province": "Kalimantan Barat",
+        "type": "PTN",
+        "logo": "images/logos/untan.svg"
+    },
+    {
+        "name": "Politeknik Negeri Pontianak",
+        "code": "POLNEP",
+        "acronym": "POLNEP",
+        "city": "Kota Pontianak",
+        "province": "Kalimantan Barat",
+        "type": "PTN",
+        "logo": "images/logos/polnep.svg"
+    },
+    {
+        "name": "Universitas Palangka Raya",
+        "code": "UPR",
+        "acronym": "UPR",
+        "city": "Kota Palangka Raya",
+        "province": "Kalimantan Tengah",
+        "type": "PTN",
+        "logo": "images/logos/upr.svg"
+    },
+    {
+        "name": "Universitas Lambung Mangkurat",
+        "code": "ULM",
+        "acronym": "ULM",
+        "city": "Kota Banjarmasin",
+        "province": "Kalimantan Selatan",
+        "type": "PTN",
+        "logo": "images/logos/ulm.svg"
+    },
+    {
+        "name": "Politeknik Negeri Banjarmasin",
+        "code": "POLIBAN",
+        "acronym": "POLIBAN",
+        "city": "Kota Banjarmasin",
+        "province": "Kalimantan Selatan",
+        "type": "PTN",
+        "logo": "images/logos/poliban.svg"
+    },
+    {
+        "name": "Universitas Mulawarman",
+        "code": "UNMUL",
+        "acronym": "UNMUL",
+        "city": "Kota Samarinda",
+        "province": "Kalimantan Timur",
+        "type": "PTN",
+        "logo": "images/logos/unmul.svg"
+    },
+    {
+        "name": "Politeknik Negeri Samarinda",
+        "code": "POLNES",
+        "acronym": "POLNES",
+        "city": "Kota Samarinda",
+        "province": "Kalimantan Timur",
+        "type": "PTN",
+        "logo": "images/logos/polnes.svg"
+    },
+    {
+        "name": "Institut Teknologi Kalimantan",
+        "code": "ITK",
+        "acronym": "ITK",
+        "city": "Kota Balikpapan",
+        "province": "Kalimantan Timur",
+        "type": "PTN",
+        "logo": "images/logos/itk.svg"
+    },
+    {
+        "name": "Politeknik Negeri Balikpapan",
+        "code": "POLTEKBA",
+        "acronym": "POLTEKBA",
+        "city": "Kota Balikpapan",
+        "province": "Kalimantan Timur",
+        "type": "PTN",
+        "logo": "images/logos/poltekba.svg"
+    },
+    {
+        "name": "Universitas Borneo Tarakan",
+        "code": "UBT",
+        "acronym": "UBT",
+        "city": "Kota Tarakan",
+        "province": "Kalimantan Utara",
+        "type": "PTN",
+        "logo": "images/logos/ubt.svg"
+    },
+    {
+        "name": "Universitas Hasanuddin",
+        "code": "UNHAS",
+        "acronym": "UNHAS",
+        "city": "Kota Makassar",
+        "province": "Sulawesi Selatan",
+        "type": "PTN",
+        "logo": "images/logos/unhas.svg"
+    },
+    {
+        "name": "Universitas Negeri Makassar",
+        "code": "UNM",
+        "acronym": "UNM",
+        "city": "Kota Makassar",
+        "province": "Sulawesi Selatan",
+        "type": "PTN",
+        "logo": "images/logos/unm.svg"
+    },
+    {
+        "name": "Politeknik Negeri Ujung Pandang",
+        "code": "PNUP",
+        "acronym": "PNUP",
+        "city": "Kota Makassar",
+        "province": "Sulawesi Selatan",
+        "type": "PTN",
+        "logo": "images/logos/pnup.svg"
+    },
+    {
+        "name": "UIN Alauddin Makassar",
+        "code": "UIN-ALAUDDIN",
+        "acronym": "UIN Alauddin",
+        "city": "Kabupaten Gowa / Makassar",
+        "province": "Sulawesi Selatan",
+        "type": "PTN",
+        "logo": "images/logos/uin-alauddin.svg"
+    },
+    {
+        "name": "Universitas Muslim Indonesia",
+        "code": "UMI",
+        "acronym": "UMI Makassar",
+        "city": "Kota Makassar",
+        "province": "Sulawesi Selatan",
+        "type": "PTS",
+        "logo": "images/logos/umi-makassar.svg"
+    },
+    {
+        "name": "Universitas Sam Ratulangi",
+        "code": "UNSRAT",
+        "acronym": "UNSRAT",
+        "city": "Kota Manado",
+        "province": "Sulawesi Utara",
+        "type": "PTN",
+        "logo": "images/logos/unsrat.svg"
+    },
+    {
+        "name": "Politeknik Negeri Manado",
+        "code": "POLIMDO",
+        "acronym": "POLIMDO",
+        "city": "Kota Manado",
+        "province": "Sulawesi Utara",
+        "type": "PTN",
+        "logo": "images/logos/polimdo.svg"
+    },
+    {
+        "name": "Universitas Tadulako",
+        "code": "UNTAD",
+        "acronym": "UNTAD",
+        "city": "Kota Palu",
+        "province": "Sulawesi Tengah",
+        "type": "PTN",
+        "logo": "images/logos/untad.svg"
+    },
+    {
+        "name": "Universitas Halu Oleo",
+        "code": "UHO",
+        "acronym": "UHO",
+        "city": "Kota Kendari",
+        "province": "Sulawesi Tenggara",
+        "type": "PTN",
+        "logo": "images/logos/uho.svg"
+    },
+    {
+        "name": "Universitas Negeri Gorontalo",
+        "code": "UNG",
+        "acronym": "UNG",
+        "city": "Kota Gorontalo",
+        "province": "Gorontalo",
+        "type": "PTN",
+        "logo": "images/logos/ung.svg"
+    },
+    {
+        "name": "Universitas Sulawesi Barat",
+        "code": "UNSULBAR",
+        "acronym": "UNSULBAR",
+        "city": "Kabupaten Majene",
+        "province": "Sulawesi Barat",
+        "type": "PTN",
+        "logo": "images/logos/unsulbar.svg"
+    },
+    {
+        "name": "Universitas Pattimura",
+        "code": "UNPATTI",
+        "acronym": "UNPATTI",
+        "city": "Kota Ambon",
+        "province": "Maluku",
+        "type": "PTN",
+        "logo": "images/logos/unpatti.svg"
+    },
+    {
+        "name": "Universitas Khairun",
+        "code": "UNKHAIR",
+        "acronym": "UNKHAIR",
+        "city": "Kota Ternate",
+        "province": "Maluku Utara",
+        "type": "PTN",
+        "logo": "images/logos/unkhair.svg"
+    },
+    {
+        "name": "Universitas Cenderawasih",
+        "code": "UNCEN",
+        "acronym": "UNCEN",
+        "city": "Kota Jayapura",
+        "province": "Papua",
+        "type": "PTN",
+        "logo": "images/logos/uncen.svg"
+    },
+    {
+        "name": "Universitas Papua",
+        "code": "UNIPA-PAPUA",
+        "acronym": "UNIPA Papua",
+        "city": "Kabupaten Manokwari",
+        "province": "Papua Barat",
+        "type": "PTN",
+        "logo": "images/logos/unipa-papua.svg"
+    },
+    {
+        "name": "Universitas Musamus Merauke",
+        "code": "UNMUS",
+        "acronym": "UNMUS",
+        "city": "Kabupaten Merauke",
+        "province": "Papua Selatan",
+        "type": "PTN",
+        "logo": "images/logos/unmus.svg"
+    },
+    {
+        "name": "Universitas Terbuka",
+        "code": "UT",
+        "acronym": "UT",
+        "city": "Kota Tangerang Selatan",
+        "province": "Banten",
+        "type": "PTN",
+        "logo": "images/logos/ut.png"
+    },
+    {
+        "name": "Universitas Nusa Putra",
+        "code": "UNP-146",
+        "acronym": "UNP",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "https://nusaputra.ac.id/",
+        "logo": "images/logos/nusa-putra.svg"
+    },
+    {
+        "name": "Akademi Farmasi Mitra Sehat Mandiri Sidoarjo",
+        "code": "AFMSMS-147",
+        "acronym": "AFMSMS",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.akfarmitseda.ac.id/",
+        "logo": "images/logos/akfar-mitrasehat.svg"
+    },
+    {
+        "name": "Institut Sains & Teknologi Akprind",
+        "code": "ISTA-148",
+        "acronym": "ISTA",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.akprind.ac.id/",
+        "logo": "images/logos/akprind.svg"
+    },
+    {
+        "name": "STMIK AMIKOM Yogyakarta",
+        "code": "SAY-149",
+        "acronym": "SAY",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.amikom.ac.id/",
+        "logo": "images/logos/amikom.svg"
+    },
+    {
+        "name": "STIKES RS Anwar Medika",
+        "code": "SAM-150",
+        "acronym": "SAM",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.stikesrsanwarmedika.ac.id/",
+        "logo": "images/logos/stikes-anwarmedika.svg"
+    },
+    {
+        "name": "Binus University",
+        "code": "BU-151",
+        "acronym": "BU",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.binus.ac.id/",
+        "logo": "images/logos/binus.svg"
+    },
+    {
+        "name": "STIKES Bina Sehat PPNI Mojokerto",
+        "code": "SBSPM-152",
+        "acronym": "SBSPM",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.stikes-ppni.ac.id/",
+        "logo": "images/logos/stikes-ppni-mojokerto.svg"
+    },
+    {
+        "name": "Universitas Bung Hatta",
+        "code": "UBH-153",
+        "acronym": "UBH",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.bunghatta.ac.id/",
+        "logo": "images/logos/ubh.svg"
+    },
+    {
+        "name": "Universitas Ibn Chaldun Jakarta",
+        "code": "UICJ-154",
+        "acronym": "UICJ",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.ibnuchaldun.ac.id/",
+        "logo": "images/logos/uic-jakarta.svg"
+    },
+    {
+        "name": "Universitas Indonusa Esa Unggul",
+        "code": "UIEU-155",
+        "acronym": "UIEU",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.indonusa.ac.id/",
+        "logo": "images/logos/esa-unggul.svg"
+    },
+    {
+        "name": "Bogor Agricultural University",
+        "code": "BAU-156",
+        "acronym": "BAU",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.ipb.ac.id/",
+        "logo": "images/logos/ipb.svg"
+    },
+    {
+        "name": "Institut Sains dan Teknologi Al Kamal",
+        "code": "ISDTK-157",
+        "acronym": "ISDTK",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.ista.ac.id/",
+        "logo": "images/logos/ista-alkamal.svg"
+    },
+    {
+        "name": "Institut Teknologi Adhi Tama Surabaya",
+        "code": "ITATS-158",
+        "acronym": "ITATS",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.itats.ac.id/",
+        "logo": "images/logos/itats.svg"
+    },
+    {
+        "name": "Universitas Janabadra",
+        "code": "UJ-159",
+        "acronym": "UJ",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.janabadra.ac.id/",
+        "logo": "images/logos/ujb.svg"
+    },
+    {
+        "name": "Universitas Jayabaya",
+        "code": "UJ-160",
+        "acronym": "UJ",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.jayabaya.ac.id/",
+        "logo": "images/logos/jayabaya.svg"
+    },
+    {
+        "name": "Universitas Ma Chung",
+        "code": "UC-161",
+        "acronym": "UC",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.machung.ac.id/",
+        "logo": "images/logos/machung.svg"
+    },
+    {
+        "name": "Universitas Maarif Hasyim Latif",
+        "code": "UMHL-162",
+        "acronym": "UMHL",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.umaha.ac.id/",
+        "logo": "images/logos/umaha.svg"
+    },
+    {
+        "name": "Universitas Mahendradatta",
+        "code": "UM-163",
+        "acronym": "UM",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.mahendradatta.org/",
+        "logo": "images/logos/mahendradatta.svg"
+    },
+    {
+        "name": "Universitas Dr. R. Moestopo",
+        "code": "UDM-164",
+        "acronym": "UDM",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.moestopo.ac.id/",
+        "logo": "images/logos/moestopo.svg"
+    },
+    {
+        "name": "Universitas HKBP Nommensen",
+        "code": "UHN-165",
+        "acronym": "UHN",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.nommensen.org/",
+        "logo": "images/logos/uhn.svg"
+    },
+    {
+        "name": "Universitas Pembangunan Panca Budi",
+        "code": "UPPB-166",
+        "acronym": "UPPB",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.pancabudi.ac.id/",
+        "logo": "images/logos/unpab.svg"
+    },
+    {
+        "name": "Universitas Paramadina Mulya",
+        "code": "UPM-167",
+        "acronym": "UPM",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.paramadina.ac.id/",
+        "logo": "images/logos/paramadina.svg"
+    },
+    {
+        "name": "Universitas Nasional Pasim",
+        "code": "UNP-168",
+        "acronym": "UNP",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.pasim.ac.id/",
+        "logo": "images/logos/pasim.svg"
+    },
+    {
+        "name": "STIE Perbanas",
+        "code": "SP-169",
+        "acronym": "SP",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.perbanas.ac.id/",
+        "logo": "images/logos/perbanas.svg"
+    },
+    {
+        "name": "Perbanas Institute",
+        "code": "PI-170",
+        "acronym": "PI",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://perbanas.id/",
+        "logo": "images/logos/perbanas.svg"
+    },
+    {
+        "name": "Prasetiya Mulya Business School",
+        "code": "PMBS-171",
+        "acronym": "PMBS",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.pmbs.ac.id/",
+        "logo": "images/logos/prasetiya-mulya.svg"
+    },
+    {
+        "name": "Politeknik Negeri Lhokseumawe",
+        "code": "PNL-172",
+        "acronym": "PNL",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTN",
+        "website": "http://www.pnl.ac.id/",
+        "logo": "images/logos/pnl.svg"
+    },
+    {
+        "name": "Politeknik Negeri Padang",
+        "code": "PNP-173",
+        "acronym": "PNP",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTN",
+        "website": "http://www.polinpdg.ac.id/",
+        "logo": "images/logos/pnp.svg"
+    },
+    {
+        "name": "Politeknik Pos Indonesia",
+        "code": "PPI-174",
+        "acronym": "PPI",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.poltekpos.ac.id/",
+        "logo": "images/logos/poltekpos.svg"
+    },
+    {
+        "name": "Politeknik Negeri Sambas",
+        "code": "PNS-175",
+        "acronym": "PNS",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTN",
+        "website": "http://www.poltesa.ac.id/",
+        "logo": "images/logos/poltesa.svg"
+    },
+    {
+        "name": "Universitas Putera Batam",
+        "code": "UPB-176",
+        "acronym": "UPB",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.puterabatam.ac.id/",
+        "logo": "images/logos/upb-batam.svg"
+    },
+    {
+        "name": "Universitas Sarjanawiyata Tamansiswa",
+        "code": "UST-177",
+        "acronym": "UST",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.sarjanawiyata.ac.id/",
+        "logo": "images/logos/ust-jogja.svg"
+    },
+    {
+        "name": "STMIK Sinar Nusantara",
+        "code": "SSN-178",
+        "acronym": "SSN",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.sinus.ac.id/",
+        "logo": "images/logos/sinus.svg"
+    },
+    {
+        "name": "Sekolah Tinggi Akuntansi Negara (STAN)",
+        "code": "STAN(-179",
+        "acronym": "STAN(",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.stan.ac.id/",
+        "logo": "images/logos/pkn-stan.svg"
+    },
+    {
+        "name": "Trisakti Institute of Tourism",
+        "code": "TIT-180",
+        "acronym": "TIT",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.stptrisakti.ac.id/",
+        "logo": "images/logos/stptrisakti.svg"
+    },
+    {
+        "name": "Universitas Klabat",
+        "code": "UK-181",
+        "acronym": "UK",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unklab.ac.id/",
+        "logo": "images/logos/unklab.svg"
+    },
+    {
+        "name": "Universitas Bhayangkara Jakarta Raya",
+        "code": "UBJR-182",
+        "acronym": "UBJR",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.ubharajaya.ac.id/",
+        "logo": "images/logos/ubhara-jaya.svg"
+    },
+    {
+        "name": "Universitas Bunda Mulia Jakarta",
+        "code": "UBMJ-183",
+        "acronym": "UBMJ",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.ubm.ac.id/",
+        "logo": "images/logos/ubm.svg"
+    },
+    {
+        "name": "Universitas Darma Agung",
+        "code": "UDA-184",
+        "acronym": "UDA",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.uda.ac.id/",
+        "logo": "images/logos/uda.svg"
+    },
+    {
+        "name": "Universitas Ibn Khaldun Bogor",
+        "code": "UIKB-185",
+        "acronym": "UIKB",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.uika-bogor.ac.id/",
+        "logo": "images/logos/uika.svg"
+    },
+    {
+        "name": "Universitas Islam Jakarta",
+        "code": "UIJ-186",
+        "acronym": "UIJ",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.uinjkt.ac.id/",
+        "logo": "images/logos/uij.svg"
+    },
+    {
+        "name": "Universitas Islam Riau",
+        "code": "UIR-187",
+        "acronym": "UIR",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.uir.ac.id/",
+        "logo": "images/logos/uir.svg"
+    },
+    {
+        "name": "Universitas Islam Sumatera Utara",
+        "code": "UISU-188",
+        "acronym": "UISU",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.uisu.ac.id/",
+        "logo": "images/logos/uisu.svg"
+    },
+    {
+        "name": "Universitas Kristen Duta Wacana",
+        "code": "UKDW-189",
+        "acronym": "UKDW",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.ukdw.ac.id/",
+        "logo": "images/logos/ukdw.svg"
+    },
+    {
+        "name": "Universitas Kristen Indonesia",
+        "code": "UKI-190",
+        "acronym": "UKI",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.uki.ac.id/",
+        "logo": "images/logos/uki.svg"
+    },
+    {
+        "name": "Universitas Kristen Indonesia Tomohon",
+        "code": "UKIT-191",
+        "acronym": "UKIT",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.ukit-tomohon.org/",
+        "logo": "images/logos/ukit.svg"
+    },
+    {
+        "name": "Universitas Kristen Krida Wacana",
+        "code": "UKKW-192",
+        "acronym": "UKKW",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.ukrida.ac.id/",
+        "logo": "images/logos/ukrida.svg"
+    },
+    {
+        "name": "Universitas Methodist Indonesia",
+        "code": "UMI-193",
+        "acronym": "UMI",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.umi-mdn.edu/",
+        "logo": "images/logos/umi-medan.svg"
+    },
+    {
+        "name": "Universitas Muhammadiyah Jakarta",
+        "code": "UMJ-194",
+        "acronym": "UMJ",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.umj.ac.id/",
+        "logo": "images/logos/umj.svg"
+    },
+    {
+        "name": "Universitas Muria Kudus",
+        "code": "UMK-195",
+        "acronym": "UMK",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.umk.ac.id/",
+        "logo": "images/logos/umk.svg"
+    },
+    {
+        "name": "Universitas Muhammadiyah Magelang",
+        "code": "UMM-196",
+        "acronym": "UMM",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.ummgl.ac.id/",
+        "logo": "images/logos/unimma.svg"
+    },
+    {
+        "name": "Universitas Muhammadiyah Sumatra Utara",
+        "code": "UMSU-197",
+        "acronym": "UMSU",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.umsu.ac.id/",
+        "logo": "images/logos/umsu.svg"
+    },
+    {
+        "name": "Universitas Advent Indonesia",
+        "code": "UAI-198",
+        "acronym": "UAI",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unai.edu/",
+        "logo": "images/logos/unai.svg"
+    },
+    {
+        "name": "Universitas Nasional Jakarta",
+        "code": "UNJ-199",
+        "acronym": "UNJ",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unas.ac.id/",
+        "logo": "images/logos/unas.svg"
+    },
+    {
+        "name": "Universitas Amir Hamzah",
+        "code": "UAH-200",
+        "acronym": "UAH",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unhamzah.ac.id/",
+        "logo": "images/logos/unham.svg"
+    },
+    {
+        "name": "Universitas Bojonegoro",
+        "code": "UB-201",
+        "acronym": "UB",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unigoro.ac.id/",
+        "logo": "images/logos/unigoro.svg"
+    },
+    {
+        "name": "Universitas Katolik Soegijapranoto",
+        "code": "UKS-202",
+        "acronym": "UKS",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unika.ac.id/",
+        "logo": "images/logos/unika-soegija.svg"
+    },
+    {
+        "name": "Universitas Pekalongan",
+        "code": "UP-203",
+        "acronym": "UP",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unikal.ac.id/",
+        "logo": "images/logos/unikal.svg"
+    },
+    {
+        "name": "Universitas Kediri",
+        "code": "UK-204",
+        "acronym": "UK",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unik-kediri.ac.id/",
+        "logo": "images/logos/unik-kediri.svg"
+    },
+    {
+        "name": "Universitas Lancang Kuning",
+        "code": "ULK-205",
+        "acronym": "ULK",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://unilak.ac.id/",
+        "logo": "images/logos/unilak.svg"
+    },
+    {
+        "name": "Universitas Negeri Manado",
+        "code": "UNM-206",
+        "acronym": "UNM",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTN",
+        "website": "http://www.unima.ac.id/",
+        "logo": "images/logos/unima.svg"
+    },
+    {
+        "name": "Universitas Islam Nusantara",
+        "code": "UIN-207",
+        "acronym": "UIN",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.uninus.ac.id/",
+        "logo": "images/logos/uninus.svg"
+    },
+    {
+        "name": "Universitas Pesantren Darul Ulum Jombang",
+        "code": "UPDUJ-208",
+        "acronym": "UPDUJ",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unipdu.ac.id/",
+        "logo": "images/logos/unipdu.svg"
+    },
+    {
+        "name": "Universitas Madura",
+        "code": "UM-209",
+        "acronym": "UM",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unira.ac.id/",
+        "logo": "images/logos/unira-pamekasan.svg"
+    },
+    {
+        "name": "Universitas Muhammadiyah Makassar",
+        "code": "UMM-210",
+        "acronym": "UMM",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unismuh.ac.id/",
+        "logo": "images/logos/unismuh-makassar.svg"
+    },
+    {
+        "name": "Universitas Slamet Riyadi Surakarta",
+        "code": "USRS-211",
+        "acronym": "USRS",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unisri.ac.id/",
+        "logo": "images/logos/unisri.svg"
+    },
+    {
+        "name": "Universitas Islam Syekh-Yusuf",
+        "code": "UIS-212",
+        "acronym": "UIS",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unistangerang.ac.id/",
+        "logo": "images/logos/unis-tangerang.svg"
+    },
+    {
+        "name": "Unitomo Surabaya",
+        "code": "US-213",
+        "acronym": "US",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unitomo.ac.id/",
+        "logo": "images/logos/unitomo.png"
+    },
+    {
+        "name": "Universitas Trilogi",
+        "code": "UT-214",
+        "acronym": "UT",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.universitas-trilogi.ac.id/",
+        "logo": "images/logos/trilogi.svg"
+    },
+    {
+        "name": "Universitas Jenderal Achmad Yani",
+        "code": "UJAY-215",
+        "acronym": "UJAY",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unjani.ac.id/",
+        "logo": "images/logos/unjani.svg"
+    },
+    {
+        "name": "Universitas Krisnadwipayana",
+        "code": "UK-216",
+        "acronym": "UK",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unkris.ac.id/",
+        "logo": "images/logos/unkris.svg"
+    },
+    {
+        "name": "Universitas Mahasaraswati Denpasar",
+        "code": "UMD-217",
+        "acronym": "UMD",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unmas.org/",
+        "logo": "images/logos/unmas-bali.svg"
+    },
+    {
+        "name": "Universitas Merdeka Madiun",
+        "code": "UMM-218",
+        "acronym": "UMM",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unmer-madiun.ac.id/",
+        "logo": "images/logos/unmer-madiun.svg"
+    },
+    {
+        "name": "Universitas Muhammadiyah Jember",
+        "code": "UMJ-219",
+        "acronym": "UMJ",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unmuhjember.ac.id/",
+        "logo": "images/logos/um-jember.svg"
+    },
+    {
+        "name": "Universitas Muhammadiyah Mataram",
+        "code": "UMM-220",
+        "acronym": "UMM",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unmuhmataram.com/",
+        "logo": "images/logos/ummat.svg"
+    },
+    {
+        "name": "STMIK Widya Cipta Dharma",
+        "code": "SWCD-221",
+        "acronym": "SWCD",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.wicida.ac.id/",
+        "logo": "images/logos/wicida.svg"
+    },
+    {
+        "name": "Universitas Pakuan",
+        "code": "UP-222",
+        "acronym": "UP",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unpak.ac.id/",
+        "logo": "images/logos/unpak.svg"
+    },
+    {
+        "name": "Universitas Ngurah Rai",
+        "code": "UNR-223",
+        "acronym": "UNR",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unr.ac.id/",
+        "logo": "images/logos/unr-bali.svg"
+    },
+    {
+        "name": "Universitas Darma Persada",
+        "code": "UDP-224",
+        "acronym": "UDP",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unsada.ac.id/",
+        "logo": "images/logos/unsada.svg"
+    },
+    {
+        "name": "Universitas Swadaya Gunung Djati",
+        "code": "USGD-225",
+        "acronym": "USGD",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unswagati-crb.ac.id/",
+        "logo": "images/logos/ugj-cirebon.svg"
+    },
+    {
+        "name": "Universitas 17 Agustus 1945 Banyuwangi",
+        "code": "UA1B-226",
+        "acronym": "UA1B",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.untag-banyuwangi.ac.id/",
+        "logo": "images/logos/untag-bwi.svg"
+    },
+    {
+        "name": "Universitas 17 Agustus 1945 Cirebon",
+        "code": "UA1C-227",
+        "acronym": "UA1C",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.untagcirebon.info/",
+        "logo": "images/logos/untag-crb.svg"
+    },
+    {
+        "name": "Universitas 17 Agustus 1945 Jakarta",
+        "code": "UA1J-228",
+        "acronym": "UA1J",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.untag-jkt.org/",
+        "logo": "images/logos/uta45-jkt.svg"
+    },
+    {
+        "name": "Universitas 17 Agustus 1945 Samarinda",
+        "code": "UA1S-229",
+        "acronym": "UA1S",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.untag-smd.ac.id/",
+        "logo": "images/logos/untag-smd.svg"
+    },
+    {
+        "name": "Universitas 17 Agustus 1945 Semarang",
+        "code": "UA1S-230",
+        "acronym": "UA1S",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.untagsmg.ac.id/",
+        "logo": "images/logos/untag-smg.svg"
+    },
+    {
+        "name": "Universitas Wijaya Kusuma Purwokerto",
+        "code": "UWKP-231",
+        "acronym": "UWKP",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.unwiku.ac.id/",
+        "logo": "images/logos/unwiku.svg"
+    },
+    {
+        "name": "Universitas Proklamasi 45",
+        "code": "UP-232",
+        "acronym": "UP",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.up45.ac.id/",
+        "logo": "images/logos/up45.svg"
+    },
+    {
+        "name": "Universitas Pancasakti Tegal",
+        "code": "UPT-233",
+        "acronym": "UPT",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.upstegal.ac.id/",
+        "logo": "images/logos/ups-tegal.svg"
+    },
+    {
+        "name": "Universitas Simalungun",
+        "code": "US-234",
+        "acronym": "US",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.usi.ac.id/",
+        "logo": "images/logos/usi-siantar.svg"
+    },
+    {
+        "name": "Universitas Semarang",
+        "code": "US-235",
+        "acronym": "US",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.usm.ac.id/",
+        "logo": "images/logos/usm-semarang.svg"
+    },
+    {
+        "name": "Universitas Terbuka Indonesia",
+        "code": "UTI-236",
+        "acronym": "UTI",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.ut.ac.id/",
+        "logo": "images/logos/ut.svg"
+    },
+    {
+        "name": "Universitas Tidar Magelang",
+        "code": "UTM-237",
+        "acronym": "UTM",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.untidar.ac.id/",
+        "logo": "images/logos/untidar.svg"
+    },
+    {
+        "name": "Universitas Tunas Pembangunan",
+        "code": "UTP-238",
+        "acronym": "UTP",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.utp.ac.id/",
+        "logo": "images/logos/utp-solo.svg"
+    },
+    {
+        "name": "Universitas Widya Gama Malang",
+        "code": "UWGM-239",
+        "acronym": "UWGM",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.widyagama.ac.id/",
+        "logo": "images/logos/uwg-malang.svg"
+    },
+    {
+        "name": "Universitas Katolik Widya Karya",
+        "code": "UKWK-240",
+        "acronym": "UKWK",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.widyakarya.ac.id/",
+        "logo": "images/logos/ukwk-malang.svg"
+    },
+    {
+        "name": "Universitas Katolik Widya Manadala",
+        "code": "UKWM-241",
+        "acronym": "UKWM",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.wima.ac.id/",
+        "logo": "images/logos/wima-surabaya.svg"
+    },
+    {
+        "name": "Universitas Wisnuwardhana",
+        "code": "UW-242",
+        "acronym": "UW",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.wisnuwardhana.ac.id/",
+        "logo": "images/logos/unidha-malang.svg"
+    },
+    {
+        "name": "Universitas Persada Indonesia Y.A.I",
+        "code": "UPIY-243",
+        "acronym": "UPIY",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.yai.ac.id/",
+        "logo": "images/logos/upi-yai.svg"
+    },
+    {
+        "name": "Universitas Yarsi",
+        "code": "UY-244",
+        "acronym": "UY",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "http://www.yarsi.ac.id/",
+        "logo": "images/logos/yarsi.svg"
+    },
+    {
+        "name": "Duta Bangsa University",
+        "code": "DBU-245",
+        "acronym": "DBU",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "https://udb.ac.id/",
+        "logo": "images/logos/udb-solo.svg"
+    },
+    {
+        "name": "Akademi Farmasi Yarsis Pekanbaru",
+        "code": "AFYP-246",
+        "acronym": "AFYP",
+        "city": "Indonesia",
+        "province": "Indonesia",
+        "type": "PTS",
+        "website": "https://akfaryarsiptk.ac.id/",
+        "logo": "images/logos/yarsi.svg"
+    },
+    {
+        "name": "STMIK Adhi Guna",
+        "code": "SAG-247",
+        "acronym": "SAG",
+        "city": "Central Sulawesi",
+        "province": "Central Sulawesi",
+        "type": "PTS",
+        "website": "https://stmikadhiguna.ac.id/",
+        "logo": "images/logos/stmik-adhiguna.svg"
+    },
+    {
+        "name": "UIN Datokarama Palu",
+        "code": "UDP-248",
+        "acronym": "UDP",
+        "city": "Central Sulawesi",
+        "province": "Central Sulawesi",
+        "type": "PTS",
+        "website": "https://uindatokarama.ac.id/",
+        "logo": "images/logos/uin-datokarama.svg"
+    },
+    {
+        "name": "Universitas Alkhairaat",
+        "code": "UA-249",
+        "acronym": "UA",
+        "city": "Central Sulawesi",
+        "province": "Central Sulawesi",
+        "type": "PTS",
+        "website": "https://unisapalu.ac.id/",
+        "logo": "images/logos/unisa-palu.svg"
+    },
+    {
+        "name": "Universitas Muhammadiyah Palu",
+        "code": "UMP-250",
+        "acronym": "UMP",
+        "city": "Central Sulawesi",
+        "province": "Central Sulawesi",
+        "type": "PTS",
+        "website": "https://unismuhpalu.ac.id/",
+        "logo": "images/logos/unismuh-palu.svg"
+    },
+    {
+        "name": "Universitas Sintuwu Maroso",
+        "code": "USM-251",
+        "acronym": "USM",
+        "city": "Central Sulawesi",
+        "province": "Central Sulawesi",
+        "type": "PTS",
+        "website": "https://unsimar.ac.id/",
+        "logo": "images/logos/unsimar.svg"
+    }
 ]

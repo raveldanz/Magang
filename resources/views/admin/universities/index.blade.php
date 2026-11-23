@@ -222,7 +222,7 @@
                             </svg>
                         </div>
                         <input type="text" name="search" value="{{ request('search') }}"
-                            placeholder="Cari nama perguruan tinggi, kode kampus (e.g. UNESA, ITS), email..."
+                            placeholder="Cari nama perguruan tinggi / sekolah, kode (e.g. UNESA, SMKN 10), email..."
                             class="w-full min-h-[44px] sm:min-h-0 text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
                             style="padding-left: 2.75rem !important; padding-right: 1rem !important; padding-top: 0.65rem !important; padding-bottom: 0.65rem !important;">
                     </div>
@@ -239,6 +239,68 @@
                 </form>
             </div>
 
+            <!-- Rekomendasi Hasil dari Direktori Nasional (API & Master Kemendikbud) jika dicari -->
+            @if(isset($externalSuggestions) && $externalSuggestions->isNotEmpty())
+                <div class="bg-gradient-to-r from-blue-50/90 to-indigo-50/70 border border-blue-200/90 rounded-3xl p-5 shadow-xs space-y-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-2 text-blue-900 font-bold text-xs uppercase tracking-wider">
+                            <span class="flex h-2.5 w-2.5 relative">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-600"></span>
+                            </span>
+                            <span>Ditemukan di Direktori Nasional (API & Master Kemendikbud):</span>
+                        </div>
+                        <span class="text-[11px] font-semibold text-blue-700 bg-blue-100/80 px-2.5 py-0.5 rounded-full">
+                            {{ $externalSuggestions->count() }} institusi tersedia
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-600">
+                        Institusi berikut ditemukan dari direktori nasional dan belum terdaftar di database mitra lokal Anda. Klik <strong>+ Tambahkan ke Mitra</strong> untuk mendaftarkannya secara otomatis ke sistem.
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+                        @foreach($externalSuggestions as $ext)
+                            <div class="bg-white rounded-2xl border border-blue-200/80 p-4 shadow-2xs flex flex-col justify-between gap-3 hover:border-blue-400 transition">
+                                <div>
+                                    <div class="flex items-start justify-between gap-2 mb-1.5">
+                                        <h4 class="font-bold text-slate-900 text-xs sm:text-sm leading-snug line-clamp-2">
+                                            {{ $ext['name'] }}
+                                        </h4>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-blue-50 text-blue-700 border border-blue-200 shrink-0">
+                                            {{ $ext['acronym'] ?? ($ext['npsn'] ?? ($ext['code'] ?? 'NASIONAL')) }}
+                                        </span>
+                                    </div>
+                                    <div class="text-[11px] text-slate-500">
+                                        <span>{{ $ext['city'] ?? 'Indonesia' }}</span>
+                                        @if(!empty($ext['province']) && $ext['province'] !== ($ext['city'] ?? ''))
+                                            <span>, {{ $ext['province'] }}</span>
+                                        @endif
+                                    </div>
+                                    @if(!empty($ext['npsn']))
+                                        <div class="text-[10px] text-slate-400 font-mono mt-0.5">NPSN: {{ $ext['npsn'] }}</div>
+                                    @endif
+                                </div>
+
+                                <form method="POST" action="{{ route('admin.universities.quick_import') }}" class="m-0 pt-1">
+                                    @csrf
+                                    <input type="hidden" name="name" value="{{ $ext['name'] }}">
+                                    <input type="hidden" name="npsn" value="{{ $ext['npsn'] ?? '' }}">
+                                    <input type="hidden" name="acronym" value="{{ $ext['acronym'] ?? '' }}">
+                                    <input type="hidden" name="city" value="{{ $ext['city'] ?? '' }}">
+                                    <input type="hidden" name="province" value="{{ $ext['province'] ?? '' }}">
+                                    <input type="hidden" name="institution_type" value="{{ $ext['institution_type'] ?? 'perguruan_tinggi' }}">
+                                    <button type="submit"
+                                        class="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs shadow-xs transition cursor-pointer">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                        <span>Tambahkan ke Mitra</span>
+                                    </button>
+                                </form>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
             <!-- List Universities Grid (Struktur Presisi & Konsisten Penuh dengan Agencies) -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @forelse($universities as $univ)
@@ -249,34 +311,35 @@
                     <div
                         class="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md transition p-6 flex flex-col justify-between">
                         <div>
-                            <!-- Header: Logo, Kode Kampus, Status Badge, & Menu Opsi Kanan Atas -->
+                            <!-- Header: Logo, Kode Kampus & Status Badge (Zero Overflow Protection) -->
                             <div class="flex items-start justify-between gap-3 mb-4">
                                 <a href="{{ route('admin.universities.show', $univ->id) }}"
-                                    class="rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2 shrink-0 overflow-hidden shadow-2xs"
-                                    style="min-width: 64px; max-width: 88px; height: 64px;">
+                                    class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2 shrink-0 overflow-hidden shadow-2xs hover:bg-slate-100 transition"
+                                    title="Lihat detail {{ $univ->name }}">
                                     <img src="{{ $univLogoUrl }}" alt="{{ $univ->name }}"
-                                        class="object-contain shrink-0" style="height: 48px; width: auto; min-width: 48px; max-width: 72px;">
+                                        class="w-full h-full object-contain">
                                 </a>
 
-                                <div class="flex items-center gap-1.5 shrink-0">
-                                    <span
-                                        class="px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200/80 rounded-lg text-[10px] font-bold">
-                                        {{ $univ->code ?: 'BARU' }}
-                                    </span>
-
-                                    @if($univ->universityAdmin)
+                                <div class="flex flex-col items-end gap-1.5 min-w-0 max-w-[calc(100%-4.25rem)]">
+                                    <div class="flex flex-wrap items-center justify-end gap-1.5">
                                         <span
-                                            class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                            Akun Aktif
+                                            class="px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200/80 rounded-lg text-[10px] font-bold max-w-[110px] truncate"
+                                            title="{{ $univ->code }}">
+                                            {{ $univ->code ?: 'BARU' }}
                                         </span>
-                                    @else
-                                        <span
-                                            class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                            Belum Ada Akun
-                                        </span>
-                                    @endif
 
-                            
+                                        @if($univ->universityAdmin)
+                                            <span
+                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 whitespace-nowrap">
+                                                Akun Aktif
+                                            </span>
+                                        @else
+                                            <span
+                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 whitespace-nowrap">
+                                                Belum Ada Akun
+                                            </span>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
 
@@ -306,8 +369,8 @@
                                 {{ $univ->address ?? 'Alamat kampus belum diatur' }}
                             </p>
 
-                            <div class="text-[11px] font-mono text-slate-400 truncate mb-5">
-                                Admin:
+                            <div class="text-[11px] text-slate-500 truncate mb-4">
+                                <span class="text-slate-400">Admin:</span>
                                 @if($univ->universityAdmin)
                                     <span class="text-slate-700 font-medium">{{ $univ->universityAdmin->email }}</span>
                                 @else
@@ -323,8 +386,8 @@
                                     <div class="text-[10px] font-medium text-slate-500 mt-0.5">Peserta Magang</div>
                                 </div>
                                 <div class="border-x border-slate-200/60">
-                                    <div class="text-sm font-black text-blue-600">{{ $univ->dosens_count }}</div>
-                                    <div class="text-[10px] font-medium text-blue-600/90 mt-0.5">Pembimbing</div>
+                                    <div class="text-sm font-black text-slate-900">{{ $univ->dosens_count }}</div>
+                                    <div class="text-[10px] font-medium text-slate-500 mt-0.5">Pembimbing</div>
                                 </div>
                                 <div>
                                     <div class="text-sm font-black text-slate-900">{{ $univ->users_count }}</div>
@@ -347,7 +410,7 @@
                                         desc: 'Setelah diverifikasi, kampus akan tampil di dropdown pendaftaran semua peserta magang.',
                                         confirmText: 'Ya, Verifikasi'
                                     })"
-                                    class="w-full inline-flex items-center justify-center min-h-[44px] sm:min-h-0 py-2.5 px-3 rounded-xl bg-emerald-600hover:bg-emerald-700 text-white font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs">
+                                    class="w-full inline-flex items-center justify-center min-h-[44px] sm:min-h-0 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs">
                                     Verifikasi Kampus
                                 </button>
                             </form>
@@ -380,7 +443,7 @@
                                                 desc: 'Tindakan ini tidak dapat dibatalkan.',
                                                 confirmText: 'Ya, Gabungkan'
                                             })"
-                                            class="shrink-0 inline-flex items-center justify-center min-h-[44px] sm:min-h-0 py-2 px-3 rounded-xl border border-blue-300text-blue-700 bg-white hover:bg-blue-50 font-bold text-[11px] transition cursor-pointer">
+                                            class="shrink-0 inline-flex items-center justify-center min-h-[44px] sm:min-h-0 py-2 px-3 rounded-xl border border-blue-300 text-blue-700 bg-white hover:bg-blue-50 font-bold text-[11px] transition cursor-pointer">
                                             Gabungkan
                                         </button>
                                     </div>
@@ -420,17 +483,33 @@
                             @endif
 
                             <a href="{{ route('admin.universities.show', $univ->id) }}"
-                                class="flex-1 min-w-0 inline-flex items-center justify-center min-h-[44px] sm:min-h-0 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs text-centershadow-xs transition cursor-pointer whitespace-nowrap truncate">
+                                class="flex-1 min-w-0 inline-flex items-center justify-center min-h-[44px] sm:min-h-0 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs text-center shadow-xs transition cursor-pointer whitespace-nowrap truncate">
                                 Kelola Kampus
                             </a>
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-12 text-center text-gray-400 bg-white rounded-2xl border border-gray-100">
-                        <p class="font-bold text-gray-600">Belum ada universitas terdaftar</p>
-                        <p class="text-xs mt-1">Gunakan tombol "Tambah Kampus/Sekolah Baru" untuk mendaftarkan perguruan
-                            tinggi.</p>
-                    </div>
+                    @if(request('search'))
+                        <div class="col-span-full py-10 px-4 text-center bg-white rounded-3xl border border-slate-100 shadow-xs">
+                            <div class="w-12 h-12 mx-auto mb-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            </div>
+                            <p class="font-bold text-slate-700 text-sm">Tidak ada kampus/sekolah mitra lokal yang cocok</p>
+                            <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                                Kata kunci "<strong>{{ request('search') }}</strong>" belum terdaftar sebagai mitra aktif di database lokal.
+                                @if(isset($externalSuggestions) && $externalSuggestions->isNotEmpty())
+                                    Silakan gunakan tombol <strong>+ Tambahkan ke Mitra</strong> pada rekomendasi direktori nasional di atas.
+                                @else
+                                    Anda dapat mendaftarkannya secara manual melalui tombol "Tambah Kampus/Sekolah Baru".
+                                @endif
+                            </p>
+                        </div>
+                    @else
+                        <div class="col-span-full py-12 text-center text-gray-400 bg-white rounded-2xl border border-gray-100">
+                            <p class="font-bold text-gray-600">Belum ada universitas terdaftar</p>
+                            <p class="text-xs mt-1">Gunakan tombol "Tambah Kampus/Sekolah Baru" untuk mendaftarkan perguruan tinggi.</p>
+                        </div>
+                    @endif
                 @endforelse
             </div>
 

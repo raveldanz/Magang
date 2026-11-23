@@ -26,9 +26,14 @@ class RegisterRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        $name = trim((string) $this->input('name'));
+        if (! $this->registersAdvisor()) {
+            $name = mb_strtoupper($name);
+        }
+
         $this->merge([
             'email' => strtolower(trim((string) $this->input('email'))),
-            'name' => trim((string) $this->input('name')),
+            'name' => $name,
         ]);
     }
 

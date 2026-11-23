@@ -270,7 +270,7 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <x-input-label for="name" value="Nama Lengkap (Sesuai Akun)" class="text-xs font-bold uppercase tracking-wider" />
-                                        <x-text-input id="name" name="name" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('name', $user->name)" required />
+                                        <x-text-input id="name" name="name" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('name', mb_strtoupper($user->name))" required />
                                         <x-input-error data-inline-for="name" :messages="$errors->get('name')" class="mt-1" />
                                     </div>
 
