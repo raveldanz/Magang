@@ -183,9 +183,17 @@
                                             <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                                                 Tahun Perjalanan {{ $yr }}
                                             </h2>
+                                            @php
+                                                $totalInYear = $yearlyCounts[(string)$yr] ?? $projectList->count();
+                                                $shownInPage = $projectList->count();
+                                            @endphp
                                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/80 shadow-2xs">
                                                 <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                                                <span>{{ $projectList->count() }} Karya Inovasi</span>
+                                                @if((string)$year !== (string)$yr && $totalInYear > $shownInPage)
+                                                    <span>{{ $shownInPage }} dari {{ $totalInYear }} Karya</span>
+                                                @else
+                                                    <span>{{ $totalInYear }} Karya Inovasi</span>
+                                                @endif
                                             </span>
                                         </div>
                                         <p class="text-xs text-slate-500 font-medium mt-0.5">
@@ -194,18 +202,50 @@
                                     </div>
                                 </div>
 
-                                <div class="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-500">
-                                    <span>Arsip Karya Magang</span>
-                                    <span class="text-slate-300">&bull;</span>
-                                    <span class="font-mono text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
-                                        DISPUSIP-{{ $yr }}
-                                    </span>
+                                <div class="flex flex-wrap items-center gap-2.5">
+                                    @if((string)$year !== (string)$yr)
+                                        <a href="{{ route('public.projects.index', array_merge(request()->query(), ['year' => $yr, 'page' => 1])) }}" 
+                                           class="inline-flex items-center gap-1.5 min-h-[38px] px-3.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200/80 text-xs font-bold transition-all shadow-2xs group/btn cursor-pointer"
+                                           title="Saring dan lihat seluruh karya inovasi tahun {{ $yr }}">
+                                            <span>Lihat Semua Karya {{ $yr }}</span>
+                                            <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-md text-[10px] font-extrabold bg-blue-200/70 text-blue-800 group-hover/btn:bg-white/20 group-hover/btn:text-white">
+                                                {{ $totalInYear }}
+                                            </span>
+                                            <svg class="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                            </svg>
+                                        </a>
+                                    @else
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200">
+                                            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                            <span>Menampilkan Khusus Tahun {{ $yr }}</span>
+                                        </span>
+                                        <a href="{{ route('public.projects.index', request()->except('year', 'page')) }}" 
+                                           class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-slate-600 hover:text-blue-600 transition"
+                                           title="Hapus filter tahun dan tampilkan seluruh tahun perjalanan">
+                                            <span>Tampilkan Semua Tahun</span>
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </a>
+                                    @endif
+
+                                    <div class="hidden lg:flex items-center gap-2 text-xs font-semibold text-slate-500 pl-2.5 border-l border-slate-200">
+                                        <span class="font-mono text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
+                                            DISPUSIP-{{ $yr }}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 
-                            {{-- Grid Kartu Proyek Inovasi Tahun Terkait --}}
+                            {{-- Grid Kartu Proyek Inovasi Tahun Terkait (Maksimal 3 Kartu ke Kanan di Timeline) --}}
+                            @php
+                                $cardsToShow = (string)$year === (string)$yr ? $projectList : $projectList->take(3);
+                            @endphp
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-                                @foreach($projectList as $project)
+                                @foreach($cardsToShow as $project)
                                     @php
                                         $mhs = $project->placement?->application?->user;
                                         $univ = $mhs?->studentProfile?->universitas ?? $mhs?->university ?? 'Kampus/Sekolah Mitra';

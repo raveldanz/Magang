@@ -110,9 +110,9 @@
                        required 
                        autofocus 
                        autocomplete="name" 
-                       :placeholder="roleType === 'advisor' ? 'Contoh: Dr. Budi Santoso, S.Kom.' : 'Nama lengkap Anda'"
+                       :placeholder="roleType === 'advisor' ? 'Contoh: DR. BUDI SANTOSO, S.KOM.' : 'Nama lengkap Anda'"
                        oninvalid="this.setCustomValidity('Harap isi nama lengkap Anda terlebih dahulu.')"
-                       @input="if (roleType === 'student' && !$event.isComposing) {
+                       @input="if (!$event.isComposing) {
                            const upper = $el.value.toLocaleUpperCase('id-ID');
                            if ($el.value !== upper) {
                                const caret = $el.value.slice(0, $el.selectionStart).toLocaleUpperCase('id-ID').length;

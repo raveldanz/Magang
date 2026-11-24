@@ -86,18 +86,20 @@ class PublicProjectController extends Controller
             return $item->created_at ? $item->created_at->format('Y') : date('Y');
         });
 
-        // 6. Ambil Daftar Tahun Unik untuk Pilihan Filter
-        $yearExpression = $driver === 'sqlite'
-            ? "strftime('%Y', created_at) as project_year"
-            : 'EXTRACT(YEAR FROM created_at) as project_year';
+        // 6. Hitung Total Karya per Tahun (untuk Badge & Tombol "Lihat Semua Tahun X")
+        $yearCol = $driver === 'sqlite'
+            ? "strftime('%Y', created_at)"
+            : 'EXTRACT(YEAR FROM created_at)';
 
-        $yearQuery = InternshipProject::selectRaw($yearExpression)->visibleTo($user);
+        $yearlyCounts = InternshipProject::visibleTo($user)
+            ->selectRaw("{$yearCol} as yr, COUNT(*) as count")
+            ->groupByRaw($yearCol)
+            ->pluck('count', 'yr')
+            ->mapWithKeys(fn ($c, $y) => [(string) (int) $y => (int) $c]);
 
-        $availableYears = $yearQuery->distinct()
-            ->orderBy('project_year', 'desc')
-            ->pluck('project_year')
-            ->filter()
+        $availableYears = $yearlyCounts->keys()
             ->map(fn ($y) => (int) $y)
+            ->sortDesc()
             ->values();
 
         if ($availableYears->isEmpty()) {
@@ -116,6 +118,7 @@ class PublicProjectController extends Controller
             'projects',
             'groupedProjects',
             'availableYears',
+            'yearlyCounts',
             'stats',
             'search',
             'category',

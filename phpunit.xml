@@ -19,6 +19,8 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <env name="APP_LOCALE" value="id"/>
+        <env name="APP_FALLBACK_LOCALE" value="id"/>
         <env name="SCHOOL_DIRECTORY_ENABLED" value="false"/>
         <env name="COLLEGE_DIRECTORY_ENABLED" value="false"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
