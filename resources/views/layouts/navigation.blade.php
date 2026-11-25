@@ -86,7 +86,7 @@
                          class="h-9 sm:h-10 w-auto object-contain shrink-0 transition-transform group-hover:scale-105"
                          style="aspect-ratio: 960/1234; height: 38px; width: auto; max-height: 40px; object-fit: contain;">
                     <div class="h-6 w-px bg-slate-200"></div>
-                    <img src="{{ asset('images/logos/dispusip.png') }}" 
+                    <img src="{{ asset('images/logos/dispusip.png') }}?v=5" 
                          alt="Dispusip Surabaya" 
                          class="h-9 sm:h-10 w-auto object-contain shrink-0 transition-transform group-hover:scale-105"
                          style="height: 38px; width: auto; max-height: 40px; object-fit: contain;">
@@ -662,7 +662,7 @@
                 <div class="flex items-center gap-2 min-w-0">
                     <img src="{{ asset('images/logos/surabaya.png') }}" alt="Pemkot Surabaya" class="h-7 w-auto object-contain shrink-0">
                     <div class="h-5 w-px bg-slate-200 shrink-0"></div>
-                    <img src="{{ asset('images/logos/dispusip.png') }}" alt="Dispusip Surabaya" class="h-7 w-auto object-contain shrink-0">
+                    <img src="{{ asset('images/logos/dispusip.png') }}?v=5" alt="Dispusip Surabaya" class="h-7 w-auto object-contain shrink-0">
                     <span class="text-xs font-extrabold text-slate-800 truncate ml-0.5">Portal Magang</span>
                 </div>
                 <button type="button"

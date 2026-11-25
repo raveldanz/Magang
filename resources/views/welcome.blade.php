@@ -6,9 +6,11 @@
         <title>Portal Magang Resmi - Dinas Perpustakaan dan Kearsipan Kota Surabaya</title>
 
         <!-- Favicon Resmi Pemerintah Kota Surabaya & Dispusip -->
-        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/logos/dispusip.png') }}">
-        <link rel="shortcut icon" href="{{ asset('images/logos/dispusip.png') }}">
-        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/logos/dispusip.png') }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}?v=5">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}?v=5">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v=5">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}?v=5">
+        <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('android-chrome-192x192.png') }}?v=5">
 
         <!-- Fonts: Plus Jakarta Sans -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
