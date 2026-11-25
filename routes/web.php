@@ -193,6 +193,16 @@ Route::middleware('auth')->group(function () {
 | Masing-masing file sudah membungkus route dengan middleware auth + role.
 */
 
+// Route favicon eksplisit dengan header anti-cache agar browser langsung memperbarui favicon tanpa flicker
+Route::get('/favicon.ico', function () {
+    return response()->file(public_path('favicon.ico'), [
+        'Content-Type' => 'image/x-icon',
+        'Cache-Control' => 'no-cache, no-store, must-revalidate',
+        'Pragma' => 'no-cache',
+        'Expires' => '0',
+    ]);
+});
+
 // API Pencarian Master Perguruan Tinggi Nasional untuk Autocomplete
 Route::get('/universities/master-search', [MasterUniversityApiController::class, 'search'])->name('universities.master-search');
 
