@@ -320,26 +320,24 @@
                                         class="w-full h-full object-contain">
                                 </a>
 
-                                <div class="flex flex-col items-end gap-1.5 min-w-0 max-w-[calc(100%-4.25rem)]">
-                                    <div class="flex flex-wrap items-center justify-end gap-1.5">
-                                        <span
-                                            class="px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200/80 rounded-lg text-[10px] font-bold max-w-[110px] truncate"
-                                            title="{{ $univ->code }}">
-                                            {{ $univ->code ?: 'BARU' }}
-                                        </span>
+                                <div class="flex flex-col items-end gap-1 min-w-0 shrink-0">
+                                    <span
+                                        class="px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200/80 rounded-lg text-[10px] font-bold max-w-[120px] truncate"
+                                        title="{{ $univ->code }}">
+                                        {{ $univ->code ?: 'BARU' }}
+                                    </span>
 
-                                        @if($univ->universityAdmin)
-                                            <span
-                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 whitespace-nowrap">
-                                                Akun Aktif
-                                            </span>
-                                        @else
-                                            <span
-                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 whitespace-nowrap">
-                                                Belum Ada Akun
-                                            </span>
-                                        @endif
-                                    </div>
+                                    @if($univ->universityAdmin)
+                                        <span
+                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 whitespace-nowrap">
+                                            Akun Aktif
+                                        </span>
+                                    @else
+                                        <span
+                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 whitespace-nowrap">
+                                            Belum Ada Akun
+                                        </span>
+                                    @endif
                                 </div>
                             </div>
 
