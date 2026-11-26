@@ -22,6 +22,15 @@ use App\Http\Controllers\Student\FinalReportController as StudentFinalReportCont
 use App\Http\Middleware\EnsureNotImpersonating;
 use App\Models\Application;
 use App\Models\Placement;
+use Database\Seeders\AdminWorkflowSeeder;
+use Database\Seeders\DemoE2ESeeder;
+use Database\Seeders\DemoScenarioSeeder;
+use Database\Seeders\InternshipGroupDemoSeeder;
+use Database\Seeders\MasterSchoolsSeeder;
+use Database\Seeders\SupervisorDemoSeeder;
+use Database\Seeders\SurabayaAgenciesSeeder;
+use Database\Seeders\SurabayaAndTopUniversitiesSeeder;
+use Database\Seeders\YearlyProjectsFiveYearsSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -217,14 +226,29 @@ Route::get('/init-cloud-db', function (Request $request) {
     Artisan::call('migrate', ['--force' => true]);
     $migrateOutput = Artisan::output();
 
-    Artisan::call('db:seed', ['--force' => true]);
-    $seedOutput = Artisan::output();
+    $seeders = [
+        SurabayaAndTopUniversitiesSeeder::class,
+        MasterSchoolsSeeder::class,
+        SurabayaAgenciesSeeder::class,
+        DemoE2ESeeder::class,
+        AdminWorkflowSeeder::class,
+        SupervisorDemoSeeder::class,
+        InternshipGroupDemoSeeder::class,
+        YearlyProjectsFiveYearsSeeder::class,
+        DemoScenarioSeeder::class,
+    ];
+
+    $seedOutputs = [];
+    foreach ($seeders as $seeder) {
+        Artisan::call('db:seed', ['--class' => $seeder, '--force' => true]);
+        $seedOutputs[] = class_basename($seeder).': '.trim(Artisan::output());
+    }
 
     return response()->json([
         'status' => 'success',
-        'message' => 'Migrasi dan seeder database berhasil dijalankan di server cloud!',
+        'message' => 'Migrasi dan seeder akun demo berhasil diisi ke database cloud!',
         'migrate' => $migrateOutput,
-        'seed' => $seedOutput,
+        'seed' => $seedOutputs,
     ]);
 });
 
