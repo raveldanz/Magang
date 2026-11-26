@@ -223,7 +223,9 @@
                 @forelse($agencies as $agency)
                     @php
                         $agencyLogoUrl = $agency->logo_url;
-                        $firstAdmin = $agency->users->firstWhere('role', 'admin');
+                        $firstAdmin = $agency->users->where('role', 'admin')->first(fn ($u) => str_contains(strtolower($u->email), 'dispusip'))
+                            ?? $agency->users->where('role', 'admin')->firstWhere('unit_id', null)
+                            ?? $agency->users->firstWhere('role', 'admin');
                     @endphp
 
                     <div

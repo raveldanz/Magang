@@ -170,8 +170,13 @@
                             </div>
                         @endif
 
-                        <div class="space-y-6 sm:space-y-8">
-                            
+                        <div id="tahun-{{ $yr }}" class="space-y-6 sm:space-y-8 scroll-mt-24">
+                            @php
+                                $section = $yearSections[(string) $yr] ?? null;
+                                $sectionPaginator = $section['paginator'] ?? null;
+                                $totalInYear = $sectionPaginator ? $sectionPaginator->total() : $projectList->count();
+                            @endphp
+
                             {{-- Header Section Pembatas Tahun (Elegan & Minimalis Modern) --}}
                             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-slate-200/80">
                                 <div class="flex items-center gap-3.5 sm:gap-4">
@@ -183,14 +188,10 @@
                                             <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                                                 Tahun Perjalanan {{ $yr }}
                                             </h2>
-                                            @php
-                                                $totalInYear = $yearlyCounts[(string)$yr] ?? $projectList->count();
-                                                $shownInPage = $projectList->count();
-                                            @endphp
                                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/80 shadow-2xs">
                                                 <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                                                @if((string)$year !== (string)$yr && $totalInYear > $shownInPage)
-                                                    <span>{{ $shownInPage }} dari {{ $totalInYear }} Karya</span>
+                                                @if($sectionPaginator && $sectionPaginator->hasPages())
+                                                    <span>{{ $sectionPaginator->firstItem() }}–{{ $sectionPaginator->lastItem() }} dari {{ $totalInYear }} Karya</span>
                                                 @else
                                                     <span>{{ $totalInYear }} Karya Inovasi</span>
                                                 @endif
@@ -204,12 +205,18 @@
 
                                 <div class="flex flex-wrap items-center gap-2.5">
                                     @if((string)$year !== (string)$yr)
-                                        <a href="{{ route('public.projects.index', array_merge(request()->query(), ['year' => $yr, 'page' => 1])) }}" 
+                                        @php
+                                            $focusYearQuery = collect(request()->query())
+                                                ->reject(fn ($v, $k) => $k === 'page' || str_starts_with((string) $k, 'page_'))
+                                                ->put('year', $yr)
+                                                ->all();
+                                        @endphp
+                                        <a href="{{ route('public.projects.index', $focusYearQuery) }}" 
                                            class="inline-flex items-center gap-1.5 min-h-[38px] px-3.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200/80 text-xs font-bold transition-all shadow-2xs group/btn cursor-pointer"
-                                           title="Saring dan lihat seluruh karya inovasi tahun {{ $yr }}">
+                                           title="Saring dan lihat khusus karya inovasi tahun {{ $yr }}">
                                             <span>Lihat Semua Karya {{ $yr }}</span>
                                             <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-md text-[10px] font-extrabold bg-blue-200/70 text-blue-800 group-hover/btn:bg-white/20 group-hover/btn:text-white">
-                                                {{ $totalInYear }}
+                                                {{ $yearlyCounts[(string) $yr] ?? $totalInYear }}
                                             </span>
                                             <svg class="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -240,12 +247,9 @@
                                 </div>
                             </div>
 
-                            {{-- Grid Kartu Proyek Inovasi Tahun Terkait (Maksimal 3 Kartu ke Kanan di Timeline) --}}
-                            @php
-                                $cardsToShow = (string)$year === (string)$yr ? $projectList : $projectList->take(3);
-                            @endphp
+                            {{-- Grid Kartu Proyek Inovasi Tahun Terkait (Maksimal 3 Kartu per Halaman Tahun Ini) --}}
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-                                @foreach($cardsToShow as $project)
+                                @foreach($projectList as $project)
                                     @php
                                         $mhs = $project->placement?->application?->user;
                                         $univ = $mhs?->studentProfile?->universitas ?? $mhs?->university ?? 'Kampus/Sekolah Mitra';
@@ -261,7 +265,7 @@
                                                     <img src="{{ $project->photo_url }}" 
                                                          alt="{{ $project->title }}" 
                                                          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                                         loading="lazy">
+                                                         onerror="this.onerror=null; this.src='{{ asset('images/projects/ruang_baca_modern_interior.jpg') }}';">
                                                 @else
                                                     <div class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-slate-400">
                                                         <svg class="w-10 h-10 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -398,16 +402,16 @@
                                 @endforeach
                             </div>
 
+                            {{-- Paginasi Per Tahun (Maksimal 3 Proyek per Halaman Tahun Ini, Tanpa Memecah Halaman Utama 2026-2022) --}}
+                            @if($sectionPaginator && $sectionPaginator->hasPages())
+                                <div class="pt-3 border-t border-slate-100">
+                                    {{ $sectionPaginator->links() }}
+                                </div>
+                            @endif
+
                         </div>
                     @endforeach
                 </div>
-
-                {{-- 4. NAVIGASI PAGINATION ELEGAN --}}
-                @if(isset($projects) && $projects->hasPages())
-                    <div class="pt-6 sm:pt-8">
-                        {{ $projects->links() }}
-                    </div>
-                @endif
             @endif
 
         </div>
