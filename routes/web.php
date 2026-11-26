@@ -22,6 +22,8 @@ use App\Http\Controllers\Student\FinalReportController as StudentFinalReportCont
 use App\Http\Middleware\EnsureNotImpersonating;
 use App\Models\Application;
 use App\Models\Placement;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -205,6 +207,26 @@ Route::get('/favicon.ico', function () {
 
 // API Pencarian Master Perguruan Tinggi Nasional untuk Autocomplete
 Route::get('/universities/master-search', [MasterUniversityApiController::class, 'search'])->name('universities.master-search');
+
+// Rute Inisialisasi Database Cloud (Wasmer / Serverless) terproteksi APP_KEY
+Route::get('/init-cloud-db', function (Request $request) {
+    if (! $request->has('key') || $request->query('key') !== config('app.key')) {
+        abort(403, 'Akses ditolak.');
+    }
+
+    Artisan::call('migrate', ['--force' => true]);
+    $migrateOutput = Artisan::output();
+
+    Artisan::call('db:seed', ['--force' => true]);
+    $seedOutput = Artisan::output();
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Migrasi dan seeder database berhasil dijalankan di server cloud!',
+        'migrate' => $migrateOutput,
+        'seed' => $seedOutput,
+    ]);
+});
 
 // Pencarian async kampus/sekolah untuk dropdown (hanya pengguna login; melengkapi dari direktori nasional NPSN)
 Route::middleware(['auth', 'throttle:60,1'])->group(function () {
