@@ -100,11 +100,15 @@ class ProjectInteractionsAndCatalogTest extends TestCase
         $base = $this->createSampleProject(true);
         $placement = $base['placement'];
 
-        // Buat 14 proyek tambahan (total 15 proyek publik)
-        for ($i = 2; $i <= 15; $i++) {
+        $currentYear = (int) date('Y');
+        $previousYear = $currentYear - 1;
+
+        // Pastikan proyek awal berada di tahun berjalan, lalu buat 4 proyek tambahan di tahun berjalan (total 5)
+        $base['project']->update(['created_at' => now()->startOfYear()->addMonths(1)]);
+        for ($i = 2; $i <= 5; $i++) {
             InternshipProject::create([
                 'placement_id' => $placement->id,
-                'title' => 'Inovasi Proyek Layanan Ke-'.$i,
+                'title' => 'Inovasi Proyek Layanan Tahun Ini Ke-'.$i,
                 'category' => 'teknologi',
                 'is_public' => true,
                 'description' => 'Deskripsi proyek pengujian paginasi ke-'.$i,
@@ -113,21 +117,49 @@ class ProjectInteractionsAndCatalogTest extends TestCase
                 'likes_count' => 0,
                 'comments_count' => 0,
                 'views_count' => 0,
-                'created_at' => now()->subDays($i),
+                'created_at' => now()->startOfYear()->addDays($i),
             ]);
         }
 
-        // Halaman 1 (6 item)
-        $responsePage1 = $this->get(route('public.projects.index', ['page' => 1]));
-        $responsePage1->assertStatus(200);
-        $responsePage1->assertSee('Navigasi Halaman');
-        $responsePage1->assertSee('Menampilkan');
-        $responsePage1->assertSee('6');
+        // Buat 2 proyek di tahun sebelumnya untuk memastikan semua tahun tampil di halaman yang sama
+        for ($j = 1; $j <= 2; $j++) {
+            InternshipProject::create([
+                'placement_id' => $placement->id,
+                'title' => 'Arsip Inovasi Tahun Lalu Ke-'.$j,
+                'category' => 'buku',
+                'is_public' => true,
+                'description' => 'Deskripsi arsip tahun sebelumnya ke-'.$j,
+                'community_benefit' => 'Manfaat literasi arsip ke-'.$j,
+                'photo_path' => 'internship_projects/sample.jpg',
+                'likes_count' => 0,
+                'comments_count' => 0,
+                'views_count' => 0,
+                'created_at' => now()->subYear()->startOfYear()->addDays($j),
+            ]);
+        }
 
-        // Halaman 2 (6 item berikutnya)
-        $responsePage2 = $this->get(route('public.projects.index', ['page' => 2]));
-        $responsePage2->assertStatus(200);
-        $responsePage2->assertSee('Navigasi Halaman');
+        // 1. Tampilan Semua Tahun: Tahun berjalan & tahun lalu tampil bersamaan dalam SATU halaman,
+        // masing-masing tahun maksimal 3 proyek + paginasi per tahun bila > 3
+        $responseAll = $this->get(route('public.projects.index'));
+        $responseAll->assertStatus(200);
+        $responseAll->assertSee("Tahun Perjalanan {$currentYear}");
+        $responseAll->assertSee("Tahun Perjalanan {$previousYear}");
+        $responseAll->assertSee('Navigasi Halaman');
+        $responseAll->assertSee('1–3 dari 5 Karya');
+        $responseAll->assertSee("page_{$currentYear}=2");
+        $responseAll->assertSee('Arsip Inovasi Tahun Lalu Ke-1');
+
+        // 2. Halaman 2 khusus pada tahun berjalan masih menampilkan seluruh tahun lain dalam 1 halaman
+        $responseYearPage2 = $this->get(route('public.projects.index', ["page_{$currentYear}" => 2]));
+        $responseYearPage2->assertStatus(200);
+        $responseYearPage2->assertSee('4–5 dari 5 Karya');
+        $responseYearPage2->assertSee("Tahun Perjalanan {$previousYear}");
+
+        // 3. Filter khusus satu tahun juga membatasi 3 proyek per halaman
+        $responseSingleYear = $this->get(route('public.projects.index', ['year' => $currentYear, 'page' => 2]));
+        $responseSingleYear->assertStatus(200);
+        $responseSingleYear->assertSee('4–5 dari 5 Karya');
+        $responseSingleYear->assertDontSee("Tahun Perjalanan {$previousYear}");
     }
 
     public function test_guest_can_like_and_unlike_project_via_ajax()
