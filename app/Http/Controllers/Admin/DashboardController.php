@@ -68,7 +68,7 @@ class DashboardController extends Controller
 
         // Master Counters
         $totalAgencies = AgencyProfile::count();
-        $totalUniversities = University::count();
+        $totalUniversities = University::where(fn ($q) => $q->where('institution_type', University::TYPE_COLLEGE)->orWhereNull('institution_type'))->count();
         $totalUsers = User::count();
 
         $totalMentorsQuery = User::whereIn('role', ['mentor', 'pembimbing']);

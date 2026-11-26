@@ -891,6 +891,31 @@ class InternshipGroupWorkflowTest extends TestCase
         $this->assertEquals(100, Unit::MAX_GROUP_MEMBERS);
     }
 
+    public function test_pesan_kelompok_penuh_tidak_menyebut_angka(): void
+    {
+        $this->actingAs($this->leader)->post(route('student.group.create'), [
+            'name' => 'Tim Penuh',
+            'unit_id' => $this->unit->id,
+            'start_date' => now()->addDays(5)->toDateString(),
+            'end_date' => now()->addDays(65)->toDateString(),
+        ]);
+        $group = InternshipGroup::where('leader_user_id', $this->leader->id)->firstOrFail();
+
+        // Ketua sudah 1 pengajuan; tambah 99 anggota sehingga kelompok tepat di batas.
+        foreach (User::factory()->count(Unit::MAX_GROUP_MEMBERS - 1)->create(['role' => 'mahasiswa']) as $anggota) {
+            Application::create([
+                'user_id' => $anggota->id, 'unit_id' => $this->unit->id, 'group_id' => $group->id,
+                'role_in_group' => 'member', 'status' => 'draft',
+                'start_date' => $group->start_date, 'end_date' => $group->end_date,
+            ]);
+        }
+
+        $this->actingAs($this->member)->post(route('student.group.join'), ['group_code' => $group->code])
+            ->assertSessionHas('error', 'Kelompok ini sudah penuh sehingga anggota baru tidak bisa ditambahkan.');
+
+        $this->assertSame(Unit::MAX_GROUP_MEMBERS, $group->applications()->count());
+    }
+
     public function test_supervisor_approve_from_member_application_approves_all_group_members_together(): void
     {
         $supervisor = User::factory()->create([

@@ -45,7 +45,8 @@ class SchoolParticipantEndToEndTest extends TestCase
         $schoolAdmin = User::factory()->create(['role' => 'universitas', 'university_id' => $school->id, 'university' => $school->name]);
 
         // ── 1. Guru daftar sendiri dari halaman Daftar Akun (sekolah dikenali dari nama singkat) ──
-        $this->get('/register')->assertOk()->assertSee('SMK NEGERI 7 SURABAYA');
+        $this->get('/register')->assertOk();
+        $this->getJson(route('register.institutions', ['q' => 'SMK NEGERI 7 SURABAYA']))->assertOk()->assertJsonFragment(['id' => $school->id]);
         $this->post('/register', [
             'register_as' => 'advisor',
             'name' => 'Sri Wahyuni, S.Pd.',

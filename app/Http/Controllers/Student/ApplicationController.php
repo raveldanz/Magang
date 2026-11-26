@@ -75,7 +75,7 @@ class ApplicationController extends Controller
 
         $agencies = AgencyProfile::orderBy('agency_name')->get();
         $defaultAgency = $agencies->first();
-        $maxGroupMembers = 100;
+        $maxGroupMembers = Unit::MAX_GROUP_MEMBERS;
 
         return view('student.application.create', compact('units', 'groupedUnits', 'agencies', 'activeApplication', 'draftGroup', 'applicationHistory', 'maxGroupMembers', 'rejectedGroupApplication'));
     }
@@ -348,11 +348,10 @@ class ApplicationController extends Controller
             return redirect()->back()->with('error', 'Anda tidak dapat bergabung karena kelompok ini dikhususkan untuk peserta magang dari '.($group->leader->university ?? 'kampus lain').'.');
         }
 
-        // Validasi batas maksimal aman anggota kelompok standar 100 orang
-        $maxGroupMembers = 100;
+        // Batas aman jumlah anggota kelompok; angkanya sengaja tidak ditampilkan ke peserta.
         $currentCount = $group->applications()->count();
-        if ($currentCount >= $maxGroupMembers) {
-            return redirect()->back()->with('error', "Jumlah anggota kelompok sudah mencapai batas maksimal sistem yaitu {$maxGroupMembers} orang.");
+        if ($currentCount >= Unit::MAX_GROUP_MEMBERS) {
+            return redirect()->back()->with('error', 'Kelompok ini sudah penuh sehingga anggota baru tidak bisa ditambahkan.');
         }
 
         // Validasi sisa kuota bidang

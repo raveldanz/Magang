@@ -4,7 +4,6 @@ namespace App\Services\Directory;
 
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -45,55 +44,6 @@ class SchoolDirectoryClient
     }
 
     /**
-     * Pencarian langsung berdasarkan nama (dicache singkat agar tidak membebani API sumber).
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    public function search(string $keyword, int $limit = 15): array
-    {
-        $keyword = trim($keyword);
-        if (! $this->enabled() || mb_strlen($keyword) < 3) {
-            return [];
-        }
-
-        $key = 'school-directory:search:'.md5(mb_strtolower($keyword));
-        $rows = Cache::get($key);
-
-        if ($rows === null) {
-            $payload = $this->get('/sekolah/s', ['sekolah' => $keyword, 'perPage' => 30]);
-            if ($payload === null) {
-                return []; // gagal: jangan di-cache agar percobaan berikutnya tetap ke API
-            }
-            $rows = array_map(fn (array $row) => $this->normalizeRow($row), $payload['dataSekolah'] ?? []);
-            // Hanya jenjang peserta magang/PKL (SMA/SMK/MA/SMLB), sama dengan cakupan sinkronisasi; SD/SMP diabaikan.
-            $rows = array_values(array_filter($rows, fn (array $row) => in_array($row['form'], self::FORMS, true)));
-            Cache::put($key, $rows, now()->addHours(6));
-        }
-
-        // Simpan tiap baris per NPSN: endpoint resolve hanya boleh memakai data yang benar-benar datang dari API.
-        foreach ($rows as $row) {
-            if ($row['npsn'] !== '') {
-                Cache::put(self::npsnCacheKey($row['npsn']), $row, now()->addDay());
-            }
-        }
-
-        return array_slice($rows, 0, $limit);
-    }
-
-    public static function npsnCacheKey(string $npsn): string
-    {
-        return 'school-directory:npsn:'.$npsn;
-    }
-
-    /** Baris sekolah hasil pencarian API terakhir untuk NPSN ini (null bila tidak pernah dikembalikan API). */
-    public function cached(string $npsn): ?array
-    {
-        $row = Cache::get(self::npsnCacheKey($npsn));
-
-        return is_array($row) ? $row : null;
-    }
-
-    /**
      * @param  array<string, mixed>  $row
      * @return array{npsn: string, name: string, form: string, status: string, address: string, city: string, province: string}
      */
@@ -101,7 +51,7 @@ class SchoolDirectoryClient
     {
         $status = strtoupper(trim((string) ($row['status'] ?? '')));
 
-        return [
+        $normalized = [
             'npsn' => trim((string) ($row['npsn'] ?? '')),
             'name' => trim((string) ($row['sekolah'] ?? '')),
             'form' => strtoupper(trim((string) ($row['bentuk'] ?? ''))),
@@ -110,6 +60,16 @@ class SchoolDirectoryClient
             'city' => trim(preg_replace('/^(Kota|Kab\.?)\s+/i', '', (string) ($row['kabupaten_kota'] ?? ''))),
             'province' => trim(preg_replace('/^Prov\.\s*/i', '', (string) ($row['propinsi'] ?? ''))),
         ];
+        static $corrections;
+        $corrections ??= json_decode(file_get_contents(database_path('data/school_directory_corrections.json')), true, flags: JSON_THROW_ON_ERROR);
+        $verified = $corrections[$normalized['npsn']] ?? null;
+        if ($verified && $verified['old_name'] === $normalized['name']) {
+            foreach (['name', 'address', 'city', 'province'] as $field) {
+                $normalized[$field] = $verified[$field];
+            }
+        }
+
+        return $normalized;
     }
 
     /**

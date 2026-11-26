@@ -28,6 +28,11 @@ class UniversityResolver
         'the', 'of', 'dan', 'and',
     ];
 
+    /** Kata yang ada di belasan ribu nama sekolah: tidak dipakai menyaring kandidat saran. */
+    private const BROAD_WORDS = [
+        'sma', 'sman', 'smas', 'smk', 'smkn', 'smks', 'ma', 'man', 'mas', 'slb', 'smlb', 'negeri', 'swasta',
+    ];
+
     /** Kemiripan minimum agar sebuah kampus ditawarkan sebagai saran. */
     public const SUGGEST_THRESHOLD = 0.55;
 
@@ -111,6 +116,30 @@ class UniversityResolver
     }
 
     /**
+     * Semua institusi terverifikasi yang namanya sama (mengabaikan huruf besar-kecil & tanda baca).
+     * Lebih dari satu berarti pengguna harus memilih; tidak boleh dipasangkan sembarang.
+     *
+     * @return Collection<int, University>
+     */
+    public function sameNamed(?string $text): Collection
+    {
+        $needle = self::normalize($text);
+        if ($needle === '') {
+            return collect();
+        }
+
+        $tokens = explode(' ', $needle);
+        usort($tokens, fn ($a, $b) => mb_strlen($b) <=> mb_strlen($a));
+
+        return $this->candidates([$tokens[0]])
+            ->where('is_verified', true)
+            ->get(['id', 'name', 'acronym', 'code', 'address'])
+            ->filter(fn (University $u) => self::normalize($u->name) === $needle)
+            ->sortBy(fn (University $u) => (string) $u->cityLabel())
+            ->values();
+    }
+
+    /**
      * Kampus untuk seorang user: university_id → profil mahasiswa → nama persis (data lama).
      */
     public function forUser(?User $user): ?University
@@ -164,8 +193,11 @@ class UniversityResolver
 
         // Master institusi bisa berisi puluhan ribu sekolah (direktori NPSN): skor kemiripan hanya dihitung untuk
         // kandidat yang memuat potongan awal (4 huruf) salah satu kata inti, cukup longgar untuk salah ketik.
-        $fragments = collect(explode(' ', $inputCore !== '' ? $inputCore : $input))
-            ->filter(fn ($w) => mb_strlen($w) >= 2)
+        $words = collect(explode(' ', $inputCore !== '' ? $inputCore : $input))
+            ->filter(fn ($w) => mb_strlen($w) >= 2);
+        // Kata sangat umum ("sma", "negeri", "al") memuat sebagian besar tabel; pakai hanya bila tidak ada kata lain.
+        $distinct = $words->filter(fn ($w) => mb_strlen($w) >= 3 && ! in_array($w, self::BROAD_WORDS, true));
+        $fragments = ($distinct->isNotEmpty() ? $distinct : $words)
             ->map(fn ($w) => mb_substr($w, 0, 4))
             ->unique()
             ->values()

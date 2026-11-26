@@ -4,17 +4,15 @@ namespace App\Services\Directory;
 
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Klien direktori perguruan tinggi nasional/internasional (Hipo / Higher Education Directory).
+ * Klien direktori perguruan tinggi nasional/internasional (PDDikti melalui portal Kemdiktisaintek).
  *
  * Dirancang dengan arsitektur toleran gagal (graceful degradation):
  * - Database lokal (PostgreSQL) dan master dataset (253+ kampus) tetap menjadi sumber data utama.
- * - API dipanggil saat pengguna mencari kampus yang belum ada di database lokal.
- * - Hasil API yang dipilih pengguna otomatis disimpan/direkam (upsert) ke tabel universities.
+ * - API hanya dipakai sinkron direktori, tidak saat pengguna mengetik pencarian.
  * - Bila API eksternal timeout atau down, sistem otomatis melayani dari database lokal tanpa error.
  */
 class CollegeDirectoryClient
@@ -26,66 +24,31 @@ class CollegeDirectoryClient
     }
 
     /**
-     * Pencarian kampus berbasis API dengan cache memori.
+     * Seluruh perguruan tinggi Indonesia menurut direktori. Null bila API gagal.
      *
-     * @return array<int, array<string, mixed>>
+     * @return array<int, array<string, mixed>>|null
      */
-    public function search(string $keyword, int $limit = 15): array
+    public function all(): ?array
     {
-        $keyword = trim($keyword);
-        if (! $this->enabled() || mb_strlen($keyword) < 3) {
-            return [];
+        $payload = $this->get('/dashboard/kelembagaan', ['type' => 'pt', 'draw' => 1, 'start' => 0, 'length' => 10000]);
+        $data = $payload['data'] ?? null;
+        if (! is_array($data) || count($data) !== (int) ($payload['recordsFiltered'] ?? -1)) {
+            return null;
         }
 
-        $cacheKey = 'college-directory:search:'.md5(mb_strtolower($keyword));
-        $rows = Cache::get($cacheKey);
-
-        if ($rows === null) {
-            $payload = $this->get('/search', [
-                'country' => 'Indonesia',
-                'name' => $keyword,
-            ]);
-
-            if ($payload === null) {
-                return []; // Jika API gagal, jangan cache agar percobaan berikutnya bisa mencoba lagi
+        $rows = [];
+        foreach ($data as $item) {
+            $name = trim((string) ($item['nama_pt'] ?? ''));
+            $code = trim((string) ($item['npsn'] ?? ''));
+            if ($name === '' || $code === '') {
+                return null;
             }
-
-            $rows = [];
-            foreach ($payload as $item) {
-                if (! is_array($item) || empty($item['name'])) {
-                    continue;
-                }
-                $rows[] = $this->normalizeRow($item);
-            }
-
-            Cache::put($cacheKey, $rows, now()->addHours(6));
+            $row = $this->normalizeRow(['name' => $name, 'state-province' => $item['kabupaten_pt'] ?? null]);
+            $row['official_code'] = $code;
+            $rows[] = $row;
         }
 
-        // Cache setiap item per key unik agar endpoint resolve hanya menyimpan data yang valid dari API
-        foreach ($rows as $row) {
-            if (! empty($row['key'])) {
-                Cache::put(self::itemCacheKey($row['key']), $row, now()->addDay());
-            }
-        }
-
-        return array_slice($rows, 0, $limit);
-    }
-
-    public static function itemCacheKey(string $key): string
-    {
-        return 'college-directory:item:'.$key;
-    }
-
-    /**
-     * Ambil data kampus dari cache API berdasarkan key unik.
-     *
-     * @return array<string, mixed>|null
-     */
-    public function cached(string $key): ?array
-    {
-        $row = Cache::get(self::itemCacheKey($key));
-
-        return is_array($row) ? $row : null;
+        return $rows;
     }
 
     /**
@@ -145,7 +108,7 @@ class CollegeDirectoryClient
                 $ca = is_file(resource_path('certs/cacert.pem')) ? resource_path('certs/cacert.pem') : null;
             }
 
-            $response = Http::acceptJson()
+            $response = Http::acceptJson()->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
                 ->when($ca, fn ($http) => $http->withOptions(['verify' => $ca]))
                 ->timeout((int) config('services.college_directory.timeout', 5))
                 ->retry(2, 300, fn ($e) => $e instanceof ConnectionException || ($e instanceof RequestException && $e->response->serverError()), throw: false)

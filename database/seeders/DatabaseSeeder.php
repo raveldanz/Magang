@@ -26,9 +26,15 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
+        // Gambar dan dokumen contoh buatan; dilewati saat pengujian agar tidak menulis ke penyimpanan asli.
+        if (! app()->runningUnitTests()) {
+            $this->call(DemoSampleFilesSeeder::class);
+        }
+
         $this->call([
             SurabayaAndTopUniversitiesSeeder::class,
             MasterSchoolsSeeder::class,
+            SchoolSnapshotSeeder::class,
             SurabayaAgenciesSeeder::class,
             DemoE2ESeeder::class,
             AdminWorkflowSeeder::class,

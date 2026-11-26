@@ -22,6 +22,10 @@ Schedule::command('institutions:sync-external')->hourlyAt(30)
     ->when(fn () => SyncExternalInstitutions::isDue())
     ->withoutOverlapping(120)->runInBackground();
 
+Schedule::command('institutions:sync-external --kind=college')->hourlyAt(45)
+    ->when(fn () => SyncExternalInstitutions::isDue(kind: 'college'))
+    ->withoutOverlapping(120)->runInBackground();
+
 // Heartbeat tiap 5 menit: menandai scheduler hidup & mengirim job kecil untuk memastikan queue worker hidup.
 // Statusnya tampil di dasbor Super Admin dan lewat `php artisan app:health`.
 Schedule::call(function () {

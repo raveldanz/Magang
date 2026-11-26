@@ -49,7 +49,7 @@ return [
     // Direktori perguruan tinggi (Higher Education Directory) untuk live search & auto-cache
     'college_directory' => [
         'enabled' => env('COLLEGE_DIRECTORY_ENABLED', true),
-        'base_url' => env('COLLEGE_DIRECTORY_URL', 'http://universities.hipolabs.com'),
+        'base_url' => env('PDDIKTI_DIRECTORY_URL', 'https://data.kemdiktisaintek.go.id'),
         'timeout' => (int) env('COLLEGE_DIRECTORY_TIMEOUT', 5),
         'ca_bundle' => env('COLLEGE_DIRECTORY_CA_BUNDLE') ?: resource_path('certs/cacert.pem'),
     ],

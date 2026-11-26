@@ -71,23 +71,23 @@ class UniversityController extends Controller
 
         // Saran "mungkin sama dengan" untuk kampus belum terverifikasi di halaman ini (bantu admin menggabungkan)
         $resolver = app(UniversityResolver::class);
+        // Hanya saran dobel yang dibawa ke halaman; tujuan lain dicari lewat server (data bisa puluhan ribu).
         $mergeSuggestions = [];
-        $verifiedOptions = collect();
         $univCollection = $universities instanceof AbstractPaginator
             ? $universities->getCollection()
             : $universities;
 
-        if ($univCollection->contains(fn ($u) => ! ($u->is_verified ?? true))) {
-            $verifiedOptions = University::verified()->orderBy('name')->get(['id', 'name', 'acronym', 'code']);
-            foreach ($univCollection as $u) {
-                if (! ($u->is_verified ?? true)) {
-                    $mergeSuggestions[$u->id] = $resolver->suggest($u->name, 3)->pluck('university.id')->all();
-                }
+        // Saran otomatis memindai puluhan ribu baris, jadi dibatasi; kartu lain tetap bisa mencari lewat kotak pilihan.
+        foreach ($univCollection as $u) {
+            if (! ($u->is_verified ?? true) && count($mergeSuggestions) < 8) {
+                $mergeSuggestions[$u->id] = $resolver->suggest($u->name, 3)->pluck('university')
+                    ->map(fn (University $s) => ['id' => $s->id, 'name' => $s->name, 'acronym' => $s->acronym ?: $s->code])
+                    ->values()->all();
             }
         }
 
         // Executive Macro Stats
-        $totalUniversities = University::count();
+        $totalUniversities = University::where(fn ($q) => $q->where('institution_type', University::TYPE_COLLEGE)->orWhereNull('institution_type'))->count();
         $totalStudents = User::where('role', 'mahasiswa')
             ->where(function ($q) {
                 $q->whereNotNull('university_id')
@@ -121,7 +121,7 @@ class UniversityController extends Controller
         $user = Auth::user();
         $isSuperAdmin = ($user?->isSuperAdmin() ?? false);
 
-        return view('admin.universities.index', compact('universities', 'unregisteredCount', 'pendingVerificationCount', 'isSuperAdmin', 'macroStats', 'mergeSuggestions', 'verifiedOptions', 'externalSuggestions'));
+        return view('admin.universities.index', compact('universities', 'unregisteredCount', 'pendingVerificationCount', 'isSuperAdmin', 'macroStats', 'mergeSuggestions', 'externalSuggestions'));
     }
 
     /**
@@ -140,14 +140,13 @@ class UniversityController extends Controller
         $institutionType = $request->input('institution_type');
 
         if ($institutionType === University::TYPE_SCHOOL || ! empty($npsn)) {
+            // Hanya data yang benar-benar dikirim yang disimpan: tanpa kode atau lokasi karangan.
             $row = [
-                'npsn' => $npsn ?: 'SCH-'.rand(1000, 9999),
+                'npsn' => $npsn,
                 'name' => $name,
-                'form' => $request->input('form', 'SMK'),
-                'address' => $request->input('address', ''),
-                'city' => $request->input('city', 'Kota Surabaya'),
-                'province' => $request->input('province', 'Jawa Timur'),
-                'status' => 'NEGERI',
+                'address' => (string) $request->input('address'),
+                'city' => (string) $request->input('city'),
+                'province' => (string) $request->input('province'),
             ];
             $result = $masterService->upsertDirectorySchool($row);
             $univ = $result['university'];
@@ -208,10 +207,10 @@ class UniversityController extends Controller
         $univ = University::findOrFail($id);
 
         if (! $service->verifyUniversity($univ)) {
-            return redirect()->back()->with('success', "Perguruan tinggi '{$univ->name}' sudah terverifikasi.");
+            return redirect()->back()->with('success', "Institusi '{$univ->name}' sudah terverifikasi.");
         }
 
-        return redirect()->back()->with('success', "Perguruan tinggi '{$univ->name}' berhasil diverifikasi. Lengkapi kode kampus & profilnya melalui menu Edit bila diperlukan.");
+        return redirect()->back()->with('success', "Institusi '{$univ->name}' berhasil diverifikasi. Lengkapi kode institusi dan profilnya melalui menu Edit bila diperlukan.");
     }
 
     public function create()
