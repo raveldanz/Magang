@@ -50,6 +50,9 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::match(['put', 'patch'], '/admin/logbooks/{id}/review', [AdminLogbookController::class, 'review'])->name('admin.logbooks.review');
 
     // Penerbitan Sertifikat
+    Route::get('/admin/pengaturan-sistem', [\App\Http\Controllers\Admin\SystemSettingsController::class, 'edit'])->name('admin.settings.edit');
+    Route::put('/admin/pengaturan-sistem', [\App\Http\Controllers\Admin\SystemSettingsController::class, 'update'])->name('admin.settings.update');
+
     Route::get('/admin/certificates', [AdminCertificateController::class, 'index'])->name('admin.certificates.index');
     Route::get('/admin/certificates/batch-print', [AdminCertificateController::class, 'batchPrint'])->name('admin.certificates.batchPrint');
     Route::get('/admin/certificates/{placementId}/preview', [AdminCertificateController::class, 'show'])->name('admin.certificates.show');

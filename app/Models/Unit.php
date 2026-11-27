@@ -62,6 +62,11 @@ class Unit extends Model
 
     const MAX_GROUP_MEMBERS = 100;
 
+    public static function groupLimit(): int
+    {
+        return (int) RegistrationSettings::current()->group_limit;
+    }
+
     protected $casts = [
         'quota' => 'integer',
     ];
@@ -78,6 +83,6 @@ class Unit extends Model
      */
     public function getEffectiveMaxGroupMembersAttribute(): int
     {
-        return min(self::MAX_GROUP_MEMBERS, $this->remaining_quota);
+        return min(self::groupLimit(), $this->remaining_quota);
     }
 }

@@ -560,7 +560,7 @@
 
             <!-- 5. PARAGRAF PELAKSANAAN & NARAHUBUNG -->
             <p>
-                Untuk melaksanakan Praktik Kerja Magang pada <strong>{{ $agencyName }}</strong> dengan jadwal pelaksanaan mulai tanggal <strong>{{ $startDateFormatted }}</strong> s.d. <strong>{{ $endDateFormatted }}</strong> pada Unit Kerja <strong>{{ $application->unit->name ?? 'Dinas' }}</strong>. Untuk informasi lebih lanjut, silakan hubungi <strong>Pak Nanang</strong> selaku narahubung magang.
+                Untuk melaksanakan Praktik Kerja Magang pada <strong>{{ $agencyName }}</strong> dengan jadwal pelaksanaan mulai tanggal <strong>{{ $startDateFormatted }}</strong> s.d. <strong>{{ $endDateFormatted }}</strong> pada Unit Kerja <strong>{{ $application->unit->name ?? 'Dinas' }}</strong>. Untuk informasi lebih lanjut, silakan hubungi <strong>{{ \App\Models\RegistrationSettings::current()->letter_contact }}</strong> selaku narahubung magang.
             </p>
 
             <p>

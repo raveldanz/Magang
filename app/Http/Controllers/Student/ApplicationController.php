@@ -75,7 +75,7 @@ class ApplicationController extends Controller
 
         $agencies = AgencyProfile::orderBy('agency_name')->get();
         $defaultAgency = $agencies->first();
-        $maxGroupMembers = Unit::MAX_GROUP_MEMBERS;
+        $maxGroupMembers = Unit::groupLimit();
 
         return view('student.application.create', compact('units', 'groupedUnits', 'agencies', 'activeApplication', 'draftGroup', 'applicationHistory', 'maxGroupMembers', 'rejectedGroupApplication'));
     }
@@ -350,7 +350,7 @@ class ApplicationController extends Controller
 
         // Batas aman jumlah anggota kelompok; angkanya sengaja tidak ditampilkan ke peserta.
         $currentCount = $group->applications()->count();
-        if ($currentCount >= Unit::MAX_GROUP_MEMBERS) {
+        if ($currentCount >= Unit::groupLimit()) {
             return redirect()->back()->with('error', 'Kelompok ini sudah penuh sehingga anggota baru tidak bisa ditambahkan.');
         }
 

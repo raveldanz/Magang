@@ -119,6 +119,9 @@
                             Proyek Dinas
                         </a>
 
+                        @if(auth()->user()->isSuperAdmin())
+                            <a href="{{ route('admin.settings.edit') }}" class="px-2 py-1 font-semibold hover:text-blue-600 {{ request()->routeIs('admin.settings.*') ? 'text-blue-600' : 'text-slate-600' }}">Pengaturan Sistem</a>
+                        @endif
                         <div x-data="{ open: false }" class="relative" @click.outside="open = false">
                             <button @click="open = !open" 
                                     type="button" 
@@ -729,6 +732,9 @@
                         <a href="{{ route('admin.universities.index') }}" class="{{ $mLinkBase }} {{ request()->routeIs('admin.universities.*') ? $mLinkActive : $mLinkIdle }}">
                             <span>Kampus & Sekolah</span>
                         </a>
+                        @if(auth()->user()->isSuperAdmin())
+                            <a href="{{ route('admin.settings.edit') }}" class="px-2 py-1 font-semibold hover:text-blue-600 {{ request()->routeIs('admin.settings.*') ? 'text-blue-600' : 'text-slate-600' }}">Pengaturan Sistem</a>
+                        @endif
                         <a href="{{ route('admin.users.index') }}" class="{{ $mLinkBase }} {{ request()->routeIs('admin.users.*') ? $mLinkActive : $mLinkIdle }}">
                             <span>Semua Pengguna</span>
                         </a>
