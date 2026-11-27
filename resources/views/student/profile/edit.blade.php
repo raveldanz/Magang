@@ -326,6 +326,7 @@
                                         :selected="$selectedUniversity"
                                         :allow-custom="true"
                                         custom-name="custom_university_name"
+                                        custom-label="[+] Sekolah/kampus tidak ada? Tambahkan manual"
                                         label="Asal Kampus / Sekolah"
                                         placeholder="-- Cari nama kampus/sekolah atau singkatan (misal: UNESA, ITS, SMKN 1 Surabaya) --"
                                         :required="true"
@@ -335,7 +336,7 @@
 
                                     @if (session('university_suggestions'))
                                         <div class="mt-2 p-3 rounded-xl bg-blue-50 border border-blue-200 space-y-2">
-                                            <p class="text-[11px] font-bold text-blue-900">Apakah maksud Anda salah satu kampus ini? Klik untuk memakai &amp; menyimpan:</p>
+                                            <p class="text-[11px] font-bold text-blue-900">Apakah maksud Anda salah satu sekolah/kampus ini? Klik untuk memakai &amp; menyimpan:</p>
                                             <div class="flex flex-wrap gap-1.5">
                                                 @foreach (session('university_suggestions') as $suggestion)
                                                     <button type="submit" name="university_id" value="{{ $suggestion['id'] }}"
@@ -346,7 +347,7 @@
                                             </div>
                                             <label class="flex items-start gap-2 text-[11px] text-slate-700">
                                                 <input type="checkbox" name="confirm_new_university" value="1" class="mt-0.5 rounded border-slate-300 text-amber-600 focus:ring-amber-500">
-                                                <span>Bukan, kampus saya <strong>berbeda</strong> - tetap daftarkan "{{ old('custom_university_name') }}" sebagai kampus baru (akan diverifikasi Admin).</span>
+                                                <span>Bukan, sekolah/kampus saya <strong>berbeda</strong> - tetap daftarkan "{{ old('custom_university_name') }}" sebagai data baru (akan diverifikasi Admin).</span>
                                             </label>
                                         </div>
                                     @endif

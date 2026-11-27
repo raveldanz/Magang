@@ -91,6 +91,20 @@ flowchart TD
 
 ## 🚀 Panduan Instalasi & Menjalankan Aplikasi
 
+### Cara cepat di Windows
+
+Siapkan PHP 8.3+, Composer, dan Node.js, lalu:
+
+1. `git clone https://github.com/raveldanz/Magang.git`
+2. Klik dua kali `PASANG.bat` (sekali saja, butuh internet). Tanpa pengaturan tambahan aplikasi memakai SQLite. Untuk PostgreSQL, salin `.env.example` menjadi `.env` dan isi bagian `DB_*` **sebelum** menjalankan `PASANG.bat`.
+3. Klik dua kali `start_demo.bat`.
+
+Sesudah `git pull`, jalankan `PERBARUI.bat`. Skrip ini memasang paket baru dan memperbarui database tanpa menghapus data.
+
+Data sekolah ikut dari berkas `database/data/schools_snapshot.json.gz`. Pembaruan berikutnya lewat tombol **Muat/Perbarui dari API** di menu Kampus & Sekolah (Super Admin) atau jadwal mingguan. Data yang diketik manual di komputer lain tidak ikut lewat GitHub.
+
+### Pemasangan manual
+
 ### 1. Kloning Repositori
 ```bash
 git clone https://github.com/raveldanz/Magang.git
@@ -103,7 +117,7 @@ composer install
 npm install
 ```
 
-Untuk instalasi dengan aset frontend yang sudah dibangun, jalankan `npm ci --omit=dev` untuk memasang `pdf-lib`. PHP memanggil `node` dari PATH server untuk menggabungkan dokumen kelompok.
+> **Penting:** jalankan `npm install` lagi setiap kali `package.json` berubah, termasuk sesudah mengambil kode terbaru. Jika terlewat, muncul galat seperti `Failed to resolve import "pdf-lib"`. Gabung PDF kelompok berjalan di peramban, jadi server tidak perlu menjalankan Node.js.
 
 ### 3. Konfigurasi Environment (`.env`)
 Salin file template `.env.example` menjadi `.env`:

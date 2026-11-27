@@ -395,10 +395,12 @@ proxy otomatis, alamat lokal biasanya tetap langsung; bila tidak, tambahkan alam
 <?= $table(['Data', 'Asal', 'Butuh internet?'], [
     ['Kampus / perguruan tinggi', 'Daftar bawaan di dalam aplikasi (252 kampus) + kampus yang ditambahkan Super Admin/peserta.', '<b>Tidak</b>'],
     ['Sekolah demo (SMKN 7, dll.) &amp; sekolah Jawa Timur bawaan', 'Ikut di database zip / diimpor saat persiapan.', '<b>Tidak</b>'],
-    ['SMA/SMK/SLB se-Indonesia (&plusmn;25.000)', 'Direktori sekolah publik di internet (api-sekolah-indonesia.vercel.app).', 'Ya, hanya saat mengambil'],
+    ['SMA/SMK/SLB se-Indonesia (&plusmn;25.000)', 'Ikut dari berkas data awal di dalam aplikasi; pembaruan dari direktori publik (api-sekolah-indonesia.vercel.app).', 'Hanya saat memperbarui'],
     ['Madrasah Aliyah (MA)', 'Tidak tersedia di direktori (di bawah Kemenag).', 'Diketik manual'],
 ], ['30%', '50%', '20%']) ?>
 <ul>
+    <li><b>Data awal tanpa internet:</b> <?= $code('php\\php.exe artisan institutions:import-snapshot') ?> (dijalankan otomatis saat persiapan; aman diulang).</li>
+    <li><b>Tombol admin:</b> menu Kampus &amp; Sekolah &rarr; <b>Muat/Perbarui dari API</b> (Super Admin). Perubahan nama/alamat menunggu persetujuan.</li>
     <li><b>Otomatis:</b> selama demo menyala, penjadwal memeriksa tiap jam; bila belum pernah atau sudah &ge; 7 hari, daftar sekolah se-Indonesia
         diambil (3&ndash;5 menit, berjalan di latar, peserta tidak terganggu). Bila tidak ada internet, dicoba lagi jam berikutnya. Data lama tidak dihapus.</li>
     <li><b>Tanpa internet tetap aman:</b> pendaftaran tetap jalan. Sekolah/kampus yang tidak ada di daftar bisa <b>diketik manual</b>,
@@ -411,7 +413,7 @@ proxy otomatis, alamat lokal biasanya tetap langsung; bila tidak, tambahkan alam
     <li><b>Mengambil manual</b> (opsional, saat demo mati): Command Prompt di folder SIP-MAGANG &rarr;
         <?= $code('php\\php.exe artisan institutions:sync-external') ?>.</li>
 </ul>
-<p class="muted">Yang dikirim ke internet hanya permintaan daftar sekolah (nama provinsi/kata kunci). Data peserta, akun, dan berkas tidak pernah dikirim keluar.</p>
+<p class="muted">Yang dikirim ke internet hanya permintaan daftar sekolah dan kampus; ketikan pencarian peserta tidak dikirim. Data peserta, akun, dan berkas tidak pernah dikirim keluar.</p>
 
 <!-- ===================== 10. ISI ZIP ===================== -->
 <div class="page-break"></div>

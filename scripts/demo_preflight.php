@@ -268,6 +268,12 @@ if (! $checkOnly && ! $errors) {
         ? $say('SEKOLAH', 'Daftar sekolah (SMA/SMK/MA) siap dipilih di profil peserta.')
         : $warnings[] = 'Impor daftar sekolah gagal; pilihan sekolah di profil peserta bisa kosong:'.PHP_EOL.$out;
 
+    // Sekolah se-Indonesia dari file bawaan proyek (tanpa internet); aman diulang.
+    [$code, $out] = $artisan('institutions:import-snapshot');
+    if ($code !== 0) {
+        $warnings[] = 'Impor data awal sekolah gagal; daftar sekolah akan dilengkapi sinkron saat ada internet:'.PHP_EOL.$out;
+    }
+
     // 5. Tautan public/storage (junction Windows tidak ikut ter-zip dengan benar) -----------
     $link = $base.'/public/storage';
     $target = realpath($base.'/storage/app/public');

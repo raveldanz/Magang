@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AuditLogController as AdminAuditLogController;
 use App\Http\Controllers\Admin\CertificateController as AdminCertificateController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\GroupDocumentBundleController;
+use App\Http\Controllers\Admin\InstitutionSyncController;
 use App\Http\Controllers\Admin\LogbookController as AdminLogbookController;
 use App\Http\Controllers\Admin\MentorController as AdminMentorController;
 use App\Http\Controllers\Admin\PlacementAssignmentController;
@@ -79,6 +80,11 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::resource('/admin/users', AdminUserController::class)->names('admin.users');
 
     // Master Perguruan Tinggi (Universitas)
+    // Sinkron direktori & usul perubahan (khusus Super Admin; harus sebelum route /admin/universities/{id})
+    Route::get('/admin/universities/sync/status', [InstitutionSyncController::class, 'status'])->name('admin.universities.sync.status');
+    Route::get('/admin/universities/sync/proposals', [InstitutionSyncController::class, 'proposals'])->name('admin.universities.sync.proposals');
+    Route::post('/admin/universities/sync/proposals', [InstitutionSyncController::class, 'decide'])->name('admin.universities.sync.decide');
+    Route::post('/admin/universities/sync', [InstitutionSyncController::class, 'start'])->name('admin.universities.sync.start');
     Route::post('/admin/universities/quick-import', [AdminUniversityController::class, 'quickImport'])->name('admin.universities.quick_import');
     Route::post('/admin/universities/{id}/create-account', [AdminUniversityController::class, 'createAccount'])->name('admin.universities.create_account');
     Route::post('/admin/universities/{id}/verify', [AdminUniversityController::class, 'verify'])->name('admin.universities.verify');

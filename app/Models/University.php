@@ -6,6 +6,7 @@ use App\Services\UniversityResolver;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class University extends Model
@@ -33,6 +34,7 @@ class University extends Model
         'dinas_components',
         'dpl_components',
         'institution_type',
+        'directory_synced_at',
     ];
 
     /** Jenis institusi asal peserta magang (kolom institution_type). */
@@ -51,6 +53,7 @@ class University extends Model
         'weight_mentor' => 'integer',
         'weight_lecturer' => 'integer',
         'require_dpl' => 'boolean',
+        'directory_synced_at' => 'datetime',
         'is_verified' => 'boolean',
         'dinas_components' => 'array',
         'dpl_components' => 'array',
@@ -163,6 +166,12 @@ class University extends Model
 
     protected static function booted(): void
     {
+        static::deleted(function (University $school) {
+            if ($school->isSchool() && preg_match('/^\d{8}$/D', (string) $school->code)) {
+                DB::table('excluded_school_codes')->insertOrIgnore(['code' => $school->code]);
+            }
+        });
+
         // Slug otomatis dari nama kampus (dibuat ulang bila nama berubah)
         static::saving(function (University $university) {
             if ($university->isDirty('name') || empty($university->slug)) {
@@ -218,6 +227,14 @@ class University extends Model
     public function institutionTypeLabel(): string
     {
         return $this->isSchool() ? 'Sekolah' : 'Perguruan Tinggi';
+    }
+
+    /** Kota dari alamat berformat "jalan, kota, provinsi"; null bila formatnya tidak demikian. */
+    public function cityLabel(): ?string
+    {
+        $parts = array_values(array_filter(array_map('trim', explode(',', (string) $this->address))));
+
+        return count($parts) >= 3 ? $parts[count($parts) - 2] : null;
     }
 
     /**

@@ -29,35 +29,28 @@
         </p>
     </div>
 
-    @php
-        // Hanya nama institusi yang sudah diverifikasi yang ditawarkan; nama baru tetap boleh diketik.
-        // Master sekolah berisi puluhan ribu sekolah se-Indonesia (direktori NPSN), jadi saran dibatasi ke kampus,
-        // sekolah di Jawa Timur, dan institusi yang sudah punya pengguna. Nama/NPSN lain tetap dicocokkan persis saat daftar.
-        $likeOp = \Illuminate\Support\Facades\DB::getDriverName() === 'pgsql' ? 'ilike' : 'like';
-        $institutionNames = \App\Models\University::where('is_verified', true)
-            ->where(fn($q) => $q->where('institution_type', '!=', \App\Models\University::TYPE_SCHOOL)
-                ->orWhereNull('institution_type')
-                ->orWhere('address', $likeOp, '%Jawa Timur%')
-                ->orWhereIn('id', \App\Models\User::whereNotNull('university_id')->select('university_id')))
-            ->orderBy('name')
-            ->pluck('name')
-            ->values()
-            ->all();
-    @endphp
 
     <div class="bg-white p-5 sm:px-8 sm:py-6 shadow-xl shadow-slate-200/60 rounded-3xl border border-slate-200/80"
         x-data="{
             roleType: @js(old('register_as') === 'advisor' ? 'advisor' : 'student'),
             institutionQuery: @js((string) old('university', '')),
             institutionOpen: false,
-            institutions: @js($institutionNames),
-            get filteredInstitutions() {
-                const q = (this.institutionQuery || '').trim().toLowerCase();
-                if (!q) return this.institutions.slice(0, 20);
-                return this.institutions.filter((name) => name.toLowerCase().includes(q)).slice(0, 25);
+            selectedCode: '',
+            filteredInstitutions: [],
+            async loadInstitutions() {
+                const query = this.institutionQuery.trim();
+                try {
+                    const response = await fetch(@js(route('register.institutions')) + '?q=' + encodeURIComponent(query));
+                    if (!response.ok) throw new Error();
+                    const result = await response.json();
+                    if (this.institutionQuery.trim() === query) this.filteredInstitutions = result.data;
+                } catch {
+                    if (this.institutionQuery.trim() === query) this.filteredInstitutions = [];
+                }
             },
-            pickInstitution(name) {
-                this.institutionQuery = name;
+            pickInstitution(inst) {
+                this.institutionQuery = inst.name;
+                this.selectedCode = inst.id;
                 this.$refs.institutionInput.focus();
                 this.institutionOpen = false;
             }
@@ -121,16 +114,17 @@
                     ASAL PERGURUAN TINGGI / SEKOLAH <span class="text-rose-500">*</span>
                 </label>
                 <div class="relative mt-1.5">
+                    <input type="hidden" name="selected_institution_id" :value="selectedCode" :disabled="roleType !== 'advisor'">
                     <input type="text" id="university" name="university" x-ref="institutionInput"
                         x-model="institutionQuery" role="combobox" aria-autocomplete="list"
                         aria-controls="institution-list" :aria-expanded="institutionOpen.toString()"
                         @keydown.down.prevent="institutionOpen = true; $nextTick(() => $refs.institutionList.querySelector('button')?.focus())"
-                        @focus="institutionOpen = true" @input="institutionOpen = true; $el.setCustomValidity('')"
+                        @focus="institutionOpen = true; loadInstitutions()" @input.debounce.250ms="loadInstitutions()" @input="selectedCode = ''; filteredInstitutions = []; institutionOpen = true; $el.setCustomValidity('')"
                         autocomplete="off" :required="roleType === 'advisor'" :disabled="roleType !== 'advisor'"
                         placeholder="Ketik atau pilih Kampus / SMK asal..."
                         oninvalid="this.setCustomValidity('Harap isi nama Perguruan Tinggi atau Sekolah asal Anda.')"
                         class="block w-full min-h-[44px] rounded-xl bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 text-sm shadow-2xs py-2.5 pl-3.5 pr-10 transition" />
-                    <button type="button" @click="institutionOpen = !institutionOpen" :disabled="roleType !== 'advisor'"
+                    <button type="button" @click="institutionOpen = !institutionOpen; if (institutionOpen) loadInstitutions()" :disabled="roleType !== 'advisor'"
                         aria-label="Tampilkan daftar perguruan tinggi atau sekolah" tabindex="-1"
                         class="absolute top-0 right-0 h-11 w-11 sm:w-10 flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer">
                         <svg class="w-4 h-4 transition-transform duration-150"
@@ -150,14 +144,14 @@
                         x-ref="institutionList" role="listbox" aria-label="Pilihan instansi pendidikan"
                         class="relative sm:absolute sm:left-0 sm:right-0 sm:top-full mt-1.5 z-30 w-full max-w-full bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
                         <div class="max-h-56 overflow-y-auto scrollbar-thin divide-y divide-slate-100">
-                            <template x-for="inst in filteredInstitutions" :key="inst">
+                            <template x-for="inst in filteredInstitutions" :key="inst.id">
                                 <button type="button" role="option"
-                                    :aria-selected="(inst === institutionQuery).toString()"
+                                    :aria-selected="(inst.id === selectedCode).toString()"
                                     @keydown.down.prevent="$el.nextElementSibling?.closest('button')?.focus()"
                                     @keydown.up.prevent="($el.previousElementSibling?.closest('button') || $refs.institutionInput).focus()"
                                     @click="pickInstitution(inst)"
                                     class="w-full min-h-[44px] text-left px-3.5 py-2.5 text-sm text-slate-800 hover:bg-blue-50 hover:text-blue-700 transition cursor-pointer whitespace-normal break-words leading-snug">
-                                    <span x-text="inst"></span>
+                                    <span x-text="inst.name"></span> <small x-text="inst.meta"></small>
                                 </button>
                             </template>
                             <div x-show="filteredInstitutions.length === 0"

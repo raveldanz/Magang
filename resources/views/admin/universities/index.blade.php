@@ -25,6 +25,10 @@
     <div class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
+            @if($isSuperAdmin)
+                @include('admin.universities.partials.sync-panel')
+            @endif
+
             <!-- Flash Alert Success -->
             @if (session('success') && !session('new_university_credential'))
                 <div
@@ -248,7 +252,7 @@
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                                 <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-600"></span>
                             </span>
-                            <span>Ditemukan di Direktori Nasional (API & Master Kemendikbud):</span>
+                            <span>Ditemukan di Data Bawaan:</span>
                         </div>
                         <span class="text-[11px] font-semibold text-blue-700 bg-blue-100/80 px-2.5 py-0.5 rounded-full">
                             {{ $externalSuggestions->count() }} institusi tersedia
@@ -414,23 +418,21 @@
                             </form>
 
                             {{-- Gabungkan ke kampus terdaftar bila ternyata dobel (salah ketik / singkatan) --}}
-                            @php
-                                $suggestedIds = $mergeSuggestions[$univ->id] ?? [];
-                                $mergeOptions = ($verifiedOptions ?? collect())->sortBy(fn ($o) => in_array($o->id, $suggestedIds) ? array_search($o->id, $suggestedIds) : 999)->values();
-                            @endphp
-                            @if ($mergeOptions->isNotEmpty())
+                            @php $suggested = $mergeSuggestions[$univ->id] ?? []; @endphp
                                 <form method="POST" action="{{ route('admin.universities.merge', $univ->id) }}" class="m-0 mb-2 space-y-1.5">
                                     @csrf
-                                    @if (!empty($suggestedIds))
-                                        <p class="text-[10px] font-bold text-blue-700">Kemungkinan dobel dengan kampus terdaftar (ditandai ★)</p>
+                                    @if (!empty($suggested))
+                                        <p class="text-[10px] font-bold text-blue-700">Kemungkinan dobel dengan: {{ collect($suggested)->pluck('name')->join(', ') }}</p>
                                     @endif
-                                    <div class="flex items-center gap-1.5">
-                                        <select name="target_university_id" required class="flex-1 min-w-0 min-h-[44px] sm:min-h-0 text-[11px] border-slate-200 rounded-xl py-2">
-                                            <option value="">Gabungkan ke…</option>
-                                            @foreach ($mergeOptions as $opt)
-                                                <option value="{{ $opt->id }}" @selected(($suggestedIds[0] ?? null) === $opt->id)>{{ in_array($opt->id, $suggestedIds) ? '★ ' : '' }}{{ $opt->name }}{{ ($opt->acronym ?? $opt->code) ? ' (' . ($opt->acronym ?? $opt->code) . ')' : '' }}</option>
-                                            @endforeach
-                                        </select>
+                                    <div class="space-y-1.5">
+                                        <x-searchable-select
+                                            name="target_university_id"
+                                            :id="'merge_target_'.$univ->id"
+                                            :items="$suggested"
+                                            :remote-url="route('institutions.search')"
+                                            :selected="$suggested[0]['id'] ?? null"
+                                            placeholder="Gabungkan ke… (ketik nama tujuan)"
+                                        />
                                         <button type="button"
                                             @click="$dispatch('open-confirm-modal', {
                                                 form: $el.form,
@@ -441,12 +443,11 @@
                                                 desc: 'Tindakan ini tidak dapat dibatalkan.',
                                                 confirmText: 'Ya, Gabungkan'
                                             })"
-                                            class="shrink-0 inline-flex items-center justify-center min-h-[44px] sm:min-h-0 py-2 px-3 rounded-xl border border-blue-300 text-blue-700 bg-white hover:bg-blue-50 font-bold text-[11px] transition cursor-pointer">
+                                            class="w-full inline-flex items-center justify-center min-h-[44px] sm:min-h-0 py-2 px-3 rounded-xl border border-blue-300 text-blue-700 bg-white hover:bg-blue-50 font-bold text-[11px] transition cursor-pointer">
                                             Gabungkan
                                         </button>
                                     </div>
                                 </form>
-                            @endif
                         @endif
                         <div class="flex items-center gap-2 pt-2">
                             @if($isSuperAdmin && !$univ->universityAdmin)

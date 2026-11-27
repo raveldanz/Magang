@@ -2,17 +2,18 @@
 
 namespace App\Console\Commands;
 
+use App\Exceptions\SyncAlreadyRunning;
+use App\Services\Directory\CollegeDirectoryClient;
 use App\Services\Directory\SchoolDirectoryClient;
-use App\Services\MasterUniversityService;
+use App\Services\Institutions\InstitutionSyncService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class SyncExternalInstitutions extends Command
 {
     protected $signature = 'institutions:sync-external
+        {--kind=school : Jenis direktori (school atau college)}
         {--form=* : Bentuk sekolah yang disinkronkan (default: SMA, SMK, MA, SMLB)}
         {--per-page=1000 : Jumlah data per permintaan ke API}
         {--max-pages=0 : Batas halaman per bentuk (0 = semua), berguna untuk uji coba}';
@@ -22,15 +23,20 @@ class SyncExternalInstitutions extends Command
     /** Waktu sinkron penuh terakhir (disk privat 'local'). */
     public const STAMP_FILE = 'sync/institutions-external-last.txt';
 
-    public static function lastFullSync(): ?Carbon
+    public static function stampFile(string $kind): string
+    {
+        return $kind === 'college' ? 'sync/colleges-external-last.txt' : self::STAMP_FILE;
+    }
+
+    public static function lastFullSync(string $kind = 'school'): ?Carbon
     {
         $disk = Storage::disk('local');
-        if (! $disk->exists(self::STAMP_FILE)) {
+        if (! $disk->exists(self::stampFile($kind))) {
             return null;
         }
 
         try {
-            return Carbon::parse(trim((string) $disk->get(self::STAMP_FILE)));
+            return Carbon::parse(trim((string) $disk->get(self::stampFile($kind))));
         } catch (\Throwable) {
             return null;
         }
@@ -40,66 +46,62 @@ class SyncExternalInstitutions extends Command
      * Sinkron dianggap jatuh tempo bila belum pernah sinkron penuh atau sudah lewat $days hari.
      * Penjadwal memeriksanya tiap jam, sehingga laptop yang mati pada jadwal mingguan tetap menyusul.
      */
-    public static function isDue(int $days = 7): bool
+    public static function isDue(int $days = 7, string $kind = 'school'): bool
     {
-        $last = self::lastFullSync();
+        $last = self::lastFullSync($kind);
 
         return $last === null || $last->lte(now()->subDays($days));
     }
 
-    public function handle(SchoolDirectoryClient $client, MasterUniversityService $service): int
+    public function handle(SchoolDirectoryClient $client, InstitutionSyncService $sync, CollegeDirectoryClient $colleges): int
     {
-        if (! $client->enabled()) {
-            $this->warn('Direktori sekolah dinonaktifkan (SCHOOL_DIRECTORY_ENABLED / SCHOOL_DIRECTORY_URL).');
+        $kind = $this->option('kind');
+        if (! in_array($kind, ['school', 'college'], true)) {
+            $this->error('Jenis direktori tidak dikenal.');
+
+            return Command::FAILURE;
+        }
+        if (! ($kind === 'college' ? $colleges : $client)->enabled()) {
+            $this->warn('Direktori yang dipilih dinonaktifkan.');
 
             return Command::SUCCESS;
         }
 
-        $forms = array_map('strtoupper', $this->option('form') ?: SchoolDirectoryClient::FORMS);
-        $perPage = max(50, min(1000, (int) $this->option('per-page')));
-        $maxPages = max(0, (int) $this->option('max-pages'));
-        $totals = ['created' => 0, 'updated' => 0, 'skipped' => 0];
-        $failed = false;
+        try {
+            $run = $sync->start(
+                'schedule',
+                kind: $kind,
+                forms: array_map('strtoupper', $this->option('form')),
+                perPage: max(50, min(1000, (int) $this->option('per-page'))),
+                maxPages: max(0, (int) $this->option('max-pages')),
+            );
+        } catch (SyncAlreadyRunning $e) {
+            $this->warn($e->getMessage().' Dilewati.');
 
-        foreach ($forms as $form) {
-            $page = 1;
-            do {
-                $result = $client->page($form, $page, $perPage);
-                if ($result === null) {
-                    // API gagal: hentikan bentuk ini, data lokal tetap utuh dan percobaan berikutnya melanjutkan.
-                    $this->error("Gagal mengambil {$form} halaman {$page}; dilewati.");
-                    $failed = true;
-                    break;
-                }
-
-                DB::transaction(function () use ($result, $service, &$totals) {
-                    foreach ($result['rows'] as $row) {
-                        if ($row['npsn'] === '' || $row['name'] === '') {
-                            $totals['skipped']++;
-
-                            continue;
-                        }
-                        $totals[$service->upsertDirectorySchool($row)['created'] ? 'created' : 'updated']++;
-                    }
-                });
-
-                $lastPage = (int) ceil($result['total'] / $perPage);
-                $this->line("{$form}: halaman {$page}/{$lastPage} ({$result['total']} sekolah)");
-                $page++;
-            } while ($page <= $lastPage && ($maxPages === 0 || $page <= $maxPages));
+            return Command::SUCCESS;
         }
 
-        // Hanya sinkron penuh yang dicatat: uji coba --max-pages/--form tidak boleh menunda sinkron mingguan.
-        $isFullRun = $maxPages === 0 && array_diff(SchoolDirectoryClient::FORMS, $forms) === [];
-        if (! $failed && $isFullRun) {
-            $stamp = now()->toIso8601String();
-            Cache::forever('institutions:last-external-sync', $stamp);
-            // Cache dikosongkan setiap demo dimulai (optimize:clear), jadi penanda utama disimpan di berkas.
-            Storage::disk('local')->put(self::STAMP_FILE, $stamp);
+        try {
+            $step = $sync->firstStep($run);
+            while ($step !== null) {
+                $current = $step;
+                $step = $sync->processStep($run, $current['step'], $current['page']);
+                $this->line("{$current['step']}: halaman {$current['page']}".($run->last_page ? "/{$run->last_page}" : ''));
+            }
+        } catch (\Throwable $e) {
+            $sync->fail($run, 'Sinkron berhenti karena galat: '.mb_substr($e->getMessage(), 0, 200));
+
+            throw $e;
         }
 
-        $this->info("Selesai: {$totals['created']} baru, {$totals['updated']} diperbarui, {$totals['skipped']} dilewati.");
+        $run->refresh();
+        $this->info("Selesai: {$run->created_count} baru, {$run->updated_count} dilengkapi, {$run->skipped_count} dilewati.");
+        if ($run->status === 'failed') {
+            $this->error((string) $run->message);
 
-        return $failed ? Command::FAILURE : Command::SUCCESS;
+            return Command::FAILURE;
+        }
+
+        return Command::SUCCESS;
     }
 }

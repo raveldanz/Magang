@@ -45,7 +45,7 @@ class AdminUniversityQuickImportTest extends TestCase
 
         $res = $this->actingAs($admin)->get(route('admin.universities.index', ['search' => 'smkn 10']));
         $res->assertOk();
-        $res->assertSee('Ditemukan di Direktori Nasional');
+        $res->assertSee('Ditemukan di Data Bawaan');
         $res->assertSee('SMK NEGERI 10 SURABAYA');
     }
 }

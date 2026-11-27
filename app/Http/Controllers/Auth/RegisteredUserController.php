@@ -7,11 +7,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\University;
 use App\Models\User;
+use App\Services\UniversityResolver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
@@ -45,7 +47,13 @@ class RegisteredUserController extends Controller
 
             if ($isAdvisor) {
                 // Nama/akronim yang dikenal (mis. "unesa") dipakai ulang; nama baru masuk daftar verifikasi Super Admin.
-                $institution = University::findOrCreateUnverified($request->validated('university'));
+                $name = $request->validated('university');
+                $id = $request->validated('selected_institution_id');
+                $institution = $id ? University::whereKey($id)->where('is_verified', true)->where('status', 'active')->where('name', $name)->first() : null;
+                if ($id && ! $institution) {
+                    throw ValidationException::withMessages(['university' => 'Pilihan institusi berubah. Silakan pilih kembali.']);
+                }
+                $institution ??= $this->advisorInstitution($name);
                 $data['university_id'] = $institution->id;
                 $data['university'] = $institution->name;
                 $data['status'] = AccountStatus::PENDING->value;
@@ -64,5 +72,36 @@ class RegisteredUserController extends Controller
         }
 
         return redirect()->route('student.profile.edit')->with('success', 'Akun berhasil dibuat! Silakan lengkapi profil Anda.');
+    }
+
+    /**
+     * Institusi akun Pembimbing. Bila beberapa institusi bernama sama, kota wajib disebut ("Nama · Kota")
+     * agar akun tidak menempel ke sekolah yang salah. Kota yang tidak cocok menjadi data baru untuk diverifikasi.
+     *
+     * @throws ValidationException
+     */
+    private function advisorInstitution(string $typed): University
+    {
+        [$name, $city] = array_pad(array_map('trim', explode('·', $typed, 2)), 2, '');
+        $same = app(UniversityResolver::class)->sameNamed($name);
+
+        if ($city === '' && $same->count() > 1) {
+            $options = $same->map(fn (University $u) => $u->cityLabel())->filter()->unique()
+                ->take(15)->map(fn (string $label) => "\"{$name} · {$label}\"")->implode(', ');
+
+            throw ValidationException::withMessages([
+                'university' => "Ada beberapa sekolah/kampus bernama \"{$name}\". Tambahkan nama kota setelah tanda ·"
+                    .($options !== '' ? ", contoh: {$options}." : '.'),
+            ]);
+        }
+
+        if ($city !== '') {
+            $inCity = $same->filter(fn (University $u) => UniversityResolver::normalize($u->cityLabel()) === UniversityResolver::normalize($city));
+            if ($inCity->count() === 1) {
+                return University::findOrFail($inCity->first()->id);
+            }
+        }
+
+        return University::findOrCreateUnverified($typed);
     }
 }

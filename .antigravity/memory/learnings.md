@@ -4649,3 +4649,14 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   1. Setiap perubahan alur demo diuji dari zip yang diekstrak di folder baru (bukan folder kerja), untuk SQLite dan PostgreSQL, termasuk crawl semua role.
   2. Klien HTTPS di aplikasi tidak boleh bergantung pada `php.ini` mesin target: sertakan CA bundle sendiri.
   3. Penyambung ke DB eksternal butuh akses ke database `postgres` untuk membuat DB; dokumentasikan `pg_hba.conf` dengan database `all` saat penyiapan.
+
+### [LRN-167] Pencarian Institusi Lambat Tak Menentu; Sekolah Bernama Sama Terlewat Saat Sinkron
+- **Date:** 2026-11-25
+- **Problem / Symptom:** Kecepatan cari sekolah/kampus naik turun (database 11-95 ms, API 0,7-5,8 detik). Sinkron juga tidak menyimpan sekolah baru yang namanya sama dengan baris lain. Teman tim mendapat `Failed to resolve import "pdf-lib"`. Repo publik memuat PDF tugas pribadi sebagai berkas contoh.
+- **Root Cause:** API dipanggil di dalam permintaan pencarian saat hasil lokal sedikit; `upsertDirectorySchool` menganggap nama sama = sekolah sama walau NPSN berbeda; `npm install` tidak diulang setelah dependensi baru; seeder memakai unggahan asli sebagai contoh.
+- **Fix Applied:** Pencarian hanya database; sinkron per langkah dengan status dan kunci (tombol Super Admin + jadwal); perbedaan nama/alamat menjadi usul; pencocokan nama hanya untuk baris tanpa kode; `database/data/schools_snapshot.json.gz` + `institutions:import-snapshot`; `PASANG.bat`/`PERBARUI.bat`; berkas contoh dibuat `DemoSampleFilesSeeder`.
+- **Prevention Rule:**
+  1. Jalur yang ditunggu pengguna saat mengetik tidak boleh memanggil API pihak ketiga.
+  2. NPSN adalah identitas sekolah; ratusan nama dipakai lebih dari satu sekolah.
+  3. Berkas contoh harus buatan kode. Jangan pernah memakai unggahan asli, karena repo bersifat publik.
+  4. Sesudah menarik kode yang mengubah dependensi, jalankan `PERBARUI.bat`.

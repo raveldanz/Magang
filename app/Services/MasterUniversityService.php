@@ -3,8 +3,6 @@
 namespace App\Services;
 
 use App\Models\University;
-use App\Services\Directory\CollegeDirectoryClient;
-use App\Services\Directory\SchoolDirectoryClient;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -21,13 +19,7 @@ class MasterUniversityService
 
     protected ?array $schoolData = null;
 
-    public function __construct(
-        private UniversityResolver $resolver,
-        private SchoolDirectoryClient $directory,
-        private ?CollegeDirectoryClient $collegeDirectory = null
-    ) {
-        $this->collegeDirectory ??= app(CollegeDirectoryClient::class);
-    }
+    public function __construct(private UniversityResolver $resolver) {}
 
     /**
      * Path ke dataset Master Perguruan Tinggi Indonesia
@@ -155,61 +147,6 @@ class MasterUniversityService
             }
         }
 
-        // 3. Sekolah dari direktori nasional (API) yang belum ada di database lokal; tersimpan saat dipilih.
-        //    Maksimal 5 slot, mengganti entri lokal berskor terendah agar hasil API tidak tertutup kecocokan longgar.
-        if ($this->directory->enabled()) {
-            $knownNpsn = $results->pluck('npsn')->filter()->all();
-            $fromApi = [];
-            foreach ($this->directory->search($keyword, $limit) as $row) {
-                $cleanKey = $this->normalize($row['name']);
-                if ($row['npsn'] === '' || isset($seenKeys[$cleanKey]) || in_array($row['npsn'], $knownNpsn, true)) {
-                    continue;
-                }
-                $seenKeys[$cleanKey] = true;
-                $fromApi[] = $this->schoolItem([
-                    'name' => $row['name'], 'npsn' => $row['npsn'], 'form' => $row['form'],
-                    'address' => $row['address'], 'city' => $row['city'], 'province' => $row['province'],
-                    'status' => $row['status'],
-                ]);
-                if (count($fromApi) >= 5) {
-                    break;
-                }
-            }
-            if ($fromApi !== []) {
-                $results = $results->take(max(0, $limit - count($fromApi)))->concat($fromApi);
-            }
-        }
-
-        // 4. Perguruan tinggi dari direktori nasional/internasional (API) yang belum ada di database lokal
-        if ($this->collegeDirectory?->enabled()) {
-            $fromCollegeApi = [];
-            foreach ($this->collegeDirectory->search($keyword, $limit) as $row) {
-                $cleanKey = $this->normalize($row['name']);
-                if ($row['name'] === '' || isset($seenKeys[$cleanKey])) {
-                    continue;
-                }
-                $seenKeys[$cleanKey] = true;
-                $fromCollegeApi[] = [
-                    'id' => null,
-                    'key' => $row['key'],
-                    'name' => $row['name'],
-                    'code' => $row['acronym'],
-                    'acronym' => $row['acronym'],
-                    'city' => $row['state_province'] ?? 'Indonesia',
-                    'province' => $row['country'] ?? 'Indonesia',
-                    'type' => 'PTN/PTS',
-                    'institution_type' => University::TYPE_COLLEGE,
-                    'is_in_db' => false,
-                ];
-                if (count($fromCollegeApi) >= 5) {
-                    break;
-                }
-            }
-            if ($fromCollegeApi !== []) {
-                $results = $results->take(max(0, $limit - count($fromCollegeApi)))->concat($fromCollegeApi);
-            }
-        }
-
         return $results->take($limit);
     }
 
@@ -226,14 +163,12 @@ class MasterUniversityService
             return ['university' => null, 'created' => false];
         }
 
-        $existing = University::whereRaw('LOWER(name) = ?', [mb_strtolower($name)])
-            ->orWhere(function ($q) use ($name) {
-                $norm = $this->resolver->findExact($name);
-                if ($norm) {
-                    $q->where('id', $norm->id);
-                }
-            })
-            ->first();
+        $colleges = University::query()->where(fn ($query) => $query
+            ->where('institution_type', University::TYPE_COLLEGE)->orWhereNull('institution_type'));
+        $existing = empty($row['official_code']) ? null : (clone $colleges)->where('code', $row['official_code'])->first();
+        if (empty($row['official_code'])) {
+            $existing = $colleges->whereRaw('LOWER(name) = ?', [mb_strtolower($name)])->first();
+        }
 
         if ($existing) {
             $changes = [];
@@ -260,7 +195,7 @@ class MasterUniversityService
             $acronym = mb_substr($letters, 0, 6) ?: 'UNIV';
         }
 
-        $code = $acronym;
+        $code = $row['official_code'] ?? $acronym;
         if (University::where('code', $code)->exists()) {
             $code = $acronym.'-'.rand(100, 999);
         }
@@ -285,48 +220,61 @@ class MasterUniversityService
         return ['university' => $university, 'created' => true];
     }
 
+    /** Alamat berformat "jalan, kota, provinsi" dari satu baris direktori. */
+    public static function cleanDirectoryAddress(?string $address): ?string
+    {
+        return $address === null ? null : trim((string) preg_replace('/\s*\b(?:no\.?\s*)?(?:telp|telepon|hp|wa)\.?\s*:?\s*\+?\d(?:[ ()-]*\d){7,14}/iu', '', $address));
+    }
+
+    public static function directoryAddress(array $row): string
+    {
+        return collect([self::cleanDirectoryAddress($row['address'] ?? null), $row['city'] ?? null, $row['province'] ?? null])
+            ->filter(fn ($part) => trim((string) $part) !== '')->implode(', ');
+    }
+
     /**
      * Upsert satu sekolah dari direktori nasional (data pihak ketiga, bukan input moderator).
-     * Kunci hanya NPSN (kolom code): baris yang sudah ada hanya dilengkapi di kolom kosong dan TIDAK PERNAH
+     * Kuncinya NPSN (kolom code): baris yang sudah ada hanya dilengkapi di kolom kosong dan TIDAK PERNAH
      * diubah is_verified/status/institution_type-nya, sehingga keputusan moderasi admin tidak tertimpa.
-     * Nama yang sama dengan baris lain tanpa NPSN dipakai untuk mengisi NPSN-nya, bukan membuat duplikat.
+     * Saat NPSN tersedia, hanya kecocokan kode yang membuktikan identitas sekolah. Tanpa NPSN, pencocokan hanya lewat nama dan kode dibiarkan kosong.
      *
-     * @param  array{npsn: string, name: string, form?: string, address?: string, city?: string, province?: string, status?: string}  $row
-     * @return array{university: University|null, created: bool}
+     * @param  array{npsn?: string, name: string, form?: string, address?: string, city?: string, province?: string, status?: string}  $row
+     * @return array{university: University|null, created: bool, filled: bool, matched_by: 'npsn'|'name'|null}
      */
     public function upsertDirectorySchool(array $row): array
     {
-        $npsn = trim((string) $row['npsn']);
+        $npsn = trim((string) ($row['npsn'] ?? ''));
         $name = trim((string) $row['name']);
-        if ($npsn === '' || $name === '') {
-            return ['university' => null, 'created' => false];
+        if ($name === '' || ($npsn !== '' && DB::table('excluded_school_codes')->where('code', $npsn)->exists())) {
+            return ['university' => null, 'created' => false, 'filled' => false, 'matched_by' => null];
         }
-        $address = collect([$row['address'] ?? null, $row['city'] ?? null, $row['province'] ?? null])
-            ->filter(fn ($part) => trim((string) $part) !== '')->implode(', ');
+        $address = self::directoryAddress($row);
 
-        $existing = University::where('code', $npsn)->first();
-        if (! $existing) {
-            $sameName = University::whereRaw('LOWER(name) = ?', [mb_strtolower($name)])->first();
-            if ($sameName) {
-                if ($sameName->code === null || $sameName->code === '') {
-                    $sameName->update(['code' => $npsn]);
-                }
+        $existing = $npsn !== '' ? University::where('code', $npsn)->first() : null;
+        $matchedBy = $existing ? 'npsn' : null;
 
-                return ['university' => $sameName, 'created' => false];
-            }
+        if (! $existing && $npsn === '') {
+            $existing = University::whereRaw('LOWER(name) = ?', [mb_strtolower($name)])
+                ->orderBy('id')
+                ->first();
+            $matchedBy = $existing ? 'name' : null;
         }
 
         if ($existing) {
-            if (! $existing->address && $address !== '') {
-                $existing->update(['address' => $address]);
+            $changes = [];
+            if ($matchedBy === 'npsn' && ! $existing->address && $address !== '') {
+                $changes['address'] = $address;
+            }
+            if ($changes !== []) {
+                $existing->update($changes);
             }
 
-            return ['university' => $existing, 'created' => false];
+            return ['university' => $existing, 'created' => false, 'filled' => $changes !== [], 'matched_by' => $matchedBy];
         }
 
         return ['university' => University::create([
             'name' => $name,
-            'code' => $npsn,
+            'code' => $npsn ?: null,
             'address' => $address ?: null,
             'is_verified' => true, // NPSN = identitas resmi satuan pendidikan di registri nasional
             'status' => 'active',
@@ -335,7 +283,7 @@ class MasterUniversityService
             'weight_mentor' => 100,
             'weight_lecturer' => 0,
             'require_dpl' => false,
-        ]), 'created' => true];
+        ]), 'created' => true, 'filled' => false, 'matched_by' => null];
     }
 
     /**
@@ -446,7 +394,11 @@ class MasterUniversityService
     {
         $counts = ['created' => 0, 'updated' => 0];
         DB::transaction(function () use (&$counts) {
+            $excluded = array_fill_keys(DB::table('excluded_school_codes')->pluck('code')->all(), true);
             foreach ($this->allSchools() as $school) {
+                if (isset($excluded[$school['npsn']])) {
+                    continue;
+                }
                 if (trim($school['name'] ?? '') === '' || trim($school['npsn'] ?? '') === '') {
                     continue;
                 }
@@ -505,8 +457,7 @@ class MasterUniversityService
     }
 
     /**
-     * Sekolah: cocokkan lewat NPSN (kode), lalu nama panjang / nama resmi Dapodik (tanpa LIKE),
-     * agar sekolah yang sebelumnya diketik manual oleh peserta ikut terverifikasi, bukan digandakan.
+     * Data sekolah bawaan memakai NPSN untuk mengenali institusi.
      *
      * @param  array<string, mixed>  $item
      * @return array{university: University, created: bool}
@@ -520,10 +471,7 @@ class MasterUniversityService
             ->filter(fn ($part) => trim((string) $part) !== '')
             ->implode(', ');
 
-        $existing = ($npsn !== '' ? University::where('code', $npsn)->first() : null)
-            ?? $this->resolver->findExact($name)
-            ?? ($official !== '' ? $this->resolver->findExact($official) : null)
-            ?? University::whereRaw('LOWER(name) = ?', [mb_strtolower($name)])->first();
+        $existing = $npsn !== '' ? University::where('code', $npsn)->first() : null;
 
         if ($existing) {
             $existing->update(array_filter([

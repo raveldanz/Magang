@@ -48,6 +48,7 @@ class RegisterRequest extends FormRequest
                     }
                 },
             ],
+            'selected_institution_id' => ['nullable', 'integer'],
             'university' => ['nullable', 'required_if:register_as,advisor', 'string', 'max:255'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ];

@@ -70,7 +70,7 @@ class MasterSchoolsTest extends TestCase
         $this->assertSame($schoolCount, University::count(), 'Impor kedua tidak boleh menggandakan sekolah.');
     }
 
-    public function test_sync_reuses_school_typed_manually_by_a_participant(): void
+    public function test_sync_does_not_assign_an_npsn_by_name_alone(): void
     {
         $typed = University::findOrCreateUnverified('SMKN 7 Surabaya');
         $this->assertFalse((bool) $typed->is_verified);
@@ -78,10 +78,11 @@ class MasterSchoolsTest extends TestCase
         $this->service()->syncSchools();
 
         $typed->refresh();
-        $this->assertTrue($typed->is_verified);
+        $this->assertFalse($typed->is_verified);
+        $this->assertNull($typed->code);
         $this->assertTrue($typed->isSchool());
-        // Entri ketikan peserta dipakai untuk SMKN 7 (tidak ada entri kedua dari master)
-        $this->assertSame($this->datasetCount(), University::count());
+        // Admin dapat meninjau kecocokan sebelum menggabungkan entri manual.
+        $this->assertSame($this->datasetCount() + 1, University::count());
     }
 
     public function test_full_sync_marks_campuses_as_colleges(): void

@@ -45,6 +45,29 @@ class ProfileController extends Controller
             $typed = (string) $request->input('custom_university_name');
             $resolver = app(UniversityResolver::class);
 
+            // 0. Beberapa institusi bernama persis sama: jangan dipasangkan sembarang
+            $sameName = $resolver->sameNamed($typed);
+            if ($sameName->count() > 1) {
+                if ($request->boolean('confirm_new_university')) {
+                    $university = University::create([
+                        'name' => University::normalizeName($typed), 'is_verified' => false,
+                        'status' => 'active', 'institution_type' => $this->educationLevel($request),
+                    ]);
+                    $this->recordSelfRegistration($request, $university);
+
+                    return $university;
+                }
+                session()->flash('university_suggestions', $sameName->take(30)->map(fn (University $u) => [
+                    'id' => $u->id,
+                    'name' => implode(' · ', array_filter([$u->name, $u->cityLabel()])),
+                    'acronym' => $u->acronym ?? $u->code,
+                ])->values()->all());
+
+                throw ValidationException::withMessages([
+                    'custom_university_name' => "Ada beberapa sekolah/kampus bernama \"{$typed}\". Pilih yang sesuai dari saran di bawah.",
+                ]);
+            }
+
             // 1. Ternyata sama persis dengan nama/akronim/kode kampus terdaftar → pakai yang ada
             $exact = $resolver->findExact($typed);
             if ($exact) {
@@ -73,10 +96,7 @@ class ProfileController extends Controller
             $university = University::findOrCreateUnverified($typed, $this->educationLevel($request));
 
             if ($university->wasRecentlyCreated) {
-                AuditLog::record('UNIVERSITY_SELF_REGISTER', 'University', $university->id, [
-                    'name' => $university->name,
-                    'registered_by' => $request->user()?->email,
-                ]);
+                $this->recordSelfRegistration($request, $university);
             }
 
             return $university;
@@ -94,6 +114,14 @@ class ProfileController extends Controller
         }
 
         return $university;
+    }
+
+    private function recordSelfRegistration(Request $request, University $university): void
+    {
+        AuditLog::record('UNIVERSITY_SELF_REGISTER', 'University', $university->id, [
+            'name' => $university->name,
+            'registered_by' => $request->user()?->email,
+        ]);
     }
 
     /** Jenjang peserta dari form profil: perguruan_tinggi (bawaan) atau sekolah. */

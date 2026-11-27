@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Console\Commands\SyncExternalInstitutions;
 use App\Models\University;
 use App\Models\User;
+use App\Services\Directory\SchoolDirectoryClient;
 use App\Services\MasterUniversityService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -22,6 +23,13 @@ class ExternalInstitutionSyncTest extends TestCase
             'npsn' => $npsn, 'sekolah' => $name, 'bentuk' => $form, 'status' => 'N',
             'alamat_jalan' => 'Jl. Contoh 1', 'kabupaten_kota' => 'Kota Surabaya', 'propinsi' => 'Prov. Jawa Timur',
         ];
+    }
+
+    public function test_npsn_terverifikasi_mengoreksi_nama_lama_provider(): void
+    {
+        $client = app(SchoolDirectoryClient::class);
+        $row = $client->normalizeRow($this->row('20529953', 'SMA PGRI SUMENEP', 'SMA'));
+        $this->assertSame('SMA CHUNG CHUNG CHRISTIAN SCHOOL SURABAYA', $row['name']);
     }
 
     public function test_sync_menambah_sekolah_baru_dan_memperbarui_tanpa_menghapus(): void
@@ -82,24 +90,6 @@ class ExternalInstitutionSyncTest extends TestCase
         $this->assertDatabaseHas('universities', ['code' => '11111111']);
     }
 
-    public function test_pencarian_menambahkan_sekolah_dari_api_lalu_tersimpan_saat_dipilih(): void
-    {
-        config(['services.school_directory.base_url' => 'https://dir.test', 'services.school_directory.enabled' => true]);
-        Cache::flush();
-        Http::fake(['dir.test/sekolah/s*' => Http::response(['status' => 'success', 'dataSekolah' => [
-            $this->row('90000077', 'SMKN 77 UJI PENCARIAN'),
-        ]])]);
-
-        $service = app(MasterUniversityService::class);
-        $hit = $service->search('uji pencarian', 10)->firstWhere('npsn', '90000077');
-        $this->assertNotNull($hit);
-        $this->assertFalse($hit['is_in_db']);
-        $this->assertDatabaseMissing('universities', ['code' => '90000077']);
-
-        $service->resolveToUniversity($hit);
-        $this->assertDatabaseHas('universities', ['code' => '90000077']);
-    }
-
     public function test_pencarian_tetap_jalan_saat_api_mati(): void
     {
         config(['services.school_directory.base_url' => 'https://dir.test', 'services.school_directory.enabled' => true]);
@@ -125,44 +115,6 @@ class ExternalInstitutionSyncTest extends TestCase
             ->assertJsonPath('data.0.name', 'Universitas Async Uji');
     }
 
-    public function test_get_pencarian_read_only_dan_resolve_hanya_memakai_data_cache_api(): void
-    {
-        config(['services.school_directory.base_url' => 'https://dir.test', 'services.school_directory.enabled' => true]);
-        Cache::flush();
-        Http::fake(['dir.test/sekolah/s*' => Http::response(['status' => 'success', 'dataSekolah' => [$this->row('90000123', 'SMKN 123 ASYNC')]])]);
-        $admin = User::factory()->create(['role' => 'super_admin']);
-
-        $res = $this->actingAs($admin)->getJson(route('institutions.search', ['q' => 'smkn 123 async']))->assertOk();
-        $this->assertSame('npsn:90000123', $res->json('data.0.id'));
-        $this->assertDatabaseMissing('universities', ['code' => '90000123']); // GET tidak menyimpan apa pun
-
-        // NPSN yang tidak pernah dikembalikan API ditolak: pengguna tidak bisa membuat institusi dari isian bebas.
-        $this->actingAs($admin)->postJson(route('institutions.resolve'), ['npsn' => '99999999'])->assertNotFound();
-        $this->assertDatabaseMissing('universities', ['code' => '99999999']);
-
-        $saved = $this->actingAs($admin)->postJson(route('institutions.resolve'), ['npsn' => '90000123'])->assertOk();
-        $this->assertDatabaseHas('universities', ['code' => '90000123', 'name' => 'SMKN 123 ASYNC']);
-        $this->assertSame('SMKN 123 ASYNC', $saved->json('data.name'));
-    }
-
-    public function test_saran_direktori_hanya_jenjang_magang_dan_tidak_muncul_saat_mencari_kampus(): void
-    {
-        config(['services.school_directory.base_url' => 'https://dir.test', 'services.school_directory.enabled' => true]);
-        Cache::flush();
-        Http::fake(['dir.test/sekolah/s*' => Http::response(['status' => 'success', 'dataSekolah' => [
-            $this->row('90000301', 'SMP NEGERI 1 JENJANG', 'SMP'),
-            $this->row('90000302', 'SMA NEGERI 1 JENJANG', 'SMA'),
-        ]])]);
-        $user = User::factory()->create(['role' => 'mahasiswa']);
-
-        $ids = collect($this->actingAs($user)->getJson(route('institutions.search', ['q' => 'jenjang']))->assertOk()->json('data'))->pluck('id');
-        $this->assertTrue($ids->contains('npsn:90000302'));
-        $this->assertFalse($ids->contains('npsn:90000301')); // SMP bukan peserta magang/PKL
-
-        $kampus = $this->actingAs($user)->getJson(route('institutions.search', ['q' => 'jenjang', 'type' => University::TYPE_COLLEGE]))->assertOk();
-        $this->assertSame([], $kampus->json('data')); // memilih kampus tidak menampilkan saran sekolah
-    }
-
     public function test_upsert_direktori_tidak_menimpa_keputusan_moderasi_admin(): void
     {
         // Sekolah yang sengaja dinonaktifkan/diturunkan admin tidak boleh hidup lagi oleh sinkron API.
@@ -179,7 +131,8 @@ class ExternalInstitutionSyncTest extends TestCase
         $this->assertFalse($ditolak->is_verified);
         $this->assertSame('inactive', $ditolak->status);
         $this->assertSame('Jl. Baru', $ditolak->address); // kolom kosong boleh dilengkapi
-        $this->assertSame('90000051', $manual->code);
+        $this->assertNull($manual->code);
+        $this->assertDatabaseHas('universities', ['code' => '90000051', 'is_verified' => true]);
         $this->assertFalse($manual->is_verified);
         $this->assertSame('pending', $manual->status);
         $this->assertSame(University::TYPE_COLLEGE, $manual->institution_type);

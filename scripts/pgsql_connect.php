@@ -102,11 +102,10 @@ try {
 } catch (PDOException $e) {
     $fail('Tidak bisa membuka database "'.$dbName.'": '.preg_replace('/\s+/', ' ', $e->getMessage()));
 }
-$hasUsers = (bool) $pdo->query("SELECT to_regclass('public.users') IS NOT NULL")->fetchColumn()
-    && (int) $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn() > 0;
+$hasTables = (int) $pdo->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = current_schema() AND table_type = 'BASE TABLE'")->fetchColumn() > 0;
 $pdo = null;
 $admin = null;
-if ($hasUsers) {
+if ($hasTables) {
     $say('INFO', 'Database "'.$dbName.'" sudah berisi data: data itu dipakai apa adanya (tidak ditimpa).');
 }
 
@@ -139,13 +138,17 @@ foreach (glob($base.'/bootstrap/cache/*.php') ?: [] as $cached) {
 $say('ENV', '.env kini memakai PostgreSQL ('.$dbName.'@'.$host.':'.$port.').');
 
 // 5. Tabel + data demo ---------------------------------------------------------------------------
-[$code, $out] = $artisan($hasUsers ? 'migrate --force' : 'migrate --force --seed');
+[$code, $out] = $artisan($hasTables ? 'migrate --force' : 'migrate --force --seed');
 if ($code !== 0) {
     $fail('Migrasi database gagal:'.PHP_EOL.$out);
 }
-$say('DB', $hasUsers ? 'Struktur tabel diperbarui.' : 'Tabel dibuat dan data demo diisi (akun demo, kata sandi: password).');
+$say('DB', $hasTables ? 'Struktur tabel diperbarui.' : 'Tabel dibuat dan data demo diisi (akun demo, kata sandi: password).');
 [$code] = $artisan('universities:sync-master --only-schools');
 $say('SEKOLAH', $code === 0 ? 'Daftar sekolah bawaan siap.' : 'Daftar sekolah bawaan gagal diimpor (bisa diulang lewat 1_MULAI_DEMO.bat).');
+[$code] = $artisan('institutions:import-snapshot');
+if ($code !== 0) {
+    $say('PERHATIAN', 'Data awal sekolah gagal diimpor; sinkron akan melengkapinya saat ada internet.');
+}
 
 // 6. Direktori sekolah nasional (butuh internet) -------------------------------------------------
 if ($syncSchools) {
